@@ -1,0 +1,21 @@
+vuex（2.3.1）使用：
+1、引入安装：npm install vuex --save
+2、使用：
+在src 目录下新建store文件夹
+在store文件夹下新建index.js
+在index.js中import Vue 和Vuex
+Vue.use(Vuex)
+export default new Vuex.Store({
+  state:{
+
+  },
+  mutations:{
+
+  }
+})
+在main.js中import store并像router一样导入
+在组件的computed中把来自store的数据导入（如果使用mapState需要在使用前按需加载）
+组件更改数据后需要使用commit进行提交更改
+vuex modules中的坑
+const store = new Vue.Store()会报错（store undefind）
+使用模块时，官网示例不能用，会报错，新建modules文件通过export default暴露，然后在index文件里import，这样才能用

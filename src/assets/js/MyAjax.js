@@ -14,7 +14,7 @@ var MyAjax = {
 			dataType: option.dataType,
 			contentType: option.contentType, 
 			
-			async: true, // 使用同步方式  
+			async: false, // 使用同步方式  
 			success: function(data) {			
 				callback(data);
 			},error:function(error){

@@ -9,12 +9,12 @@
     <div class="languageContainer" v-show="reveal.addLanguage">
       <div class="personal-empty" v-if="reveal.empty">（您尚未添加语言信息）</div>
       <!--显示、编辑已存在的信息开始-->
-      <div class="languageInfo" v-for="(item,index) in this.language">
+      <div class="languageInfo" v-for="(item,index) in language">
         <!--显示信息列表开始-->
         <div class="languageInfoList" v-if="!reveal.editInfo[index]">
           <div class="languageInfoTitle">
             <h4 v-cloak>{{localLanguage.languageName[index]}}</h4>
-            <ul>
+            <ul class="toolsBox">
               <li v-bind:class="{openOrPrivacy:reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
                 <p v-cloak>{{reveal.openOrPrivacyText[index]}}</p>
               </li>
@@ -28,6 +28,11 @@
           </div>
           <div class="languageInfoBody">
             <p v-cloak>{{localLanguage.info.profession[index]}}</p>
+            <ul class="showImg">
+	        		<li v-for="item in picInfo">
+	        			<img :src="item" />
+	        		</li>
+            </ul>
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -48,7 +53,7 @@
               </label>
             </li>
             <li class="img-wrap">
-							<span class="wrap-left">图片展示</span>
+							<span class="wrap-left">上传附件</span>
 							<script type="text/template" id="qq-template-manual-trigger">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 						            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
@@ -239,6 +244,18 @@
           addLanguage:true,//是否添加信息
           keepAddLanguage:true,//添加模式下，保存按钮是否可用
         },
+//      language:{
+//      	"accountID": "string",
+//				  "creAccountID": "string",
+//				  "creTime": "2017-11-15T01:55:55.345Z",
+//				  "ifVisable": 0,
+//				  "pkid": "string",
+//				  "proficiency": "string",
+//				  "proficiencyCode": "string",
+//				  'language':"",
+//				  
+//      },
+        picInfo:[require("../../../assets/img/images/captainmiao1.jpg"),require("../../../assets/img/images/captainmiao2.jpg")],
         localLanguage:{
           languageName:[],
           info:{
@@ -258,6 +275,9 @@
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
       }
     },
+    computed:mapState({
+      language:state=>state.personal.personalMessage.otherSkill.language,
+    }),
     created(){
     	for(var i=0;i<this.language.length;i++){
     		this.fineUploaderId.push("fine-uploader-manual-trigger"+this.language[i].id);
@@ -345,9 +365,7 @@
         Vue.set(this.reveal,"keepAddLanguage",true);//控制保存按钮的背景颜色
       }
     },
-    computed:mapState({
-      language:state=>state.personal.personalMessage.otherSkill.language,
-    }),
+    
     methods:{
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);
@@ -525,10 +543,10 @@
             h4{
               float: left;
             }
-            ul{
+            .toolsBox{
               float: right;
               margin-top:2px;
-              li{
+              >li{
                 float: left;
                 cursor: pointer;
                 margin:0;
@@ -537,38 +555,39 @@
                   color: $themeColor;
                   padding:0 17px 0 12px;
                 }
+                &:nth-child(1){
+	                p{
+	                  padding-left:32px;
+	                  background: url("../../../assets/img/personal/education/eye.png") left center no-repeat;
+	                }
+	              }
+	              &:nth-child(2){
+	                p{
+	                  padding-left:27px;
+	                  background: url("../../../assets/img/personal/education/edit.png") left center no-repeat;
+	                }
+	              }
+	              &.img-wrap{
+						    	/*padding-left: 30px;*/
+						    	>div{
+						    		width: 680px;
+						    		float: left;
+						    	}
+						    }
+						    
+						    &.tip-wrap{
+						    	padding-left: 90px;
+						    	color: #999999;
+						    }
+	              &:last-child{
+	                p{
+	                  padding-right:0;
+	                  padding-left:21px;
+	                  background: url("../../../assets/img/personal/education/delete.png") left center no-repeat;
+	                }
+	              }
               }
-              li:nth-child(1){
-                p{
-                  padding-left:32px;
-                  background: url("../../../assets/img/personal/education/eye.png") left center no-repeat;
-                }
-              }
-              li:nth-child(2){
-                p{
-                  padding-left:27px;
-                  background: url("../../../assets/img/personal/education/edit.png") left center no-repeat;
-                }
-              }
-              li.img-wrap{
-					    	/*padding-left: 30px;*/
-					    	>div{
-					    		width: 680px;
-					    		float: left;
-					    	}
-					    }
-					    
-					    li.tip-wrap{
-					    	padding-left: 90px;
-					    	color: #999999;
-					    }
-              li:last-child{
-                p{
-                  padding-right:0;
-                  padding-left:21px;
-                  background: url("../../../assets/img/personal/education/delete.png") left center no-repeat;
-                }
-              }
+              
               .openOrPrivacy{
                 p{
                   background: url("../../../assets/img/personal/education/hidden.png") left center no-repeat!important;
@@ -591,6 +610,18 @@
             }
             p:last-child{
               margin-bottom:17px;
+            }
+            .showImg{
+            	padding-bottom: 20px;
+            	&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;}
+            	li{
+            		float: left;
+            		margin-right: 10px;
+            		img{
+	            		width: 120px;
+	            	}
+            	}
+            	
             }
           }
         }
@@ -688,8 +719,8 @@
     }
     /*添加信息开始*/
     .languageContainer{
-      ul{
-        li{
+      >ul{
+        >li{
           margin:20px 0;
           .wrap-left{
 		      	line-height: 35px;

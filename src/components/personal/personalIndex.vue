@@ -25,7 +25,7 @@
 				  <div class="cropped"></div>
 				</div>
       </div>
-      <p v-cloak>{{personalMessage.baseInfo.NickName}}</p>
+      <p v-cloak>{{personalMessage.baseInfo.nickName}}</p>
     </div>
     <ul class="personalIndexList">
       <li>
@@ -40,19 +40,19 @@
           <ul v-if="!empty.basicInfo">
             <li>
               <h5>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
-              <p>{{personalMessage.baseInfo.NickName}}</p>
+              <p>{{personalMessage.baseInfo.nickName}}</p>
             </li>
             <li>
               <h5>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
-              <p>{{personalMessage.baseInfo.PsnName}}</p>
+              <p>{{personalMessage.baseInfo.psnName}}</p>
             </li>
             <li>
               <h5>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</h5>
-              <p>{{personalMessage.baseInfo.Sex}}</p>
+              <p>{{personalMessage.baseInfo.sex}}</p>
             </li>
             <li>
               <h5>手机号码：</h5>
-              <p>{{personalMessage.baseInfo.PhoneNumber}}</p>
+              <p>{{personalMessage.baseInfo.phoneNumber}}</p>
             </li>
           </ul>
         </div>
@@ -329,7 +329,7 @@
 			})
     	//上传头像end
     	
-      if(this.personalMessage.baseInfo.NickName.length==0 && this.personalMessage.baseInfo.PsnName.length==0 && this.personalMessage.baseInfo.Sex.length==0){
+      if(this.personalMessage.baseInfo.nickName.length==0 && this.personalMessage.baseInfo.psnName.length==0 && this.personalMessage.baseInfo.sex.length==0){
         Vue.set(this.empty,"basicInfo",true)
       }
       //基础信息部分数据空和非空切换
@@ -436,22 +436,22 @@
     destroyed(){
     	var that = this;
     	var url = "http://10.1.31.6:8080/personalbasicinfo/uploadBase64";
-//  	$.ajax({
-//				type: "POST",
-//				url:url,
-//				data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
-//				dataType: "json",
-////				content-type: "text/plain;charset=UTF-8",
-//				success:function(data){
-//				console.log(data)
-//				data = JSON.stringify(data);
-//				console.log(data)
-////					that.dataInfo = data
-////					console.log(that.dataInfo)
-//				},error:function(err){
-//					console.log(err)
-//				}
-//			})
+//  	var url = "http://10.1.31.6:8080/psnsoftware/upload";
+    	
+    	$.ajax({
+				type: "POST",
+				url:url,
+				data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
+				dataType: "json",
+//				content-type: "text/plain;charset=UTF-8",
+				success:function(data){
+				console.log(data)
+//					that.dataInfo = data
+//					console.log(that.dataInfo)
+				},error:function(err){
+					console.log(err)
+				}
+			})
     	//上传头像
     }
   }

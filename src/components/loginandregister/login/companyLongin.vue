@@ -22,6 +22,7 @@
 <script>
 	import Vue from "vue";
   import {mapState} from "vuex"
+  import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"companyLogin",
     components:{
@@ -42,9 +43,9 @@
     }),
     mounted(){
       sessionStorage.setItem("account","{\"username\":\"123@qq.com\",\"password\":\"123\"}")
-
+			
       var placeholder = 'placeholder' in document.createElement('input');
-      console.log($("input").eq(1))
+//    console.log($("input").eq(1))
       if(!placeholder){
         Vue.set(this.reveal,"username","请输入您的邮箱")
         Vue.set(this.reveal,"password","请输入您的密码")

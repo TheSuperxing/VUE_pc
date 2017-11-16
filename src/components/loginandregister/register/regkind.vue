@@ -179,7 +179,7 @@
 				var that = this;
 //				var data = JSON.parse({tel:that.personalRegInput.tel,picConfirm:that.personalRegInput.picConfirm})
 //				console.log(data)
-				var url = "http://10.1.31.2:8080/accountmanainfo/register";	
+				var url = "http://10.1.31.6:8080/accountmanainfo/register";	
 //				console.log(that.personalRegInput)
 				
 				$.ajax({
@@ -190,11 +190,10 @@
 //			        contentType: "application/json; charset=utf-8",
 					async: true, //使用同步方式
 			        success: function(data){
-//			        	debugger;
-			        	data = JSON.stringify(data)
-			            console.log(data +"suceed")
+						console.log(data);
 			        },error:function(error){
 			         	console.log(error+"error")
+			         	
 			        }
 			    });
 //				console.log({tel:that.personalRegInput.tel,messageConfirm:that.personalRegInput.picConfirm})

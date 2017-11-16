@@ -25,6 +25,8 @@
 <script>
   import Vue from "vue"
   import {mapState} from "vuex"
+  import MyAjax from "../../../assets/js/MyAjax.js"
+  
   export default {
     name:"companyLogin",
     data(){
@@ -96,13 +98,27 @@
           },1000);
       },
       personalLogin(){
+      	var that = this;
+      	var url = "http://10.1.31.6:8080/accountmanainfo/login";
+      	MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: {mobile:that.personalLoginInput.tel,password:that.personalLoginInput.messageConfirm},
+					dataType: "json",
+					
+				}, function(data){
+					console.log(data)
+					
+				},function(err){
+					console.log(err)
+				})
         var account = sessionStorage.getItem("account");
-        if((this.personalLoginInput.tel==account||this.personalLoginInput.tel=="root")&&!this.reveal.error){
-          location.hash="/index";
-        }else if(this.personalLoginInput.tel!=account&&this.personalLoginInput.tel!="root"){
-          alert("账号不存在")
-        }
-        location.hash="/index";
+//      if((this.personalLoginInput.tel==account||this.personalLoginInput.tel=="root")&&!this.reveal.error){
+//        location.hash="/index";
+//      }else if(this.personalLoginInput.tel!=account&&this.personalLoginInput.tel!="root"){
+//        alert("账号不存在")
+//      }
+//      location.hash="/index";
       }
 
     },

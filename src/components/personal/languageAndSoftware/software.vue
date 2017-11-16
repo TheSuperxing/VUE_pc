@@ -9,13 +9,13 @@
     <div class="softwareContainer" v-show="reveal.addSoftware">
       <div class="personal-empty" v-if="reveal.empty">（您尚未添加软件信息）</div>
       <!--显示、编辑已存在的信息开始-->
-      <div class="softwareInfo" v-for="(item,index) in this.software">
+      <div class="softwareInfo" v-for="(item,index) in software">
         <!--显示信息列表开始-->
         <div class="softwareInfoList" v-if="!reveal.editInfo[index]">
           <div class="softwareInfoTitle">
-            <h4 v-cloak>{{localSoftware.softwareName[index]}}</h4>
+            <h4 v-cloak>{{item.software}}</h4>
             <ul>
-              <li v-bind:class="{openOrPrivacy:reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
+              <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
                 <p v-cloak>{{reveal.openOrPrivacyText[index]}}</p>
               </li>
               <li v-on:click="softwareEdit(index)">
@@ -27,7 +27,12 @@
             </ul>
           </div>
           <div class="softwareInfoBody">
-            <p v-cloak>{{localSoftware.info.profession[index]}}</p>
+            <p v-cloak>{{item.proficiency}}</p>
+            <ul class="showImg">
+	        		<li v-for="item in picInfo">
+	        			<img :src="item" />
+	        		</li>
+            </ul>
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -38,13 +43,13 @@
             <li>
               <label>
                 <h5>*&nbsp;语言种类</h5>
-                <input v-model="localSoftware.softwareName[index]" type="text" placeholder="请输入语言种类">
+                <input v-model="localSoftware[index].software" type="text" placeholder="请输入语言种类">
               </label>
             </li>
             <li>
               <label>
                 <h5>熟练程度</h5>
-                <input v-model="localSoftware.info.profession[index]" type="text" placeholder="请输入熟练程度">
+                <input v-model="localSoftware[index].proficiency" type="text" placeholder="请输入熟练程度">
               </label>
             </li>
             <li class="img-wrap">
@@ -132,13 +137,13 @@
         <li>
           <label>
             <h5>*&nbsp;软件名称</h5>
-            <input v-model="newSoftware.softwareName" type="text" placeholder="请输入软件名称">
+            <input v-model="newSoftware.software" type="text" placeholder="请输入软件名称">
           </label>
         </li>
         <li>
           <label>
             <h5>熟练程度</h5>
-            <input v-model="newSoftware.info.profession" type="text" placeholder="请输入熟练程度">
+            <input v-model="newSoftware.proficiency" type="text" placeholder="请输入熟练程度">
           </label>
         </li>
         <li class="img-wrap">
@@ -225,6 +230,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import qq from "fine-uploader"
+  import MyAjax from "../../../assets/js/MyAjax.js"
   
   export default {
     name:"SoftwareIndex",
@@ -239,34 +245,55 @@
           addSoftware:true,//是否添加信息
           keepAddSoftware:true,//添加模式下，保存按钮是否可用
         },
-        localSoftware:{
-          softwareName:[],
-          info:{
-            time:[],
-            profession:[]
-          }
-        },
+        picInfo:[require("../../../assets/img/images/captainmiao1.jpg"),require("../../../assets/img/images/captainmiao2.jpg")],
+        software:[],
+        localSoftware:[],
         newSoftware:{
-          softwareName:"",
-          info:{
-            time:"",
-            profession:""
-          }
+          "accountID": "",
+				  "creAccountID": "",
+				  "creTime": "",
+				  "ifVisable": 1,
+				  "pkid": "",
+				  "proficiency": "",
+				  "proficiencyCode": "",
+				  "software": ""
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
       }
     },
+//  computed:mapState({
+//    software:state=>state.personal.personalMessage.otherSkill.software,
+//  }),
     created(){
-    	for(var i=0;i<this.software.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger-software"+this.software[i].id);
-    		this.qqTemplate.push("qq-template-manual-trigger-software"+this.software[i].id);
-    	}
-    	//console.log(this.fineUploaderClass)
+    	
+//    	console.log(this.software)
     },
     mounted(){
-    	
+    	var that = this;
+    	var url = "http://10.1.31.6:8080/psnsoftware/findByPsn/"+"string";
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+				dataType: "json",
+//				content-type: "text/plain;charset=UTF-8",
+				
+			},function(data){
+				console.log(data)
+				data = data.msg;
+				that.software = data;
+			},function(err){
+				console.log(err)
+			})
+    	/*数据同步本地一份开始*/
+      that.localSoftware=JSON.parse(JSON.stringify(that.software));
+    	console.log(that.software)
+    	for(var i=0;i<this.software.length;i++){
+    		this.fineUploaderId.push("fine-uploader-manual-trigger-software"+this.software[i].pkid);
+    		this.qqTemplate.push("qq-template-manual-trigger-software"+this.software[i].pkid);
+    	}
     	//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-template-manual-trigger-software'),
@@ -288,7 +315,7 @@
 	        autoUpload: false,
 	        debug: true,
 	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
+	        	onSubmit:  function(id,fileName)  {
 	        		$('#trigger-upload-software').show()
 	        	},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
@@ -314,20 +341,30 @@
 	        $('#trigger-upload-software').hide()
 	    });
 	    
-      if(this.software.length!=0){
-        Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
-        for(let i=0;i<this.software.length;i++){
-          /*数据同步本地一份开始*/
-          this.localSoftware.softwareName[i]=this.software[i].softwareName;
-          this.localSoftware.info.profession[i]=this.software[i].info.profession;
+      if(that.software.length!=0){
+        Vue.set(that.reveal,"empty",false)//是否显示执业资格信息尚未添加
+        for(let i=0;i<that.software.length;i++){
+          
           //论文数据
-          this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
-          this.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+          that.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
+          that.reveal.openOrPrivacy.push(that.software[i].ifVisable);//信息是否对外显示赋初始值
           this.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值
         }
       }else{
-        Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
+        Vue.set(that.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }
+//    console.log(that.localSoftware)
+      //改变各行'显示'的文本
+      for(let i=0;i<that.reveal.openOrPrivacy.length;i++){
+      	if(that.reveal.openOrPrivacy[i]==0){
+      		that.reveal.openOrPrivacy[i]=false;
+      		that.reveal.openOrPrivacyText.push("隐藏")
+      	}else if(that.reveal.openOrPrivacy[i]==1){
+      		that.reveal.openOrPrivacy[i]=true;
+      		that.reveal.openOrPrivacyText.push("显示")
+      	}
+      }
+      console.log(that.reveal.openOrPrivacy)
     },
     updated(){
       if(this.software.length!=0){
@@ -336,27 +373,51 @@
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newSoftware.softwareName.length!=0){
-        if(this.newSoftware.softwareName.trim().length!=0){
+      if(this.newSoftware.software.length!=0){
+        if(this.newSoftware.software.length!=0){
           Vue.set(this.reveal,"keepAddSoftware",false);//控制保存按钮的背景颜色
-          Vue.set(this.newSoftware,"softwareName",this.newSoftware.softwareName.trim())//进行必填项的空格去除处理
+          Vue.set(this.newSoftware,"software",this.newSoftware.software.trim())//进行必填项的空格去除处理
         }
       }else {
         Vue.set(this.reveal,"keepAddSoftware",true);//控制保存按钮的背景颜色
       }
     },
-    computed:mapState({
-      software:state=>state.personal.personalMessage.otherSkill.software,
-    }),
+    
     methods:{
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
         if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
+        	
           Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
         }else{
           Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
         }
-
+        
+        for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
+        	if(this.reveal.openOrPrivacy[i]==false){
+        		this.software[i].ifVisable = 0;
+        	}else{
+        		this.software[i].ifVisable = 1;
+        	}
+        }
+        
+        var that = this;
+        console.log(JSON.stringify(that.software[index]))
+        var url = "http://10.1.31.6:8080/psnsoftware/update"
+        $.ajaxSetup({contentType : 'application/json'});
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.software[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        
       },
       softwareEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
@@ -368,7 +429,7 @@
 			            element: document.getElementById(that.fineUploaderId[i]),
 			            template: that.qqTemplate[i],
 			            request: {
-			              endpoint: '/server/uploads'
+			              endpoint: 'http://10.1.31.6:8080/psnsoftware/upload'
 			            },
 			            thumbnails: {
 			              //	                placeholders: {
@@ -386,7 +447,7 @@
 			            callbacks:{
 			              onSubmit:  function(id,fileName){
 	//			              	if(index == i){
-			              		console.log(index)
+			              		console.log(id)
 			              		$('.btn-primary-software').show()
 	//			              	}
 			                
@@ -404,6 +465,7 @@
 			                //	                $('.stateTwo').show()
 			
 			                ///console.log($('.btn-primary'))
+			                console.log(responseJSON)
 			                if(index == i){
 			              		$('.btn-primary-software').eq(index).hide()
 			              	}
@@ -411,64 +473,143 @@
 			            }
 			          });
 			          that.qqFineloader.push(manualUploader)
-	           
 	        }
 	      }
 	      var btnPrimary=document.getElementsByClassName("btn-primary-software");
-	      console.log("aa"+index)
 	      qq(btnPrimary[index]).attach("click", function() {
 	        that.qqFineloader[index].uploadStoredFiles();
 	        $('.btn-primary-software').eq(index).hide()
 	      });
       },
       softwareEditKeep(index){//编辑状态，保存按钮
-        if(this.localSoftware.softwareName[index].trim().length!=0){
+        
+        var that = this;
+        var url = "http://10.1.31.6:8080/psnsoftware/update"
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.localSoftware[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+				//保存之后再重新拉取数据
+				that.updateData();
+				if(this.localSoftware[index].length!=0){
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
-          this.software[index].softwareName=this.localSoftware.softwareName[index];
-          this.software[index].info.profession=this.localSoftware.info.profession[index];
-          /*如果是保存，把数据保存到Vuex中*/
         }
+      },
+      updateData(){
+      	var that = this;
+	    	var url = "http://10.1.31.6:8080/psnsoftware/findByPsn/"+"string";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.software = data;
+				},function(err){
+					console.log(err)
+				})
+	    	/*数据同步本地一份开始*/
+        that.localSoftware=JSON.parse(JSON.stringify(that.software));
+        for(var i=0;i<this.software.length;i++){
+	    		this.fineUploaderId.push("fine-uploader-manual-trigger-software"+this.software[i].pkid);
+	    		this.qqTemplate.push("qq-template-manual-trigger-software"+this.software[i].pkid);
+	    	}
       },
       softwareEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        this.localSoftware.softwareName[index]=this.software[index].softwareName;
-        this.localSoftware.info.profession[index]=this.software[index].info.profession;
+        
+        this.localSoftware[index].software=this.software[index].software;
+        this.localSoftware[index].proficiency=this.software[index].proficiency;
 
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },
       softwareEditDel(index){//编辑状态，删除按钮
-        this.software.splice(index,1);
-        this.localSoftware.softwareName.splice(index,1);
-        this.localSoftware.info.profession.splice(index,1);
+        
+        var that = this;
+        console.log(that.software[index].pkid)
+        var url = "http://10.1.31.6:8080/psnsoftware/del/"+that.software[index].pkid;
+        MyAjax.ajax({
+					type: "DELETE",
+					url:url,
+					dataType: "json",
+					contentType: "application/json;charset=UTF-8",
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
+//      that.software.splice(index,1);
+//      that.localSoftware.splice(index,1);
       },
       addSoftware(){//添加信息按钮，添加信息的视图切换
+      	this.newSoftware.software = "";
+        this.newSoftware.proficiency = "";
         Vue.set(this.reveal,"addSoftware",false);
         Vue.set(this.reveal,"empty",false);
       },
       keepNewSoftware(){//添加模式下的保存
-        if(this.newSoftware.softwareName.length!=0){
-          if(this.newSoftware.softwareName.trim().length!=0){
-
-            this.localSoftware.softwareName.push(this.newSoftware.softwareName);
-            this.localSoftware.info.profession.push(this.newSoftware.info.profession);
-            //同步信息到执业资格首页
-            this.software.push({softwareName:this.newSoftware.softwareName,info:{time:"",profession:this.newSoftware.info.profession,introduce:"",level:"",organ:"",}})
+        if(this.newSoftware.software.length!=0){
+						console.log(this.newSoftware);
+						let obj = {
+//		          "accountID": "",
+//						  "creAccountID": "",
+//						  "creTime": "",
+//						  "ifVisable": 1,
+//						  "pkid": "",
+//						  "proficiency": "",
+//						  "proficiencyCode": "",
+//						  "software": ""
+		        };
+		        obj= JSON.parse(JSON.stringify(this.newSoftware));
+            this.localSoftware.push(obj);
+            //同步信息到编辑状态页
+            this.software.push(obj)
+            
             /*同步信息到个人信息首页*/
             Vue.set(this.reveal,"addSoftware",true);
             //视图切换到执业资格的首页
-            Vue.set(this.newSoftware,"softwareName","");
-            Vue.set(this.newSoftware.info,"profession","");
             /*清除数据，保证下次输入时输入框为空*/
             this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-            this.reveal.openOrPrivacy.push(false)//追加显示隐藏按钮状态
-          }
+            this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
+            
         }
+        
+        var that = this;
+//      console.log(that.software[index])
+        var url = "http://10.1.31.6:8080/psnsoftware/insert";
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.newSoftware),
+					dataType: "json",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
       },
       cancelNewSoftware(){
         Vue.set(this.reveal,"addSoftware",true);
         //视图切换到执业资格的首页
-        Vue.set(this.newSoftware,"softwareName","");
-        Vue.set(this.newSoftware.info,"profession","");
+        Vue.set(this.newSoftware,"software","");
+        Vue.set(this.newSoftware,"proficiency","");
         /*清除数据，保证下次输入时输入框为空*/
       }
     }
@@ -524,7 +665,7 @@
             h4{
               float: left;
             }
-            ul{
+            >ul{
               float: right;
               margin-top:2px;
               li{
@@ -556,7 +697,13 @@
 					    		float: left;
 					    	}
 					    }
-					    
+					    li:last-child{
+                p{
+                  padding-right:0;
+                  padding-left:21px;
+                  background: url("../../../assets/img/personal/education/delete.png") left center no-repeat;
+                }
+              }
               .openOrPrivacy{
                 p{
                   background: url("../../../assets/img/personal/education/hidden.png") left center no-repeat!important;
@@ -580,13 +727,25 @@
             p:last-child{
               margin-bottom:17px;
             }
+            .showImg{
+            	padding-bottom: 20px;
+            	&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;}
+            	li{
+            		float: left;
+            		margin-right: 10px;
+            		img{
+	            		width: 120px;
+	            	}
+            	}
+            	
+            }
           }
         }
         /*信息列表结束*/
         /*编辑信息列表开始*/
         .softwareInfoEdit{
-          ul{
-            li{
+          >ul{
+            >li{
               margin:20px 0;
               .wrap-left{
 				      	line-height: 35px;
@@ -677,8 +836,8 @@
     }
     /*添加信息开始*/
     .softwareContainer{
-      ul{
-        li{
+      >ul{
+       > li{
           margin:20px 0;
           .wrap-left{
 		      	line-height: 35px;

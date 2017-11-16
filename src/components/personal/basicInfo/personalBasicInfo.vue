@@ -53,14 +53,14 @@
           <p><input type="text" v-model="localBaseInfo.nickName" v-bind:value="localBaseInfo.nickName" v-on:input="changeNickName"></p>
           <i>{{textLeng.nickName}}/30</i>
         </li>
-        <li v-if="baseInfo.IfRNA">
+        <li v-if="baseInfo.ifRNA">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p>{{baseInfo.psnName}}</p>
           <i>{{textLeng.psnName}}/30</i>
           <span>（进入实名认证流程后，姓名将不可以自行修改，需联系管理员）</span>
 
         </li>
-        <li v-if="!baseInfo.IfRNA">
+        <li v-if="!baseInfo.ifRNA">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p><input type="text" v-model="localBaseInfo.psnName" v-bind:value="localBaseInfo.psnName" v-on:input="changeName"></p>
           <i>{{textLeng.psnName}}/30</i>
@@ -165,23 +165,14 @@
 				    </script>
 				    <div id="fine-uploader-manual-trigger"></div>
         		</li>
-        		<li v-for="item in localBaseInfo.IfRNA"  v-if="localBaseInfo.IfRNA">
+        		<li v-for="item in localBaseInfo.ifRNA"  v-if="localBaseInfo.ifRNA">
         			<img src="" alt=""/>
         		</li>
         		<p  v-if="localBaseInfo.ifRNA">您已通过实名认证</p>
             <p  v-if="localBaseInfo.ifRNA">您可点击“添加”继续上传，不会影响您已上传的实名认证文件</p>
         	</ul>
           <ul class="addFile" >
-            <li>
-              <!--<button class="addBtn">
-                点击上传文件证件
-                <input v-on:change="addFile" type="file">
-              </button>-->
-              <!--<p>实例</p>-->
-              <!--<div>
-                <img src="" alt="">
-              </div>-->
-            </li>
+           
             <li>
               <p>请上传本人手持身份证照片一面的免冠近照，支持JPG、PNG,不超过2M</p>
               <p>请确认身份证姓名与您填写的姓名一致，以免影响审核结果</p>
@@ -216,10 +207,14 @@
           ifRNA:"",
           openOrPrivacy:[]
         },
+        
         textLeng:{
           nickName:0,
           psnName:0
         },
+        
+        baseInfo:{},
+        
         localBaseInfo:{
           nickName:"",
           psnName:"",
@@ -235,56 +230,38 @@
           ifRNA:0,
           psnID:"3b15132cdb994b76bd0d9ee0de0dc0b8",
         },
-        
-        	
-
       }
 
     },
     components:{
 	    Datepicker,
 	  },
-    computed:mapState({
-      baseInfo:state=>state.personal.personalMessage.baseInfo,
+//  computed:mapState({
+////    baseInfo:state=>state.personal.personalMessage.baseInfo,
+//
+//  }),
 
-    }),
     mounted(){
+    	
     	var that = this;
-    	var url = "";
-//  	MyAjax.ajax({
-//				type: "GET",
-//				url:url,
-//				data: {AccountID:""},
-//				dataType: "json",
-////				content-type: "text/plain;charset=UTF-8",
-//				
-//			}, function(data){
-//				console.log(data)
-//					data = JSON.stringify(data);
-//				console.log(data)
-////					that.dataInfo = data
-////					console.log(that.dataInfo)
-//			},function(err){
-//				console.log(err)
-//			})
-//  	$.ajax({
-//  		type:"",
-//  		url:url,
-//  		async:true,
-//  		data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
-//				dataType: "json",
-////				content-type: "text/plain;charset=UTF-8",
-//				success:function(data){
-//					console.log(data)
-//					data = JSON.stringify(data);
-//					console.log(data)
-////					that.dataInfo = data
-////					console.log(that.dataInfo)
-//				},error:function(err){
-//					console.log(err)
-//				}
-//  	});
-      //console.log(this.baseInfo)
+    	var url = "http://10.1.31.6:8080/personalbasicinfo/findByID/"+"3b15132cdb994b76bd0d9ee0de0dc0b8";
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+				dataType: "json",
+//				content-type: "text/plain;charset=UTF-8",
+				
+			},function(data){
+				console.log(data.msg)
+				data = data.msg;
+				that.baseInfo = data;
+			},function(err){
+				console.log(err)
+			})
+    	
+    	
+
       //上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -312,7 +289,7 @@
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	                //alert('This is onComplete function.');
 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-	                console.log(responseJSON)
+	                //console.log(responseJSON)
 	                $('#message').append(responseJSON.msg);
 	//	                $('#progress').hide();//隐藏进度动画
 	                //清除已上传队列
@@ -323,79 +300,68 @@
 	//	                $('.stateTwo').show()
 	                
 	                $('#trigger-upload').hide()
-	                console.log(maybeXhr)
+	                //console.log(maybeXhr)
 	          	},
 	    	}
 	    });
+	    
 			qq(document.getElementById("trigger-upload")).attach("click", function() {
 	        manualUploader.uploadStoredFiles();
 	    });
 
       function emptyText(text) {
-        if(text.trim().length==0){
+        if(text.length==0){
           return "（此处暂时没有消息）";
         }else {
           return text;
         }
       }
-      this.baseInfo.nickName=emptyText(this.baseInfo.nickName);
-      this.baseInfo.psnName=emptyText(this.baseInfo.psnName);
-      this.baseInfo.sex=emptyText(this.baseInfo.sex);
-      this.baseInfo.dateOfBirth=emptyText(this.baseInfo.dateOfBirth);
-      this.baseInfo.psnMail=emptyText(this.baseInfo.psnMail);
+      that.baseInfo.nickName=emptyText(that.baseInfo.nickName);
+      that.baseInfo.psnName=emptyText(that.baseInfo.psnName);
+      that.baseInfo.sex=emptyText(that.baseInfo.sex);
+      that.baseInfo.dateOfBirth=emptyText(that.baseInfo.dateOfBirth);
+      that.baseInfo.psnMail=emptyText(that.baseInfo.psnMail);
+      that.baseInfo.phoneNumber=emptyText(that.baseInfo.phoneNumber);
       //如果得到的数据为空，进行暂没有消息处理
 
-      this.localBaseInfo.nickName=this.baseInfo.nickName;
-      this.localBaseInfo.psnName=this.baseInfo.psnName;
-      this.localBaseInfo.sex=this.baseInfo.sex;
-      this.localBaseInfo.dateOfBirth=this.baseInfo.dateOfBirth;
-      this.localBaseInfo.psnMail=this.baseInfo.psnMail;
-      this.localBaseInfo.ifRNA=this.baseInfo.ifRNA;
+      that.localBaseInfo.nickName=that.baseInfo.nickName;
+      that.localBaseInfo.psnName=that.baseInfo.psnName;
+      that.localBaseInfo.sex=that.baseInfo.sex;
+      that.localBaseInfo.dateOfBirth=that.baseInfo.dateOfBirth;
+      that.localBaseInfo.psnMail=that.baseInfo.psnMail;
+      that.localBaseInfo.ifRNA=that.baseInfo.ifRNA;
+      console.log(that.localBaseInfo)
       /*从store获取数据初始话本地数据，保证在修改数据的时候不会改变store中的原始数据，只有当提交修改数据的时候store的值再进行修改*/
 
 
-      if(this.localBaseInfo.sex.trim().length==0){
-        Vue.set(this.reveal,'selectSex',true);
-      }else if(this.localBaseInfo.sex.trim()=="女"){
-        Vue.set(this.reveal,'selectSex',false);
-      }else if(this.localBaseInfo.sex.trim()=="男"){
-        Vue.set(this.reveal,'selectSex',true);
+      if(that.localBaseInfo.sex.trim().length==0){
+        Vue.set(that.reveal,'selectSex',true);
+      }else if(that.localBaseInfo.sex.trim()=="女"){
+        Vue.set(that.reveal,'selectSex',false);
+      }else if(that.localBaseInfo.sex.trim()=="男"){
+        Vue.set(that.reveal,'selectSex',true);
       }
       /*设置性别的初始勾选状态*/
-      if(this.baseInfo.ifRNA){
-        this.reveal.throughRealName=true;
+      if(that.baseInfo.ifRNA){
+        that.reveal.throughRealName=true;
       }
 
       /*0-name 1-sex 2-age 3-phone 4-mail*/
-      this.reveal.openOrPrivacy.push(this.baseInfo.psnNameVisable)
-      this.reveal.openOrPrivacy.push(this.baseInfo.sexVisable)
-      this.reveal.openOrPrivacy.push(this.baseInfo.ageVisable)
-      this.reveal.openOrPrivacy.push(this.baseInfo.phoneNumberVisable)
-      this.reveal.openOrPrivacy.push(this.baseInfo.psnMailVisable)
+      that.reveal.openOrPrivacy.push(that.baseInfo.psnNameVisable)
+      that.reveal.openOrPrivacy.push(that.baseInfo.sexVisable)
+      that.reveal.openOrPrivacy.push(that.baseInfo.ageVisable)
+      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
+      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
       /*初始化openOrPrivacy*/
-			console.log(this.reveal.openOrPrivacy)
-    },
-    updated(){
-    	for(var i=0;i<this.reveal.openOrPrivacy.length;i++){
-    		if(this.reveal.openOrPrivacy[i]==false){ 
-    			this.reveal.openOrPrivacy[i] = 0;
-    		}else if(this.reveal.openOrPrivacy[i]==true){
-    			this.reveal.openOrPrivacy[i] = 1;
-    		}
-    		
-    	}
-    	this.baseInfo.psnNameVisable = this.reveal.openOrPrivacy[0];
-    	this.baseInfo.sexVisable = this.reveal.openOrPrivacy[1];
-    	this.baseInfo.ageVisable = this.reveal.openOrPrivacy[2];
-    	this.baseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
-    	this.baseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
-    	console.log(this.baseInfo.psnMailVisable)
-//  	console.log(this.reveal.openOrPrivacy)
-			if(this.localBaseInfo.ifRNA==false){
-				this.localBaseInfo.ifRNA = 0;
-			}else{
-				this.localBaseInfo.ifRNA = 1;
+			console.log(that.reveal.openOrPrivacy)
+			for(var i=0;i<that.reveal.openOrPrivacy.length;i++){
+				if(that.reveal.openOrPrivacy[i] == 0){
+					that.reveal.openOrPrivacy[i] = false;
+				}else{
+					that.reveal.openOrPrivacy[i] = true;
+				}
 			}
+			console.log(that.reveal.openOrPrivacy)
     },
     methods:{
       editBasicInfo(){//编辑进入编辑状态
@@ -442,7 +408,7 @@
       /*input字符长度显示*/
       changeName(){//编辑状态修改名字
         Vue.set(this.textLeng,"psnName",this.localBaseInfo.psnName.trim().length)
-        if(this.localBaseInfo.PsnName.trim().length>=30){
+        if(this.localBaseInfo.psnName.trim().length>=30){
           this.localBaseInfo.psnName=this.localBaseInfo.psnName.trim().slice(0,30)
           Vue.set(this.textLeng,"psnName",30)
         }
@@ -472,7 +438,7 @@
       },
       submitEdit(){//保存编辑
         function emptyText(text) {
-          if(text.trim().length==0){
+          if(text.length==0){
             return "（此处暂时没有消息）";
           }else {
             return text;
@@ -494,15 +460,25 @@
           Vue.set(this.reveal,"edit",false)
           /*只有当昵称，和名字不为空的时候，保存按钮才可用*/
         }
-        	//上传
-        	
-        	var that = this;
-//      	console.log(that.localBaseInfo)
-        	var data = JSON.stringify(that.localBaseInfo)
-        	console.log(data)
-        	var url = "http://10.1.31.6:8080/personalbasicinfo/update";
-        	$.ajaxSetup({ contentType : 'application/json' });
-        	MyAjax.ajax({
+        //上传之前处理一下Boolean值
+	    	for(var i=0;i<this.reveal.openOrPrivacy.length;i++){
+					if(this.reveal.openOrPrivacy[i] == false){
+						this.reveal.openOrPrivacy[i] = 0;
+					}else{
+						this.reveal.openOrPrivacy[i] = 1;
+					}
+				}
+	    	this.localBaseInfo.psnNameVisable = this.reveal.openOrPrivacy[0];
+	    	this.localBaseInfo.sexVisable = this.reveal.openOrPrivacy[1];
+	    	this.localBaseInfo.ageVisable = this.reveal.openOrPrivacy[2];
+	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
+	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
+	    	var that = this;
+	    	var data = JSON.stringify(that.localBaseInfo)
+	    	console.log(data)
+	    	var url = "http://10.1.31.6:8080/personalbasicinfo/update";
+	    	$.ajaxSetup({ contentType : 'application/json' });
+	    	MyAjax.ajax({
 						type: "POST",
 						url:url,
 						data: data,
@@ -511,10 +487,6 @@
 						
 					}, function(data){
 						console.log(data)
-							data = JSON.stringify(data);
-						console.log(data)
-		//					that.dataInfo = data
-		//					console.log(that.dataInfo)
 					},function(err){
 						console.log(err)
 					})
@@ -577,7 +549,7 @@
     padding:0 40px;
     background: $bfColor;
     min-height: 671px;
-    padding-bottom: 30px;
+    padding-bottom: 40px;
     color: $textColor;
     .basicInfoTitle{
       padding:42px 0;
@@ -871,7 +843,7 @@
                 background: $themeColor;
               }
             }
-            li:nth-child(2){
+            li:nth-child(1){
               p{
                 color: $themeColor;
                 font-size:12px;

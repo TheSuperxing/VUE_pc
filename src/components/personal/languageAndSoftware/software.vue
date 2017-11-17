@@ -290,16 +290,28 @@
     	/*数据同步本地一份开始*/
       that.localSoftware=JSON.parse(JSON.stringify(that.software));
     	console.log(that.software)
-    	for(var i=0;i<this.software.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger-software"+this.software[i].pkid);
-    		this.qqTemplate.push("qq-template-manual-trigger-software"+this.software[i].pkid);
+    	that.fineUploaderId = [];
+    	that.qqTemplate = [];
+    	that.reveal.openOrPrivacyText = [];
+    	that.reveal.openOrPrivacy = [];
+    	for(var i=0;i<that.software.length;i++){
+    		that.fineUploaderId.push("fine-uploader-manual-trigger-software"+that.software[i].pkid);
+    		that.qqTemplate.push("qq-template-manual-trigger-software"+that.software[i].pkid);
+    		if(that.software[i].ifVisable==1){
+    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
+        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
+    		}else{
+    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
+    		}
+    		
     	}
     	//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-template-manual-trigger-software'),
 	        template: 'qq-template-manual-trigger-software',
 	        request: {
-	            endpoint: '/server/uploads'
+	            endpoint: 'http://10.1.31.6:8080/psnsoftware/batchUpload'
 	        },
 	        thumbnails: {
 	//	                placeholders: {
@@ -347,23 +359,22 @@
           
           //论文数据
           that.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
-          that.reveal.openOrPrivacy.push(that.software[i].ifVisable);//信息是否对外显示赋初始值
-          this.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值
+         
         }
       }else{
         Vue.set(that.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }
 //    console.log(that.localSoftware)
       //改变各行'显示'的文本
-      for(let i=0;i<that.reveal.openOrPrivacy.length;i++){
-      	if(that.reveal.openOrPrivacy[i]==0){
-      		that.reveal.openOrPrivacy[i]=false;
-      		that.reveal.openOrPrivacyText.push("隐藏")
-      	}else if(that.reveal.openOrPrivacy[i]==1){
-      		that.reveal.openOrPrivacy[i]=true;
-      		that.reveal.openOrPrivacyText.push("显示")
-      	}
-      }
+//    for(let i=0;i<that.reveal.openOrPrivacy.length;i++){
+//    	if(that.reveal.openOrPrivacy[i]==0){
+//    		that.reveal.openOrPrivacy[i]=false;
+//    		that.reveal.openOrPrivacyText.push("隐藏")
+//    	}else if(that.reveal.openOrPrivacy[i]==1){
+//    		that.reveal.openOrPrivacy[i]=true;
+//    		that.reveal.openOrPrivacyText.push("显示")
+//    	}
+//    }
       console.log(that.reveal.openOrPrivacy)
     },
     updated(){
@@ -384,6 +395,41 @@
     },
     
     methods:{
+    	updateData(){
+      	var that = this;
+	    	var url = "http://10.1.31.6:8080/psnsoftware/findByPsn/"+"string";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.software = data;
+				},function(err){
+					console.log(err)
+				})
+	    	/*数据同步本地一份开始*/
+        that.localSoftware=JSON.parse(JSON.stringify(that.software));
+        that.fineUploaderId = [];
+	    	that.qqTemplate = [];
+	    	that.reveal.openOrPrivacyText = [];
+	    	that.reveal.openOrPrivacy = [];
+	    	for(var i=0;i<that.software.length;i++){
+	    		that.fineUploaderId.push("fine-uploader-manual-trigger-software"+that.software[i].pkid);
+	    		that.qqTemplate.push("qq-template-manual-trigger-software"+that.software[i].pkid);
+	    		if(that.software[i].ifVisable==1){
+	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
+	    		}else{
+	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
+	    		}
+	    	}
+      },
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
         if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
@@ -429,7 +475,7 @@
 			            element: document.getElementById(that.fineUploaderId[i]),
 			            template: that.qqTemplate[i],
 			            request: {
-			              endpoint: 'http://10.1.31.6:8080/psnsoftware/upload'
+			              endpoint: 'http://10.1.31.6:8080/psnsoftware/batchUpload'
 			            },
 			            thumbnails: {
 			              //	                placeholders: {
@@ -504,35 +550,11 @@
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
         }
       },
-      updateData(){
-      	var that = this;
-	    	var url = "http://10.1.31.6:8080/psnsoftware/findByPsn/"+"string";
-	    	MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-					
-				},function(data){
-					console.log(data)
-					data = data.msg;
-					that.software = data;
-				},function(err){
-					console.log(err)
-				})
-	    	/*数据同步本地一份开始*/
-        that.localSoftware=JSON.parse(JSON.stringify(that.software));
-        for(var i=0;i<this.software.length;i++){
-	    		this.fineUploaderId.push("fine-uploader-manual-trigger-software"+this.software[i].pkid);
-	    		this.qqTemplate.push("qq-template-manual-trigger-software"+this.software[i].pkid);
-	    	}
-      },
+      
       softwareEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
         
-        this.localSoftware[index].software=this.software[index].software;
-        this.localSoftware[index].proficiency=this.software[index].proficiency;
+        this.localSoftware[index]=JSON.parse(JSON.stringify(this.software[index]));
 
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },

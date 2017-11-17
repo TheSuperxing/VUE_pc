@@ -9,13 +9,13 @@
     <div class="certificateContainer" v-show="reveal.addCertificate">
       <div class="personal-empty" v-if="reveal.empty">（您尚未添加执业资格信息）</div>
       <!--显示、编辑已存在的信息开始-->
-      <div class="certificateInfo" v-for="(item,index) in this.certificate">
+      <div class="certificateInfo" v-for="(item,index) in certificate">
         <!--显示信息列表开始-->
         <div class="certificateInfoList" v-show="!reveal.editInfo[index]">
           <div class="certificateInfoTitle">
-            <h4 v-cloak>{{localCertificate.certificateName[index]}}</h4>
+            <h4 v-cloak>{{item.qualificationName}}</h4>
             <ul>
-              <li v-bind:class="{openOrPrivacy:reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
+              <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
                 <p>{{reveal.openOrPrivacyText[index]}}</p>
               </li>
               <li v-on:click="certificateInfoEdit(index)">
@@ -27,8 +27,8 @@
             </ul>
           </div>
           <div class="certificateInfoBody">
-            <p v-cloak>{{localCertificate.info.profession[index]}}</p>
-            <p v-cloak>证书编号：{{localCertificate.info.introduce[index]}}</p>
+            <p v-cloak>{{item.registeredUnit}}</p>
+            <p v-cloak>证书编号：{{item.certificateNumber}}</p>
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -39,19 +39,19 @@
             <li>
               <label>
                 <h5>*&nbsp;资格名称</h5>
-                <input v-model="localCertificate.certificateName[index]" type="text" placeholder="请输入资格名称">
+                <input v-model="localCertificate[index].qualificationName" type="text" placeholder="请输入资格名称">
               </label>
             </li>
             <li>
               <label>
                 <h5>注册单位</h5>
-                <input v-model="localCertificate.info.profession[index]" type="text" placeholder="请输入注册单位">
+                <input v-model="localCertificate[index].registeredUnit" type="text" placeholder="请输入注册单位">
               </label>
             </li>
             <li>
               <label>
                 <h5>证件编号</h5>
-                <input v-model="localCertificate.info.introduce[index]" type="text" placeholder="请输入证件编号">
+                <input v-model="localCertificate[index].certificateNumber" type="text" placeholder="请输入证件编号">
               </label>
             </li>
             <li class="img-wrap" >
@@ -143,19 +143,19 @@
         <li>
           <label>
             <h5>*&nbsp;资格名称</h5>
-            <input v-model="newCertificate.certificateName" type="text" placeholder="请输入资格名称">
+            <input v-model="newCertificate.qualificationName" type="text" placeholder="请输入资格名称">
           </label>
         </li>
         <li>
           <label>
             <h5>注册单位</h5>
-            <input v-model="newCertificate.info.profession" type="text" placeholder="请输入注册单位">
+            <input v-model="newCertificate.registeredUnit" type="text" placeholder="请输入注册单位">
           </label>
         </li>
         <li>
           <label>
             <h5>证件编号</h5>
-            <input v-model="newCertificate.info.introduce" type="text" placeholder="请输入证件编号">
+            <input v-model="newCertificate.certificateNumber" type="text" placeholder="请输入证件编号">
           </label>
         </li>
         <li class="img-wrap">
@@ -242,6 +242,8 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import qq from "fine-uploader"
+  import MyAjax from "../../../assets/js/MyAjax.js"
+  
   
   export default {
     name:"certificateIndex",
@@ -256,19 +258,17 @@
           addCertificate:true,//是否添加信息
           keepAdd:true,//添加模式下，保存按钮是否可用
         },
-        localCertificate:{
-          certificateName:[],
-          info:{
-            profession:[],
-            introduce:[]
-          }
-        },
+        certificate:[],
+        localCertificate:[],
         newCertificate:{
-          certificateName:[],
-          info:{
-            profession:[],
-            introduce:[]
-          }
+          "accountID": "",
+				  "certificateNumber": "",
+				  "creAccountID": "",
+				  "creTime": "",
+				  "ifVisable": 1,
+				  "pkid": "",
+				  "qualificationName": "",
+				  "registeredUnit": ""
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
@@ -276,14 +276,11 @@
         
       }
     },
-    created(){
-    	for(var i=0;i<this.certificate.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger"+this.certificate[i].id);
-    		this.qqTemplate.push("qq-template-manual-trigger"+this.certificate[i].id);
-    	}
-    		//console.log(this.fineUploaderClass)
-    },
+    computed:mapState({
+//    certificate:state=>state.personal.personalMessage.certificate,
+    }),
     mounted(){
+    	this.updateData();
     	//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -334,27 +331,10 @@
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }else {
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
-        for(let i=0;i<this.certificate.length;i++){
-          /*数据同步本地一份开始*/
-          this.localCertificate.certificateName[i]=this.certificate[i].certificateName;
-          this.localCertificate.info.profession[i]=this.certificate[i].info.profession;
-          this.localCertificate.info.introduce[i]=this.certificate[i].info.introduce;
-          /*数据同步本地一份结束*/
-          this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
-        }
+        this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
       }
       /*以上是初始化*/
-      if(this.reveal.openOrPrivacy.length!=0){
-        for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
-          if(!this.reveal.openOrPrivacy[i]){
-            Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
-            //this.reveal.openOrPrivacyText.push("显示")
-          }else{
-            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
-            //this.reveal.openOrPrivacyText.push("隐藏")
-          }
-        }
-      }
+      
       /*以上是是否对外显示文本信息初始化*/
     },
     updated(){
@@ -364,27 +344,87 @@
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newCertificate.certificateName.length!=0){
-        if(this.newCertificate.certificateName.trim().length!=0){
+      if(this.newCertificate.qualificationName.length!=0){
+        if(this.newCertificate.qualificationName.trim().length!=0){
           Vue.set(this.reveal,"keepAdd",false);
-          Vue.set(this.newCertificate,"certificateName",this.newCertificate.certificateName.trim())//进行空格去除处理
+          Vue.set(this.newCertificate,"qualificationName",this.newCertificate.qualificationName.trim())//进行空格去除处理
         }
       }else {
         Vue.set(this.reveal,"keepAdd",true);
       }
       /*控制保存按钮的背景颜色*/
     },
-    computed:mapState({
-      certificate:state=>state.personal.personalMessage.certificate,
-    }),
+    
     methods:{
+    	updateData(){
+    		var that = this;
+	    	var url = "http://10.1.31.16:8080/psnQualification/findAll/"+"string";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.certificate = data;
+				},function(err){
+					console.log(err)
+				})
+	    	/*数据同步本地一份开始*/
+        that.localCertificate=JSON.parse(JSON.stringify(that.certificate));
+        that.fineUploaderId = [];
+	    	that.qqTemplate = [];
+	    	that.reveal.openOrPrivacyText = [];
+	    	that.reveal.openOrPrivacy = [];
+	    	for(var i=0;i<that.certificate.length;i++){
+	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.localCertificate[i].pkid);
+	    		that.qqTemplate.push("qq-template-manual-trigger"+that.localCertificate[i].pkid);
+	    		if(that.certificate[i].ifVisable==1){
+	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
+	    		}else{
+	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
+	    		}
+	    	}
+    	},
       openOrPrivacy(index){//信息是否对外公开控制按钮
-        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);
-        if(!this.reveal.openOrPrivacy[index]){//显示文本的控制
-          Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
-        }else{
+        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
+      	
+        if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
+        	
           Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+        }else{
+          Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
         }
+        
+        for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
+        	if(this.reveal.openOrPrivacy[i]==false){
+        		this.certificate[i].ifVisable = 0;
+        	}else{
+        		this.certificate[i].ifVisable = 1;
+        	}
+        }
+        
+        var that = this;
+        console.log(JSON.stringify(that.certificate[index]))
+        var url = "http://10.1.31.16:8080/psnQualification/update"
+        $.ajaxSetup({contentType : 'application/json'});
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.certificate[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
       },
       certificateInfoEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
@@ -456,50 +496,97 @@
           console.log(that.qqFineloader)
       },
       keepCertificateInfoEdit(index){//编辑状态，保存按钮
-        if(this.localCertificate.certificateName[index].trim().length!=0){
-          Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
+      	var that = this;
+        var url = "http://10.1.31.16:8080/psnQualification/update"
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.localCertificate[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+				//保存之后再重新拉取数据
+				that.updateData();
+        if(that.localCertificate[index].qualificationName.trim().length!=0){
+          Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
         }
+        
+        
       },
       cancelCertificateInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
+        this.localCertificate[index]=JSON.parse(JSON.stringify(this.certificate[index]));
+        
       },
       certificateInfoDel(index){//编辑状态，删除按钮
-        this.certificate.splice(index,1);
-        this.localCertificate.certificateName.splice(index,1);
-        this.localCertificate.info.introduce.splice(index,1);
-        this.localCertificate.info.profession.splice(index,1);
+        var that = this;
+        var url = "http://10.1.31.16:8080/psnQualification/del/"+that.certificate[index].pkid;
+        MyAjax.ajax({
+					type: "DELETE",
+					url:url,
+					dataType: "json",
+					contentType: "application/json;charset=UTF-8",
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
         
       },
       addInfo(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addCertificate",false);
         Vue.set(this.reveal,"empty",false)
+        Vue.set(this.newCertificate,"qualificationName","");
+        Vue.set(this.newCertificate,"certificateNumber","");
+        Vue.set(this.newCertificate,"registeredUnit","");
       },
       keepCertificateInfoAdd(){
-        if(this.newCertificate.certificateName.length!=0){
-          if(this.newCertificate.certificateName.trim().length!=0){
-            this.localCertificate.certificateName.push(this.newCertificate.certificateName);
-            this.localCertificate.info.profession.push(this.newCertificate.info.profession);
-            this.localCertificate.info.introduce.push(this.newCertificate.info.introduce);
-            /*同步信息到执业资格首页*/
-            this.certificate.push({certificateName:this.newCertificate.certificateName,info:{profession:this.newCertificate.info.profession,introduce:this.newCertificate.info.introduce}})
+        if(this.newCertificate.qualificationName.length!=0){
+						console.log(this.newCertificate);
+						
+            this.localCertificate.push(JSON.parse(JSON.stringify(this.newCertificate)));
+            //同步信息到编辑状态页
+            this.certificate.push(JSON.parse(JSON.stringify(this.newCertificate)))
+            
             /*同步信息到个人信息首页*/
             Vue.set(this.reveal,"addCertificate",true);
             //视图切换到执业资格的首页
-            Vue.set(this.newCertificate,"certificateName","");
-            Vue.set(this.newCertificate.info,"profession","");
-            Vue.set(this.newCertificate.info,"introduce","");
             /*清除数据，保证下次输入时输入框为空*/
-            this.reveal.openOrPrivacy.push(false)//设置是否对外显示
-            this.reveal.openOrPrivacyText.push("显示")//设置是否对外显示文本
-          }
+            this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
+            this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
+            
         }
+        
+        var that = this;
+//      console.log(that.software[index])
+        var url = "http://10.1.31.16:8080/psnQualification/insert";
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.newCertificate),
+					dataType: "json",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
       },
       cancelCertificateInfoAdd(){
         Vue.set(this.reveal,"addCertificate",true);
         //视图切换到执业资格的首页
-        Vue.set(this.newCertificate,"certificateName","");
-        Vue.set(this.newCertificate.info,"profession","");
-        Vue.set(this.newCertificate.info,"introduce","");
+        Vue.set(this.newCertificate,"qualificationName","");
+        Vue.set(this.newCertificate,"certificateNumber","");
+        Vue.set(this.newCertificate,"registeredUnit","");
         /*清除数据，保证下次输入时输入框为空*/
       }
     }
@@ -603,7 +690,7 @@
           }
           .certificateInfoBody{
             p:nth-child(1){
-              color: rgb(186,186,186);
+              /*color: rgb(186,186,186);*/
               margin-bottom: 11px;
             }
             p:last-child{

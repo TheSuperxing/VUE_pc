@@ -13,7 +13,7 @@
           <div v-show="!editEdu.edit[0][index]">
             <h4 v-cloak>{{item.schoolName}}</h4>
             <ul>
-              <li v-bind:class="{openOrPrivacy:openOrPrivacy[index]}" v-on:click="openOrPrivacyInfo(index)">{{openOrPrivacyText[index]}}</li>
+              <li v-bind:class="{openOrPrivacy:!openOrPrivacy[index]}" v-on:click="openOrPrivacyInfo(index)">{{openOrPrivacyText[index]}}</li>
               <li v-on:click="editEduExist(index)">编辑</li>
               <li v-on:click="deleteEduExist(index)">删除</li>
             </ul>
@@ -258,17 +258,17 @@
         education:[],//用于存放请求的数据；
         localEdu:[],//本地用于编辑的数据
         newInputValue:{
-        	"professionName": "string",
-		      "schoolTimeDown": "2017-11-15",
+        	"professionName": "",
+		      "schoolTimeDown": "",
 		      "creAccountID": "",
-		      "creTime": "2017-11-15 16:39:08",
-		      "pkid": "48ff5f1b034a43f79c463648910e79e0",
-		      "schoolName": "string",
-		      "schoolTimeUp": "2017-11-15",
-		      "educationCode": "string",
-		      "education": "string",
+		      "creTime": "",
+		      "pkid": "",
+		      "schoolName": "",
+		      "schoolTimeUp": "",
+		      "educationCode": "",
+		      "education": "",
 		      "ifVisable": 1,
-		      "accountID": "string"
+		      "accountID": ""
         },
         buttonColor:{exist:[],add:true},
         //按钮颜色
@@ -310,11 +310,22 @@
 			})
       that.localEdu=JSON.parse(JSON.stringify(that.education));
       console.log(that.localEdu)
+      that.openOrPrivacy = [];
+      that.openOrPrivacyText = [];
+      that.fineUploaderId = [];
+      that.qqTemplate = [];
     	for(var i=0;i<that.education.length;i++){
-    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].id);
-    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].id);
-    		
+    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
+    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
+    		if(that.education[i].ifVisable==1){
+    			that.openOrPrivacy.push(true);
+    			that.openOrPrivacyText.push("显示")
+	      }else{
+	        that.openOrPrivacy.push(false);
+    			that.openOrPrivacyText.push("隐藏")
+	      }
     	}
+    	console.log(that.openOrPrivacy)
 			//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -376,11 +387,9 @@
           Vue.set(that.textLeng.schoolName,[i],that.localEdu[i].schoolName.length)
           Vue.set(that.textLeng.profession,[i],that.localEdu[i].professionName.length)
           /*初始化记录输入字符长度的值*/
-          if(that.openOrPrivacy[i]){
-            Vue.set(that.openOrPrivacyText,[i],"隐藏")
-          }else{
-            Vue.set(that.openOrPrivacyText,[i],"显示")
-          }
+          //信息是否对外显示赋初始值
+          //信息是否对外显示文字切换赋初始值
+          
           /*是否显示隐藏文本的初始化*/
         }
         //为每一个对象添加一个独有的状态
@@ -408,23 +417,62 @@
 					console.log(err)
 				})
 	      that.localEdu=JSON.parse(JSON.stringify(that.education));
+	    	that.openOrPrivacy = [];
+	      that.openOrPrivacyText = [];
+	      that.fineUploaderId = [];
+	      that.qqTemplate = [];
 	    	for(var i=0;i<that.education.length;i++){
-	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].id);
-	    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].id);
-	    		
+	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
+	    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
+	    		if(that.education[i].ifVisable==1){
+	    			that.openOrPrivacy.push(true);
+	    			that.openOrPrivacyText.push("显示")
+		      }else{
+		        that.openOrPrivacy.push(false);
+	    			that.openOrPrivacyText.push("隐藏")
+		      }
 	    	}
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
         Vue.set(this.empty,"promote",false);//取消无数据提示信息
+        Vue.set(this.newInputValue,"schoolName","")
+        Vue.set(this.newInputValue,"schoolTimeUp","")
+        Vue.set(this.newInputValue,"schoolTimeDown","")
+        Vue.set(this.newInputValue,"professionName","")
+        Vue.set(this.newInputValue,"education","")
       },
       openOrPrivacyInfo(index){//是否显示隐藏按钮的事件
         Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index]);//通过类名控制图片和文字颜色
-        if(this.openOrPrivacy[index]){
+        if(!this.openOrPrivacy[index]){
           Vue.set(this.openOrPrivacyText,[index],"隐藏")
         }else{
           Vue.set(this.openOrPrivacyText,[index],"显示")
         }
+        for(let i=0;i<this.openOrPrivacy.length;i++){
+        	if(this.openOrPrivacy[i]==false){
+        		this.education[i].ifVisable = 0;
+        	}else{
+        		this.education[i].ifVisable = 1;
+        	}
+        }
+        var that = this;
+        var url = "http://10.1.31.16:8080/psnEduBackGround/update"
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.education[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+				//保存之后再重新拉取数据
+				that.updateData();
         /*显示隐藏文字切换*/
       },
       editEduExist(index){//编辑按钮事件，进入编辑模式
@@ -490,8 +538,6 @@
 			            }
 			          });
 			          that.qqFineloader.push(manualUploader)
-//							}
-               
             }
           }
           var btnPrimary=document.getElementsByClassName("btn-primary");
@@ -508,12 +554,27 @@
         //console.log("ok")
       },
       deleteEduExist(index){//删除按钮事件
-        Vue.set(this.editEdu.delete[0],[index],false);
-        this.education.splice(index,1)
-        Vue.set(this.editEdu.delete[0],[index],true)//为了解决删除一项后一项不会显示问题
+      	
+//      Vue.set(this.editEdu.delete[0],[index],false);
+//      this.education.splice(index,1)
+//      Vue.set(this.editEdu.delete[0],[index],true)//为了解决删除一项后一项不会显示问题
         if(this.education.length==0){//数据完全删除后显示无数据提示
           Vue.set(this.empty,"promote",true);
         }
+        var that = this;
+        console.log(that.education[index].pkid)
+        var url = "http://10.1.31.16:8080/psnEduBackGround/del/"+that.education[index].pkid;
+        MyAjax.ajax({
+					type: "DELETE",
+					url:url,
+					dataType: "json",
+					contentType: "application/json;charset=UTF-8",
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
       },
       //以上是状态的改变
       changeShoolName(index){//编辑状态，改变学校名称
@@ -562,21 +623,11 @@
 				})//更新到服务器
 				//保存之后再重新拉取数据
 				that.updateData();
-        if(this.localEdu[index].schoolName.length!=0){
-					Vue.set(this.editEdu.edit[0],[index],true);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
-//        if(judgUpDate){
-//          
-//          //以后提交数据的条件
-//        }else{
-//          this.education[index].schoolName=this.inputValue.schoolText[index];
-//          this.education[index].info.profession=this.inputValue.professionText[index];
-//          this.education[index].info.schoolTimeStart=this.inputValue.schoolTimeStart[index];
-//          this.education[index].info.schoolTimeEnd=this.inputValue.schoolTimeEnd[index];
-//          this.education[index].info.introduce = this.inputValue.introduce[index];
-//          Vue.set(this.editEdu.edit[0],[index],false);//如果学校名称没有填写视图在单击保存时，视图不会切换 单击取消时视图会切换
-//        }
+//      if(this.localEdu[index].schoolName.length!=0){
+				Vue.set(this.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+//        
 
-        }
+//      }
         //提交编辑后的数据
         
 
@@ -587,20 +638,20 @@
         if(this.education.length==0){//在没有数据并且取消添加数据后，依然显示无数据视图
           Vue.set(this.empty,"promote",true);
         }
-        Vue.set(this.newInputValue,"schoolText","")
-        Vue.set(this.newInputValue,"TimeStart","")
-        Vue.set(this.newInputValue,"schoolTimeEnd","")
-        Vue.set(this.newInputValue,"professionText","")
-        Vue.set(this.newInputValue,"introduce","")
+        Vue.set(this.newInputValue,"schoolName","")
+        Vue.set(this.newInputValue,"schoolTimeUp","")
+        Vue.set(this.newInputValue,"schoolTimeDown","")
+        Vue.set(this.newInputValue,"professionName","")
+        Vue.set(this.newInputValue,"education","")
         /*取消添加后，清除之前添加的数据*/
       },
       addShoolName(){//添加模式下，添加校名
-        Vue.set(this.newTextLeng.schoolName,[0],this.newInputValue.schoolText.length)
+        Vue.set(this.newTextLeng.schoolName,[0],this.newInputValue.schoolName.length)
         //当input的值改变时改变相应的数字
-        if(this.newInputValue.schoolText.length>=30){
-          this.newInputValue.schoolText=this.newInputValue.schoolText.slice(0,29);
+        if(this.newInputValue.schoolName.length>=30){
+          this.newInputValue.schoolName=this.newInputValue.schoolName.slice(0,29);
         }
-        if(this.newInputValue.schoolText.length!=0){
+        if(this.newInputValue.schoolName.length!=0){
           Vue.set(this.buttonColor,"add",false)
         }else {
           Vue.set(this.buttonColor,"add",true)
@@ -608,36 +659,46 @@
         //通过学校名字的长度，设置提交按钮的不同样式
       },
       addProfession(){//添加模式下，添加专业名
-        Vue.set(this.newTextLeng.profession,[0],this.newInputValue.professionText.length)
+        Vue.set(this.newTextLeng.profession,[0],this.newInputValue.professionName.length)
         //当input的值改变时改变相应的数字
 
-        if(this.newInputValue.professionText.length>=30){
-          this.newInputValue.professionText=this.newInputValue.professionText.slice(0,31);
+        if(this.newInputValue.professionName.length>=30){
+          this.newInputValue.professionName=this.newInputValue.professionName.slice(0,29);
         }
       },
       keepEditEduNew(){//添加模式下保存
-
-        if(this.newInputValue.schoolText.length!=0){
-          this.inputValue.schoolText.push(this.newInputValue.schoolText);
-          this.inputValue.professionText.push(this.newInputValue.professionText);
-          this.inputValue.schoolTimeStart.push(this.newInputValue.schoolTimeStart);
-          this.inputValue.schoolTimeEnd.push(this.newInputValue.schoolTimeEnd);
-          this.inputValue.introduce.push(this.newInputValue.introduce);
+				if(this.newInputValue.schoolName.length!=0){
+          this.localEdu.push(JSON.parse(JSON.stringify(this.newInputValue)))
           /*添加的数据，追加到本地数据里一份*/
-          this.education.push({schoolName:this.newInputValue.schoolText,info:{schoolTimeStart:this.newInputValue.schoolTimeStart,schoolTimeEnd:this.newInputValue.schoolTimeEnd,profession:this.newInputValue.professionText,introduce:this.newInputValue.introduce}})//向store中追加添加的数据
+//        this.education.push({schoolName:this.newInputValue.schoolText,info:{schoolTimeStart:this.newInputValue.schoolTimeStart,schoolTimeEnd:this.newInputValue.schoolTimeEnd,profession:this.newInputValue.professionText,introduce:this.newInputValue.introduce}})//向store中追加添加的数据
           /*添加的数据追加到vuex中*/
-          Vue.set(this.newInputValue,"schoolText","")
-          Vue.set(this.newInputValue,"TimeStart","")
-          Vue.set(this.newInputValue,"schoolTimeEnd","")
-          Vue.set(this.newInputValue,"professionText","")
-          Vue.set(this.newInputValue,"introduce","")
+          
           /*保存添加后，清除之前添加的数据*/
           this.editEdu.delete[0].push(true)//解决添加数据后视图部更新
           Vue.set(this.editEdu,"add",false);//如果学校名称为空不能提交，视图不会切换
-          this.openOrPrivacy.push(false);//是否显示样式
+          this.openOrPrivacy.push(true);//是否显示样式
           this.openOrPrivacyText.push("显示");//是否显示文本信息
         }
-      }
+        
+        var that = this;
+        console.log(JSON.stringify(that.newInputValue))
+        var url = "http://10.1.31.16:8080/psnEduBackGround/insert";
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.newInputValue),
+					dataType: "json",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
+	        
+	    }
+	      
       //新建部分
     }
   }
@@ -811,6 +872,7 @@
           }
         }
         li:nth-child(3){
+        	height: 55px;
           input{
             width:480px;
           }

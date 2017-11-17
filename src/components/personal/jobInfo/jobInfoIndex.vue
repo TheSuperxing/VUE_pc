@@ -1,5 +1,5 @@
 <template>
-  <div class="jobInfoIndex">
+  <div class="titleInfo">
 
     <div class="title">
       <h2 v-cloak>{{title.text}}</h2>
@@ -9,13 +9,13 @@
     <div class="jobInfoContainer" v-show="reveal.addJobInfo">
       <div class="personal-empty" v-if="reveal.empty">（您尚未添加执业资格信息）</div>
       <!--显示、编辑已存在的信息开始-->
-      <div class="jobInfoInfo" v-for="(item,index) in this.jobInfo">
+      <div class="jobInfoInfo" v-for="(item,index) in titleInfo">
         <!--显示信息列表开始-->
         <div class="jobInfoInfoList" v-show="!reveal.editInfo[index]">
           <div class="jobInfoInfoTitle">
-            <h4 v-cloak>{{localJobInfo.jobInfoName[index]}}</h4>
+            <h4 v-cloak>{{item.titleName}}</h4>
             <ul>
-              <li v-bind:class="{openOrPrivacy:reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
+              <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
                 <p>{{reveal.openOrPrivacyText[index]}}</p>
               </li>
               <li v-on:click="jobInfoEdit(index)">
@@ -27,11 +27,11 @@
             </ul>
           </div>
           <div class="jobInfoInfoBody">
-            <p v-cloak>职称专业：<span>{{localJobInfo.info.profession[index]}}</span></p>
-            <p v-cloak>证书级别：<span>{{localJobInfo.info.level[index]}}</span></p>
-            <p v-cloak>证书编号：<span>{{localJobInfo.info.introduce[index]}}</span></p>
-            <p v-cloak>评定日期：<span>{{localJobInfo.info.time[index]}}</span></p>
-            <p v-cloak>发证机构：<span>{{localJobInfo.info.organ[index]}}</span></p>
+            <p v-cloak>职称专业：<span>{{item.professionalTitle}}</span></p>
+            <p v-cloak>证书级别：<span>{{item.titleLevel}}</span></p>
+            <p v-cloak>证书编号：<span>{{item.certificateNumber}}</span></p>
+            <p v-cloak>评定日期：<span>{{item.assessmentTime}}</span></p>
+            <p v-cloak>发证机构：<span>{{item.certificateBody}}</span></p>
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -42,38 +42,38 @@
             <li>
               <label>
                 <h5>*&nbsp;资格名称</h5>
-                <input v-model="localJobInfo.jobInfoName[index]" type="text" placeholder="请输入资格名称">
+                <input v-model="localTitleInfo[index].titleName" type="text" placeholder="请输入资格名称">
               </label>
             </li>
             <li>
               <label>
                 <h5>职称专业</h5>
-                <input v-model="localJobInfo.info.profession[index]" type="text" placeholder="请输入注册单位">
+                <input v-model="localTitleInfo[index].professionalTitle" type="text" placeholder="请输入注册单位">
               </label>
             </li>
             <li>
               <label>
                 <h5>职称级别</h5>
-                <input v-model="localJobInfo.info.level[index]" type="text" placeholder="请输入职称级别">
+                <input v-model="localTitleInfo[index].titleLevel" type="text" placeholder="请输入职称级别">
               </label>
             </li>
             <li>
               <label>
-                <h5>证件编号</h5>
-                <input v-model="localJobInfo.info.introduce[index]" type="text" placeholder="请输入证件编号">
+                <h5>证书编号</h5>
+                <input v-model="localTitleInfo[index].certificateNumber" type="text" placeholder="请输入证件编号">
               </label>
             </li>
             <li>
               <label>
                 <h5>评定日期</h5>
                 <!--<input v-model="localJobInfo.info.time[index]" type="month" placeholder="请输入注册单位">-->
-                <datepicker v-model="localJobInfo.info.time[index]"></datepicker>
+                <datepicker v-model="localTitleInfo[index].assessmentTime"></datepicker>
               </label>
             </li>
             <li>
               <label>
                 <h5>发证机构</h5>
-                <input v-model="localJobInfo.info.organ[index]" type="text" placeholder="请输入发证机构">
+                <input v-model="localTitleInfo[index].certificateBody" type="text" placeholder="请输入发证机构">
               </label>
             </li>
             <li class="img-wrap" >
@@ -162,38 +162,38 @@
         <li>
           <label>
             <h5>*&nbsp;职称名称</h5>
-            <input v-model="newJobInfo.jobInfoName" type="text" placeholder="请输入资格名称">
+            <input v-model="newTitleInfo.titleName" type="text" placeholder="请输入资格名称">
           </label>
         </li>
         <li>
           <label>
             <h5>职称专业</h5>
-            <input v-model="newJobInfo.info.profession" type="text" placeholder="请输入资格名称">
+            <input v-model="newTitleInfo.professionalTitle" type="text" placeholder="请输入资格名称">
           </label>
         </li>
         <li>
           <label>
             <h5>职称级别</h5>
-            <input v-model="newJobInfo.info.level" type="text" placeholder="请输入资格名称">
+            <input v-model="newTitleInfo.titleLevel" type="text" placeholder="请输入资格名称">
           </label>
         </li>
         <li>
           <label>
             <h5>证书编号</h5>
-            <input v-model="newJobInfo.info.introduce" type="text" placeholder="请输入证件编号">
+            <input v-model="newTitleInfo.certificateNumber" type="text" placeholder="请输入证件编号">
           </label>
         </li>
         <li>
           <label>
             <h5>评定时间</h5>
-           <!-- <input v-model="newJobInfo.info.time" type="month" placeholder="请输入注册单位">-->
-            <datepicker v-model="newJobInfo.info.time"></datepicker>
+           <!-- <input v-model="newTitleInfo.info.time" type="month" placeholder="请输入注册单位">-->
+            <datepicker v-model="newTitleInfo.assessmentTime"></datepicker>
           </label>
         </li>
         <li>
           <label>
             <h5>注册单位</h5>
-            <input v-model="newJobInfo.info.organ" type="text" placeholder="请输入注册单位">
+            <input v-model="newTitleInfo.certificateBody" type="text" placeholder="请输入注册单位">
           </label>
         </li>
 				<li class="img-wrap">
@@ -281,9 +281,11 @@
   import {mapState} from "vuex"
   import datepicker from "../../units/Datepicker.vue"
   import qq from "fine-uploader"
+  import MyAjax from "../../../assets/js/MyAjax.js"
+  
   
   export default {
-    name:"jobInfoIndex",
+    name:"titleInfo",
     components:{
       datepicker
     },
@@ -298,40 +300,29 @@
           addJobInfo:true,//是否添加信息
           keepAdd:true,//添加模式下，保存按钮是否可用
         },
-        localJobInfo:{
-          jobInfoName:[],
-          info:{
-            profession:[],
-            introduce:[],
-            time:[],
-            level:[],
-            organ:[]
-          }
-        },
-        newJobInfo:{
-          jobInfoName:"",
-          info:{
-            profession:"",
-            introduce:"",
-            time:"",
-            level:"",
-            organ:""
-          }
+        titleInfo:[],
+        localTitleInfo:[],
+        newTitleInfo:{
+          "accountID": "string",
+				  "assessmentTime": "2017-11-17T06:13:42.380Z",
+				  "certificateBody": "string",
+				  "certificateNumber": "string",
+				  "creAccountID": "string",
+				  "creTime": "2017-11-17T06:13:42.380Z",
+				  "ifVisable": 0,
+				  "pkid": "string",
+				  "professionalTitle": "string",
+				  "titleLevel": "string",
+				  "titleName": "string"
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
       }
     },
-    created(){
-    	for(var i=0;i<this.jobInfo.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger"+this.jobInfo[i].id);
-    		this.qqTemplate.push("qq-template-manual-trigger"+this.jobInfo[i].id);
-    		
-    	}
-    		//console.log(this.fineUploaderClass)
-    },
+    
     mounted(){
+    	this.updateData();
     	//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -378,20 +369,12 @@
 	        manualUploader.uploadStoredFiles();
 	    });
 	    
-      if(this.jobInfo.length==0){
+      if(this.titleInfo.length==0){
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }else {
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
-        for(let i=0;i<this.jobInfo.length;i++){
-          /*数据同步本地一份开始*/
-          this.localJobInfo.jobInfoName[i]=this.jobInfo[i].jobInfoName;
-          this.localJobInfo.info.profession[i]=this.jobInfo[i].info.profession;
-          this.localJobInfo.info.introduce[i]=this.jobInfo[i].info.introduce;
-          this.localJobInfo.info.time[i]=this.jobInfo[i].info.time;
-          this.localJobInfo.info.level[i]=this.jobInfo[i].info.level;
-          this.localJobInfo.info.organ[i]=this.jobInfo[i].info.organ;
-
-          /*数据同步本地一份结束*/
+        for(let i=0;i<this.titleInfo.length;i++){
+          
           this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
         }
       }
@@ -410,33 +393,93 @@
       /*以上是是否对外显示文本信息初始化*/
     },
     updated(){
-      if(this.jobInfo.length==0){
+      if(this.titleInfo.length==0){
         Vue.set(this.reveal,"empty",true)
       }else {
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newJobInfo.jobInfoName.length!=0){
-        if(this.newJobInfo.jobInfoName.trim().length!=0){
+      if(this.newTitleInfo.titleName.length!=0){
+        if(this.newTitleInfo.titleName.trim().length!=0){
           Vue.set(this.reveal,"keepAdd",false);
-          Vue.set(this.newJobInfo,"jobInfoName",this.newJobInfo.jobInfoName.trim())//进行空格去除处理
+          Vue.set(this.newTitleInfo,"titleName",this.newTitleInfo.titleName.trim())//进行空格去除处理
         }
       }else {
         Vue.set(this.reveal,"keepAdd",true);
       }
       /*控制保存按钮的背景颜色*/
     },
-    computed:mapState({
-      jobInfo:state=>state.personal.personalMessage.jobInfo,
-    }),
+   
     methods:{
+    	updateData(){
+    		var that = this;
+	    	var url = "http://10.1.31.16:8080/psnTitleMessage/findAll/"+"string";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.titleInfo = data;
+				},function(err){
+					console.log(err)
+				})
+	    	/*数据同步本地一份开始*/
+        that.localTitleInfo=JSON.parse(JSON.stringify(that.titleInfo));
+        that.fineUploaderId = [];
+	    	that.qqTemplate = [];
+	    	that.reveal.openOrPrivacyText = [];
+	    	that.reveal.openOrPrivacy = [];
+	    	for(var i=0;i<that.titleInfo.length;i++){
+	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.titleInfo[i].pkid);
+	    		that.qqTemplate.push("qq-template-manual-trigger"+that.titleInfo[i].pkid);
+	    		if(that.titleInfo[i].ifVisable==1){
+	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
+	    		}else{
+	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
+	    		}
+	    	}
+    	},
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);
-        if(!this.reveal.openOrPrivacy[index]){//显示文本的控制
-          Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
-        }else{
+        if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
+        	
           Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+        }else{
+          Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
         }
+        
+        for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
+        	if(this.reveal.openOrPrivacy[i]==false){
+        		this.titleInfo[i].ifVisable = 0;
+        	}else{
+        		this.titleInfo[i].ifVisable = 1;
+        	}
+        }//更新一下可见的值以便传给后端
+        
+        var that = this;
+        console.log(JSON.stringify(that.titleInfo[index]))
+        var url = "http://10.1.31.16:8080/psnTitleMessage/update"
+        $.ajaxSetup({contentType : 'application/json'});
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.titleInfo[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        
       },
       jobInfoEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
@@ -444,7 +487,7 @@
 
         //上传图片
           if(that.qqFineloader.length==0){
-            for(var i=0;i<that.jobInfo.length;i++){
+            for(var i=0;i<that.titleInfo.length;i++){
 //							if(index==i){
 								var manualUploader= new qq.FineUploader({
 			            element: document.getElementById(that.fineUploaderId[i]),
@@ -506,73 +549,95 @@
           console.log(that.qqFineloader)
       },
       keepJobInfoEdit(index){//编辑状态，保存按钮
-        if(this.localJobInfo.jobInfoName[index].trim().length!=0){
+        if(this.titleInfo[index].titleName.trim().length!=0){
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-          this.jobInfo[index].jobInfoName=this.localJobInfo.jobInfoName[index];
-          this.jobInfo[index].info.time=this.localJobInfo.info.time[index];
-          this.jobInfo[index].info.organ=this.localJobInfo.info.organ[index];
-          this.jobInfo[index].info.level=this.localJobInfo.info.level[index];
-          this.jobInfo[index].info.profession=this.localJobInfo.info.profession[index];
-          this.jobInfo[index].info.introduce=this.localJobInfo.info.introduce[index];
+          
           /*如果是保存，把数据保存到Vuex中*/
         }
+        var that = this;
+        var url = "http://10.1.31.16:8080/psnTitleMessage/update"
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.localTitleInfo[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+				//保存之后再重新拉取数据
+				that.updateData();
+        
+        
       },
       cancelJobInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        this.localJobInfo.jobInfoName[index]=this.jobInfo[index].jobInfoName;
-        this.localJobInfo.info.time[index]=this.jobInfo[index].info.time;
-        this.localJobInfo.info.organ[index]=this.jobInfo[index].info.organ;
-        this.localJobInfo.info.level[index]=this.jobInfo[index].info.level;
-        this.localJobInfo.info.profession[index]=this.jobInfo[index].info.profession;
-        this.localJobInfo.info.introduce[index]=this.jobInfo[index].info.introduce;
+         this.localTitleInfo[index]=JSON.parse(JSON.stringify(this.titleInfo[index]));
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },
       jobInfoDel(index){//编辑状态，删除按钮
-        this.jobInfo.splice(index,1);
-        this.localJobInfo.jobInfoName.splice(index,1);
-        this.localJobInfo.info.introduce.splice(index,1);
-        this.localJobInfo.info.profession.splice(index,1);
+        var that = this;
+        var url = "http://10.1.31.16:8080/psnTitleMessage/del/"+that.titleInfo[index].pkid;
+        MyAjax.ajax({
+					type: "DELETE",
+					url:url,
+					dataType: "json",
+					contentType: "application/json;charset=UTF-8",
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
       },
       addInfo(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addJobInfo",false);
         Vue.set(this.reveal,"empty",false)
+        Vue.set(this.newTitleInfo,"titleName","");
+        Vue.set(this.newTitleInfo,"professionalTitle","");
+        Vue.set(this.newTitleInfo,"certificateNumber","");
+        Vue.set(this.newTitleInfo,"assessmentTime","");
+        Vue.set(this.newTitleInfo,"titleLevel","");
+        Vue.set(this.newTitleInfo,"certificateBody","");
       },
       keepJobInfoAdd(){//添加模式下的保存
-        if(this.newJobInfo.jobInfoName.length!=0){
-          if(this.newJobInfo.jobInfoName.trim().length!=0){
-
-            this.localJobInfo.jobInfoName.push(this.newJobInfo.jobInfoName);
-            this.localJobInfo.info.time.push(this.newJobInfo.info.time)
-            this.localJobInfo.info.profession.push(this.newJobInfo.info.profession);
-            this.localJobInfo.info.introduce.push(this.newJobInfo.info.introduce);
-            this.localJobInfo.info.level.push(this.newJobInfo.info.level);
-            this.localJobInfo.info.organ.push(this.newJobInfo.info.organ);
-            //同步信息到执业资格首页
-            this.jobInfo.push({jobInfoName:this.newJobInfo.jobInfoName,info:{time:this.newJobInfo.info.time,profession:this.newJobInfo.info.profession,introduce:this.newJobInfo.info.introduce,level:this.newJobInfo.info.level,organ:this.newJobInfo.info.organ}})
-            /*同步信息到个人信息首页*/
-            Vue.set(this.reveal,"addJobInfo",true);
-            //视图切换到执业资格的首页
-            Vue.set(this.newJobInfo,"jobInfoName","");
-            Vue.set(this.newJobInfo.info,"profession","");
-            Vue.set(this.newJobInfo.info,"introduce","");
-            Vue.set(this.newJobInfo.info,"time","");
-            Vue.set(this.newJobInfo.info,"level","");
-            Vue.set(this.newJobInfo.info,"organ","");
-            /*清除数据，保证下次输入时输入框为空*/
-            this.reveal.openOrPrivacy.push(false)//设置是否对外显示
+        if(this.newTitleInfo.titleName.length!=0){
+          if(this.newTitleInfo.titleName.trim().length!=0){
+            this.reveal.openOrPrivacy.push(true)//设置是否对外显示
             this.reveal.openOrPrivacyText.push("显示")//设置是否对外显示文本
+            Vue.set(this.reveal,"addJobInfo",true);
           }
         }
+        var that = this;
+//      console.log(that.software[index])
+        var url = "http://10.1.31.16:8080/psnTitleMessage/insert";
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.newTitleInfo),
+					dataType: "json",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
       },
       cancelJobInfoAdd(){
         Vue.set(this.reveal,"addJobInfo",true);
         //视图切换到执业资格的首页
-        Vue.set(this.newJobInfo,"jobInfoName","");
-        Vue.set(this.newJobInfo.info,"profession","");
-        Vue.set(this.newJobInfo.info,"introduce","");
-        Vue.set(this.newJobInfo.info,"time","");
-        Vue.set(this.newJobInfo.info,"level","");
-        Vue.set(this.newJobInfo.info,"organ","");
+        Vue.set(this.newTitleInfo,"titleName","");
+        Vue.set(this.newTitleInfo,"professionalTitle","");
+        Vue.set(this.newTitleInfo,"certificateNumber","");
+        Vue.set(this.newTitleInfo,"assessmentTime","");
+        Vue.set(this.newTitleInfo,"titleLevel","");
+        Vue.set(this.newTitleInfo,"certificateBody","");
         /*清除数据，保证下次输入时输入框为空*/
       }
     }
@@ -584,7 +649,7 @@
   $borderColor:#ebebeb;
   $emptyColor:#9c9c9c;
   $themeColor:rgb(242,117,25);
-  .jobInfoIndex {
+  .titleInfo {
     width: 940px;
     float: left;
     padding: 0 40px;

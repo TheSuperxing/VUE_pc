@@ -272,7 +272,7 @@
     },
     mounted(){
     	var that = this;
-    	var url = "http://10.1.31.6:8080/psnsoftware/findByPsn/"+"string";
+    	var url = "http://10.1.31.7:8080/psnsoftware/findByPsn/"+"string";
     	MyAjax.ajax({
 				type: "GET",
 				url:url,
@@ -397,7 +397,7 @@
     methods:{
     	updateData(){
       	var that = this;
-	    	var url = "http://10.1.31.6:8080/psnsoftware/findByPsn/"+"string";
+	    	var url = "http://10.1.31.7:8080/psnsoftware/findByPsn/"+"string";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -449,7 +449,7 @@
         
         var that = this;
         console.log(JSON.stringify(that.software[index]))
-        var url = "http://10.1.31.6:8080/psnsoftware/update"
+        var url = "http://10.1.31.7:8080/psnsoftware/update"
         $.ajaxSetup({contentType : 'application/json'});
         MyAjax.ajax({
 					type: "POST",
@@ -475,7 +475,7 @@
 			            element: document.getElementById(that.fineUploaderId[i]),
 			            template: that.qqTemplate[i],
 			            request: {
-			              endpoint: 'http://10.1.31.6:8080/psnsoftware/batchUpload'
+			              endpoint: 'http://10.1.31.7:8080/psnsoftware/batchUpload'
 			            },
 			            thumbnails: {
 			              //	                placeholders: {
@@ -530,7 +530,7 @@
       softwareEditKeep(index){//编辑状态，保存按钮
         
         var that = this;
-        var url = "http://10.1.31.6:8080/psnsoftware/update"
+        var url = "http://10.1.31.7:8080/psnsoftware/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -562,7 +562,7 @@
         
         var that = this;
         console.log(that.software[index].pkid)
-        var url = "http://10.1.31.6:8080/psnsoftware/del/"+that.software[index].pkid;
+        var url = "http://10.1.31.7:8080/psnsoftware/del/"+that.software[index].pkid;
         MyAjax.ajax({
 					type: "DELETE",
 					url:url,
@@ -612,7 +612,7 @@
         
         var that = this;
 //      console.log(that.software[index])
-        var url = "http://10.1.31.6:8080/psnsoftware/insert";
+        var url = "http://10.1.31.7:8080/psnsoftware/insert";
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",

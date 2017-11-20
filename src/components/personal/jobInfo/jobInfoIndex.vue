@@ -303,17 +303,17 @@
         titleInfo:[],
         localTitleInfo:[],
         newTitleInfo:{
-          "accountID": "string",
-				  "assessmentTime": "2017-11-17T06:13:42.380Z",
-				  "certificateBody": "string",
-				  "certificateNumber": "string",
-				  "creAccountID": "string",
-				  "creTime": "2017-11-17T06:13:42.380Z",
-				  "ifVisable": 0,
-				  "pkid": "string",
-				  "professionalTitle": "string",
-				  "titleLevel": "string",
-				  "titleName": "string"
+          "accountID": "",
+				  "assessmentTime": "",
+				  "certificateBody": "",
+				  "certificateNumber": "",
+				  "creAccountID": "",
+				  "creTime": "",
+				  "ifVisable": 1,
+				  "pkid": "",
+				  "professionalTitle": "",
+				  "titleLevel": "",
+				  "titleName": ""
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组

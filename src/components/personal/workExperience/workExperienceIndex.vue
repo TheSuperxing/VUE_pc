@@ -18,7 +18,7 @@
         <ul class="modal-container" v-bind:class="{ modalContainerShow : reveal.modal,modalContainerEmpty: !reveal.modal}">
           <li v-bind:class="{beforeSearch:!reveal.searchShow}">
             <h6>公司名称</h6>
-            <input v-model="input.value" type="text" placeholder="请输入公司名称">
+            <input v-model="input.value" type="text" placeholder="请输入公司名称"/>
             <button  v-on:click="search">
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
@@ -28,8 +28,8 @@
             <h6>搜索结果</h6>
             <p v-if="!reveal.modal">抱歉，未找到该公司，请从新搜索</p>
             <div v-if="reveal.modal">
-              <p v-for="(item,index) in num" v-on:click="selectCompanyName(index)">
-                <span>{{item}}</span>
+              <p v-for="(item,index) in searchResult" v-on:click="selectCompanyName(index)">
+                <span>{{item.companyName}}</span>
                 <i v-bind:class="{iSelectActive:reveal.iSelectActive[index]}"></i>
               </p>
             </div>
@@ -164,7 +164,7 @@
     data(){
       return {
         title:"工作经历",
-        num:["1","2","3"],
+        searchResult:[],
         input:{value:""},//搜索公司时，自己输入的公司名称
         companyName:{name:''},//用来存放选择公司的索引
         reveal:{
@@ -237,14 +237,13 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = "http://10.1.31.16:8080/psnWorkExperience/findAll/"+"string";
+	    	var url = "http://10.1.31.16:8080/psnWorkExperience/findByMySelf/"+"string";//暂时先写成这样
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
 				},function(data){
 					console.log(data)
 					data = data.msg;
@@ -382,35 +381,36 @@
 	      Vue.set(this.newWorkExperience,"jobDescription","")
       },
       search(){//公司名称的搜索,单击时可能出现公司名称列表
-//    	var that = this;
-//	    	var url = "http://10.1.31.16:8080/psnWorkExperience/findAll/"+"string";
-//	    	MyAjax.ajax({
-//					type: "GET",
-//					url:url,
-//	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-//					dataType: "json",
-//	//				content-type: "text/plain;charset=UTF-8",
-//					
-//				},function(data){
-//					console.log(data)
-//					data = data.msg;
-//					that.workExperience = data;
-//				},function(err){
-//					console.log(err)
-//				})
-        if(this.input.value!=0){
+      	var that = this;
+	    	var url = "http://10.1.31.16:8080/psnWorkExperience/findByCorpName/"+that.input.value;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.searchResult = data;
+				},function(err){
+					console.log(err)
+				})
+        if(that.input.value!=""){
           Vue.set(this.reveal,"searchShow",true)//点击搜索按钮后，展示搜索结果
 
-          if(this.num.length!=0){
+          if(this.searchResult.length!=0){
             Vue.set(this.reveal,"modal",true)
           }else {
             Vue.set(this.reveal,"modal",false)
           }
         }
 
-        for(var i= 0 ; i< this.num.length;i++){/*给每一个搜索出的公司的列表添加一个状态*/
+        for(var i= 0 ; i< this.searchResult.length;i++){/*给每一个搜索出的公司的列表添加一个状态*/
           this.reveal.iSelectActive.push(false);
         }
+        
       },
       customCompanyName(){//自定义公司
         Vue.set(this.reveal,"customCompanyName",false);//切换到能自定义公司数据
@@ -421,15 +421,15 @@
         Vue.set(this.input,"value","")//选择自定义公司后会把输入要搜索的公司的信息清空
       },
       selectCompanyName(index){//在弹出的公司列表里挑选公司名称
-        Vue.set(this.companyName,"name",this.num[index]);
+        Vue.set(this.companyName,"name",this.searchResult[index].companyName);
 
-        for(var i= 0 ; i< this.num.length;i++){/*在每一次单击后对搜索出的列表状态进行初始化*/
+        for(var i= 0 ; i< this.searchResult.length;i++){/*在每一次单击后对搜索出的列表状态进行初始化*/
           Vue.set(this.reveal.iSelectActive,[i],false)
         }
         Vue.set(this.reveal.iSelectActive,[index],true);
       },
       confirm(){//确认保存公司名称
-       if(this.num.length!=0){//如果搜索结果不为空，确认按钮才能用
+       if(this.searchResult.length!=0){//如果搜索结果不为空，确认按钮才能用
          Vue.set(this.newWorkExperience,"companyName",this.companyName.name);
          var modal2= new ModalOpp("#modal-overlay2");
          modal2.closeModal();
@@ -881,6 +881,8 @@
             }
             .textArea{
               position: relative;
+              border-radius: 5px;
+              
               i{
                 position: absolute;
                 bottom: 0;
@@ -913,7 +915,8 @@
             border:1px solid $borderColor;
             padding-left:13px;
             color: #353535;
-
+            border-radius: 5px;
+						
           }
           input[type=text]{
             width:480px;
@@ -933,6 +936,7 @@
           }
         }
         textarea{
+        	border-radius: 5px;
           border:1px solid $borderColor;
         }
         button{

@@ -5,7 +5,7 @@
   	<div id="modal-overlay" class="search-modal">
   		<div class="searchPro">
 				<h5>搜索项目</h5>
-				<span class="modalChaBtn" @click="closeModal"></span>
+				<span class="modalChaBtn" @click="closeModal()"></span>
 				<div class="content-wrap">
 						<div class="search-wrap">
 							<span class="wrap-left">项目名称</span>
@@ -18,10 +18,10 @@
 							<span class="wrap-left">搜索结果</span>
 							
 							<ul class="resultList">
-								<li class="noResult">抱歉，未找到该项目，请重新搜索</li>
-								<li v-for="">
-									<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-									<span class="choseBtn" @click="choseThis($event)">
+								<li class="noResult" v-if="noresult">抱歉，未找到该项目，请重新搜索</li>
+								<li v-for="(item,$index) in searchResult" v-if="!noresult">
+									<router-link :to="{name:'ProjectDetail',query:{id:item.psnProExpeID}}">{{item.projectName}}</router-link>
+									<span class="choseBtn" @click="choseThis($event,$index)">
 										
 									</span>
 								</li>
@@ -42,16 +42,15 @@
 							<router-link to="/yhzx/personal/info/personalProject/definedProject" @click="closeModal">
 								<div class="goToDefinedPro">自定义添加项目</div>
 							</router-link>
-							
-							<span class="confirmBtn">确认</span>
+							<span class="confirmBtn" @click="confirmAddpro">确认</span>
 						</div>
 				</div>
   		</div>
   	</div>
   	<!--搜索项目模态框-->
     <h3 class="c-title"><span>{{title}}</span></h3>
-    <div class="projectTable" v-for="(item,$index) in companyProInfo">
-    	<router-link :to="{name:'ProjectDetail',query:{id:item.id}}" class="tableTitle" >{{item.proName}}</router-link>
+    <div class="projectTable" v-for="(item,$index) in proInfo">
+    	<router-link :to="{name:'ProjectDetail',query:{id:item.id}}" class="tableTitle" >{{item.projectName}}</router-link>
     	<div class="toolsBox">
     		<!--点击跳转到编辑该项目的页面  路由传值index-->
     		<span v-bind:class="{openOrPrivacy:!openOrPrivacy[$index]}" v-on:click="OpenOrPrivacy($index)">{{openOrPrivacyText[$index]}}</span>
@@ -60,7 +59,7 @@
     		<!--确认删除该项目模态框-->
     			<div id="modal-overlay" v-bind:class="deleteModalClass[$index]">
 						<div class="deletePro">
-							<h5>搜索项目</h5>
+							<h5>删除项目</h5>
 							<span class="modalChaBtn" @click="closeModal($index)"></span>
 							<div class="content-wrap">
 							<p class="deleteOrNo">确定删除该项目吗？</p>
@@ -74,10 +73,10 @@
     		<!--确认删除该项目模态框-->
     	</div>
     	<div class="pr-wrap-a">
-    		<span class="completeTime">Time : {{item.parTakeTime_S}} 至 {{item.parTakeTime_E}}</span>
+    		<span class="completeTime">Time : {{item.partakeTimeUp}} 至 {{item.partakeTimeDown}}</span>
   			<span class="takeOfficeBar">项目责任：<em class="takeOffice">{{item.takeOffice}}</em></span>
     	</div>
-    	<div class="pr-wrap-b">{{item.detailDes}}
+    	<div class="pr-wrap-b">责任描述：{{item.detailDes}}
     	</div>
     	
     	<div class="morePics" v-if="!show.tag[$index]">
@@ -105,52 +104,82 @@
 	import router from "../../../router"
 	import Vue from "vue"
 	import {mapState} from "vuex"
+  import MyAjax from "../../../assets/js/MyAjax.js"
+	
   export default {
     name:"companyProjectIndex",
     data:function(){
       return {
-        title:"公司项目信息",
+        title:"个人项目信息",
 //      updown:"view-down",
         updowntxt:[],
         show:{
         	tag:[],
-        	
         },
         proInfo:[],
+        localProInfo:[],
         searchText:"", /*搜索框input值*/
-        list:[], /*搜索结果*/
+        searchResult:[], /*搜索结果*/
+       	chosedOne:{},/*被选中的搜索结果*/
+       	noresult:true,/*默认没有结果*/
         deleteModalClass:[],//确认删除项目的模态框
         openOrPrivacy: [],//控制信息对外是否显示状态
         openOrPrivacyText: [],//控制信息是否对外显示文本
       }
     },
-    computed:mapState({
-      companyProInfo:state=>state.company.companyMessage.companyProInfo/*获取vuex数据*/
-    }),
+//  computed:mapState({
+//    companyProInfo:state=>state.company.companyMessage.companyProInfo/*获取vuex数据*/
+//  }),
     mounted(){
-    	/*将vuex里面的数据获取到本组件*/
-    	this.proInfo= this.companyProInfo.reduce(function(coll,item){
-    		coll.push(item);
-    		return coll;
-    	},this.proInfo)
-//  	console.log(this.proInfo);
-//  	console.log(this.companyProInfo)
-    	
-    	this.show.tag.length = this.companyProInfo.length;
-//  	console.log(this.show.tag.length)
-    	for(var i=0;i<this.companyProInfo.length;i++){
-    		this.show.tag[i]=true;
-    		this.updowntxt.push("展开查看更多");
-    		this.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
-    		this.openOrPrivacy.push(true);
-	      this.openOrPrivacyText.push("显示");
-	      /*对每一个循环列表的对外显示赋初始值*/
-    	}
-    	
+    	this.updateData();
     },
     methods:{
+    	updateData(){
+    		var that = this;
+	    	var url = "http://10.1.31.16:8080/psnProjExpe/findProjExpe";//暂时先写成这样
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.proInfo = data;
+				},function(err){
+					console.log(err)
+				})
+	    	/*数据同步本地一份开始*/
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			  }
+        that.localProInfo=JSON.parse(JSON.stringify(that.proInfo));
+        that.show.tag = [];
+        that.updowntxt = [];
+        that.deleteModalClass = [];
+        that.openOrPrivacy = [];
+        that.openOrPrivacyText = [];
+        that.show.tag.length = that.proInfo.length;
+	//  	console.log(this.show.tag.length)
+	    	for(var i=0;i<this.proInfo.length;i++){
+	    		that.proInfo[i].takeOffice = emptyText(that.proInfo[i].takeOffice);
+	    	  that.proInfo[i].detailDes = emptyText(that.proInfo[i].detailDes);
+	    		that.show.tag[i]=true;
+	    		that.updowntxt.push("展开查看更多");
+	    		that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
+	    		that.openOrPrivacy.push(true);
+		      that.openOrPrivacyText.push("显示");
+		      /*对每一个循环列表的对外显示赋初始值*/
+	    	}
+    	},
     	goToEditPro(index,item){
-    		router.push({name:'editPerProject',params:{id:item.id}})
+    		console.log(item.projectID,item.psnProExpeID)
+    		router.push({name:'editPerProject',query:{proId:item.projectID,psnId:item.psnProExpeID}})
     		/*通过路由传值*/
     	},
     	
@@ -168,6 +197,7 @@
     		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
     	},
     	OpenOrPrivacy(index){//显示隐藏按钮，通过这个按钮可以控制显示到别人查看信息页的信息
+    		
         Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index])
         if(this.openOrPrivacyText[index]=="显示"){
           Vue.set(this.openOrPrivacyText,[index],"隐藏")
@@ -179,6 +209,7 @@
     		//删除模态框的弹出按钮事件
     		var aa = "deleteModalClass"+index;
     		Modal.makeText($('.'+aa))
+    		
     	},
     	cancleDele(index){
     		//取消删除该项目
@@ -186,12 +217,28 @@
     	},
     	saveDele(index){
     		//确认删除该项目
-    		this.companyProInfo.splice(index,1);
+    		var that = this;
+        console.log(that.proInfo[index].psnProExpeID)
+        var url = "http://10.1.31.16:8080/psnProjExpe/del/"+that.proInfo[index].psnProExpeID;
+        MyAjax.ajax({
+					type: "DELETE",
+					url:url,
+					dataType: "json",
+					contentType: "application/json;charset=UTF-8",
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();//更新一下数据
     		this.closeModal(index);
+    		
     	},
     	//模态框
 			overlay(){
 				Modal.makeText($('.search-modal'))
+				this.searchResult = [];
+				this.searchText = '';
 			},
 			closeModal(index){
 				Modal.closeModal($('.search-modal'))
@@ -201,17 +248,48 @@
 				$('.result-wrap').css({display:"none"})
 			},
 			getData(){
-//				console.log($('.search-wrap').offsetTop())
+				var that = this;
+	    	var url = "http://10.1.31.16:8080/psnProjExpe/findProjByName/"+that.searchText;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.searchResult = data;
+					if(that.searchResult.length!=0){
+						that.noresult=false;
+						
+					}else{
+						that.noresult=true;
+					}
 					$('.search-wrap').animate({marginTop:"30px",marginBottom:"40px"},100);
 					$('.result-wrap').fadeIn(200);
+				},function(err){
+					console.log(err)
+				})
+					
+					
 			},
-			choseThis(e){
+			choseThis(e,index){
+				
 				$(".resultList li span").removeClass('selected');
 				$(e.target).addClass("selected");
-				console.log($(".resultList li span"))
+				this.chosedOne = this.searchResult[index]
+//				console.log($(".resultList li span"))
+        console.log(this.chosedOne)
 				
 			},
-			
+			confirmAddpro(){
+				var that = this;
+				console.log(that.chosedOne.projectID,that.chosedOne.psnProExpeID)
+				router.push({name:'editPerProject',query:{proId:that.chosedOne.projectID,psnId:that.chosedOne.psnProExpeID}})
+        
+			}
 	
     
     }

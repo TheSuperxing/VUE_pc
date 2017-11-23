@@ -13,9 +13,9 @@
         <!--显示信息列表开始-->
         <div class="languageInfoList" v-if="!reveal.editInfo[index]">
           <div class="languageInfoTitle">
-            <h4 v-cloak>{{localLanguage.languageName[index]}}</h4>
+            <h4 v-cloak>{{item.language}}</h4>
             <ul class="toolsBox">
-              <li v-bind:class="{openOrPrivacy:reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
+              <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
                 <p v-cloak>{{reveal.openOrPrivacyText[index]}}</p>
               </li>
               <li v-on:click="languageEdit(index)">
@@ -27,7 +27,7 @@
             </ul>
           </div>
           <div class="languageInfoBody">
-            <p v-cloak>{{localLanguage.info.profession[index]}}</p>
+            <p v-cloak>{{item.proficiency}}</p>
             <ul class="showImg">
 	        		<li v-for="item in picInfo">
 	        			<img :src="item" />
@@ -43,13 +43,13 @@
             <li>
               <label>
                 <h5>*&nbsp;语言种类</h5>
-                <input v-model="localLanguage.languageName[index]" type="text" placeholder="请输入语言种类">
+                <input v-model="localLanguage[index].language" type="text" placeholder="请输入语言种类">
               </label>
             </li>
             <li>
               <label>
                 <h5>熟练程度</h5>
-                <input v-model="localLanguage.info.profession[index]" type="text" placeholder="请输入熟练程度">
+                <input v-model="localLanguage[index].proficiency" type="text" placeholder="请输入熟练程度">
               </label>
             </li>
             <li class="img-wrap">
@@ -137,13 +137,13 @@
         <li>
           <label>
             <h5>*&nbsp;语言种类</h5>
-            <input v-model="newLanguage.languageName" type="text" placeholder="请输入语言种类">
+            <input v-model="newLanguage.language" type="text" placeholder="请输入语言种类">
           </label>
         </li>
         <li>
           <label>
             <h5>熟练程度</h5>
-            <input v-model="newLanguage.info.profession" type="text" placeholder="请输入熟练程度">
+            <input v-model="newLanguage.proficiency" type="text" placeholder="请输入熟练程度">
           </label>
         </li>
         <li class="img-wrap">
@@ -230,6 +230,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import qq from "fine-uploader"
+  import MyAjax from "../../../assets/js/MyAjax.js"
   
   export default {
     name:"LanguageIndex",
@@ -244,49 +245,22 @@
           addLanguage:true,//是否添加信息
           keepAddLanguage:true,//添加模式下，保存按钮是否可用
         },
-//      language:{
-//      	"accountID": "string",
-//				  "creAccountID": "string",
-//				  "creTime": "2017-11-15T01:55:55.345Z",
-//				  "ifVisable": 0,
-//				  "pkid": "string",
-//				  "proficiency": "string",
-//				  "proficiencyCode": "string",
-//				  'language':"",
-//				  
-//      },
+        language:[],
+        localLanguage:[],
         picInfo:[require("../../../assets/img/images/captainmiao1.jpg"),require("../../../assets/img/images/captainmiao2.jpg")],
-        localLanguage:{
-          languageName:[],
-          info:{
-            time:[],
-            profession:[]
-          }
-        },
+        
         newLanguage:{
-          languageName:"",
-          info:{
-            time:"",
-            profession:""
-          }
+				  "ifVisable": 1,
+				  "language": "",
+				  "proficiency": "",
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
       }
     },
-    computed:mapState({
-      language:state=>state.personal.personalMessage.otherSkill.language,
-    }),
-    created(){
-    	for(var i=0;i<this.language.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger"+this.language[i].id);
-    		this.qqTemplate.push("qq-template-manual-trigger"+this.language[i].id);
-    	}
-    	//console.log(this.fineUploaderClass)
-    },
     mounted(){
-    	
+    	this.updateData();
     	//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-template-manual-trigger-language'),
@@ -337,13 +311,7 @@
       if(this.language.length!=0){
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
         for(let i=0;i<this.language.length;i++){
-          /*数据同步本地一份开始*/
-          this.localLanguage.languageName[i]=this.language[i].languageName;
-          this.localLanguage.info.profession[i]=this.language[i].info.profession;
-          //论文数据
           this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
-          this.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
-          this.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值
         }
       }else{
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
@@ -356,10 +324,10 @@
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newLanguage.languageName.length!=0){
-        if(this.newLanguage.languageName.trim().length!=0){
+      if(this.newLanguage.language.length!=0){
+        if(this.newLanguage.language.trim().length!=0){
           Vue.set(this.reveal,"keepAddLanguage",false);//控制保存按钮的背景颜色
-          Vue.set(this.newLanguage,"languageName",this.newLanguage.languageName.trim())//进行必填项的空格去除处理
+          Vue.set(this.newLanguage,"language",this.newLanguage.language.trim())//进行必填项的空格去除处理
         }
       }else {
         Vue.set(this.reveal,"keepAddLanguage",true);//控制保存按钮的背景颜色
@@ -367,18 +335,78 @@
     },
     
     methods:{
+    	updateData(){
+      	var that = this;
+	    	var url = "http://10.1.31.7:8080/psnlanguage/findByMySelf";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.language = data;
+				},function(err){
+					console.log(err)
+				})
+	    	/*数据同步本地一份开始*/
+        that.localLanguage=JSON.parse(JSON.stringify(that.language));
+        that.fineUploaderId = [];
+	    	that.qqTemplate = [];
+	    	that.reveal.openOrPrivacyText = [];
+	    	that.reveal.openOrPrivacy = [];
+	    	for(var i=0;i<that.language.length;i++){
+	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.language[i].pkid);
+	    		that.qqTemplate.push("qq-template-manual-trigger"+that.language[i].pkid);
+	    		if(that.language[i].ifVisable==1){
+	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
+	    		}else{
+	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
+	    		}
+	    	}
+      },
       openOrPrivacy(index){//信息是否对外公开控制按钮
-        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);
+        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
         if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
+        	
           Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
         }else{
           Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
         }
+        
+        for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
+        	if(this.reveal.openOrPrivacy[i]==false){
+        		this.language[i].ifVisable = 0;
+        	}else{
+        		this.language[i].ifVisable = 1;
+        	}
+        }
+        
+        var that = this;
+        console.log(JSON.stringify(that.language[index]))
+        var url = "http://10.1.31.7:8080/psnlanguage/update"
+        $.ajaxSetup({contentType : 'application/json'});
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.language[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
       },
       languageEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
-
         //上传图片
           if(that.qqFineloader.length==0){
             for(var i=0;i<that.language.length;i++){
@@ -388,7 +416,7 @@
 			            request: {
 			              endpoint: '/server/uploads'
 			            },
-			            thumbnails: {
+			            thumbnails:{
 			              //	                placeholders: {
 			              //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
 			              //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
@@ -441,53 +469,87 @@
           console.log(that.qqFineloader)
       },
       languageEditKeep(index){//编辑状态，保存按钮
-        if(this.localLanguage.languageName[index].trim().length!=0){
+        var that = this;
+        var url = "http://10.1.31.7:8080/psnlanguage/update"
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.localLanguage[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+				//保存之后再重新拉取数据
+				that.updateData();
+				if(this.localLanguage[index].length!=0){
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
-          this.language[index].languageName=this.localLanguage.languageName[index];
-          this.language[index].info.profession=this.localLanguage.info.profession[index];
-          /*如果是保存，把数据保存到Vuex中*/
         }
       },
       languageEditCancel(index){//编辑状态，取消按钮
-        Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        this.localLanguage.languageName[index]=this.language[index].languageName;
-        this.localLanguage.info.profession[index]=this.language[index].info.profession;
+       Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
+        
+        this.localLanguage[index]=JSON.parse(JSON.stringify(this.language[index]));
 
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },
       languageEditDel(index){//编辑状态，删除按钮
-        this.language.splice(index,1);
-        this.localLanguage.languageName.splice(index,1);
-        this.localLanguage.info.profession.splice(index,1);
+        var that = this;
+        console.log(that.language[index].pkid)
+        var url = "http://10.1.31.7:8080/psnlanguage/del/"+that.language[index].pkid;
+        MyAjax.ajax({
+					type: "DELETE",
+					url:url,
+					dataType: "json",
+					contentType: "application/json;charset=UTF-8",
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
       },
       addLanguage(){//添加信息按钮，添加信息的视图切换
+        /*先清除数据，保证下次输入时输入框为空*/
+        Vue.set(this.newLanguage,"language","");
+        Vue.set(this.newLanguage,"proficiency","");
         Vue.set(this.reveal,"addLanguage",false);
         Vue.set(this.reveal,"empty",false);
       },
       keepNewLanguage(){//添加模式下的保存
-        if(this.newLanguage.languageName.length!=0){
-          if(this.newLanguage.languageName.trim().length!=0){
-
-            this.localLanguage.languageName.push(this.newLanguage.languageName);
-            this.localLanguage.info.profession.push(this.newLanguage.info.profession);
-            //同步信息到执业资格首页
-            this.language.push({languageName:this.newLanguage.languageName,info:{time:"",profession:this.newLanguage.info.profession,introduce:"",level:"",organ:"",}})
-            /*同步信息到个人信息首页*/
-            Vue.set(this.reveal,"addLanguage",true);
-            //视图切换到执业资格的首页
-            Vue.set(this.newLanguage,"languageName","");
-            Vue.set(this.newLanguage.info,"profession","");
-            /*清除数据，保证下次输入时输入框为空*/
-            this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-            this.reveal.openOrPrivacy.push(false)//追加显示隐藏按钮状态
-          }
+        if(this.newLanguage.language.length!=0){
+//      	this.localLanguage.push(JSON.parse(JSON.stringify(this.newLanguage)))
+//      	this.language.push(JSON.parse(JSON.stringify(this.newLanguage)))
+	        Vue.set(this.reveal,"addLanguage",true);
+	        this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
+	        this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
         }
+        var that = this;
+//      console.log(that.software[index])
+        var url = "http://10.1.31.7:8080/psnlanguage/insert";
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.newLanguage),
+					dataType: "json",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
       },
       cancelNewLanguage(){
         Vue.set(this.reveal,"addLanguage",true);
         //视图切换到执业资格的首页
-        Vue.set(this.newLanguage,"languageName","");
-        Vue.set(this.newLanguage.info,"profession","");
+        Vue.set(this.newLanguage,"language","");
+        Vue.set(this.newLanguage,"proficiency","");
         /*清除数据，保证下次输入时输入框为空*/
       }
     }

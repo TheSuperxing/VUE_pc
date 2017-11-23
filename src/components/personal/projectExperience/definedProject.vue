@@ -8,12 +8,13 @@
 		<ul class="modify-table-wrap">
 			<li class="name-wrap">
 				<span class="table-wrap-left">* 项目名称</span>
-				<input type="text" placeholder="请输入项目名称" v-model="projectInfo.proName"/>
+				<input type="text" placeholder="请输入项目名称" v-model="projectInfo.projectName"/>
 				<alertTip v-if="showAlert.name" :showHide="showAlert.name" @closeTip="closeTip" :alertText="alertText.name"></alertTip>
 			</li>
 			<li class="place-wrap">
-				<span class="table-wrap-left">项目地址</span>
+				<span class="table-wrap-left">* 项目地址</span>
 				<provinces-city v-on:accpt-province-change="changeProjectAds"></provinces-city>
+				
 			</li>
 			<li class="status-wrap">
 				<span class="table-wrap-left">项目状态</span>
@@ -25,10 +26,12 @@
 			</li>
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 建成时间</span>
-				<datepicker class="datePicker" v-model="projectInfo.compalteTime_S"></datepicker>
-				<span class="heng"></span>
-				<datepicker class="datePicker" v-model="projectInfo.compalteTime_E"></datepicker>
+				<datepicker class="datePicker" v-model="projectInfo.compalteTime"></datepicker>
 				<alertTip v-if="showAlert.compalteTime" :showHide="showAlert.compalteTime" @closeTip="closeTip" :alertText="alertText.compalteTime"></alertTip>
+				<div class="timeGray" v-if="complated">
+					<span class="table-wrap-left">* 建成时间</span>
+					<span class="picker"></span>
+				</div>
 			</li>
 			<li class="func-wrap">
 				<span class="table-wrap-left">建筑功能</span>
@@ -43,14 +46,14 @@
 			</li>
 			<li class="describe-wrap">
 				<span class="table-wrap-left">项目描述</span>
-				<textarea placeholder="请输入项目详细描述文案..." v-model="projectInfo.proDesc" maxlength="500"></textarea>
+				<textarea placeholder="请输入项目详细描述文案..." v-model="projectInfo.projectDescription" maxlength="500"></textarea>
 				<p class="limit-words">{{procont}}/500</p>
 			</li>
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 参与时间</span>
-				<datepicker class="datePicker" v-model="projectInfo.parTakeTime_S"></datepicker>
+				<datepicker class="datePicker" v-model="projectInfo.partakeTimeUp"></datepicker>
 				<span class="heng"></span>
-				<datepicker class="datePicker" v-model="projectInfo.parTakeTime_E"></datepicker>
+				<datepicker class="datePicker" v-model="projectInfo.partakeTimeDown"></datepicker>
 				<alertTip v-if="showAlert.parTakeTime" :showHide="showAlert.parTakeTime" @closeTip="closeTip" :alertText="alertText.parTakeTime"></alertTip>
 			</li>
 			<li class="duty-wrap">
@@ -95,7 +98,7 @@
 			            <div class="buttons">
 			                <div class="qq-upload-button-selector qq-upload-button">
 			                	
-			                    <span><img src="../../../assets/img/company/top.png" />请上传图片</span>
+			                    <span>请上传图片</span>
 			                </div>
 			                <button type="button"  class="btn btn-primary"  id="trigger-upload">
 			                    	提交上传
@@ -157,6 +160,7 @@
 	import Datepicker from "../units/Datepicker.vue"
 	import alertTip from "../units/alertTip.vue"
 	import qq from "fine-uploader"
+    import MyAjax from "../../../assets/js/MyAjax.js"
 	
 	export default {
 	    name:"editProject",
@@ -180,28 +184,22 @@
         	addProjectType:{value:"",type:false},//建筑功能的扩展
             projectStateColor:[],//项目状态的选中(单选)
             projectTypeColor:[],//建筑功能的选中(多选)
+	        complated:false,//项目状态在建或者是建成的标志，控制建成时间的可操作性
 	        projectInfo:{//新增的项目信息采集
-	        	id:"3",
-	        	proName:"",//同步到项目主页的信息 (必填*)
-				proPlace:"",
-				projectAds:{province:"上海市",city:"上海市",county:"杨浦区"},//项目地址
-				proState:"",//项目状态projectState
-				compalteTime_S:"",//同步到项目主页的信息 (必填*)
-				compalteTime_E:"",//同步到项目主页的信息 (必填*)
-				proFunc:[],//建筑功能种类projectType
-				proDesc:"",////项目详细描述文案
-				proPics:"",
-				parTakeTime_S:"",// (必填*)
-				parTakeTime_E:"",// (必填*)
+	        	projectName:"",//同步到项目主页的信息 (必填*)
+				projectPlaceObj:"",//项目地址
+				projectState:"",//项目状态projectState
+				compalteTime:"",//同步到项目主页的信息 (必填*)
+				architectFunctions:[],//建筑功能种类projectType
+				projectDescription:"",////项目详细描述文案
+				partakeTimeUp:"",// (必填*)
+				partakeTimeDown:"",// (必填*)
 				takeOffice:"",//公司职责(必填*)
 				detailDes:"",//职责详细描述
-				picsDisplay:"",
+			    "ifVisable": 1,
 	        }
 	      }
 	    },
-	    computed:mapState({
-		  companyProInfo:state=>state.company.companyMessage.companyProInfo/*获取vuex数据*/
-		}),
 	    mounted(){
 	    	$(document.body).css("overflow","scroll");
 	    	for(var i=0;i<this.addNewProject.projectState.length;i++){
@@ -220,8 +218,8 @@
 	            },
 	            thumbnails: {
 	                placeholders: {
-	                    waitingPath: '/source/placeholders/waiting-generic.png',
-	                    notAvailablePath: '/source/placeholders/not_available-generic.png'
+//	                    waitingPath: '/source/placeholders/waiting-generic.png',
+//	                    notAvailablePath: '/source/placeholders/not_available-generic.png'
 	                }
 	            },
 	            validation: {
@@ -256,13 +254,14 @@
 		},
 		methods: {
 		    changeProjectAds(val){//通过事件同步子组件信息
-		        this.projectInfo.projectAds=val;
+		        this.projectInfo.projectPlaceObj=val;
+		        console.log(this.projectInfo.projectPlaceObj)
 		     },
 		    changeProjectStateColor(index){//添加模式下，标记项目状态选中
 			    for(var i=0 ; i<this.addNewProject.projectState.length ; i++){
 			      if(i==index){
 			        Vue.set(this.projectStateColor,[index],true);
-			        this.projectInfo.proState=this.addNewProject.projectState[index];//更改项目状态名
+			        this.projectInfo.projectState=this.addNewProject.projectState[index];//更改项目状态名
 			      }else{
 			        Vue.set(this.projectStateColor,[i],false);
 			        
@@ -274,8 +273,8 @@
 			      if(i==index){
 			      	if(this.projectTypeColor[index]==false){
 			      		Vue.set(this.projectTypeColor,[index],true);
-			      		this.projectInfo.proFunc.push(this.addNewProject.projectType[index]);//更改项目功能名
-			      		this.projectInfo.proFunc.push.apply(this.projectInfo.proFunc,[])//去重
+			      		this.projectInfo.architectFunctions.push(this.addNewProject.projectType[index]);//更改项目功能名
+			      		this.projectInfo.architectFunctions.push.apply(this.projectInfo.architectFunctions,[])//去重
 	
 			      	}else{
 			      		console.log(333)
@@ -286,7 +285,7 @@
 								this.splice(index, 1);
 							}
 						};
-						this.projectInfo.proFunc.remove(this.addNewProject.projectType[index])
+						this.projectInfo.architectFunctions.remove(this.addNewProject.projectType[index])
 			      		
 			      	}
 			        
@@ -300,8 +299,8 @@
 		        Vue.set(this.addProjectType,"type",false);
 		        if(this.addProjectType.value.trim()!=''){
 		          this.addNewProject.projectType.push(this.addProjectType.value)//添加到建筑功能列表里
-		          this.projectInfo.proFunc.push(this.addProjectType.value);//更改项目建筑功能名
-			      this.projectInfo.proFunc.push.apply(this.projectInfo.proFunc,[])//去重
+		          this.projectInfo.architectFunctions.push(this.addProjectType.value);//更改项目建筑功能名
+			      this.projectInfo.architectFunctions.push.apply(this.projectInfo.architectFunctions,[])//去重
 		          Vue.set(this.addProjectType,"value","");//清空input框的内容
 		          this.projectTypeColor.push(true);//使得新添加的建筑功能被选中
 		          
@@ -314,21 +313,21 @@
 		        });
 				//判断几个必填项是否为空
 				
-				if(this.projectInfo.proName.trim().length==0){
+				if(this.projectInfo.projectName.trim().length==0){
 					this.showAlert.name = true;
 					this.alertText.name = "项目名称为必填项"
 				}else{
 					this.showAlert.name = false;
 				};//判断项目名称不能为空
 				
-				if(this.projectInfo.compalteTime_S.trim().length==0||this.projectInfo.compalteTime_E.trim().length==0){
+				if(this.projectInfo.compalteTime.trim().length==0&&this.complated==false){
 					this.showAlert.compalteTime = true;
 					this.alertText.compalteTime = "项目建成时间为必填项"
 				}else{
 					this.showAlert.compalteTime = false;
 				};//判断建成时间不能为空
 				
-				if(this.projectInfo.parTakeTime_S.trim().length==0||this.projectInfo.parTakeTime_E.trim().length==0){
+				if(this.projectInfo.partakeTimeUp.trim().length==0||this.projectInfo.partakeTimeDown.trim().length==0){
 					this.showAlert.parTakeTime = true;
 					this.alertText.parTakeTime = "项目参与时间为必填项"
 				}else{
@@ -341,18 +340,62 @@
 				}else{
 					this.showAlert.takeOffice = false;
 				};//判断项目职责不能为空
-				
-				if(this.projectInfo.proName.trim().length!=0&&this.projectInfo.compalteTime_S.trim().length!=0&&this.projectInfo.parTakeTime_S.trim().length!=0
-				&&this.projectInfo.parTakeTime_E.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0){
-					this.companyProInfo.push(this.projectInfo)
-					console.log(this.companyProInfo)
-					router.push("/yhzx/personal/info/personalProject/index")
+				if(this.complated=false){
+					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.compalteTime.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
+					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0){
+						var that = this;
+					    console.log(JSON.stringify(that.projectInfo))
+					    var url = "http://10.1.31.16:8080/psnProjExpe/insertProjAndProjExpe";
+					    $.ajaxSetup({ contentType : 'application/json' });
+					    MyAjax.ajax({
+							type: "POST",
+							url:url,
+							data:JSON.stringify(that.projectInfo),
+							dataType: "json",
+							
+						},function(data){
+							console.log(data)
+							if(data.code == 0){
+								router.push("/yhzx/personal/info/personalProject/index")
+							}
+							
+						},function(err){
+							console.log(err)
+						})
+						
+					}
+				}else{
+					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
+					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0){
+						var that = this;
+					    console.log(JSON.stringify(that.projectInfo))
+					    var url = "http://10.1.31.16:8080/psnProjExpe/insertProjAndProjExpe";
+					    $.ajaxSetup({ contentType : 'application/json' });
+					    MyAjax.ajax({
+							type: "POST",
+							url:url,
+							data:JSON.stringify(that.projectInfo),
+							dataType: "json",
+							
+						},function(data){
+							console.log(data)
+							if(data.code == 0){
+								router.push("/yhzx/personal/info/personalProject/index")
+							}
+							
+						},function(err){
+							console.log(err)
+						})
+						
+					}
 				}
+				
 			},
 			closeTip(){  /*关闭提示框*/
                 this.showAlert.name= false;
-//              this.showAlert = false;
-//              this.showAlert = false;
+                this.showAlert.compalteTime= false;
+                this.showAlert.parTakeTime= false;
+                this.showAlert.takeOffice= false;
             },
             cancelEdit(){
             	console.log(44)
@@ -364,10 +407,13 @@
 	    	this.dutycont = num1;//公司职责限制字数
 	    	var num2 = this.projectInfo.detailDes.length;//职责详细描述
 	    	this.detailcont = num2;
-	    	var num3 = this.projectInfo.proDesc.length;//项目描述
+	    	var num3 = this.projectInfo.projectDescription.length;//项目描述
 	    	this.procont = num3;
-	    	console.log(this.projectInfo)
-            
+            if(this.projectInfo.projectState=="在建"||this.projectInfo.projectState=="未建"){
+            	this.complated = true;
+            }else{
+            	this.complated = false;
+            }
 	    }
    }
 </script>
@@ -376,7 +422,7 @@
 $bfColor:#ffffff;
 $activeColor: rgb(242,117,25);
 #fine-uploader-manual-trigger{
-	width: 720px;
+	width: 710px;
 	float: right;
 }
 .editProject{
@@ -420,7 +466,7 @@ $activeColor: rgb(242,117,25);
 			border-radius: 5px;
 			cursor: pointer;
 			&.cancelBtn{
-			border: 1px solid #bfcbd9;
+			border: 1px solid #E0E0E0;
 
 			&:hover{
 				border: 1px solid $activeColor;
@@ -456,6 +502,8 @@ $activeColor: rgb(242,117,25);
 					color: $activeColor;
 					margin-right: 30px;
 					float: left;
+					width: 80px;
+					text-align: right;
 				}
 				&.name-wrap{	
 					height: 35px;
@@ -470,11 +518,16 @@ $activeColor: rgb(242,117,25);
 					}
 				}
 				&.place-wrap{
-					padding-left: 10px;
 					color: $activeColor;
 					.table-wrap-left{
 						height: 35px;
 						line-height: 35px;
+					}
+					.provincesCity{
+						float: left;
+						input{
+							
+						}
 					}
 					select{
 						width: 120px;
@@ -486,9 +539,9 @@ $activeColor: rgb(242,117,25);
 						display: inline-block;
 						color: rgb(53,53,53);
 					}
+					
 				}
 				&.status-wrap{
-					padding-left: 10px;
 					label{
 						height: 20px;
 						line-height: 20px;
@@ -519,7 +572,6 @@ $activeColor: rgb(242,117,25);
 					
 				}
 				&.func-wrap{
-					padding-left: 10px;
 					overflow: hidden;
 					.table-wrap-left{
 						float: left;
@@ -572,6 +624,7 @@ $activeColor: rgb(242,117,25);
 				&.time-wrap{
 					height: 35px;
 					line-height: 35px;
+					position: relative;
 					.datePicker{
 						height: 35px;
 						float: left;
@@ -588,6 +641,23 @@ $activeColor: rgb(242,117,25);
 						margin-right: 20px;
 						margin-top: 16px;
 						
+					}
+					.timeGray{
+						position: absolute;
+						left: 0px;
+						top: 0;
+						background: #FFFFFF;
+						color: #e0e0e0;
+						.table-wrap-left{
+							color:#BFBFBF;
+						}
+						.picker{
+							float: left;
+							width: 140px;
+							height: 35px;
+							border-radius: 5px;
+							border: 1px solid #E0E0E0;
+						}
 					}
 				}
 				&.duty-wrap{
@@ -619,7 +689,6 @@ $activeColor: rgb(242,117,25);
 					color: rgb(167,167,167);
 					position: relative;
 					overflow: hidden;
-					padding-left: 10px;
 					.table-wrap-left{
 						float: left;
 					}
@@ -645,7 +714,6 @@ $activeColor: rgb(242,117,25);
 				&.img-wrap{
 					/*height: 100px;
 					line-height: 100px;*/
-					padding-left: 10px;
 					overflow: hidden;
 					.table-wrap-left{
 						float: left;

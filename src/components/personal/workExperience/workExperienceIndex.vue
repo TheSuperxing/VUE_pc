@@ -66,19 +66,17 @@
           <!--头部信息-->
           <div v-if="reveal.editInfo[index]">
             <p>
-              <span>{{item.ocupationTimeUp}}</span>
-              <span>——</span>
-              <span>{{item.ocupationTimeDown}}</span>
+            	Time : {{item.ocupationTimeUp}}——{{item.ocupationTimeDown}}
             </p>
             <!--时间部分-->
-            <p>{{item.ocupation}}</p>
-            <p>{{item.jobDescription}}</p>
+            <p>任职职位：{{item.ocupation}}</p>
+            <p>职位描述：{{item.jobDescription}}</p>
           </div>
           <!--显示存在信息-->
           <!--编辑工作经历-->
           <ul v-if="!reveal.editInfo[index]">
             <li>
-              <h5>公司名称</h5>
+              <h5>*&nbsp;公司名称</h5>
               <p v-if="reveal.editDetailInfo[index]">{{localWorkExperience.companyName[index]}}</p>
               <input v-if="!reveal.editDetailInfo[index]" type="text" v-model="localWorkExperience[index].companyName" placeholder="请输入公司名称">
             </li>
@@ -91,7 +89,7 @@
               <input type="text" v-model="localWorkExperience[index].ocupation" v-bind:value="localWorkExperience[index].ocupation">
             </li>
             <li>
-              <h5>任职时间</h5>
+              <h5>*&nbsp;任职时间</h5>
               <datepicker v-model="localWorkExperience[index].ocupationTimeUp"></datepicker>
               <span></span>
               <datepicker v-model="localWorkExperience[index].ocupationTimeDown"></datepicker>
@@ -126,11 +124,11 @@
           <input v-model="newWorkExperience.companyAddress" type="text" placeholder="请输入公司地址">
         </li>
         <li>
-          <h5>任职职位</h5>
+          <h5>*&nbsp;任职职位</h5>
           <input v-model="newWorkExperience.ocupation" type="text" placeholder="请输入职位名称">
         </li>
         <li>
-          <h5>任职时间</h5>
+          <h5>*&nbsp;任职时间</h5>
           <datepicker v-model="newWorkExperience.ocupationTimeUp"></datepicker>
           <span></span>
           <datepicker v-model="newWorkExperience.ocupationTimeDown"></datepicker>
@@ -153,13 +151,13 @@
   import Vue from "vue"
   import ModalOpp from "../../../assets/js/modalOpp"
   import {mapState} from "vuex"
-  import datepicker from "../../units/Datepicker.vue"
+  import Datepicker from "../units/Datepicker.vue"
   import MyAjax from "../../../assets/js/MyAjax.js"
   
   export default {
     name:"workExperienceIndex",
     components:{
-      datepicker
+      Datepicker
     },
     data(){
       return {
@@ -252,11 +250,22 @@
 					console.log(err)
 				})
 	    	/*数据同步本地一份开始*/
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			  }
+	    	
+	    	
         that.localWorkExperience=JSON.parse(JSON.stringify(that.workExperience));
        
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	for(var i=0;i<that.workExperience.length;i++){
+	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].takeOffice);
+	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
 	    		if(that.workExperience[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
@@ -320,10 +329,10 @@
         //返回到更改之前
       },
       textLength(index){//编辑状态下记录输入多行文本的字数
-        if(this.localWorkExperience.info.introduce[index].trim().length<=500){
-          Vue.set(this.reveal.textLength,[index],this.localWorkExperience.info.introduce[index].trim().length)
+        if(this.localWorkExperience[index].jobDescription.trim().length<=500){
+          Vue.set(this.reveal.textLength,[index],this.localWorkExperience[index].jobDescription.trim().length)
         }else{
-          this.localWorkExperience.info.introduce[index]=this.localWorkExperience.info.introduce[index].trim().slice(0,499);
+          this.localWorkExperience[index].jobDescription=this.localWorkExperience[index].jobDescription.trim().slice(0,499);
           Vue.set(this.reveal.textLength,[index],500)
         }
       },
@@ -371,7 +380,7 @@
       addInfo(){//添加信息
         var model2= new ModalOpp("#modal-overlay2");
         model2.makeText();
-        Vue.set(this.reveal,"addOrShow",false);//添加按钮视图切换
+
         Vue.set(this.reveal,"empty",false);
         Vue.set(this.reveal,"customCompanyName",true);//切换到只能在已有库中挑选公司
         Vue.set(this.newWorkExperience,"companyName","")
@@ -414,15 +423,19 @@
       },
       customCompanyName(){//自定义公司
         Vue.set(this.reveal,"customCompanyName",false);//切换到能自定义公司数据
+        console.log(this.reveal.customCompanyName)
         var modal2= new ModalOpp("#modal-overlay2");
         modal2.closeModal();
+        Vue.set(this.reveal,"modal",false);
+         Vue.set(this.reveal,"keepAdd",true);//设置保存按钮的颜色
         /*关闭搜索公司的弹框*/
+        Vue.set(this.reveal,"addOrShow",false);//添加按钮视图切换
         Vue.set(this.reveal,"searchShow",false)//搜索恢复没有显示状态
         Vue.set(this.input,"value","")//选择自定义公司后会把输入要搜索的公司的信息清空
       },
       selectCompanyName(index){//在弹出的公司列表里挑选公司名称
         Vue.set(this.companyName,"name",this.searchResult[index].companyName);
-
+				
         for(var i= 0 ; i< this.searchResult.length;i++){/*在每一次单击后对搜索出的列表状态进行初始化*/
           Vue.set(this.reveal.iSelectActive,[i],false)
         }
@@ -435,7 +448,8 @@
          modal2.closeModal();
          Vue.set(this.reveal,"modal",false);
          Vue.set(this.reveal,"keepAdd",true);//设置保存按钮的颜色
-
+         Vue.set(this.reveal,"addOrShow",false);//添加按钮视图切换
+					
          Vue.set(this.reveal,"searchShow",false)//搜索恢复没有显示状态
          Vue.set(this.input,"value","")//每次确认选择公司信息后都会把输入要搜索的公司的信息清空
        }
@@ -504,6 +518,7 @@
     background: $bfColor;
     min-height: 671px;
     color: $textColor;
+    padding-bottom: 40px;
     button{
       cursor: pointer;
     }
@@ -825,7 +840,9 @@
                 float: left;
                 font-size:14px;
                 color: $themeColor;
-                margin-right:35px;
+                text-align: right;
+                width: 80px;
+                margin-right: 35px;
               }
               p{
                 float: left;
@@ -846,6 +863,7 @@
                 border-radius: 5px;
                 padding-left: 13px;
                 padding-right:13px;
+                border:1px solid $borderColor;
               }
               span{
                 float: left;
@@ -905,8 +923,11 @@
           h5{
             float: left;
             line-height: 35px;
-            padding-right:35px;
+            /*padding-right:35px;*/
             color: $themeColor;
+            width: 80px;
+            text-align: right;
+            margin-right: 35px;
           }
           input{
             float: left;
@@ -930,7 +951,6 @@
           }
         }
         li:first-child{
-          margin-left:-12px;
           p{
             line-height: 35px;
           }

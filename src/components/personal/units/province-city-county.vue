@@ -14,6 +14,7 @@
       <option value="0" v-for="item in province.countyData" v-bind:value="item.name">{{item.name}}</option>
     </select>
     <p>区</p>
+    <p class="street"><input type="text" placeholder="" v-model="accptProvince.street" v-bind:value='accptProvince.street'/>路</p>
   </div>
 </template>
 <script>
@@ -14891,22 +14892,36 @@
   $borderColor:#ebebeb;
   $themeColor:rgb(242,117,25);
   .provincesCity{
-  select{
-    float: left;
-    color: #353535;
-    width:120px;
-    height:35px;
-    padding-left:15px;
-    border:2px solid $borderColor;
-    border-radius: 5px;
-    line-height: 35px;
-
-  }
-  p{
-    line-height: 35px;
-    float: left;
-    padding:0 10px;
-    color: $themeColor;
-  }
+	  select{
+	    float: left;
+	    color: #353535;
+	    width:120px;
+	    height:35px;
+	    padding-left:15px;
+	    border:1px solid $borderColor;
+	    border-radius: 5px;
+	    line-height: 35px;
+	
+	  }
+	  p{
+	    line-height: 35px;
+	    float: left;
+	    padding:0 10px;
+	    color: $themeColor;
+	  }
+	  .street{
+	  	float: left;
+			line-height: 35px;
+			input{
+				width: 120px;
+				height: 35px;
+				border: 1px solid #EBEBEB;
+				border-radius: 5px;
+				text-indent: 8px;
+				float: left;
+				margin-right: 12px;
+				color: #323333;
+			}
+	  }
   }
 </style>

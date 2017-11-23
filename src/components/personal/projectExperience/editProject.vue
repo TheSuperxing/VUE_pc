@@ -1,7 +1,7 @@
 <template>
 <div class="editProject">
 	<h3 class="c-title"><span>{{title}}</span></h3>
-	<span class="editBtn" @click="overlayA">编辑项目信息</span>
+	<span class="editBtn" @click="overlayA" v-if="isMine">编辑项目信息</span>
 	<!--模态框 修改自己添加的项目-->
 	<div id="modal-overlay" class="modal-a"> 
 		<div class="editCfr">
@@ -20,24 +20,24 @@
 	<!--模态框 修改自己添加的项目-->
 	<ul class="proInfo">
 		<li class="proName">
-			<p><span>项目名称</span><span class="">{{project.proName}}</span></p>
+			<p><span>项目名称</span><span class="">{{project.projectName}}</span></p>
 		</li>
 		<li class="proPlace">
-			<p><span>项目地点</span><span class="">{{project.proPlace}}</span></p>
+			<p><span>项目地址</span><span class="">{{projectPlaceObj.province}}{{projectPlaceObj.city}}{{projectPlaceObj.county}}{{projectPlaceObj.street}}</span></p>
 		</li>
 		<li class="proState">
-			<p><span>项目状态</span><span class="">{{project.proState}}</span></p>
+			<p><span>项目状态</span><span class="">{{project.projectState}}</span></p>
 		</li>
 		<li class="proTime">
-			<p><span>建成时间</span><span class="">{{project.compalteTime_E}}</span></p>
+			<p><span>建成时间</span><span class="">{{project.completeTime}}</span></p>
 		</li>
 		<li class="proFunc">
-			<p><span>建筑功能</span><span class="">{{project.proFunc}}</span></p>
+			<p><span>建筑功能</span><span v-for="item in project.architectFunctions">{{item}}&nbsp;&nbsp;</span></p>
 		</li>
 		<li class="proDesc">
 			<p>
 				<span>项目描述</span>
-				<span class="">{{project.proDesc}}
+				<span class="">{{project.projectDescription}}
 				</span>
 			</p>
 		</li>
@@ -59,9 +59,9 @@
 		<ul class="modify-table-wrap">
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 参与时间</span>
-				<datepicker class="datePicker" v-model="project.parTakeTime_S"></datepicker>
+				<datepicker class="datePicker" v-model="project.partakeTimeUp"></datepicker>
 				<span class="heng"></span>
-				<datepicker class="datePicker" v-model="project.parTakeTime_E"></datepicker>
+				<datepicker class="datePicker" v-model="project.partakeTimeDown"></datepicker>
 			</li>
 			<li class="duty-wrap">
 				<span class="table-wrap-left">* 公司职责</span>
@@ -74,19 +74,7 @@
 				<p class="limit-words">{{detailcont}}/500</p>
 				
 			</li>
-			<!--<li class="img-wrap">
-				<span class="table-wrap-left">图片展示</span>
-				<ul class="img-show">
-					<li v-for="" class="imgBox"><img src=""/><span class="closeImg"></span>
-					</li>
-					<div class="uploadBtn">
-						<input type="file" class=""/>
-						<img src="../../../assets/img/company/top.png" />
-						<span>请上传图片</span>
-					</div>
-				</ul>
-				
-			</li>-->
+		
 			<li class="img-wrap">
 				<span class="table-wrap-left">图片展示</span>
 				<script type="text/template" id="qq-template-manual-trigger">
@@ -175,43 +163,94 @@
 	import Datepicker from "../units/Datepicker.vue"
 	import router from "../../../router"
 	import qq from "fine-uploader"
+    import MyAjax from "../../../assets/js/MyAjax.js"
+	
 	
 	export default {
 	    name:"editProject",
-	     components:{
+	    components:{
 	      Datepicker
 	    },
 	    data:function(){
 	      return {
-	        title:"编辑公司参加项目信息",
+	        title:"编辑个人参加项目信息",
 	        state:"",
 	        editSeniorShow:false,
+	        isMine:false,/*是否是我添加的项目*/
 	        dutytext:"",
 	        dutycont:'0',
 	        detailtext:"",
 	        detailcont:'0',
-	        proInfos:[],
 	        project:{},/*由项目主页点击进去的相应项目*/
+	        projectPlaceObj:{},
 	        index:"",
 	        compalteTime:[],
 	        parTakeTime:[]
 	      }
 	    },
-	    
-	    computed:mapState({
-		  companyProInfo:state=>state.company.companyMessage.companyProInfo/*获取vuex数据*/
-		}),
-		
+	   
 		mounted(){
-			var str = JSON.stringify(this.companyProInfo);
-    		var data = JSON.parse(str);
-    		this.proInfos = data;/*获取vuex里面所有项目信息*/
-    		
 			
-	    	this.index = this.$route.params.id;
-//	    	console.log(this.index)
-	    	this.project = data[this.index-1]
-//	    	console.log(this.$route)
+			var that = this;
+			that.projectID = that.$route.query.proId;
+			that.psnProExpeID = that.$route.query.psnId;
+			
+			console.log(that.projectID,that.psnProExpeID)
+			if(that.psnProExpeID == undefined){
+				that.psnProExpeID = '""';
+			}
+			if(that.projectID == undefined){
+				that.projectID = '""';
+			}
+			console.log(that.projectID,that.psnProExpeID)
+			var url = "http://10.1.31.16:8080/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
+	    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+				dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+			},function(data){
+				console.log(data)
+				data = data.msg;
+				that.project = data;
+			},function(err){
+				console.log(err)
+			})
+			if(this.project.ifPublish==false){
+				this.isMine = true;
+			}else{
+				this.isMine = false;
+			}
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			}
+	    	function emptyText2(text) {
+			    if(text==null||text.length == 0){
+			      return "";
+			    }else {
+			      return text;
+			    }
+			}
+	    	that.projectPlaceObj = that.project.projectPlaceObj;
+			console.log(that.project.projectPlaceObj)
+	    	that.project.completeTime = emptyText(that.project.completeTime);
+	    	that.project.projectState = emptyText(that.project.projectState);
+	    	that.project.projectDescription = emptyText(that.project.projectDescription);
+	    	that.project.partakeTimeUp = emptyText2(that.project.partakeTimeUp);
+	    	that.project.partakeTimeDown = emptyText2(that.project.partakeTimeDown);
+	    	that.project.takeOffice = emptyText2(that.project.takeOffice);
+	    	that.project.detailDes = emptyText2(that.project.detailDes);
+	    	if(that.project.architectFunctions == null){
+	    		that.project.architectFunctions = [];
+	    		that.project.architectFunctions[0] = "（暂无信息）"
+	    	}
+	    	//空值的处理
+	    	
 			
 			//上传图片
 			var manualUploader = new qq.FineUploader({
@@ -261,9 +300,7 @@
 			
 	    },
 	    methods:{
-	    	textcount(){
-	    		
-	    	},
+	    	
 	    	overlayA(){
 	    		var modal = $('.modal-a')
 				Modal.makeText(modal)
@@ -273,14 +310,30 @@
 				Modal.closeModal(modal)
 			},
 			saveEdit(){
-				qq(document.getElementById("trigger-upload")).attach("click", function() {
-		            manualUploader.uploadStoredFiles();
-		        });
-				var str = JSON.stringify(this.project);
-				var data = JSON.parse(str);
-				this.companyProInfo[this.index-1] = data;/*将修改过得数据放在vuex里*/
-				console.log(this.companyProInfo)
-//				router.push("/yhzx/company/info/companyProject/index")
+//				var str = JSON.stringify(this.project);
+//				var data = JSON.parse(str);
+//				this.companyProInfo[this.index-1] = data;/*将修改过得数据放在vuex里*/
+//				console.log(this.companyProInfo)
+////				router.push("/yhzx/company/info/companyProject/index")
+				var that = this;
+			    console.log(JSON.stringify(that.project))
+			    var url = "http://10.1.31.16:8080/psnProjExpe/insertOrUpdateProjExpe";
+			    $.ajaxSetup({ contentType : 'application/json' });
+			    MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.project),
+					dataType: "json",
+					
+				},function(data){
+					console.log(data)
+					if(data.code == 0){
+						router.push("/yhzx/personal/info/personalProject/index")
+					}
+					
+				},function(err){
+					console.log(err)
+				})
 				
 			},
 			cancelEdit(){
@@ -298,9 +351,7 @@
 //	    	console.log(this.companyProInfo[0])
 	    	
 	    },
-	    attached(){
-	    	
-	    }
+	    
    }
 </script>
 
@@ -472,26 +523,35 @@ $activeColor: rgb(242,117,25);
 						color: rgb(102,102,102);
 						
 					}
-					&:last-child{
-						width: 720px;
-						color: rgb(53,53,53);
-						text-align: justify;
-						img{
-							width: 160px; height: 100px;
-							display: block;
-							margin-right: 15px;
-							margin-bottom: 15px;
-							float:left; 
-							&:nth-child(4n){
-								margin-right: 0;
-							}
-						}
-					}
+					
 					
 				}
 			}
 			
 		}
+		.proFunc{
+			span{
+				float:left;
+			}
+		}
+		.proDesc{
+			span:last-child{
+				width: 720px;
+				color: rgb(53,53,53);
+				text-align: justify;
+				img{
+					width: 160px; height: 100px;
+					display: block;
+					margin-right: 15px;
+					margin-bottom: 15px;
+					float:left; 
+					&:nth-child(4n){
+						margin-right: 0;
+					}
+				}
+			}
+		}
+		
 	}
 	.btnBox{
 		

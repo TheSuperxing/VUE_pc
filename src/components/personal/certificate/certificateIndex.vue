@@ -27,8 +27,8 @@
             </ul>
           </div>
           <div class="certificateInfoBody">
-            <p v-cloak>{{item.registeredUnit}}</p>
-            <p v-cloak>证书编号：{{item.certificateNumber}}</p>
+            <p v-cloak>注册单位  : {{item.registeredUnit}}</p>
+            <p v-cloak>证书编号  ：{{item.certificateNumber}}</p>
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -358,7 +358,7 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = "http://10.1.31.16:8080/psnQualification/findAll/"+"string";
+	    	var url = "http://10.1.31.16:8080/psnQualification/findByMySelf/"+"string";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,

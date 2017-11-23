@@ -66,8 +66,8 @@
             <li>
               <label>
                 <h5>评定日期</h5>
-                <!--<input v-model="localJobInfo.info.time[index]" type="month" placeholder="请输入注册单位">-->
-                <datepicker v-model="localTitleInfo[index].assessmentTime"></datepicker>
+           			<datepicker class="datePicker" v-model="localTitleInfo[index].assessmentTime"></datepicker>
+                	
               </label>
             </li>
             <li>
@@ -187,7 +187,8 @@
           <label>
             <h5>评定时间</h5>
            <!-- <input v-model="newTitleInfo.info.time" type="month" placeholder="请输入注册单位">-->
-            <datepicker v-model="newTitleInfo.assessmentTime"></datepicker>
+           	<datepicker class="datePicker" v-model="newTitleInfo.assessmentTime"></datepicker>
+            <!--<datepicker v-model="newTitleInfo.assessmentTime"></datepicker>-->
           </label>
         </li>
         <li>
@@ -279,7 +280,7 @@
 <script>
   import Vue from "vue"
   import {mapState} from "vuex"
-  import datepicker from "../../units/Datepicker.vue"
+  import Datepicker from "../units/Datepicker.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   
@@ -287,14 +288,14 @@
   export default {
     name:"titleInfo",
     components:{
-      datepicker
+      Datepicker
     },
     data(){
       return {
         title:{text:"职称信息"},
         reveal:{
           empty:true,//是否显示执业资格信息尚未添加
-          openOrPrivacy:[false,true],//信息是否公开显示,通过服务器获取的数据
+          openOrPrivacy:[],//信息是否公开显示,通过服务器获取的数据
           openOrPrivacyText:[],//信息是否公开显示文本信息,通过服务器获取的数据
           editInfo:[],//是否编辑信息
           addJobInfo:true,//是否添加信息
@@ -382,10 +383,10 @@
       if(this.reveal.openOrPrivacy.length!=0){
         for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
           if(!this.reveal.openOrPrivacy[i]){
-            Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
+            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
             //this.reveal.openOrPrivacyText.push("显示")
           }else{
-            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
+            Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
             //this.reveal.openOrPrivacyText.push("隐藏")
           }
         }
@@ -413,7 +414,7 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = "http://10.1.31.16:8080/psnTitleMessage/findAll/"+"string";
+	    	var url = "http://10.1.31.16:8080/psnTitleMessage/findByMySelf/"+"string";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -428,6 +429,14 @@
 				},function(err){
 					console.log(err)
 				})
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			  }
+	    	
 	    	/*数据同步本地一份开始*/
         that.localTitleInfo=JSON.parse(JSON.stringify(that.titleInfo));
         that.fineUploaderId = [];
@@ -435,42 +444,45 @@
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	for(var i=0;i<that.titleInfo.length;i++){
+	    		that.titleInfo[i].titleLevel = emptyText(that.titleInfo[i].titleLevel);
+	    		that.titleInfo[i].assessmentTime = emptyText(that.titleInfo[i].assessmentTime);
+	    		that.titleInfo[i].certificateBody = emptyText(that.titleInfo[i].certificateBody);
+	    		that.titleInfo[i].certificateNumber = emptyText(that.titleInfo[i].certificateNumber);
+	    		that.titleInfo[i].professionalTitle = emptyText(that.titleInfo[i].professionalTitle);
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.titleInfo[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.titleInfo[i].pkid);
-	    		if(that.titleInfo[i].ifVisable==1){
+	    		if(that.titleInfo[i].ifVisable==0){
+	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值	
+	    		}else{
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
-	    		}else{
-	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
-	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
 	    		}
 	    	}
     	},
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);
-        if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
-        	
-          Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
-        }else{
-          Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
-        }
+//      if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
+//        Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+//      }else{
+//        Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
+//      }
         
         for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
         	if(this.reveal.openOrPrivacy[i]==false){
-        		this.titleInfo[i].ifVisable = 0;
+        		this.localTitleInfo[i].ifVisable = 0;
         	}else{
-        		this.titleInfo[i].ifVisable = 1;
+        		this.localTitleInfo[i].ifVisable = 1;
         	}
         }//更新一下可见的值以便传给后端
         
         var that = this;
-        console.log(JSON.stringify(that.titleInfo[index]))
         var url = "http://10.1.31.16:8080/psnTitleMessage/update"
-        $.ajaxSetup({contentType : 'application/json'});
+        $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
 					url:url,
-					data: JSON.stringify(that.titleInfo[index]),
+					data: JSON.stringify(that.localTitleInfo[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
 					
@@ -478,10 +490,12 @@
 					console.log(data)
 				},function(err){
 					console.log(err)
-				})
-        
+				})//更新到服务器
+				//保存之后再重新拉取数据
+				that.updateData();
       },
       jobInfoEdit(index){//编辑状态进入按钮
+      	
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
 

@@ -52,13 +52,16 @@
           <h5><span>*</span>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
           <p><input type="text" v-model="localBaseInfo.nickName" v-bind:value="localBaseInfo.nickName" v-on:input="changeNickName"></p>
           <i>{{textLeng.nickName}}/30</i>
+				  <alertTip v-if="showAlert.nickName" :showHide="showAlert.nickName" @closeTip="closeTip" :alertText="alertText.nickName"></alertTip>
+          
         </li>
         <li v-if="baseInfo.ifRNA">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p>{{baseInfo.psnName}}</p>
           <i>{{textLeng.psnName}}/30</i>
           <span>（进入实名认证流程后，姓名将不可以自行修改，需联系管理员）</span>
-
+				  <alertTip v-if="showAlert.psnName" :showHide="showAlert.psnName" @closeTip="closeTip" :alertText="alertText.psnName"></alertTip>
+					
         </li>
         <li v-if="!baseInfo.ifRNA">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
@@ -193,6 +196,8 @@
   import qq from "fine-uploader" 
   import Datepicker from "../units/Datepicker.vue"
   import MyAjax from "../../../assets/js/MyAjax.js"
+	import alertTip from "../units/alertTip.vue"
+	  
   
   export default {
     name: "personalBasicInfo",
@@ -207,7 +212,8 @@
           ifRNA:"",
           openOrPrivacy:[]
         },
-        
+        showAlert:{nickName:false,psnName:false,},//提示框显隐
+	      alertText:{nickName:null,psnName:null,},
         textLeng:{
           nickName:0,
           psnName:0
@@ -233,6 +239,7 @@
     },
     components:{
 	    Datepicker,
+	    alertTip,
 	  },
 
     mounted(){
@@ -289,35 +296,21 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = "http://10.1.31.7:8080/personalbasicinfo/findMySelf";
-	    	$.ajax({
-					 type: "get",
-					 url: "http://10.1.31.7:8080/personalbasicinfo/findMySelf",
-					 dataType: "json",
-					 contentType:"application/json;charset=utf-8",
-					 async:false,//使用同步方式
-					 success: function(data){
-						console.log(data)
-						data = data.msg;
-					  that.baseInfo = data;
-					 },error:function(error){
-						console.log(error)
-					 }
-				});
-//	    	MyAjax.ajax({
-//					type: "GET",
-//					url:url,
-//	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-//					dataType: "json",
-//	//				content-type: "text/plain;charset=UTF-8",
-//					
-//				},function(data){
-//					console.log(data)
-//					data = data.msg;
-//					that.baseInfo = data;
-//				},function(err){
-//					console.log(err)
-//				})
+	    	var url = "http://10.1.31.7:8080/personalbasicinfo/findByMySelf";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.baseInfo = data;
+				},function(err){
+					console.log(err)
+				})
 	    	if(that.localBaseInfo.sex==null){
 			    Vue.set(that.reveal,'selectSex',true);
 			  }else if(that.localBaseInfo.sex.trim()=="女"){
@@ -332,7 +325,7 @@
 			  
 	    	function emptyText(text) {
 			    if(text==null||text.length == 0){
-			      return "（此处暂时没有信息）";
+			      return "（暂无信息）";
 			    }else {
 			      return text;
 			    }
@@ -352,7 +345,7 @@
 	      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
 	      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
 	      /*初始化openOrPrivacy*/
-				console.log(that.reveal.openOrPrivacy)
+				
 				for(var i=0;i<that.reveal.openOrPrivacy.length;i++){
 					if(that.reveal.openOrPrivacy[i] == 0){
 						that.reveal.openOrPrivacy[i] = false;
@@ -360,16 +353,30 @@
 						that.reveal.openOrPrivacy[i] = true;
 					}
 				}
+				console.log(that.reveal.openOrPrivacy)
     	},
       editBasicInfo(){//编辑进入编辑状态
 //    	console.log(this.localBaseInfo)
+				function emptyText(text) {
+			    if(text== "（暂无信息）"){
+			      return "";
+			    }else {
+			      return text;
+			    }
+			  }
+				this.localBaseInfo.nickName=emptyText(this.localBaseInfo.nickName);
+	      this.localBaseInfo.psnName=emptyText(this.localBaseInfo.psnName);
+	      this.localBaseInfo.sex=emptyText(this.localBaseInfo.sex);
+	      this.localBaseInfo.psnMail=emptyText(this.localBaseInfo.psnMail);
+	      this.localBaseInfo.phoneNumber=emptyText(this.localBaseInfo.phoneNumber);
 				var d = new Date();
 				console.log(d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate())
-				if(this.localBaseInfo.dateOfBirth == "（此处暂时没有信息）"){
+				if(this.localBaseInfo.dateOfBirth == "（暂无信息）"){
 					
 					this.localBaseInfo.dateOfBirth =d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
 					console.log(this.localBaseInfo)
 				}
+				
         Vue.set(this.reveal,"edit",false);
         
         /*进入编辑状态之前的数据处理*/
@@ -431,13 +438,6 @@
       },
       submitEdit(){//保存编辑
       	
-        function emptyText(text) {
-          if(text.length==0){
-            return "（此处暂时没有消息）";
-          }else {
-            return text;
-          }
-        }
         /*没有数据输入的处理函数*/
         if(this.localBaseInfo.nickName.trim().length!=0&&this.localBaseInfo.psnName.trim().length!=0){
           Vue.set(this.reveal,"edit",true)
@@ -491,6 +491,7 @@
       /*0-name 1-sex 2-age 3-phone 4-mail*/
      	openOrPrivacy(index){
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
+        console.log(this.reveal.openOrPrivacy[index])
      		for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
         	if(this.reveal.openOrPrivacy[i]==false){
         		this.reveal.openOrPrivacy[i] = 0;
@@ -498,18 +499,20 @@
         		this.reveal.openOrPrivacy[i] = 1;
         	}
         }
-     		this.localBaseInfo.psnNameVisable = this.reveal.openOrPrivacy[0];
-	    	this.localBaseInfo.sexVisable = this.reveal.openOrPrivacy[1];
-	    	this.localBaseInfo.ageVisable = this.reveal.openOrPrivacy[2];
-	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
-	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
+     		
+     		this.baseInfo.psnNameVisable = this.reveal.openOrPrivacy[0];
+	    	this.baseInfo.sexVisable = this.reveal.openOrPrivacy[1];
+	    	this.baseInfo.ageVisable = this.reveal.openOrPrivacy[2];
+	    	this.baseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
+	    	this.baseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
+	    	console.log(this.baseInfo)
 	    	var that = this;
 	    	var url = "http://10.1.31.7:8080/personalbasicinfo/update";
 	    	$.ajaxSetup({ contentType : 'application/json' });
 	    	MyAjax.ajax({
 					type: "POST",
 					url:url,
-					data: JSON.stringify(that.localBaseInfo),
+					data: JSON.stringify(that.baseInfo),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",//
 					
@@ -520,27 +523,7 @@
 				})
 	    	that.updateData();
      	},
-//    openOrPrivacy1(){
-//      Vue.set(this.reveal.openOrPrivacy,[0],!this.reveal.openOrPrivacy[0])
-//      
-//      
-//    },
-//    openOrPrivacy2(){
-//      Vue.set(this.reveal.openOrPrivacy,[1],!this.reveal.openOrPrivacy[1])
-//      this.baseInfo.sexVisable=this.reveal.openOrPrivacy[1];
-//    },
-//    openOrPrivacy3(){
-//      Vue.set(this.reveal.openOrPrivacy,[2],!this.reveal.openOrPrivacy[2])
-//      this.baseInfo.ageVisable=this.reveal.openOrPrivacy[2];
-//    },
-//    openOrPrivacy4(){
-//      Vue.set(this.reveal.openOrPrivacy,[3],!this.reveal.openOrPrivacy[3])
-//      this.baseInfo.phoneNumberVisable =this.reveal.openOrPrivacy[3];
-//    },
-//    openOrPrivacy5(){
-//      Vue.set(this.reveal.openOrPrivacy,[4],!this.reveal.openOrPrivacy[4])
-//      this.baseInfo.psnMailVisable =this.reveal.openOrPrivacy[4];
-//    },
+
     },
 		
 

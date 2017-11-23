@@ -19,9 +19,9 @@
             </ul>
           </div>
           <div v-show="!editEdu.edit[0][index]">
-            <p v-cloak >{{item.schoolTimeUp}}——{{item.schoolTimeDown}}</p>
-            <p v-cloak >{{item.professionName}}</p>
-            <p v-cloak >{{item.education}}</p>
+            <p v-cloak >Time :  {{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
+            <p v-cloak >专业：{{item.professionName}}</p>
+            <p v-cloak >学历：{{item.education}}</p>
           </div>
 
           <ul class="editEduInfo" v-show="editEdu.edit[0][index]">
@@ -29,7 +29,7 @@
               <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)"><span>{{textLeng.schoolName[index]}}/30</span>
             </li>
             <li>
-              <span class="wrap-left">在校时间</span>
+              <span class="wrap-left">*在校时间</span>
               <datepicker v-model="localEdu[index].schoolTimeUp"></datepicker>
               <span>——</span>
               <datepicker v-model="localEdu[index].schoolTimeDown"></datepicker>
@@ -279,53 +279,10 @@
        
       }
     },
-//  computed:mapState({
-//    education:state=>state.personal.personalMessage.education
-//  }),
-    created(){
-    	for(var i=0;i<this.education.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger"+this.education[i].id);
-    		this.qqTemplate.push("qq-template-manual-trigger"+this.education[i].id);
-    		
-    	}
-    		//console.log(this.fineUploaderClass)
-    },
+
     mounted(){
 			
-			var that = this;
-    	var url = "http://10.1.31.16:8080/psnEduBackGround/findAll/"+"string";
-    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-				dataType: "json",
-//				content-type: "text/plain;charset=UTF-8",
-				
-			},function(data){
-				console.log(data)
-				data = data.msg;
-				that.education = data;
-			},function(err){
-				console.log(err)
-			})
-      that.localEdu=JSON.parse(JSON.stringify(that.education));
-      console.log(that.localEdu)
-      that.openOrPrivacy = [];
-      that.openOrPrivacyText = [];
-      that.fineUploaderId = [];
-      that.qqTemplate = [];
-    	for(var i=0;i<that.education.length;i++){
-    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
-    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
-    		if(that.education[i].ifVisable==1){
-    			that.openOrPrivacy.push(true);
-    			that.openOrPrivacyText.push("显示")
-	      }else{
-	        that.openOrPrivacy.push(false);
-    			that.openOrPrivacyText.push("隐藏")
-	      }
-    	}
-    	console.log(that.openOrPrivacy)
+			this.updateData();
 			//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -372,20 +329,20 @@
 	      manualUploader.uploadStoredFiles();
 	    });
 
-      if(that.education.length!==0){
+      if(this.education.length!==0){
         Vue.set(this.empty,"promote",false)
         //if 有信息 信息为空的提升隐藏
-        for(let i = 0 ; i < that.education.length ; i++){
-          that.editEdu.edit[0].push(false);
-          that.editEdu.delete[0].push(true);
-          that.textLeng.schoolName.push(0);
-          that.textLeng.profession.push(0);
-          that.buttonColor.exist.push(true);
+        for(let i = 0 ; i < this.education.length ; i++){
+          this.editEdu.edit[0].push(false);
+          this.editEdu.delete[0].push(true);
+          this.textLeng.schoolName.push(0);
+          this.textLeng.profession.push(0);
+          this.buttonColor.exist.push(true);
           /*初始化本地数据开始*/
 //        
           /*初始化本地数据结束*/
-          Vue.set(that.textLeng.schoolName,[i],that.localEdu[i].schoolName.length)
-          Vue.set(that.textLeng.profession,[i],that.localEdu[i].professionName.length)
+          Vue.set(this.textLeng.schoolName,[i],this.localEdu[i].schoolName.length)
+          Vue.set(this.textLeng.profession,[i],this.localEdu[i].professionName.length)
           /*初始化记录输入字符长度的值*/
           //信息是否对外显示赋初始值
           //信息是否对外显示文字切换赋初始值
@@ -401,7 +358,7 @@
     methods:{
     	updateData(){//更新本地数据
     		var that = this;
-	    	var url = "http://10.1.31.16:8080/psnEduBackGround/findAll/"+"string";
+	    	var url = "http://10.1.31.16:8080/psnEduBackGround/findByMySelf/"+"string";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -416,12 +373,22 @@
 				},function(err){
 					console.log(err)
 				})
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			  }
+	    	
 	      that.localEdu=JSON.parse(JSON.stringify(that.education));
 	    	that.openOrPrivacy = [];
 	      that.openOrPrivacyText = [];
 	      that.fineUploaderId = [];
 	      that.qqTemplate = [];
 	    	for(var i=0;i<that.education.length;i++){
+	    		that.education[i].professionName = emptyText(that.education[i].professionName);//空值判断
+	    		that.education[i].education = emptyText(that.education[i].education);
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
 	    		if(that.education[i].ifVisable==1){

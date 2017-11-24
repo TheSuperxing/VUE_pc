@@ -22,27 +22,27 @@
         <li>
           <h5>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p>{{baseInfo.psnName}}</p>
-          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[0]}" v-on:click="openOrPrivacy1"></strong>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[0]}" v-on:click="openOrPrivacy(0)"></strong>
         </li>
         <li>
           <h5>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</h5>
           <p>{{baseInfo.sex}}</p>
-          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[1]}" v-on:click="openOrPrivacy2"></strong>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[1]}" v-on:click="openOrPrivacy(1)"></strong>
         </li>
         <li>
           <h5>出生日期：</h5>
           <p>{{baseInfo.dateOfBirth}}</p>
-          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[2]}" v-on:click="openOrPrivacy3"></strong>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[2]}" v-on:click="openOrPrivacy(2)"></strong>
         </li>
         <li>
           <h5>手机号码：</h5>
           <p>{{baseInfo.phoneNumber}}</p>
-          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[3]}" v-on:click="openOrPrivacy4"></strong>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[3]}" v-on:click="openOrPrivacy(3)"></strong>
         </li>
         <li>
           <h5>联系邮箱：</h5>
           <p>{{baseInfo.psnMail}}</p>
-          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[4]}" v-on:click="openOrPrivacy5"></strong>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[4]}" v-on:click="openOrPrivacy(4)"></strong>
         </li>
       </ul>
 
@@ -52,13 +52,16 @@
           <h5><span>*</span>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
           <p><input type="text" v-model="localBaseInfo.nickName" v-bind:value="localBaseInfo.nickName" v-on:input="changeNickName"></p>
           <i>{{textLeng.nickName}}/30</i>
+				  <alertTip v-if="showAlert.nickName" :showHide="showAlert.nickName" @closeTip="closeTip" :alertText="alertText.nickName"></alertTip>
+          
         </li>
         <li v-if="baseInfo.ifRNA">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p>{{baseInfo.psnName}}</p>
           <i>{{textLeng.psnName}}/30</i>
           <span>（进入实名认证流程后，姓名将不可以自行修改，需联系管理员）</span>
-
+				  <alertTip v-if="showAlert.psnName" :showHide="showAlert.psnName" @closeTip="closeTip" :alertText="alertText.psnName"></alertTip>
+					
         </li>
         <li v-if="!baseInfo.ifRNA">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
@@ -193,6 +196,8 @@
   import qq from "fine-uploader" 
   import Datepicker from "../units/Datepicker.vue"
   import MyAjax from "../../../assets/js/MyAjax.js"
+	import alertTip from "../units/alertTip.vue"
+	  
   
   export default {
     name: "personalBasicInfo",
@@ -207,61 +212,38 @@
           ifRNA:"",
           openOrPrivacy:[]
         },
-        
+        showAlert:{nickName:false,psnName:false,},//提示框显隐
+	      alertText:{nickName:null,psnName:null,},
         textLeng:{
           nickName:0,
           psnName:0
         },
-        
         baseInfo:{},
-        
         localBaseInfo:{
           nickName:"",
           psnName:"",
-          psnNameVisable:0,
+          psnNameVisable:1,
           sex:"",
           sexVisable:1,
           phoneNumber:"",
-          phoneNumberVisable:0,
+          phoneNumberVisable:1,
           dateOfBirth:"",
-          ageVisable:0,
+          ageVisable:1,
           psnMail:"",
           psnMailVisable:1,
           ifRNA:0,
-          psnID:"3b15132cdb994b76bd0d9ee0de0dc0b8",
+          psnID:"",
         },
       }
 
     },
     components:{
 	    Datepicker,
+	    alertTip,
 	  },
-//  computed:mapState({
-////    baseInfo:state=>state.personal.personalMessage.baseInfo,
-//
-//  }),
 
     mounted(){
-    	
-    	var that = this;
-    	var url = "http://10.1.31.6:8080/personalbasicinfo/findByID/"+"3b15132cdb994b76bd0d9ee0de0dc0b8";
-    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-				dataType: "json",
-//				content-type: "text/plain;charset=UTF-8",
-				
-			},function(data){
-				console.log(data.msg)
-				data = data.msg;
-				that.baseInfo = data;
-			},function(err){
-				console.log(err)
-			})
-    	
-    	
-
+    	this.updateData();
       //上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -287,98 +269,116 @@
 	        		$('#trigger-upload').show()
 	        	},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	                //alert('This is onComplete function.');
-									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-	                //console.log(responseJSON)
-	                $('#message').append(responseJSON.msg);
+	            //alert('This is onComplete function.');
+								//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
+	            //console.log(responseJSON)
+	            $('#message').append(responseJSON.msg);
 	//	                $('#progress').hide();//隐藏进度动画
-	                //清除已上传队列
-	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
+	            //清除已上传队列
+	            $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
+	            //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
+	            //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
-	                
-	                $('#trigger-upload').hide()
-	                //console.log(maybeXhr)
-	          	},
+	            
+	            $('#trigger-upload').hide()
+            //console.log(maybeXhr)
+	      	},
 	    	}
 	    });
 	    
-			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	        manualUploader.uploadStoredFiles();
-	    });
+		qq(document.getElementById("trigger-upload")).attach("click", function() {
+        manualUploader.uploadStoredFiles();
+    });
 
-      function emptyText(text) {
-        if(text.length==0){
-          return "（此处暂时没有消息）";
-        }else {
-          return text;
-        }
-      }
-      that.baseInfo.nickName=emptyText(that.baseInfo.nickName);
-      that.baseInfo.psnName=emptyText(that.baseInfo.psnName);
-      that.baseInfo.sex=emptyText(that.baseInfo.sex);
-      that.baseInfo.dateOfBirth=emptyText(that.baseInfo.dateOfBirth);
-      that.baseInfo.psnMail=emptyText(that.baseInfo.psnMail);
-      that.baseInfo.phoneNumber=emptyText(that.baseInfo.phoneNumber);
-      //如果得到的数据为空，进行暂没有消息处理
-
-      that.localBaseInfo.nickName=that.baseInfo.nickName;
-      that.localBaseInfo.psnName=that.baseInfo.psnName;
-      that.localBaseInfo.sex=that.baseInfo.sex;
-      that.localBaseInfo.dateOfBirth=that.baseInfo.dateOfBirth;
-      that.localBaseInfo.psnMail=that.baseInfo.psnMail;
-      that.localBaseInfo.ifRNA=that.baseInfo.ifRNA;
-      console.log(that.localBaseInfo)
-      /*从store获取数据初始话本地数据，保证在修改数据的时候不会改变store中的原始数据，只有当提交修改数据的时候store的值再进行修改*/
-
-
-      if(that.localBaseInfo.sex.trim().length==0){
-        Vue.set(that.reveal,'selectSex',true);
-      }else if(that.localBaseInfo.sex.trim()=="女"){
-        Vue.set(that.reveal,'selectSex',false);
-      }else if(that.localBaseInfo.sex.trim()=="男"){
-        Vue.set(that.reveal,'selectSex',true);
-      }
-      /*设置性别的初始勾选状态*/
-      if(that.baseInfo.ifRNA){
-        that.reveal.throughRealName=true;
-      }
-
-      /*0-name 1-sex 2-age 3-phone 4-mail*/
-      that.reveal.openOrPrivacy.push(that.baseInfo.psnNameVisable)
-      that.reveal.openOrPrivacy.push(that.baseInfo.sexVisable)
-      that.reveal.openOrPrivacy.push(that.baseInfo.ageVisable)
-      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
-      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
-      /*初始化openOrPrivacy*/
-			console.log(that.reveal.openOrPrivacy)
-			for(var i=0;i<that.reveal.openOrPrivacy.length;i++){
-				if(that.reveal.openOrPrivacy[i] == 0){
-					that.reveal.openOrPrivacy[i] = false;
-				}else{
-					that.reveal.openOrPrivacy[i] = true;
-				}
-			}
-			console.log(that.reveal.openOrPrivacy)
+      
     },
     methods:{
+    	updateData(){
+    		var that = this;
+	    	var url = "http://10.1.31.7:8080/personalbasicinfo/findByMySelf";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.baseInfo = data;
+				},function(err){
+					console.log(err)
+				})
+	    	if(that.localBaseInfo.sex==null){
+			    Vue.set(that.reveal,'selectSex',true);
+			  }else if(that.localBaseInfo.sex.trim()=="女"){
+			    Vue.set(that.reveal,'selectSex',false);
+			  }else if(that.localBaseInfo.sex.trim()=="男"){
+			    Vue.set(that.reveal,'selectSex',true);
+			  }
+			  /*设置性别的初始勾选状态*/
+			  if(that.baseInfo.ifRNA){
+			    that.reveal.throughRealName=true;
+			  }
+			  
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			  }
+	      that.baseInfo.nickName=emptyText(this.baseInfo.nickName);
+	      that.baseInfo.psnName=emptyText(this.baseInfo.psnName);
+	      that.baseInfo.sex=emptyText(this.baseInfo.sex);
+	      that.baseInfo.dateOfBirth=emptyText(this.baseInfo.dateOfBirth);
+	      that.baseInfo.psnMail=emptyText(this.baseInfo.psnMail);
+	      that.baseInfo.phoneNumber=emptyText(this.baseInfo.phoneNumber);
+	      //如果得到的数据为空，进行暂没有消息处理
+				that.reveal.openOrPrivacy = [];
+	      that.localBaseInfo=JSON.parse(JSON.stringify(that.baseInfo));
+	      that.reveal.openOrPrivacy.push(that.baseInfo.psnNameVisable)
+	      that.reveal.openOrPrivacy.push(that.baseInfo.sexVisable)
+	      that.reveal.openOrPrivacy.push(that.baseInfo.ageVisable)
+	      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
+	      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
+	      /*初始化openOrPrivacy*/
+				
+				for(var i=0;i<that.reveal.openOrPrivacy.length;i++){
+					if(that.reveal.openOrPrivacy[i] == 0){
+						that.reveal.openOrPrivacy[i] = false;
+					}else{
+						that.reveal.openOrPrivacy[i] = true;
+					}
+				}
+				console.log(that.reveal.openOrPrivacy)
+    	},
       editBasicInfo(){//编辑进入编辑状态
+//    	console.log(this.localBaseInfo)
+				function emptyText(text) {
+			    if(text== "（暂无信息）"){
+			      return "";
+			    }else {
+			      return text;
+			    }
+			  }
+				this.localBaseInfo.nickName=emptyText(this.localBaseInfo.nickName);
+	      this.localBaseInfo.psnName=emptyText(this.localBaseInfo.psnName);
+	      this.localBaseInfo.sex=emptyText(this.localBaseInfo.sex);
+	      this.localBaseInfo.psnMail=emptyText(this.localBaseInfo.psnMail);
+	      this.localBaseInfo.phoneNumber=emptyText(this.localBaseInfo.phoneNumber);
+				var d = new Date();
+				console.log(d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate())
+				if(this.localBaseInfo.dateOfBirth == "（暂无信息）"){
+					
+					this.localBaseInfo.dateOfBirth =d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+					console.log(this.localBaseInfo)
+				}
+				
         Vue.set(this.reveal,"edit",false);
-        function emptyText(text) {
-          if(text=="（此处暂时没有消息）"){
-            return "";
-
-          }else {
-            return text;
-          }
-        }
-        this.localBaseInfo.nickName=emptyText(this.baseInfo.nickName);
-        this.localBaseInfo.psnName=emptyText(this.baseInfo.psnName);
-        this.localBaseInfo.sex=emptyText(this.baseInfo.sex);
-        this.localBaseInfo.dateOfBirth=emptyText(this.baseInfo.dateOfBirth);
-        this.localBaseInfo.psnMail=emptyText(this.baseInfo.psnMail);
+        
         /*进入编辑状态之前的数据处理*/
         if(this.localBaseInfo.nickName.trim().length!=0&&this.localBaseInfo.psnName.trim().length!=0){
           Vue.set(this.reveal,"submitBgColor",true)
@@ -437,25 +437,11 @@
         console.log("ok")
       },
       submitEdit(){//保存编辑
-        function emptyText(text) {
-          if(text.length==0){
-            return "（此处暂时没有消息）";
-          }else {
-            return text;
-          }
-        }
+      	
         /*没有数据输入的处理函数*/
         if(this.localBaseInfo.nickName.trim().length!=0&&this.localBaseInfo.psnName.trim().length!=0){
           Vue.set(this.reveal,"edit",true)
           /*只有当昵称，和名字不为空的时候，保存按钮才可用*/
-          this.baseInfo.nickName=this.localBaseInfo.nickName;
-          this.baseInfo.psnName=this.localBaseInfo.psnName;
-          /*昵称和名字必须要输入内容，不需要为空处理*/
-          this.baseInfo.sex=this.localBaseInfo.sex;
-          /*性别是单选项，不需要为空处理*/
-          this.baseInfo.dateOfBirth=emptyText(this.localBaseInfo.dateOfBirth);
-          this.baseInfo.psnMail=emptyText(this.localBaseInfo.psnMail);
-          /*数据为空处理*/
         }else {
           Vue.set(this.reveal,"edit",false)
           /*只有当昵称，和名字不为空的时候，保存按钮才可用*/
@@ -474,22 +460,21 @@
 	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
 	    	var that = this;
-	    	var data = JSON.stringify(that.localBaseInfo)
-	    	console.log(data)
-	    	var url = "http://10.1.31.6:8080/personalbasicinfo/update";
+	    	var url = "http://10.1.31.7:8080/personalbasicinfo/update";
 	    	$.ajaxSetup({ contentType : 'application/json' });
 	    	MyAjax.ajax({
-						type: "POST",
-						url:url,
-						data: data,
-						dataType: "json",
-						contentType:"application/json;charset=utf-8",//
-						
-					}, function(data){
-						console.log(data)
-					},function(err){
-						console.log(err)
-					})
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.localBaseInfo),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",//
+					
+				}, function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+	    	that.updateData();
       },
       /*提交和取消按钮*/
      
@@ -504,27 +489,41 @@
 				
       },
       /*0-name 1-sex 2-age 3-phone 4-mail*/
-      openOrPrivacy1(){
-        Vue.set(this.reveal.openOrPrivacy,[0],!this.reveal.openOrPrivacy[0])
-        this.baseInfo.psnNameVisable=this.reveal.openOrPrivacy[0];
-        
-      },
-      openOrPrivacy2(){
-        Vue.set(this.reveal.openOrPrivacy,[1],!this.reveal.openOrPrivacy[1])
-        this.baseInfo.sexVisable=this.reveal.openOrPrivacy[1];
-      },
-      openOrPrivacy3(){
-        Vue.set(this.reveal.openOrPrivacy,[2],!this.reveal.openOrPrivacy[2])
-        this.baseInfo.ageVisable=this.reveal.openOrPrivacy[2];
-      },
-      openOrPrivacy4(){
-        Vue.set(this.reveal.openOrPrivacy,[3],!this.reveal.openOrPrivacy[3])
-        this.baseInfo.phoneNumberVisable =this.reveal.openOrPrivacy[3];
-      },
-      openOrPrivacy5(){
-        Vue.set(this.reveal.openOrPrivacy,[4],!this.reveal.openOrPrivacy[4])
-        this.baseInfo.psnMailVisable =this.reveal.openOrPrivacy[4];
-      },
+     	openOrPrivacy(index){
+        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
+        console.log(this.reveal.openOrPrivacy[index])
+     		for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
+        	if(this.reveal.openOrPrivacy[i]==false){
+        		this.reveal.openOrPrivacy[i] = 0;
+        	}else{
+        		this.reveal.openOrPrivacy[i] = 1;
+        	}
+        }
+     		
+     		this.baseInfo.psnNameVisable = this.reveal.openOrPrivacy[0];
+	    	this.baseInfo.sexVisable = this.reveal.openOrPrivacy[1];
+	    	this.baseInfo.ageVisable = this.reveal.openOrPrivacy[2];
+	    	this.baseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
+	    	this.baseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
+	    	console.log(this.baseInfo)
+	    	var that = this;
+	    	var url = "http://10.1.31.7:8080/personalbasicinfo/update";
+	    	$.ajaxSetup({ contentType : 'application/json' });
+	    	MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.baseInfo),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",//
+					
+				}, function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+	    	that.updateData();
+     	},
+
     },
 		
 

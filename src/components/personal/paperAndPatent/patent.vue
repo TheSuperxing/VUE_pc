@@ -13,9 +13,9 @@
         <!--显示信息列表开始-->
         <div class="patentInfoList" v-if="!reveal.editInfo[index]">
           <div class="patentInfoTitle">
-            <h4 v-cloak>{{localPatent.patentName[index]}}</h4>
+            <h4 v-cloak>{{patent[index].patentName}}</h4>
             <ul>
-              <li v-bind:class="{openOrPrivacy:reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
+              <li v-bind:class="{openOrPrivacy:!patent[index].ifVisable}" v-on:click="openOrPrivacy(index)">
                 <p v-cloak>{{reveal.openOrPrivacyText[index]}}</p>
               </li>
               <li v-on:click="paperEdit(index)">
@@ -27,8 +27,12 @@
             </ul>
           </div>
           <div class="patentInfoBody">
-            <p v-cloak>{{localPatent.info.organ[index]}}</p>
-            <p v-cloak>{{localPatent.info.time[index]}}</p>
+            <p v-cloak>{{patent[index].awardingBody}}</p>
+              <div class="validityTime">
+                <p v-cloak>{{patent[index].validityTermS}}</p>
+                <span>-</span>
+                <p v-cloak>{{patent[index].validityTermE}}</p>
+              </div>
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -39,20 +43,22 @@
             <li>
               <label>
                 <h5>*&nbsp;专利名称</h5>
-                <input v-model="localPatent.patentName[index]" type="text" placeholder="请输入论文名称">
+                <input v-model="localPatent[index].patentName" type="text" placeholder="请输入专利名称">
               </label>
             </li>
             <li>
               <label>
                 <h5>颁发机构</h5>
-                <input v-model="localPatent.info.organ[index]" type="text" placeholder="请输入熟练程度">
+                <input v-model="localPatent[index].awardingBody" type="text" placeholder="请输入颁发机构">
               </label>
             </li>
             <li>
               <label>
                 <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
                 <!--<input v-model="localPatent.info.time[index]" type="month">-->
-                <datepicker v-model="localPatent.info.time[index]"></datepicker>
+                <datepicker v-model="localPatent[index].validityTermS"></datepicker>
+                <span>—</span>
+                <datepicker v-model="localPatent[index].validityTermE"></datepicker>
               </label>
             </li>
             <li class="img-wrap">
@@ -147,14 +153,15 @@
         <li>
           <label>
             <h5>颁发机构</h5>
-            <input v-model="newPatent.info.organ" type="text" placeholder="请输入发表期刊">
+            <input v-model="newPatent.awardingBody" type="text" placeholder="请输入发表期刊">
           </label>
         </li>
         <li>
           <label>
             <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
             <!--<input v-model="newPatent.info.time" type="month" placeholder="请输入发表时间">-->
-            <datepicker v-model="newPatent.info.time"></datepicker>
+            <datepicker v-model="newPatent.validityTermS"></datepicker>
+            <datepicker v-model="newPatent.validityTermE"></datepicker>
           </label>
         </li>
         <li class="img-wrap">
@@ -243,7 +250,8 @@
   import {mapState} from "vuex"
   import datepicker from "../../units/Datepicker.vue"
   import qq from "fine-uploader"
-  
+  import MyAjax from "../../../assets/js/MyAjax.js"
+
   export default {
     name:"PatentIndex",
     components:{
@@ -254,25 +262,19 @@
         title:"专利",
         reveal:{
           empty:true,//是否显示执业资格信息尚未添加
-          openOrPrivacy:[],//信息是否公开显示,通过服务器获取的数据
           openOrPrivacyText:[],//信息是否公开显示,文字切换
           editInfo:[],//是否编辑信息
           addPatent:true,//是否添加信息
           keepAddPatent:true,//添加模式下，保存按钮是否可用
         },
-        localPatent:{
-          patentName:[],
-          info:{
-            time:[],
-            organ:[]
-          }
-        },
+        patent:[],
+        localPatent:[],
         newPatent:{
+          accountID:"string",
           patentName:"",
-          info:{
-            time:"",
-            organ:""
-          }
+          awardingBody:"",
+          validityTermS:"",//开始时间
+          validityTermE:"",//结束时间
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
@@ -280,11 +282,31 @@
       }
     },
     created(){
+    	var that=this;
+      var url = MyAjax.urlsy+"/psnPaperPatent/findByMySelfPatent/"+"string";
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				
+			},function(data){
+        if(data.code==0){
+          that.patent=data.msg
+         
+        }else{
+          console.log("错误返回");
+        }
+				
+			},function(err){
+				console.log(err)
+      })
+      // 从服务器获取数据
+      this.localPatent=JSON.parse(JSON.stringify(this.patent));
+      //数据库的数据放本地一份
     	for(var i=0;i<this.patent.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger-patent"+this.patent[i].id);
-    		this.qqTemplate.push("qq-template-manual-trigger-patent"+this.patent[i].id);
+    		this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
+    		this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
     	}
-    	//console.log(this.fineUploaderClass)
     },
     mounted(){
     	
@@ -332,19 +354,16 @@
 	    });
 			qq(document.getElementById("trigger-upload-patent")).attach("click", function() {
 	        manualUploader.uploadStoredFiles();
-	        $('#trigger-upload-patent').hide()
+	       // $('#trigger-upload-patent').hide()
 	    });
-	    
+      
+      
+      
       if(this.patent.length!=0){
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
         for(let i=0;i<this.patent.length;i++){
-          /*数据同步本地一份开始*/
-          this.localPatent.patentName[i]=this.patent[i].patentName;
-          this.localPatent.info.organ[i]=this.patent[i].info.organ;
-          this.localPatent.info.time[i]=this.patent[i].info.time;
-          //论文数据
           this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
-          this.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+
           this.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值
         }
       }else{
@@ -367,20 +386,63 @@
         Vue.set(this.reveal,"keepAddPatent",true);//控制保存按钮的背景颜色
       }
     },
-    computed:mapState({
-      patent:state=>state.personal.personalMessage.paperAndPatent.patent,
-    }),
+
     methods:{
+      getData(){//用于每次信息更新后从新获取数据
+        var that=this;
+        var url = MyAjax.urlsy+"/psnPaperPatent/findByMySelfPatent/"+"string";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          
+        },function(data){
+          if(data.code==0){
+            that.patent=data.msg
+            console.log(data)
+          }else{
+            console.log("错误返回");
+          }
+          
+        },function(err){
+          console.log(err)
+        })
+        // 从服务器获取数据
+        this.localPatent=JSON.parse(JSON.stringify(this.patent));
+        //数据库的数据放本地一份
+      },
       openOrPrivacy(index){//信息是否对外公开控制按钮
-        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
-        if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
-          Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+        var that=this;
+        if(this.patent[index].ifVisable==0){
+          Vue.set(this.patent[index],"ifVisable",1);
         }else{
-          Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
+          Vue.set(this.patent[index],"ifVisable",0);
         }
+        
+        var url = MyAjax.urlsy+"/psnPaperPatent/updatePatent";
+          MyAjax.ajax({
+            type: "POST",
+            url:url,
+            data: JSON.stringify(that.patent[index]),
+            dataType: "json",
+            contentType: "application/json;charset=UTF-8",
+            
+          },function(data){
+            //console.log(data)
+          },function(err){
+            console.log(err)
+          })
+          that.getData();
+          
+          if(this.patent[index].ifVisable==0){
+            Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+          }else{
+            Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
+          }
 
       },
       paperEdit(index){//编辑状态进入按钮
+        var index=index;
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
 
@@ -437,39 +499,56 @@
                
             }
           }
+
           var btnPrimary=document.getElementsByClassName("btn-primary-patent");
           //console.log("aa"+index)
           console.log(btnPrimary)
           
           qq(btnPrimary[index]).attach("click", function(){
-          	console.log(111)
+          	//console.log(111)
             that.qqFineloader[index].uploadStoredFiles();
-            $('.btn-primary').eq(index).hide()
+            $('.btn-primary').eq(index).hide();
           });
-          console.log(that.qqFineloader)
       },
       paperEditKeep(index){//编辑状态，保存按钮
-        if(this.localPatent.patentName[index].trim().length!=0){
+        var that=this;
+        if(this.localPatent[index].patentName.trim().length!=0){
+          var url = MyAjax.urlsy+"/psnPaperPatent/updatePatent";
+          MyAjax.ajax({
+            type: "POST",
+            url:url,
+            data: JSON.stringify(that.localPatent[index]),
+            dataType: "json",
+            contentType: "application/json;charset=UTF-8",
+            
+          },function(data){
+            //console.log(data)
+          },function(err){
+            console.log(err)
+          })
+          that.getData();
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
-          this.patent[index].patentName=this.localPatent.patentName[index];
-          this.patent[index].info.time=this.localPatent.info.time[index];
-          this.patent[index].info.organ=this.localPatent.info.organ[index];
-          /*如果是保存，把数据保存到Vuex中*/
         }
       },
       paperEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        this.localPatent.patentName[index]=this.patent[index].patentName;
-        this.localPatent.info.organ[index]=this.patent[index].info.organ;
-        this.localPatent.info.time[index]=this.patent[index].info.time;
-
+        this.localPatent[index].patentName=this.patent[index].patentName;
+        this.localPatent[index].awardingBody=this.patent[index].awardingBody;
+        this.localPatent[index].validityTermS=this.patent[index].validityTermS;
+        this.localPatent[index].validityTermE=this.patent[index].validityTermE;
+       
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },
       paperEditDel(index){//编辑状态，删除按钮
-        this.patent.splice(index,1);
-        this.localPatent.patentName.splice(index,1);
-        this.localPatent.info.organ.splice(index,1);
-        this.localPatent.info.time.splice(index,1);
+        var that=this;
+        var url = MyAjax.urlsy+"/psnPaperPatent/delPatent/"+this.patent[index].pkid;
+        MyAjax.delete(url);
+        that.getData();
+
+        for(var i=0;i<this.patent.length;i++){
+          this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
+    		  this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
+        }
       },
       addPatent(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addPatent",false);
@@ -479,29 +558,53 @@
         if(this.newPatent.patentName.length!=0){
           if(this.newPatent.patentName.trim().length!=0){
 
-            this.localPatent.patentName.push(this.newPatent.patentName);
-            this.localPatent.info.organ.push(this.newPatent.info.organ);
-            this.localPatent.info.time.push(this.newPatent.info.time);
-            //同步信息到执业资格首页
-            this.patent.push({patentName:this.newPatent.patentName,info:{time:this.newPatent.info.time,profession:"",introduce:"",level:"",organ:this.newPatent.info.organ,}})
-            /*同步信息到个人信息首页*/
+            // this.localPatent.patentName.push(this.newPatent.patentName);
+            // this.localPatent.info.organ.push(this.newPatent.info.organ);
+            // this.localPatent.info.time.push(this.newPatent.info.time);
+            // //同步信息到执业资格首页
+            // this.patent.push({patentName:this.newPatent.patentName,info:{time:this.newPatent.info.time,profession:"",introduce:"",level:"",organ:this.newPatent.info.organ,}})
+            // /*同步信息到个人信息首页*/
+
+            var that=this;
+            var url = MyAjax.urlsy+"/psnPaperPatent/insertPatent";
+            MyAjax.ajax({
+              type: "POST",
+              url:url,
+      				data: JSON.stringify(that.newPatent),
+              dataType: "json",
+      			  contentType: "application/json;charset=UTF-8",
+              
+            },function(data){
+              //console.log(data)
+            },function(err){
+              console.log(err)
+            })
+            this.getData();
+            // 从新获取数据
+            for(var i=0;i<this.patent.length;i++){
+              this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
+    		      this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
+            }
+            
             Vue.set(this.reveal,"addPatent",true);
             //视图切换到执业资格的首页
-            Vue.set(this.newPatent,"patentName","");
-            Vue.set(this.newPatent.info,"organ","");
-            Vue.set(this.newPatent.info,"time","");
-            /*清除数据，保证下次输入时输入框为空*/
+            
             this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
             this.reveal.openOrPrivacy.push(false)//追加显示隐藏按钮状态
           }
         }
+
+       // Vue.set(this.newPatent,"patentName","");
+       // Vue.set(this.newPatent.info,"organ","");
+       // Vue.set(this.newPatent.info,"time","");
+        /*清除数据，保证下次输入时输入框为空*/
       },
       cancelNewPatent(){
         Vue.set(this.reveal,"addPatent",true);
         //视图切换到执业资格的首页
         Vue.set(this.newPatent,"patentName","");
-        Vue.set(this.newPatent.info,"organ","");
-        Vue.set(this.newPatent.info,"time","");
+        Vue.set(this.newPatent,"organ","");
+        Vue.set(this.newPatent,"time","");
         /*清除数据，保证下次输入时输入框为空*/
       }
     }
@@ -560,13 +663,17 @@
           .patentInfoTitle{
             color: $themeColor;
             margin-top: 30px;
-            margin-bottom:19px;
+            margin-bottom:15px;
             h4{
               float: left;
+              height: 18px;
+              line-height: 18px;
+              font-size: 14px;
+              
             }
             ul{
+              height: 18px;
               float: right;
-              margin-top:2px;
               li{
                 float: left;
                 cursor: pointer;
@@ -605,16 +712,27 @@
           }
           .patentInfoBody{
             p{
-              height:20px;
-              margin:15px 0 ;
-              color: #353535;
+              height: 14px;
+              line-height: 14px;
+              color: rgb(53, 53, 53);
               span{
                 color: #757575;
                 margin-left:8px;
               }
             }
-            p:last-child{
+            .validityTime{
               margin-bottom:17px;
+              margin-top: 15px;
+              
+              P{
+                float: left;
+                color: rgb(117, 117, 117);
+              }
+              span{
+                float: left;
+                line-height: 14px;
+                color: rgb(117, 117, 117);
+              }
             }
           }
         }
@@ -654,6 +772,15 @@
               }
               button{
                 cursor: pointer;
+              }
+              span{
+                float: left;
+                height: 31px;
+                line-height: 31px;
+              }
+              .date-picker{
+                float: left;
+                margin-right: 22px;
               }
             }
             li:nth-child(1){

@@ -86,7 +86,7 @@
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
 			            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-			                <li>
+			                <li class="li">
 			                    <div class="qq-progress-bar-container-selector">
 			                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 			                    </div>
@@ -203,7 +203,7 @@
 				that.projectID = '""';
 			}
 			console.log(that.projectID,that.psnProExpeID)
-			var url = "http://10.1.31.16:8080/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
+			var url = MyAjax.urlhw+"/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
 	    	MyAjax.ajax({
 				type: "GET",
 				url:url,
@@ -274,8 +274,14 @@
 	            debug: true,
 	            callbacks:{
 		        	onSubmit:  function(id,  fileName)  {
-		        		$('#trigger-upload').show()
-		        	},
+		        		$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").show()
+					},
+					onCancel: function(){
+							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
+							if(imgList.length<=1){
+								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+							}
+						},
 		        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 		                //alert('This is onComplete function.');
 										//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -289,8 +295,7 @@
 		//	                $('.stateOne').hide();
 		//	                $('.stateTwo').show()
 		                
-		                $('#trigger-upload').hide()
-		                console.log(maybeXhr)
+		                $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
 		          	},
 	        	}
 	        });
@@ -317,7 +322,7 @@
 ////				router.push("/yhzx/company/info/companyProject/index")
 				var that = this;
 			    console.log(JSON.stringify(that.project))
-			    var url = "http://10.1.31.16:8080/psnProjExpe/insertOrUpdateProjExpe";
+			    var url = MyAjax.urlhw+"/psnProjExpe/insertOrUpdateProjExpe";
 			    $.ajaxSetup({ contentType : 'application/json' });
 			    MyAjax.ajax({
 					type: "POST",

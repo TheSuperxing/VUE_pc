@@ -60,7 +60,7 @@
 						              <span class="qq-upload-drop-area-text-selector"></span>
 						            </div>
 						            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-					                <li>
+					                <li class="list">
 				                    <div class="qq-progress-bar-container-selector">
 				                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 				                    </div>
@@ -157,7 +157,7 @@
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
 			            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-			                <li>
+			                <li class="list">
 			                    <div class="qq-progress-bar-container-selector">
 			                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 			                    </div>
@@ -288,8 +288,14 @@
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,fileName)  {
-	        		$('#trigger-upload-software').show()
-	        	},
+	        		$("#fine-template-manual-trigger-software div .qq-uploader-selector .buttons .btn-primary-software").show()
+            },
+            onCancel: function(){
+							var imgList=$("#fine-template-manual-trigger-software div .qq-uploader-selector .qq-upload-list-selector .list")
+							if(imgList.length<=1){
+								$("#fine-template-manual-trigger-software div .qq-uploader-selector .buttons .btn-primary-software").hide()
+							}
+						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
                 //alert('This is onComplete function.');
 								//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -303,14 +309,13 @@
 //	                $('.stateOne').hide();
 //	                $('.stateTwo').show()
                 
-                $('#trigger-upload-software').hide()
+                $("#fine-template-manual-trigger-software div .qq-uploader-selector .buttons .btn-primary-software").hide()
                 console.log(maybeXhr)
           	},
 	    	}
 	    });
 			qq(document.getElementById("trigger-upload-software")).attach("click", function() {
 	        manualUploader.uploadStoredFiles();
-	        $('#trigger-upload-software').hide()
 	    });
 	    
 //    if(this.software.length!=0){
@@ -344,7 +349,7 @@
     methods:{
     	updateData(){
       	var that = this;
-	    	var url = "http://10.1.31.7:8080/psnsoftware/findByMySelf";
+	    	var url = MyAjax.urlsy+"/psnsoftware/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -366,8 +371,8 @@
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	for(var i=0;i<that.software.length;i++){
-	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.software[i].pkid);
-	    		that.qqTemplate.push("qq-template-manual-trigger"+that.software[i].pkid);
+	    		that.fineUploaderId.push("fine-uploader-manual-trigger-software"+that.software[i].pkid);
+	    		that.qqTemplate.push("qq-template-manual-trigger-software"+that.software[i].pkid);
 	    		if(that.software[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
@@ -380,12 +385,10 @@
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
         if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
-        	
           Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
         }else{
           Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
         }
-        
         for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
         	if(this.reveal.openOrPrivacy[i]==false){
         		this.software[i].ifVisable = 0;
@@ -393,10 +396,9 @@
         		this.software[i].ifVisable = 1;
         	}
         }
-        
         var that = this;
         console.log(JSON.stringify(that.software[index]))
-        var url = "http://10.1.31.7:8080/psnsoftware/update"
+        var url = MyAjax.urlsy+"/psnsoftware/update"
         $.ajaxSetup({contentType : 'application/json'});
         MyAjax.ajax({
 					type: "POST",
@@ -416,68 +418,48 @@
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         //上传图片
         var that = this
-	      if(that.qqFineloader.length==0){
-	        for(var i=0;i<that.software.length;i++){
-								var manualUploader= new qq.FineUploader({
-			            element: document.getElementById(that.fineUploaderId[i]),
-			            template: that.qqTemplate[i],
-			            request: {
-			              endpoint: 'http://10.1.31.7:8080/psnsoftware/batchUpload'
-			            },
-			            thumbnails: {
-			              //	                placeholders: {
-			              //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-			              //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-			              //	                }
-			            },
-			            validation: {
-			              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-			              itemLimit: 5,
-			              sizeLimit: 2000000
-			            },
-			            autoUpload: false,
-			            debug: true,
-			            callbacks:{
-			              onSubmit:  function(id,fileName){
-	//			              	if(index == i){
-			              		console.log(id)
-			              		$('.btn-primary-software').show()
-	//			              	}
-			                
-			              },
-			              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-			                //alert('This is onComplete function.');
-			                //alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-			//                  $('#message').append(responseJSON.msg);
-			//                    	                $('#progress').hide();//隐藏进度动画
-			                //清除已上传队列
-			//		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-			                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-			                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）
-			                //	                $('.stateOne').hide();
-			                //	                $('.stateTwo').show()
-			
-			                ///console.log($('.btn-primary'))
-			                console.log(responseJSON)
-			                if(index == i){
-			              		$('.btn-primary-software').eq(index).hide()
-			              	}
-			              },
-			            }
-			          });
-			          that.qqFineloader.push(manualUploader)
-	        }
-	      }
-	      var btnPrimary=document.getElementsByClassName("btn-primary-software");
-	      qq(btnPrimary[index]).attach("click", function() {
-	        that.qqFineloader[index].uploadStoredFiles();
-	        $('.btn-primary-software').eq(index).hide()
-	      });
+	      if(window['manualUploader_software_'+index]==undefined){
+          window['manualUploader_software_'+index]= new qq.FineUploader({
+            element: document.getElementById(this.fineUploaderId[index]),
+            template: this.qqTemplate[index],
+            request: {
+              endpoint: '/server/uploads'
+            },
+            thumbnails: {
+            },
+            validation: {
+              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+              itemLimit: 5,
+              sizeLimit: 2000000
+            },
+            autoUpload: false,
+            debug: true,
+            callbacks:{
+              onSubmit:  function(id,fileName){
+                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software").show()
+              },
+              onCancel: function(){
+                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                if(imgList.length<=1){
+                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software").hide()
+                }
+              },
+              onComplete: function (id, fileName, responseJSON, maybeXhr) {
+                
+              },
+            }
+          });
+        }
+        var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software");
+        qq(btnPrimary[0]).attach("click", function() {
+          eval('manualUploader_software_'+index).uploadStoredFiles();
+          btnPrimary.hide()
+        });
       },
       softwareEditKeep(index){//编辑状态，保存按钮
         
         var that = this;
-        var url = "http://10.1.31.7:8080/psnsoftware/update"
+        var url = MyAjax.urlsy+"/psnsoftware/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -509,17 +491,8 @@
         
         var that = this;
         console.log(that.software[index].pkid)
-        var url = "http://10.1.31.7:8080/psnsoftware/del/"+that.software[index].pkid;
-        MyAjax.ajax({
-					type: "DELETE",
-					url:url,
-					dataType: "json",
-					contentType: "application/json;charset=UTF-8",
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
+        var url = MyAjax.urlsy+"/psnsoftware/del/"+that.software[index].pkid;
+        MyAjax.delete(url)
         that.updateData();
 //      that.software.splice(index,1);
 //      that.localSoftware.splice(index,1);
@@ -547,7 +520,7 @@
         
         var that = this;
 //      console.log(that.software[index])
-        var url = "http://10.1.31.7:8080/psnsoftware/insert";
+        var url = MyAjax.urlsy+"/psnsoftware/insert";
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",

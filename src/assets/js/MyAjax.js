@@ -4,6 +4,7 @@
 import fetchJsonp from "fetch-jsonp"
 var MyAjax = {
 	urlsy:"http://10.1.31.16:8080",
+	urlhw:"http://10.1.31.7:8080",
 	ajax(option,callback,errCallback) {
 		$.ajax({
 			type: option.type,
@@ -25,7 +26,7 @@ var MyAjax = {
 	},
 	delete(url){
 		$.ajax({
-			type: "DELETE",
+			type: "GET",
 			url: url, 
 			async: false, // 使用同步方式  
 			success: function(data) {	

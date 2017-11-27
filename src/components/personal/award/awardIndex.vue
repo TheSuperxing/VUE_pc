@@ -55,13 +55,13 @@
               </label>
             <li class="img-wrap">
 							<span class="wrap-left">图片展示</span>
-							<script type="text/template" id="qq-template-manual-trigger">
+							<script type="text/template" :id="qqTemplate[index]">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 						            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
 						              <span class="qq-upload-drop-area-text-selector"></span>
 						            </div>
 						            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-					                <li>
+					                <li class="list">
 				                    <div class="qq-progress-bar-container-selector">
 				                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 				                    </div>
@@ -166,7 +166,7 @@
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
 			            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-			                <li>
+			                <li class="list">
 			                    <div class="qq-progress-bar-container-selector">
 			                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 			                    </div>
@@ -271,34 +271,9 @@
       }
     },
     created(){
-      var that=this;
-      var url = MyAjax.urlsy+"/psnAwards/findByMySelf/"+"string";
-    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-				
-			},function(data){
-        if(data.code==0){
-          that.award=data.msg
-          //console.log()
-        }else{
-          console.log("错误返回");
-        }
-				
-			},function(err){
-				console.log(err)
-      })
-      // 从服务器获取数据
-      this.localAward=JSON.parse(JSON.stringify(this.award));
-      //数据库的数据放本地一份
-      for(let i=0;i<this.localAward.length;i++){//拼接fineUploader的ID
-        this.fineUploaderId.push("fine-uploader-manual-trigger"+i);
-    		this.qqTemplate.push("qq-template-manual-trigger"+i);
-      }
+      this.getData()
     },
     mounted(){
-      
     	//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -321,8 +296,14 @@
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload').show()
-	        	},
+	        		$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").show()
+            },
+            onCancel: function(){
+                var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
+                if(imgList.length<=1){
+                  $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+                }
+              },
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	                //alert('This is onComplete function.');
 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -336,7 +317,7 @@
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
 	                
-	                $('#trigger-upload').hide()
+	                $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
 	          	},
 	    	}
 	    });
@@ -348,15 +329,6 @@
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }else {
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
-        for(let i=0;i<this.award.length;i++){
-          // /*数据同步本地一份开始*/
-          // this.localAward.awardName[i]=this.award[i].awardName;
-          // this.localAward.info.time[i]=this.award[i].info.time;
-          // this.localAward.info.organ[i]=this.award[i].info.organ;
-
-          /*数据同步本地一份结束*/
-          this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
-        }
       }
       /*以上是初始化*/
       if(this.award.length!=0){
@@ -411,6 +383,10 @@
             })
             // 从服务器获取数据
             this.localAward=JSON.parse(JSON.stringify(this.award));
+            for(let i=0;i<this.localAward.length;i++){//拼接fineUploader的ID
+              this.fineUploaderId.push("fine-uploader-manual-trigger"+i);
+              this.qqTemplate.push("qq-template-manual-trigger"+i);
+            }
       },
       openOrPrivacy(index){//信息是否对外公开控制按钮\
         var that=this;
@@ -447,67 +423,44 @@
         var that = this;
 
         //上传图片
-          if(that.qqFineloader.length==0){
-            for(var i=0;i<that.award.length;i++){
-//							if(index==i){
-								var manualUploader= new qq.FineUploader({
-			            element: document.getElementById(that.fineUploaderId[i]),
-			            template: "qq-template-manual-trigger",
-			            request: {
-			              endpoint: '/server/uploads'
-			            },
-			            thumbnails: {
-			              //	                placeholders: {
-			              //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-			              //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-			              //	                }
-			            },
-			            validation: {
-			              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-			              itemLimit: 5,
-			              sizeLimit: 2000000
-			            },
-			            autoUpload: false,
-			            debug: true,
-			            callbacks:{
-			              onSubmit:  function(id,fileName){
-//			              	if(index == i){
-			              		console.log(index)
-			              		$('.btn-primary').show()
-//			              	}
-			                
-			              },
-			              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-			                //alert('This is onComplete function.');
-			                //alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-			//                  $('#message').append(responseJSON.msg);
-			//                    	                $('#progress').hide();//隐藏进度动画
-			                //清除已上传队列
-			//		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-			                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-			                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）
-			                //	                $('.stateOne').hide();
-			                //	                $('.stateTwo').show()
-			
-			                ///console.log($('.btn-primary'))
-			                if(index == i){
-			              		$('.btn-primary').eq(index).hide()
-			              	}
-			                
-			              },
-			            }
-			          });
-			          that.qqFineloader.push(manualUploader)
-//							}
-               
+        if(window['manualUploader'+index]==undefined){
+          window['manualUploader'+index]= new qq.FineUploader({
+            element: document.getElementById(that.fineUploaderId[index]),
+            template: this.qqTemplate[index],
+            request: {
+              endpoint: '/server/uploads'
+            },
+            thumbnails: {
+            },
+            validation: {
+              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+              itemLimit: 5,
+              sizeLimit: 2000000
+            },
+            autoUpload: false,
+            debug: true,
+            callbacks:{
+              onSubmit:  function(id,fileName){
+                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary").show()
+              },
+              onCancel: function(){
+                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                if(imgList.length<=1){
+                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary").hide()
+                }
+              },
+              onComplete: function (id, fileName, responseJSON, maybeXhr) {
+                
+              },
             }
-          }
-          var btnPrimary=document.getElementsByClassName("btn-primary");
-          console.log("aa"+index)
-          qq(btnPrimary[index]).attach("click", function() {
-            that.qqFineloader[index].uploadStoredFiles();
-            $('.btn-primary').eq(index).hide()
           });
+        }
+
+        var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary");
+        qq(btnPrimary[0]).attach("click", function() {
+          eval('manualUploader'+index).uploadStoredFiles();
+          btnPrimary.hide()
+        });
 
       },
       keepAwardEdit(index){//编辑状态，保存按钮

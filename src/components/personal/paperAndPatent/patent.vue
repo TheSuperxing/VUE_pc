@@ -70,7 +70,7 @@
 						              <span class="qq-upload-drop-area-text-selector"></span>
 						            </div>
 						            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-					                <li>
+					                <li class="list">
 				                    <div class="qq-progress-bar-container-selector">
 				                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 				                    </div>
@@ -161,6 +161,7 @@
             <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
             <!--<input v-model="newPatent.info.time" type="month" placeholder="请输入发表时间">-->
             <datepicker v-model="newPatent.validityTermS"></datepicker>
+            <span>—</span>
             <datepicker v-model="newPatent.validityTermE"></datepicker>
           </label>
         </li>
@@ -282,31 +283,7 @@
       }
     },
     created(){
-    	var that=this;
-      var url = MyAjax.urlsy+"/psnPaperPatent/findByMySelfPatent/"+"string";
-    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-				
-			},function(data){
-        if(data.code==0){
-          that.patent=data.msg
-         
-        }else{
-          console.log("错误返回");
-        }
-				
-			},function(err){
-				console.log(err)
-      })
-      // 从服务器获取数据
-      this.localPatent=JSON.parse(JSON.stringify(this.patent));
-      //数据库的数据放本地一份
-    	for(var i=0;i<this.patent.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
-    		this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
-    	}
+    	this.getData()
     },
     mounted(){
     	
@@ -332,8 +309,14 @@
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload-patent').show()
-	        	},
+	        		$("#fine-template-manual-trigger-patent div .qq-uploader-selector .buttons .btn-primary-patent").show()
+            },
+            onCancel: function(){
+							var imgList=$("#fine-template-manual-trigger-patent div .qq-uploader-selector .qq-upload-list-selector .list")
+							if(imgList.length<=1){
+								$("#fine-template-manual-trigger-patent div .qq-uploader-selector .buttons .btn-primary-patent").hide()
+							}
+						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	                //alert('This is onComplete function.');
 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -347,14 +330,12 @@
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
 	                
-	                $('#trigger-upload-patent').hide()
-	                console.log(maybeXhr)
+	                $("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-patent").hide()
 	          	},
 	    	}
 	    });
 			qq(document.getElementById("trigger-upload-patent")).attach("click", function() {
 	        manualUploader.uploadStoredFiles();
-	       // $('#trigger-upload-patent').hide()
 	    });
       
       
@@ -410,6 +391,10 @@
         // 从服务器获取数据
         this.localPatent=JSON.parse(JSON.stringify(this.patent));
         //数据库的数据放本地一份
+        for(var i=0;i<this.patent.length;i++){
+          this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
+          this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
+        }
       },
       openOrPrivacy(index){//信息是否对外公开控制按钮
         var that=this;
@@ -447,67 +432,43 @@
         var that = this;
 
         //上传图片
-          if(that.qqFineloader.length==0){
-            for(var i=0;i<that.patent.length;i++){
-								var manualUploader= new qq.FineUploader({
-			            element: document.getElementById(that.fineUploaderId[i]),
-			            template: that.qqTemplate[i],
-			            request: {
-			              endpoint: '/server/uploads'
-			            },
-			            thumbnails: {
-			              //	                placeholders: {
-			              //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-			              //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-			              //	                }
-			            },
-			            validation: {
-			              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-			              itemLimit: 5,
-			              sizeLimit: 2000000
-			            },
-			            autoUpload: false,
-			            debug: true,
-			            callbacks:{
-			              onSubmit:  function(id,fileName){
-//			              	if(index == i){
-			              		console.log(index)
-			              		$('.btn-primary-patent').show()
-//			              	}
-			                
-			              },
-			              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-			                //alert('This is onComplete function.');
-			                //alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-			//                  $('#message').append(responseJSON.msg);
-			//                    	                $('#progress').hide();//隐藏进度动画
-			                //清除已上传队列
-			//		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-			                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-			                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）
-			                //	                $('.stateOne').hide();
-			                //	                $('.stateTwo').show()
-			
-			                ///console.log($('.btn-primary'))
-			                if(index == i){
-			              		$('.btn-primary-patent').eq(index).hide()
-			              	}
-			              },
-			            }
-			          });
-			          that.qqFineloader.push(manualUploader)
-               
+        if(window['manualUploader_patent_'+index]==undefined){
+          window['manualUploader_patent_'+index]= new qq.FineUploader({
+            element: document.getElementById(that.fineUploaderId[index]),
+            template: this.qqTemplate[index],
+            request: {
+              endpoint: '/server/uploads'
+            },
+            thumbnails: {
+            },
+            validation: {
+              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+              itemLimit: 5,
+              sizeLimit: 2000000
+            },
+            autoUpload: false,
+            debug: true,
+            callbacks:{
+              onSubmit:  function(id,fileName){
+                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-patent").show()
+              },
+              onCancel: function(){
+                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                if(imgList.length<=1){
+                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-patent").hide()
+                }
+              },
+              onComplete: function (id, fileName, responseJSON, maybeXhr) {
+                
+              },
             }
-          }
+          });
+        }
 
-          var btnPrimary=document.getElementsByClassName("btn-primary-patent");
-          //console.log("aa"+index)
-          console.log(btnPrimary)
-          
-          qq(btnPrimary[index]).attach("click", function(){
-          	//console.log(111)
-            that.qqFineloader[index].uploadStoredFiles();
-            $('.btn-primary').eq(index).hide();
+          var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-patent")
+          qq(btnPrimary[0]).attach("click", function() {
+            eval('manualUploader_patent_'+index).uploadStoredFiles();
+            btnPrimary.hide()
           });
       },
       paperEditKeep(index){//编辑状态，保存按钮
@@ -557,14 +518,6 @@
       keepNewPatent(){//添加模式下的保存
         if(this.newPatent.patentName.length!=0){
           if(this.newPatent.patentName.trim().length!=0){
-
-            // this.localPatent.patentName.push(this.newPatent.patentName);
-            // this.localPatent.info.organ.push(this.newPatent.info.organ);
-            // this.localPatent.info.time.push(this.newPatent.info.time);
-            // //同步信息到执业资格首页
-            // this.patent.push({patentName:this.newPatent.patentName,info:{time:this.newPatent.info.time,profession:"",introduce:"",level:"",organ:this.newPatent.info.organ,}})
-            // /*同步信息到个人信息首页*/
-
             var that=this;
             var url = MyAjax.urlsy+"/psnPaperPatent/insertPatent";
             MyAjax.ajax({
@@ -582,21 +535,20 @@
             this.getData();
             // 从新获取数据
             for(var i=0;i<this.patent.length;i++){
-              this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
-    		      this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
+              this.fineUploaderId.push("fine-uploader-manual-trigger-patent"+this.patent[i].pkid);
+    		      this.qqTemplate.push("qq-template-manual-trigger-patent"+this.patent[i].pkid);
             }
             
             Vue.set(this.reveal,"addPatent",true);
             //视图切换到执业资格的首页
             
             this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-            this.reveal.openOrPrivacy.push(false)//追加显示隐藏按钮状态
+            //this.reveal.openOrPrivacy.push(false)//追加显示隐藏按钮状态
           }
         }
-
-       // Vue.set(this.newPatent,"patentName","");
-       // Vue.set(this.newPatent.info,"organ","");
-       // Vue.set(this.newPatent.info,"time","");
+        Vue.set(this.newPatent,"patentName","");
+        Vue.set(this.newPatent,"organ","");
+        Vue.set(this.newPatent,"time","");
         /*清除数据，保证下次输入时输入框为空*/
       },
       cancelNewPatent(){
@@ -872,6 +824,15 @@
           }
           button{
             cursor: pointer;
+          }
+          span{
+            float: left;
+            height: 31px;
+            line-height: 31px;
+          }
+          .date-picker{
+            float: left;
+            margin-right: 22px;
           }
         }
         li:nth-child(1){

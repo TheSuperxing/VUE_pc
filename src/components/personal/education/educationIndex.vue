@@ -19,7 +19,7 @@
             </ul>
           </div>
           <div v-show="!editEdu.edit[0][index]">
-            <p v-cloak >Time :  {{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
+            <p v-cloak >在校时间 :  {{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
             <p v-cloak >专业：{{item.professionName}}</p>
             <p v-cloak >学历：{{item.education}}</p>
           </div>
@@ -47,7 +47,7 @@
             <li class="img-wrap" >
 							<span class="wrap-left">图片展示</span>
 
-							<script type="text/template" id="qq-template-manual-trigger">
+							<script type="text/template" :id="qqTemplate[index]">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 						            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
 						                <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
@@ -56,7 +56,7 @@
 						                <span class="qq-upload-drop-area-text-selector"></span>
 						            </div>
 						            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-						                <li>
+						                <li class="list">
 						                    <div class="qq-progress-bar-container-selector">
 						                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 						                    </div>
@@ -161,7 +161,7 @@
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
 			            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-			                <li>
+			                <li class="list">
 			                    <div class="qq-progress-bar-container-selector">
 			                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 			                    </div>
@@ -282,7 +282,8 @@
 
     mounted(){
 			
-			this.updateData();
+      this.updateData();
+      
 			//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -304,9 +305,15 @@
 	        autoUpload: false,
 	        debug: true,
 	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload').show()
-	        	},
+	        	onSubmit:  function(id,  fileName){
+              $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").show()
+            },
+            onCancel: function(){
+							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
+              if(imgList.length<=1){
+								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+							}
+						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	                //alert('This is onComplete function.');
 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -320,8 +327,7 @@
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
 	                
-	                $('#trigger-upload').hide()
-	                console.log(maybeXhr)
+	                $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
 	          	},
 	    	}
 	    });
@@ -351,14 +357,13 @@
         }
         //为每一个对象添加一个独有的状态
       }
-
     },
     
 
     methods:{
     	updateData(){//更新本地数据
     		var that = this;
-	    	var url = "http://10.1.31.16:8080/psnEduBackGround/findByMySelf/"+"string";
+	    	var url = MyAjax.urlsy+"/psnEduBackGround/findByMySelf/"+"string";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -398,7 +403,11 @@
 		        that.openOrPrivacy.push(false);
 	    			that.openOrPrivacyText.push("隐藏")
 		      }
-	    	}
+        }
+        
+        if(this.education.length==0){//数据完全删除后显示无数据提示
+          Vue.set(this.empty,"promote",true);
+        }
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
@@ -424,7 +433,7 @@
         	}
         }
         var that = this;
-        var url = "http://10.1.31.16:8080/psnEduBackGround/update"
+        var url = MyAjax.urlsy+"/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -454,66 +463,46 @@
         var that = this;
 
         //上传图片
-          if(that.qqFineloader.length==0){
-            for(var i=0;i<that.education.length;i++){
-//							if(index==i){
-								var manualUploader= new qq.FineUploader({
-			            element: document.getElementById(that.fineUploaderId[i]),
-			            template: "qq-template-manual-trigger",
-			            request: {
-			              endpoint: '/server/uploads'
-			            },
-			            thumbnails: {
-			              //	                placeholders: {
-			              //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-			              //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-			              //	                }
-			            },
-			            validation: {
-			              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-			              itemLimit: 5,
-			              sizeLimit: 2000000
-			            },
-			            autoUpload: false,
-			            debug: true,
-			            callbacks:{
-			              onSubmit:  function(id,fileName){
-//			              	if(index == i){
-			              		console.log(index)
-			              		$('.btn-primary').show()
-//			              	}
-			                
-			              },
-			              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-			                //alert('This is onComplete function.');
-			                //alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-			//                  $('#message').append(responseJSON.msg);
-			//                    	                $('#progress').hide();//隐藏进度动画
-			                //清除已上传队列
-			//		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-			                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-			                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）
-			                //	                $('.stateOne').hide();
-			                //	                $('.stateTwo').show()
-			
-			                ///console.log($('.btn-primary'))
-			                if(index == i){
-			              		$('.btn-primary').eq(index).hide()
-			              	}
-			                
-			              },
-			            }
-			          });
-			          that.qqFineloader.push(manualUploader)
+        
+          
+        if(window['manualUploader'+index]==undefined){
+          window['manualUploader'+index]= new qq.FineUploader({
+            element: document.getElementById(that.fineUploaderId[index]),
+            template: this.qqTemplate[index],
+            request: {
+              endpoint: '/server/uploads'
+            },
+            thumbnails: {
+            },
+            validation: {
+              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+              itemLimit: 5,
+              sizeLimit: 2000000
+            },
+            autoUpload: false,
+            debug: true,
+            callbacks:{
+              onSubmit:  function(id,fileName){
+                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary").show()
+              },
+              onCancel: function(){
+                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                if(imgList.length<=1){
+                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary").hide()
+                }
+              },
+              onComplete: function (id, fileName, responseJSON, maybeXhr) {
+                
+              },
             }
-          }
-          var btnPrimary=document.getElementsByClassName("btn-primary");
-          console.log("aa"+index)
-          qq(btnPrimary[index]).attach("click", function() {
-            that.qqFineloader[index].uploadStoredFiles();
-            $('.btn-primary').eq(index).hide()
           });
-          console.log(that.qqFineloader)
+        }
+
+          var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary");
+          qq(btnPrimary[0]).attach("click", function() {
+            eval('manualUploader'+index).uploadStoredFiles();
+            btnPrimary.hide()
+          });
           
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
@@ -521,26 +510,9 @@
         //console.log("ok")
       },
       deleteEduExist(index){//删除按钮事件
-      	
-//      Vue.set(this.editEdu.delete[0],[index],false);
-//      this.education.splice(index,1)
-//      Vue.set(this.editEdu.delete[0],[index],true)//为了解决删除一项后一项不会显示问题
-        if(this.education.length==0){//数据完全删除后显示无数据提示
-          Vue.set(this.empty,"promote",true);
-        }
         var that = this;
-        console.log(that.education[index].pkid)
-        var url = "http://10.1.31.16:8080/psnEduBackGround/del/"+that.education[index].pkid;
-        MyAjax.ajax({
-					type: "DELETE",
-					url:url,
-					dataType: "json",
-					contentType: "application/json;charset=UTF-8",
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
+        var url = MyAjax.urlsy+"/psnEduBackGround/del/"+that.education[index].pkid;
+        MyAjax.delete(url);
         that.updateData();
       },
       //以上是状态的改变
@@ -574,7 +546,7 @@
 				
 //      var judgUpDate=this.education[index].schoolName==this.inputValue.schoolText[index]&&this.education[index].info.profession==this.inputValue.professionText[index]&&this.education[index].info.schoolTimeStart==this.inputValue.schoolTimeStart[index]&&this.education[index].info.schoolTimeEnd==this.inputValue.schoolTimeEnd[index]&&this.education[index].info.introduce == this.inputValue.introduce[index];/*数据是否更改的判断条件*/
 				var that = this;
-        var url = "http://10.1.31.16:8080/psnEduBackGround/update"
+        var url = MyAjax.urlsy+"/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -649,7 +621,7 @@
         
         var that = this;
         console.log(JSON.stringify(that.newInputValue))
-        var url = "http://10.1.31.16:8080/psnEduBackGround/insert";
+        var url = MyAjax.urlsy+"/psnEduBackGround/insert";
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",

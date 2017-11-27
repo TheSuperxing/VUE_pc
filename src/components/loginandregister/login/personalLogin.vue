@@ -145,7 +145,7 @@
       personalLogin(){
       	
       	var that = this;
-      	var url = "http://10.1.31.7:8080/accountmanainfo/login";
+      	var url = MyAjax.urlhw+"/accountmanainfo/login";
       	if(that.personalLoginInput.tel.trim().length!=0&&that.personalLoginInput.messageConfirm.trim().length!=0
       	&&that.personalLoginInput.picConfirm.trim().length!=0){
       		MyAjax.ajax({
@@ -153,7 +153,6 @@
 						url:url,
 						data: {tel:that.personalLoginInput.tel,pwd:that.personalLoginInput.messageConfirm,verifyCode:that.personalLoginInput.picConfirm},
 						dataType: "json",
-	//					token:document.cookie,
 					}, function(data){
 						console.log(data)
 						console.log(data.token)
@@ -165,11 +164,11 @@
 								case "100001":
 									console.log(222)
 									that.showAlert = true;
-									that.alertText = "手机号或者密码错误";
+									that.alertText = "手机号或者短信验证码错误";
 									break;
 								case "100005":
 									that.showAlert = true;
-									that.alertText = "验证码不一致";
+									that.alertText = "图片验证码不一致";
 									break;
 								default:
 									break;

@@ -509,7 +509,7 @@
           }
           var btnPrimary=document.getElementsByClassName("btn-primary");
           console.log("aa"+index)
-          qq(btnPrimary[index]).attach("click", function() {
+          qq(btnPrimary[index]).attach("click", function(){
             that.qqFineloader[index].uploadStoredFiles();
             $('.btn-primary').eq(index).hide()
           });

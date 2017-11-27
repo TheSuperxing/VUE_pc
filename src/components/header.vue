@@ -116,6 +116,8 @@
 	  mounted(){
 
 				this.user.userState = sessionStorage.getItem("state");
+				
+				//首页请求信息
 				var that = this;
 				var url = "http://10.1.31.7:8080/accountmanainfo/home";
 				MyAjax.ajax({

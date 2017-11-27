@@ -44,16 +44,20 @@
       return {
         titleText:["公司登录","团队登录","个人登录"],
         reveal:{
-          titleColor:[true,false,false]
+          titleColor:[null,null,null]
         }
       }
     },
     mounted(){
+    	console.log(sessionStorage.getItem("state"))
+    	this.loginTog(sessionStorage.getItem("state"))
+    	
       var modeal= new ModalOpp("#modal-overlay");
       modeal.makeText();
     },
     methods:{
       loginTog(index){
+      	
         for(var i=0;i<this.reveal.titleColor.length;i++){
           Vue.set(this.reveal.titleColor,[i],false)
         }

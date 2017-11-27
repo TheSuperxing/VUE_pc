@@ -58,7 +58,7 @@ var personalRouterChildren=[
 				        {
 				        	path:"/yhzx/personal/info/personalProject/index", component:personalProjectIndex},
 				        {
-				      	    path:"/yhzx/personal/info/personalProject/editProject/:id",component:editProject,name:'editPerProject'
+				      	    path:"/yhzx/personal/info/personalProject/editProject",component:editProject,name:'editPerProject'
 				      	},
 				        {
 				      		path:"/yhzx/personal/info/personalProject/definedProject",component:definedProject

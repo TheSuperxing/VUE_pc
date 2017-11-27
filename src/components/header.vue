@@ -81,6 +81,8 @@
   import Vue from "vue";
   import {mapState} from "vuex"
   import router from "../router"
+  import MyAjax from "../assets/js/MyAjax.js"
+  
   export default {
     name: 'hello',
     data: function () {
@@ -114,7 +116,22 @@
 	  mounted(){
 
 				this.user.userState = sessionStorage.getItem("state");
-
+				var that = this;
+				var url = "http://10.1.31.7:8080/accountmanainfo/home";
+				MyAjax.ajax({
+						type: "GET",
+						url:url,
+				//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+						dataType: "json",
+				//				contentType:"application/json;charset=utf-8",
+						
+					},function(data){
+						console.log(data)
+						data = data.msg;
+						that.baseInfo = data;
+					},function(err){
+						console.log(err)
+					})
 
 	  },
 	  updated(){

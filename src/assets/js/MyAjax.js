@@ -1,21 +1,22 @@
 //function MyAjax() {
 //	);
 //}
+import {cookieTool} from "./cookieTool.js"
 import fetchJsonp from "fetch-jsonp"
 var MyAjax = {
 	ajax(option,callback,errCallback) {
 		$.ajax({
 			type: option.type,
 			url: option.url,
-//			beforeSend:function(request){
-//				request.setRequestHeader("token",token)
-//			},
+			beforeSend:function(request){
+				request.setRequestHeader("token",cookieTool.getCookie("token"))
+			},
 			data: option.data,
 			dataType: option.dataType,
 			contentType: option.contentType, 
 			
 			async: false, // 使用同步方式  
-			success: function(data) {			
+			success: function(data) {		
 				callback(data);
 			},error:function(error){
 				errCallback(error)

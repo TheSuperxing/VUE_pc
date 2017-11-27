@@ -1,6 +1,7 @@
 //function MyAjax() {
 //	);
 //}
+import {cookieTool} from "./cookieTool.js"
 import fetchJsonp from "fetch-jsonp"
 var MyAjax = {
 	urlsy:"http://10.1.31.16:8080",
@@ -9,15 +10,15 @@ var MyAjax = {
 		$.ajax({
 			type: option.type,
 			url: option.url,
-//			beforeSend:function(request){
-//				request.setRequestHeader("token",token)
-//			},
+			beforeSend:function(request){
+				request.setRequestHeader("token",cookieTool.getCookie("token"))
+			},
 			data: option.data,
 			dataType: option.dataType,
 			contentType: option.contentType, 
 			
 			async: false, // 使用同步方式  
-			success: function(data) {			
+			success: function(data) {		
 				callback(data);
 			},error:function(error){
 				errCallback(error)

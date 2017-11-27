@@ -44,11 +44,11 @@
 			return {
 				tab:[
 					{
-						style:"comStyle",text:"公司注册",flag:false
+						style:"comStyle",text:"公司注册",
 					},{
-						style:"teamStyle",text:"团队注册",flag:true
+						style:"teamStyle",text:"团队注册",
 					},{
-						style:"personStyle",text:"个人注册",flag:true
+						style:"personStyle",text:"个人注册",
 					}
 				],
 				indexActive:""
@@ -60,31 +60,27 @@
 			var id= window.location.href.split("/register/regkind/")[1];
 //			console.log(id)
 			this.indexActive = id;
-
+			this.switchTab(this.indexActive)
 		},
 		methods:{
 			switchTab(index){
 //				console.log(index);
 				this.indexActive = index;
 				console.log(this.indexActive)
-//				for(var i=0;i<this.tab.length;i++){
-//					this.tab[i].flag = true;
-//					this.tab[index].flag = false;
-//				}
-//				for(var i=0;i<this.flag.length;i++){
-//					this.flag[i] = true;
-//					this.flag[index] = false;
-//				}
+//				
 
 			}
+		},
+		updated(){
+			sessionStorage.setItem("state",this.indexActive);
+			Vue.set(this.user,'userState',this.indexActive)
 		},
 		beforeDestroy(){
 			$(document.body).css("overflow","scoll");
 			var modal = $('.register');
 			Modal.closeModal(modal);
-			sessionStorage.setItem("state",this.indexActive);
-			Vue.set(this.user,'userState',this.indexActive)
-			console.log(sessionStorage.getItem("state"));
+			
+//			console.log(sessionStorage.getItem("state"));
 			
 		}
 	}

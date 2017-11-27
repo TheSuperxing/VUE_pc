@@ -36,7 +36,11 @@
       user:state=>state.userState.user
     }),
     mounted(){
+    	Vue.set(this.user,'userState',1)
+      sessionStorage.setItem("state",this.user.userState)
+      
       sessionStorage.setItem("account","{\"username\":\"123@qq.com\",\"password\":\"123\"}")
+      
     },
     methods:{
       teamLogin(){
@@ -67,6 +71,9 @@
       border-bottom:1px solid #eaeaea;
       padding-left: 41px;
       background: url("../../../assets/img/logoin/icon_code.png") left center no-repeat;
+      &:first-child{
+      	background: url(../../../assets/img/logoin/mail.png) left center no-repeat;
+      }
       input{
         font-size:14px;
         width:396px;

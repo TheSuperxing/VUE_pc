@@ -1,20 +1,22 @@
 <template>
-  <div class="companyLogin">
+  <div class="personalLogin">
     <ul class="loginInput">
       <li>
-        <input v-model="personalLoginInput.tel" type="tel" placeholder="手机号">
+        <input v-model="personalLoginInput.tel" type="tel" placeholder="手机号" @blur="personTelCfm">
       </li>
       <li>
         <input v-model="personalLoginInput.picConfirm" @blur="picConfirm" type="text" placeholder="图形验证码">
-        <img src="http://10.1.31.6:8080/captcha.jpg" alt=""/>
+        <img class="picConfirm" :src="picSrc" alt="" @click="changePic"/>
         <!--<p v-cloak @click="random">{{makeRandom.num}}</p>-->
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
       <li>
-        <input v-model="personalLoginInput.messageConfirm" type="text" :placeholder="messageConfirm.inputPlaceholder"/>
+        <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" maxlength="8"/>
         <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
       </li>
     </ul>
+		<alertTip v-if="showAlert" :showHide="showAlert" @closeTip="closeTip" :alertText="alertText"></alertTip>
+    
     <ul class="loginSubmit">
       <li>
         <button @click="personalLogin"><router-link to="">登录</router-link></button>
@@ -26,6 +28,9 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import MyAjax from "../../../assets/js/MyAjax.js"
+  import router from "../../../router"
+  import {cookieTool} from "../../../assets/js/cookieTool.js"
+	import alertTip from '../alertTip'
   
   export default {
     name:"companyLogin",
@@ -36,7 +41,7 @@
           confirmText:"获取验证码",
           inputPlaceholder:"短信验证码"
         },
-        reveal:{
+        reveal:{	
           error:false,//图片验证码
           buttonDisabled:false
         },
@@ -44,18 +49,44 @@
           tel:"",
           picConfirm:"",
           messageConfirm:""
-        }
+        },
+        picSrc:"",
+        showAlert:false,//显隐
+        alertText:"",//提示信息
       }
+    },
+		components: {
+      alertTip,
     },
     computed:mapState({
       user:state=>state.userState.user
     }),
     mounted(){
+    	
+    	this.changePic();
+    	console.log(cookieTool.getCookie("token"));
       do{
         Vue.set(this.makeRandom,"num",parseInt(Math.random()*10000))
       }while (this.makeRandom.num<1000);
 
       sessionStorage.setItem("account","15612345678")
+      
+      Vue.set(this.user,'userState',2)
+      sessionStorage.setItem("state",this.user.userState)
+      
+      var that = this;
+    	var url = "http://10.1.31.7:8080/hello"
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+//					token:document.cookie,
+			}, function(data){
+				console.log(data)
+				
+			},function(err){
+				console.log(err)
+			})
     },
     methods:{
       random(){
@@ -69,16 +100,30 @@
           Vue.set(this.reveal,"error",false)
         }
       },
+      personTelCfm(){/*验证个人登录的手机号*/
+	    	if(!/^1[34578]\d{9}$/gi.test(this.personalLoginInput.tel)){
+	    		console.log(11)
+	    		this.showAlert = true;
+	    		this.alertText = '您输入的手机号码格式不正确';
+	    	}else{
+	    		this.showAlert = false;
+	    	}
+	    },
+	    changePic(){
+	    	console.log(777)
+	    	this.picSrc = "http://10.1.31.7:8080/captcha.jpg"
+	    	$(".picConfirm").attr("src",this.picSrc)
+	    },
+	    
       picConfirm(){
-        if(this.personalLoginInput.picConfirm!=this.makeRandom.num){
-          do{
-            Vue.set(this.makeRandom,"num",parseInt(Math.random()*10000))
-          }while (this.makeRandom.num<1000);
-          //每次输入错误后重置
-          Vue.set(this.reveal,"error",true)
-        }else {
-          Vue.set(this.reveal,"error",false)
-        }
+      	//图片验证不能为空
+      	if(this.personalLoginInput.picConfirm.trim().length==0){
+      		this.showAlert = true;
+      		this.alertText  = "图形验证码不能为空";
+      	}else{
+      		this.showAlert = false;
+      	}
+        
       },
       getMessageConfirm(){
         Vue.set(this.reveal,"buttonDisabled",true)
@@ -98,28 +143,49 @@
           },1000);
       },
       personalLogin(){
+      	
       	var that = this;
-      	var url = "http://10.1.31.6:8080/accountmanainfo/login";
-      	MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: {mobile:that.personalLoginInput.tel,password:that.personalLoginInput.messageConfirm},
-					dataType: "json",
-					
-				}, function(data){
-					console.log(data)
-					
-				},function(err){
-					console.log(err)
-				})
+      	var url = "http://10.1.31.7:8080/accountmanainfo/login";
+      	if(that.personalLoginInput.tel.trim().length!=0&&that.personalLoginInput.messageConfirm.trim().length!=0
+      	&&that.personalLoginInput.picConfirm.trim().length!=0){
+      		MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: {tel:that.personalLoginInput.tel,pwd:that.personalLoginInput.messageConfirm,verifyCode:that.personalLoginInput.picConfirm},
+						dataType: "json",
+	//					token:document.cookie,
+					}, function(data){
+						console.log(data)
+						console.log(data.token)
+						cookieTool.setCookie("token",data.token)
+						if(data.code==0){
+							router.push("/index")
+						}else if(data.code==-1){
+							switch (data.msg){
+								case "100001":
+									console.log(222)
+									that.showAlert = true;
+									that.alertText = "手机号或者密码错误";
+									break;
+								case "100005":
+									that.showAlert = true;
+									that.alertText = "验证码不一致";
+									break;
+								default:
+									break;
+							}
+						}
+					},function(err){
+						console.log(err)
+					})
+      	}
+      	
         var account = sessionStorage.getItem("account");
-//      if((this.personalLoginInput.tel==account||this.personalLoginInput.tel=="root")&&!this.reveal.error){
-//        location.hash="/index";
-//      }else if(this.personalLoginInput.tel!=account&&this.personalLoginInput.tel!="root"){
-//        alert("账号不存在")
-//      }
-//      location.hash="/index";
-      }
+
+     },
+     closeTip(){  /*关闭提示框*/
+			    this.showAlert = false;
+			},
 
     },
     destroyed(){
@@ -132,6 +198,17 @@
 </script>
 <style scoped lang="scss">
   $personalThemeColor:rgb(242,117,25);
+  .alet_container{
+  	bottom:200px !important;
+  	left: 100px;
+  	font-size: 14px;
+  	.tip_text_container{
+  		.tip_text{
+	  		font-size: 14px !important;
+	  	}
+  	}
+  	
+  }
   .loginInput{
     li{
       padding:11px 0;

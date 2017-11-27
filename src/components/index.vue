@@ -5,6 +5,8 @@
 </template>
 
 <script>
+  import MyAjax from "../assets/js/MyAjax.js"
+	
   export default {
     name: 'Index',
     data:function(){
@@ -13,7 +15,23 @@
       }
     },
     mounted(){
-    	$(document.body).css("overflow","scoll");
+    	var that = this;
+    	var url = "http://10.1.31.7:8080/accountmanainfo/home";
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+				dataType: "json",
+//				contentType:"application/json;charset=utf-8",
+				
+			},function(data){
+				console.log(data)
+				data = data.msg;
+				that.baseInfo = data;
+			},function(err){
+				console.log(err)
+			})
+    	$(document.body).css("overflow-y","scoll");
     }
   }
 </script>

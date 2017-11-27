@@ -464,7 +464,6 @@
 
         //上传图片
         
-          
         if(window['manualUploader'+index]==undefined){
           window['manualUploader'+index]= new qq.FineUploader({
             element: document.getElementById(that.fineUploaderId[index]),
@@ -497,7 +496,7 @@
             }
           });
         }
-
+        
           var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary");
           qq(btnPrimary[0]).attach("click", function() {
             eval('manualUploader'+index).uploadStoredFiles();

@@ -272,7 +272,7 @@
 				$(e.target).addClass("selected");
 				this.chosedOne = this.searchResult[index]
 //				console.log($(".resultList li span"))
-        console.log(this.chosedOne)
+        		console.log(this.chosedOne)
 				
 			},
 			confirmAddpro(){

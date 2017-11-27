@@ -27,7 +27,7 @@ var MyAjax = {
 	},
 	delete(url){
 		$.ajax({
-			type: "DELETE",
+			type: "GET",
 			url: url, 
 			async: false, // 使用同步方式  
 			success: function(data) {	

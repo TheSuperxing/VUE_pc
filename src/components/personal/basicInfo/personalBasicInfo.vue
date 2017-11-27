@@ -110,7 +110,7 @@
 				                <span class="qq-upload-drop-area-text-selector"></span>
 				            </div>
 				            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-				                <li>
+				                <li class="list">
 				                    <div class="qq-progress-bar-container-selector">
 				                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 				                    </div>
@@ -241,9 +241,11 @@
 	    Datepicker,
 	    alertTip,
 	  },
-
+    created(){
+      this.updateData();
+    },
     mounted(){
-    	this.updateData();
+    	
       //上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -266,8 +268,15 @@
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload').show()
-	        	},
+              $('#trigger-upload').show()
+            },
+            onCancel: function(){
+              
+							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
+              if(imgList.length<=1){
+								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+							}
+						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	            //alert('This is onComplete function.');
 								//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -295,8 +304,8 @@
     },
     methods:{
     	updateData(){
-    		var that = this;
-	    	var url = "http://10.1.31.7:8080/personalbasicinfo/findByMySelf";
+        var that = this;
+	    	var url = MyAjax.urlhw+"/personalbasicinfo/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -460,7 +469,7 @@
 	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
 	    	var that = this;
-	    	var url = "http://10.1.31.7:8080/personalbasicinfo/update";
+	    	var url = MyAjax.urlhw+"/personalbasicinfo/update";
 	    	$.ajaxSetup({ contentType : 'application/json' });
 	    	MyAjax.ajax({
 					type: "POST",
@@ -507,7 +516,7 @@
 	    	this.baseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
 	    	console.log(this.baseInfo)
 	    	var that = this;
-	    	var url = "http://10.1.31.7:8080/personalbasicinfo/update";
+	    	var url = MyAjax.urlhw+"/personalbasicinfo/update";
 	    	$.ajaxSetup({ contentType : 'application/json' });
 	    	MyAjax.ajax({
 					type: "POST",

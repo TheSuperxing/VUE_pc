@@ -54,13 +54,13 @@
             </li>
             <li class="img-wrap">
 							<span class="wrap-left">上传附件</span>
-							<script type="text/template" id="qq-template-manual-trigger">
+							<script type="text/template" :id="qqTemplate[index]">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 						            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
 						              <span class="qq-upload-drop-area-text-selector"></span>
 						            </div>
 						            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-					                <li>
+					                <li class="list">
 				                    <div class="qq-progress-bar-container-selector">
 				                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 				                    </div>
@@ -157,7 +157,7 @@
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
 			            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-			                <li>
+			                <li class="list">
 			                    <div class="qq-progress-bar-container-selector">
 			                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 			                    </div>
@@ -283,8 +283,14 @@
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload-language').show()
-	        	},
+	        		$("#fine-template-manual-trigger-language div .qq-uploader-selector .buttons .btn-primary-language").show()
+						},
+						onCancel: function(){
+							var imgList=$("#fine-template-manual-trigger-language div .qq-uploader-selector .qq-upload-list-selector .list")
+							if(imgList.length<=1){
+								$("#fine-template-manual-trigger-language div .qq-uploader-selector .buttons .btn-primary-language").hide()
+							}
+						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	                //alert('This is onComplete function.');
 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -298,14 +304,13 @@
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
 	                
-	                $('#trigger-upload-language').hide()
+	                $("#fine-template-manual-trigger-language div .qq-uploader-selector .buttons .btn-primary-language").hide()
 	                console.log(maybeXhr)
 	          	},
 	    	}
 	    });
 			qq(document.getElementById("trigger-upload-language")).attach("click", function() {
 	        manualUploader.uploadStoredFiles();
-	        $('#trigger-upload-language').hide()
 	    });
 	    
       if(this.language.length!=0){
@@ -315,7 +320,12 @@
         }
       }else{
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
-      }
+			}
+			
+			for(var i=0;i<this.language.length;i++){
+				this.fineUploaderId.push("fine-uploader-manual-trigger-language"+this.language[i].pkid);
+				this.qqTemplate.push("qq-template-manual-trigger-language"+this.language[i].pkid);
+			}
     },
     updated(){
       if(this.language.length!=0){
@@ -337,7 +347,7 @@
     methods:{
     	updateData(){
       	var that = this;
-	    	var url = "http://10.1.31.7:8080/psnlanguage/findByMySelf";
+	    	var url = MyAjax.urlsy+"/psnlanguage/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -359,8 +369,8 @@
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	for(var i=0;i<that.language.length;i++){
-	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.language[i].pkid);
-	    		that.qqTemplate.push("qq-template-manual-trigger"+that.language[i].pkid);
+	    		that.fineUploaderId.push("fine-uploader-manual-trigger-language"+that.language[i].pkid);
+	    		that.qqTemplate.push("qq-template-manual-trigger-language"+that.language[i].pkid);
 	    		if(that.language[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
@@ -389,7 +399,7 @@
         
         var that = this;
         console.log(JSON.stringify(that.language[index]))
-        var url = "http://10.1.31.7:8080/psnlanguage/update"
+        var url = MyAjax.urlsy+"/psnlanguage/update"
         $.ajaxSetup({contentType : 'application/json'});
         MyAjax.ajax({
 					type: "POST",
@@ -408,69 +418,58 @@
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
         //上传图片
-          if(that.qqFineloader.length==0){
-            for(var i=0;i<that.language.length;i++){
-								var manualUploader= new qq.FineUploader({
-			            element: document.getElementById(that.fineUploaderId[i]),
-			            template: "qq-template-manual-trigger",
-			            request: {
-			              endpoint: '/server/uploads'
-			            },
-			            thumbnails:{
-			              //	                placeholders: {
-			              //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-			              //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-			              //	                }
-			            },
-			            validation: {
-			              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-			              itemLimit: 5,
-			              sizeLimit: 2000000
-			            },
-			            autoUpload: false,
-			            debug: true,
-			            callbacks:{
-			              onSubmit:  function(id,fileName){
-//			              	if(index == i){
-			              		console.log(index)
-			              		$('.btn-primary-language').show()
-//			              	}
-			                
-			              },
-			              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-			                //alert('This is onComplete function.');
-			                //alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-			//                  $('#message').append(responseJSON.msg);
-			//                    	                $('#progress').hide();//隐藏进度动画
-			                //清除已上传队列
-			//		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-			                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-			                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）
-			                //	                $('.stateOne').hide();
-			                //	                $('.stateTwo').show()
-			
-			                ///console.log($('.btn-primary'))
-			                if(index == i){
-			              		$('.btn-primary-language').eq(index).hide()
-			              	}
-			              },
-			            }
-			          });
-			          that.qqFineloader.push(manualUploader)
-               
+        if(window['manualUploader_language_'+index]==undefined){
+          window['manualUploader_language_'+index]= new qq.FineUploader({
+            element: document.getElementById(this.fineUploaderId[index]),
+            template: this.qqTemplate[index],
+            request: {
+              endpoint: '/server/uploads'
+            },
+            thumbnails: {
+            },
+            validation: {
+              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+              itemLimit: 5,
+              sizeLimit: 2000000
+            },
+            autoUpload: false,
+            debug: true,
+            callbacks:{
+              onSubmit:  function(id,fileName){
+                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-language").show()
+                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+
+                console.log(imgList)
+                for(let i=0;i<=imgList.length;i++){
+                    qq(imgList[i]).attach("click", function() {
+                      if(!i>0){
+                        $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-language").hide()
+                      }
+                    });
+                }
+							},
+							onCancel: function(){
+                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                if(imgList.length<=1){
+                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-language").hide()
+                }
+              },
+              onComplete: function (id, fileName, responseJSON, maybeXhr) {
+                
+              },
             }
-          }
-          var btnPrimary=document.getElementsByClassName("btn-primary-language");
-          console.log("aa"+index)
-          qq(btnPrimary[index]).attach("click", function() {
-            that.qqFineloader[index].uploadStoredFiles();
-            $('.btn-primary-language').eq(index).hide()
           });
-          console.log(that.qqFineloader)
+        }
+					
+					var btnPrimary= $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-language");
+					qq(btnPrimary[0]).attach("click", function() {
+						eval('manualUploader_language_'+index).uploadStoredFiles();
+						btnPrimary.hide()
+					});
       },
       languageEditKeep(index){//编辑状态，保存按钮
         var that = this;
-        var url = "http://10.1.31.7:8080/psnlanguage/update"
+        var url = MyAjax.urlsy+"/psnlanguage/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -499,19 +498,11 @@
       },
       languageEditDel(index){//编辑状态，删除按钮
         var that = this;
-        console.log(that.language[index].pkid)
-        var url = "http://10.1.31.7:8080/psnlanguage/del/"+that.language[index].pkid;
-        MyAjax.ajax({
-					type: "DELETE",
-					url:url,
-					dataType: "json",
-					contentType: "application/json;charset=UTF-8",
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
-        that.updateData();
+        var url = MyAjax.urlsy+"/psnlanguage/del/"+that.language[index].pkid;
+        MyAjax.delete(url)
+				that.updateData();
+				
+
       },
       addLanguage(){//添加信息按钮，添加信息的视图切换
         /*先清除数据，保证下次输入时输入框为空*/
@@ -530,7 +521,7 @@
         }
         var that = this;
 //      console.log(that.software[index])
-        var url = "http://10.1.31.7:8080/psnlanguage/insert";
+        var url = MyAjax.urlsy+"/psnlanguage/insert";
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",

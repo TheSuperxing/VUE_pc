@@ -136,7 +136,7 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = "http://10.1.31.16:8080/psnProjExpe/findProjExpe";//暂时先写成这样
+			var url = MyAjax.urlsy+"/psnProjExpe/findProjExpe";//暂时先写成这样
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -158,22 +158,22 @@
 			      return text;
 			    }
 			  }
-        that.localProInfo=JSON.parse(JSON.stringify(that.proInfo));
-        that.show.tag = [];
-        that.updowntxt = [];
-        that.deleteModalClass = [];
-        that.openOrPrivacy = [];
-        that.openOrPrivacyText = [];
-        that.show.tag.length = that.proInfo.length;
+			that.localProInfo=JSON.parse(JSON.stringify(that.proInfo));
+			that.show.tag = [];
+			that.updowntxt = [];
+			that.deleteModalClass = [];
+			that.openOrPrivacy = [];
+			that.openOrPrivacyText = [];
+			that.show.tag.length = that.proInfo.length;
 	//  	console.log(this.show.tag.length)
 	    	for(var i=0;i<this.proInfo.length;i++){
 	    		that.proInfo[i].takeOffice = emptyText(that.proInfo[i].takeOffice);
-	    	  that.proInfo[i].detailDes = emptyText(that.proInfo[i].detailDes);
+	    	  	that.proInfo[i].detailDes = emptyText(that.proInfo[i].detailDes);
 	    		that.show.tag[i]=true;
 	    		that.updowntxt.push("展开查看更多");
 	    		that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
 	    		that.openOrPrivacy.push(true);
-		      that.openOrPrivacyText.push("显示");
+		      	that.openOrPrivacyText.push("显示");
 		      /*对每一个循环列表的对外显示赋初始值*/
 	    	}
     	},
@@ -218,19 +218,10 @@
     	saveDele(index){
     		//确认删除该项目
     		var that = this;
-        console.log(that.proInfo[index].psnProExpeID)
-        var url = "http://10.1.31.16:8080/psnProjExpe/del/"+that.proInfo[index].psnProExpeID;
-        MyAjax.ajax({
-					type: "DELETE",
-					url:url,
-					dataType: "json",
-					contentType: "application/json;charset=UTF-8",
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
-        that.updateData();//更新一下数据
+			console.log(that.proInfo[index].psnProExpeID)
+			var url = MyAjax.urlsy+"/psnProjExpe/del/"+that.proInfo[index].psnProExpeID;
+			MyAjax.delete(url)
+			that.updateData();//更新一下数据
     		this.closeModal(index);
     		
     	},
@@ -249,7 +240,7 @@
 			},
 			getData(){
 				var that = this;
-	    	var url = "http://10.1.31.16:8080/psnProjExpe/findProjByName/"+that.searchText;
+	    		var url = MyAjax.urlsy+"/psnProjExpe/findProjByName/"+that.searchText;
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,

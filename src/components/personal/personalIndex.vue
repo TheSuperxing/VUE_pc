@@ -457,7 +457,7 @@
 				var fd = new FormData();
 				fd.append('file',Blob);
 				console.log(fd)
-				var url = "http://10.1.31.6:8080/personalbasicinfo/uploadBase64";
+				var url = urlsy+"/personalbasicinfo/uploadBase64";
 //	    	$.ajax({
 //					type: "POST",
 //					url:url,
@@ -491,7 +491,7 @@
     },
     destroyed(){
     	var that = this;
-    	var url = "http://10.1.31.6:8080/personalbasicinfo/uploadBase64";
+    	var url = urlsy+"/personalbasicinfo/uploadBase64";
 //  	var url = "http://10.1.31.6:8080/psnsoftware/upload";
     	
     	$.ajax({

@@ -274,33 +274,7 @@
       }
     },
     created(){
-      var that=this;
-      var url = MyAjax.urlsy+"/psnPaperPatent/findByMySelfPaper/"+"string";
-    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-				
-			},function(data){
-        if(data.code==0){
-          that.paper=data.msg
-          //console.log(data)
-        }else{
-          console.log("错误返回");
-        }
-				
-			},function(err){
-				console.log(err)
-      })
-      // 从服务器获取数据
-      this.localPaper=JSON.parse(JSON.stringify(this.paper));
-      //数据库的数据放本地一份
-    	for(var i=0;i<this.paper.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.paper[i].paperID);
-    		this.qqTemplate.push("qq-template-manual-trigger-paper"+this.paper[i].paperID);
-    		this.qqTriggerUpload.push("trigger-upload"+this.paper[i].paperID);
-    	}
-    	//console.log(this.fineUploaderClass)
+      this.getData();
     },
     mounted(){
     	
@@ -323,8 +297,14 @@
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload-paper').show()
-	        	},
+	        		$("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").show()
+            },
+            onCancel: function(){
+							var imgList=$("#fine-template-manual-trigger-paper div .qq-uploader-selector .qq-upload-list-selector .list")
+							if(imgList.length<=1){
+								$("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").hide()
+							}
+						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	                //alert('This is onComplete function.');
 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -338,7 +318,7 @@
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
 	                
-	                $('#trigger-upload-paper').hide()
+	                $("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").hide()
 	                console.log(maybeXhr)
 	          	},
 	    	}
@@ -406,6 +386,11 @@
         // 从服务器获取数据
         this.localPaper=JSON.parse(JSON.stringify(this.paper));
         //数据库的数据放本地一份
+        for(var i=0;i<this.paper.length;i++){
+          this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.paper[i].paperID);
+          this.qqTemplate.push("qq-template-manual-trigger-paper"+this.paper[i].paperID);
+          this.qqTriggerUpload.push("trigger-upload"+this.paper[i].paperID);
+        }
       },
       openOrPrivacy(index){//信息是否对外公开控制按钮
         var that=this;
@@ -442,72 +427,47 @@
       	//console.log(index)
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
-        //console.log(window['manualUploader_paper_'+index])
-        //上传图片
-        //if(that.qqFineloader.length==0){
-           //for(var i=0;i<this.paper.length;i++){
-                    
-             if(window['manualUploader_paper_'+index]==undefined){
-                window['manualUploader_paper_'+index]= new qq.FineUploader({
-                  element: document.getElementById(this.fineUploaderId[index]),
-                  template: this.qqTemplate[index],
-                  request: {
-                    endpoint: '/server/uploads'
-                  },
-                  thumbnails: {
-                  },
-                  validation: {
-                    allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-                    itemLimit: 5,
-                    sizeLimit: 2000000
-                  },
-                  autoUpload: false,
-                  debug: true,
-                  callbacks:{
-                    onSubmit:  function(id,fileName){
-                      $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").show()
-                      var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
-
-                      console.log(imgList)
-                      // for(let i=0;i<=imgList.length;i++){
-                      //     qq(imgList[i]).attach("click", function() {
-                      //       if(!i>0){
-                      //         $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").hide()
-                      //       }
-                      //     });
-                      // }
-                    },
-                    onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                      
-                    },
-                  }
-                });
-             }
-              
-              //var manualUploader=eval('manualUploader_paper_'+index)
-              //this.qqFineloader.push(manualUploader)
-              
-          //}
-        //}
+               
+        if(window['manualUploader_paper_'+index]==undefined){
+          window['manualUploader_paper_'+index]= new qq.FineUploader({
+            element: document.getElementById(this.fineUploaderId[index]),
+            template: this.qqTemplate[index],
+            request: {
+              endpoint: '/server/uploads'
+            },
+            thumbnails: {
+            },
+            validation: {
+              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+              itemLimit: 5,
+              sizeLimit: 2000000
+            },
+            autoUpload: false,
+            debug: true,
+            callbacks:{
+              onSubmit:  function(id,fileName){
+                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").show()
+              },
+              onCancel: function(){
+                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                if(imgList.length<=1){
+                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").hide()
+                }
+              },
+              onComplete: function (id, fileName, responseJSON, maybeXhr) {
+                
+              },
+            }
+          });
+        }
           
 
-          var btnPrimary=document.getElementsByClassName("btn-primary-paper");
+          var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper");
           
-          for(let i=0;i<btnPrimary.length;i++){
-            qq(btnPrimary[i]).attach("click", function() {
-              eval('manualUploader_paper_'+index).uploadStoredFiles();
-              $('.btn-primary-paper').eq(index).hide()
-            });
-          }
-          
-         var cancelSelector=document.getElementsByClassName("qq-upload-cancel-selector");
-         //var fileList=document.getElementsByClassName("")
-          // cancelSelector.onclick=function(){
-          //   console.log(123)
-          // }
-        //  qq(cancelSelector).attach("click",function(){
-        //     console.log(123)
-        //  })
+          qq(btnPrimary[0]).attach("click", function() {
+            eval('manualUploader_paper_'+index).uploadStoredFiles();
+            btnPrimary.hide()
+          });
       },
       paperEditKeep(index){//编辑状态，保存按钮
         var that=this;
@@ -531,8 +491,6 @@
         }
       },
       paperEditCancel(index){//编辑状态，取消按钮
-        //delete window['manualUploader_paper_'+index];
-        //console.log(window.eval('manualUploader_paper_'+index))
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
         this.localPaper[index].paperTitle=this.paper[index].paperTitle;
         this.localPaper[index].journal=this.paper[index].journal;
@@ -559,14 +517,6 @@
 
         if(this.newPaper.paperTitle.length!=0){
           if(this.newPaper.paperTitle.trim().length!=0){
-
-            // this.localPaper.paperName.push(this.newPaper.paperName);
-            // this.localPaper.info.organ.push(this.newPaper.info.organ);
-            // this.localPaper.info.time.push(this.newPaper.info.time);
-            // //同步信息到执业资格首页
-            // this.paper.push({paperName:this.newPaper.paperName,info:{time:this.newPaper.info.time,profession:"",introduce:"",level:"",organ:this.newPaper.info.organ,}})
-            // /*同步信息到个人信息首页*/
-
             var that=this;
             var url = MyAjax.urlsy+"/psnPaperPatent/insertPaper";
             MyAjax.ajax({

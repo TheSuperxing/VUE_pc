@@ -345,7 +345,7 @@
 					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0){
 						var that = this;
 					    console.log(JSON.stringify(that.projectInfo))
-					    var url = "http://10.1.31.16:8080/psnProjExpe/insertProjAndProjExpe";
+					    var url = MyAjax.urlsy+"/psnProjExpe/insertProjAndProjExpe";
 					    $.ajaxSetup({ contentType : 'application/json' });
 					    MyAjax.ajax({
 							type: "POST",
@@ -369,7 +369,7 @@
 					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0){
 						var that = this;
 					    console.log(JSON.stringify(that.projectInfo))
-					    var url = "http://10.1.31.16:8080/psnProjExpe/insertProjAndProjExpe";
+					    var url = MyAjax.urlsy+"/psnProjExpe/insertProjAndProjExpe";
 					    $.ajaxSetup({ contentType : 'application/json' });
 					    MyAjax.ajax({
 							type: "POST",

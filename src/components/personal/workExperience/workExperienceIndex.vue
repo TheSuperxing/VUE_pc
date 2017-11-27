@@ -18,7 +18,8 @@
         <ul class="modal-container" v-bind:class="{ modalContainerShow : reveal.modal,modalContainerEmpty: !reveal.modal}">
           <li v-bind:class="{beforeSearch:!reveal.searchShow}">
             <h6>公司名称</h6>
-            <input v-model="input.value" type="text" placeholder="请输入公司名称"/>
+            <input type="text" autocomplete="off"/>
+            <!-- <input v-model="input.value" type="text" placeholder="请输入公司名称"/> -->
             <button  v-on:click="search">
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
@@ -235,7 +236,7 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = "http://10.1.31.16:8080/psnWorkExperience/findByMySelf/"+"string";//暂时先写成这样
+	    	var url = MyAjax.urlsy+"/psnWorkExperience/findByMySelf/"+"string";//暂时先写成这样
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -273,8 +274,12 @@
 	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
 	    		}
-	    	}
-    	},
+        }
+
+        if(this.workExperience.length==0){
+          Vue.set(this.reveal,"empty",true)
+        }
+      },
       closeAlert(){
         var modal= new ModalOpp("#modal-overlay");
         modal.closeModal();
@@ -303,7 +308,7 @@
         	}
         }
         var that = this;
-        var url = "http://10.1.31.16:8080/psnWorkExperience/update"
+        var url = MyAjax.urlsy+"/psnWorkExperience/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -338,7 +343,7 @@
       },
       keepEdit(index){//编辑状态下的保存按钮
        	var that = this;
-        var url = "http://10.1.31.16:8080/psnWorkExperience/update"
+        var url = MyAjax.urlsy+"/psnWorkExperience/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -364,17 +369,8 @@
         }
         var that = this;
         console.log(that.workExperience[index].pkid)
-        var url = "http://10.1.31.16:8080/psnWorkExperience/del/"+that.workExperience[index].pkid;
-        MyAjax.ajax({
-					type: "DELETE",
-					url:url,
-					dataType: "json",
-					contentType: "application/json;charset=UTF-8",
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
+        var url = MyAjax.urlsy+"/psnWorkExperience/del/"+that.workExperience[index].pkid;
+        MyAjax.delete(url);
         that.updateData();//更新一下数据
       },
       addInfo(){//添加信息
@@ -391,7 +387,7 @@
       },
       search(){//公司名称的搜索,单击时可能出现公司名称列表
       	var that = this;
-	    	var url = "http://10.1.31.16:8080/psnWorkExperience/findByCorpName/"+that.input.value;
+	    	var url = MyAjax.urlsy+"/psnWorkExperience/findByCorpName/"+that.input.value;
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -471,7 +467,7 @@
         }
         var that = this;
         console.log(JSON.stringify(that.newWorkExperience))
-        var url = "http://10.1.31.16:8080/psnWorkExperience/insert";
+        var url = MyAjax.urlsy+"/psnWorkExperience/insert";
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",

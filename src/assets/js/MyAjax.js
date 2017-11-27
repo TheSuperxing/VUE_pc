@@ -4,6 +4,7 @@
 import {cookieTool} from "./cookieTool.js"
 import fetchJsonp from "fetch-jsonp"
 var MyAjax = {
+	urlsy:"http://10.1.31.16:8080",
 	ajax(option,callback,errCallback) {
 		$.ajax({
 			type: option.type,
@@ -20,6 +21,18 @@ var MyAjax = {
 				callback(data);
 			},error:function(error){
 				errCallback(error)
+			}
+		})
+	},
+	delete(url){
+		$.ajax({
+			type: "DELETE",
+			url: url, 
+			async: false, // 使用同步方式  
+			success: function(data) {	
+				console.log("ok")
+			},error:function(error){
+				console.log(error)
 			}
 		})
 	},

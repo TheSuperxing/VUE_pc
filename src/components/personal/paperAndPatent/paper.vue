@@ -13,9 +13,9 @@
         <!--显示信息列表开始-->
         <div class="paperInfoList" v-if="!reveal.editInfo[index]">
           <div class="paperInfoTitle">
-            <h4 v-cloak>{{localPaper.paperName[index]}}</h4>
+            <h4 v-cloak>{{paper[index].paperTitle}}</h4>
             <ul>
-              <li v-bind:class="{openOrPrivacy:reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
+              <li v-bind:class="{openOrPrivacy:!paper[index].ifVisable}" v-on:click="openOrPrivacy(index)">
                 <p v-cloak>{{reveal.openOrPrivacyText[index]}}</p>
               </li>
               <li v-on:click="paperEdit(index)">
@@ -27,8 +27,8 @@
             </ul>
           </div>
           <div class="paperInfoBody">
-            <p v-cloak>{{localPaper.info.organ[index]}}</p>
-            <p v-cloak>{{localPaper.info.time[index]}}</p>
+            <p v-cloak>{{paper[index].journal}}</p>
+            <p v-cloak>{{paper[index].publicTime}}</p>
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -39,20 +39,20 @@
             <li>
               <label>
                 <h5>*&nbsp;论文名称</h5>
-                <input v-model="localPaper.paperName[index]" type="text" placeholder="请输入论文名称">
+                <input v-model="localPaper[index].paperTitle" type="text" placeholder="请输入论文名称">
               </label>
             </li>
             <li>
               <label>
                 <h5>发表期刊</h5>
-                <input v-model="localPaper.info.organ[index]" type="text" placeholder="请输入熟练程度">
+                <input v-model="localPaper[index].journal" type="text" placeholder="请输入熟练程度">
               </label>
             </li>
             <li>
               <label>
                 <h5>发表时间</h5>
                 <!--<input v-model="localPaper.info.time[index]" type="month">-->
-                <datepicker v-model="localPaper.info.time[index]"></datepicker>
+                <datepicker v-model="localPaper[index].publicTime"></datepicker>
               </label>
             </li>
             <li class="img-wrap">
@@ -63,7 +63,7 @@
 						              <span class="qq-upload-drop-area-text-selector"></span>
 						            </div>
 						            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-					                <li>
+					                <li class="list">
 				                    <div class="qq-progress-bar-container-selector">
 				                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 				                    </div>
@@ -140,20 +140,20 @@
         <li>
           <label>
             <h5>*&nbsp;论文名称</h5>
-            <input v-model="newPaper.paperName" type="text" placeholder="请输入论文">
+            <input v-model="newPaper.paperTitle" type="text" placeholder="请输入论文">
           </label>
         </li>
         <li>
           <label>
             <h5>发表期刊</h5>
-            <input v-model="newPaper.info.organ" type="text" placeholder="请输入发表期刊">
+            <input v-model="newPaper.journal" type="text" placeholder="请输入发表期刊">
           </label>
         </li>
         <li>
           <label>
             <h5>发表时间</h5>
             <!--<input v-model="newPaper.info.time" type="month" placeholder="请输入发表时间">-->
-            <datepicker v-model="newPaper.info.time"></datepicker>
+            <datepicker v-model="newPaper.publicTime"></datepicker>
           </label>
         </li>
         <li class="img-wrap">
@@ -241,7 +241,8 @@
   import {mapState} from "vuex"
   import datepicker from "../../units/Datepicker.vue"
   import qq from "fine-uploader"
-  
+  import MyAjax from "../../../assets/js/MyAjax.js"
+
   export default {
     name:"PaperIndex",
     components:{
@@ -252,25 +253,18 @@
         title:"论文",
         reveal:{
           empty:true,//是否显示执业资格信息尚未添加
-          openOrPrivacy:[],//信息是否公开显示,通过服务器获取的数据
           openOrPrivacyText:[],//信息是否公开显示,文字切换
           editInfo:[],//是否编辑信息
           addPaper:true,//是否添加信息
           keepAddPaper:true,//添加模式下，保存按钮是否可用
         },
-        localPaper:{
-          paperName:[],
-          info:{
-            time:[],
-            organ:[]
-          }
-        },
+        paper:[],
+        localPaper:[],
         newPaper:{
-          paperName:"",
-          info:{
-            time:"",
-            organ:""
-          }
+          accountID:"string",
+          paperTitle:"",
+          journal:"",
+          publicTime:""
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
@@ -280,10 +274,31 @@
       }
     },
     created(){
+      var that=this;
+      var url = MyAjax.urlsy+"/psnPaperPatent/findByMySelfPaper/"+"string";
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				
+			},function(data){
+        if(data.code==0){
+          that.paper=data.msg
+          //console.log(data)
+        }else{
+          console.log("错误返回");
+        }
+				
+			},function(err){
+				console.log(err)
+      })
+      // 从服务器获取数据
+      this.localPaper=JSON.parse(JSON.stringify(this.paper));
+      //数据库的数据放本地一份
     	for(var i=0;i<this.paper.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.paper[i].id);
-    		this.qqTemplate.push("qq-template-manual-trigger-paper"+this.paper[i].id);
-    		this.qqTriggerUpload.push("trigger-upload"+this.paper[i].id);
+    		this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.paper[i].paperID);
+    		this.qqTemplate.push("qq-template-manual-trigger-paper"+this.paper[i].paperID);
+    		this.qqTriggerUpload.push("trigger-upload"+this.paper[i].paperID);
     	}
     	//console.log(this.fineUploaderClass)
     },
@@ -297,10 +312,7 @@
 	            endpoint: '/server/uploads'
 	        },
 	        thumbnails: {
-	//	                placeholders: {
-	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-	//	                }
+		                
 	        },
 	        validation: {
 	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
@@ -336,73 +348,24 @@
 	    });
 	    
 	    //实例化编辑状态的上传图片
-	    for(var i=0;i<this.paper.length;i++){
-					var manualUploader= new qq.FineUploader({
-            element: document.getElementById(this.fineUploaderId[i]),
-            template: this.qqTemplate[i],
-            request: {
-              endpoint: '/server/uploads'
-			            },
-			            thumbnails: {
-  //	                placeholders: {
-  //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-  //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-  //	                }
-            },
-            validation: {
-              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-              itemLimit: 5,
-              sizeLimit: 2000000
-            },
-            autoUpload: false,
-            debug: true,
-            callbacks:{
-              onSubmit:  function(id,fileName,index){
-            		console.log(id)
-								
-              	$('.btn-primary-paper').show()
-                
-              },
-              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-              	//console.log(index)
-              	//console.log($('.qq-upload-list')[index].find(".qq-upload-list"))
-                //alert('This is onComplete function.');
-                //alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-//                  $('#message').append(responseJSON.msg);
-//                    	                $('#progress').hide();//隐藏进度动画
-                //清除已上传队列
-//		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）
-                //	                $('.stateOne').hide();
-                //	                $('.stateTwo').show()
-
-                ///console.log($('.btn-primary'))
-                //if(index == i){
-//            		$('.btn-primary-paper').eq(index).hide()
-              	//}
-                
-              },
-            }
-          });
-          this.qqFineloader.push(manualUploader)
-			}
+	   
 	    
       if(this.paper.length!=0){
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
         for(let i=0;i<this.paper.length;i++){
-          /*数据同步本地一份开始*/
-          this.localPaper.paperName[i]=this.paper[i].paperName;
-          this.localPaper.info.organ[i]=this.paper[i].info.organ;
-          this.localPaper.info.time[i]=this.paper[i].info.time;
-          //论文数据
+        //   /*数据同步本地一份开始*/
+        //   this.localPaper.paperName[i]=this.paper[i].paperName;
+        //   this.localPaper.info.organ[i]=this.paper[i].info.organ;
+        //   this.localPaper.info.time[i]=this.paper[i].info.time;
+        //   //论文数据
           this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
-          this.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
+          
           this.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值
         }
       }else{
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }
+      
     },
     updated(){
       if(this.paper.length!=0){
@@ -411,104 +374,240 @@
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newPaper.paperName.length!=0){
-        if(this.newPaper.paperName.trim().length!=0){
+      if(this.newPaper.paperTitle.length!=0){
+        if(this.newPaper.paperTitle.trim().length!=0){
           Vue.set(this.reveal,"keepAddPaper",false);//控制保存按钮的背景颜色
-          Vue.set(this.newPaper,"paperName",this.newPaper.paperName.trim())//进行必填项的空格去除处理
+          Vue.set(this.newPaper,"paperName",this.newPaper.paperTitle.trim())//进行必填项的空格去除处理
         }
       }else {
         Vue.set(this.reveal,"keepAddPaper",true);//控制保存按钮的背景颜色
       }
     },
-    computed:mapState({
-      paper:state=>state.personal.personalMessage.paperAndPatent.paper,
-    }),
     methods:{
+      getData(){//用于每次信息更新后从新获取数据
+        var that=this;
+        var url = MyAjax.urlsy+"/psnPaperPatent/findByMySelfPaper/"+"string";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          
+        },function(data){
+          if(data.code==0){
+            that.paper=data.msg
+            console.log(data)
+          }else{
+            console.log("错误返回");
+          }
+          
+        },function(err){
+          console.log(err)
+        })
+        // 从服务器获取数据
+        this.localPaper=JSON.parse(JSON.stringify(this.paper));
+        //数据库的数据放本地一份
+      },
       openOrPrivacy(index){//信息是否对外公开控制按钮
-        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
-        if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
-          Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+        var that=this;
+        if(this.paper[index].ifVisable==0){
+          Vue.set(this.paper[index],"ifVisable",1);
         }else{
-          Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
+          Vue.set(this.paper[index],"ifVisable",0);
         }
-
+        
+        var url = MyAjax.urlsy+"/psnPaperPatent/updatePaper";
+          MyAjax.ajax({
+            type: "POST",
+            url:url,
+            data: JSON.stringify(that.paper[index]),
+            dataType: "json",
+            contentType: "application/json;charset=UTF-8",
+            
+          },function(data){
+            //console.log(data)
+          },function(err){
+            console.log(err)
+          })
+          that.getData();
+          
+          if(this.paper[index].ifVisable==0){
+            Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+          }else{
+            Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
+          }
+        //Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
       },
       paperEdit(index){//编辑状态进入按钮
       	var index=index;
       	//console.log(index)
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
-
+        //console.log(window['manualUploader_paper_'+index])
         //上传图片
-        	console.log(that.qqFineloader[index].callbacks)
+        //if(that.qqFineloader.length==0){
+           //for(var i=0;i<this.paper.length;i++){
+                    
+             if(window['manualUploader_paper_'+index]==undefined){
+                window['manualUploader_paper_'+index]= new qq.FineUploader({
+                  element: document.getElementById(this.fineUploaderId[index]),
+                  template: this.qqTemplate[index],
+                  request: {
+                    endpoint: '/server/uploads'
+                  },
+                  thumbnails: {
+                  },
+                  validation: {
+                    allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+                    itemLimit: 5,
+                    sizeLimit: 2000000
+                  },
+                  autoUpload: false,
+                  debug: true,
+                  callbacks:{
+                    onSubmit:  function(id,fileName){
+                      $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").show()
+                      var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
 
-//					that.qqFineloader[index].callbacks.onSubmit()
+                      console.log(imgList)
+                      // for(let i=0;i<=imgList.length;i++){
+                      //     qq(imgList[i]).attach("click", function() {
+                      //       if(!i>0){
+                      //         $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").hide()
+                      //       }
+                      //     });
+                      // }
+                    },
+                    onComplete: function (id, fileName, responseJSON, maybeXhr) {
+                      
+                    },
+                  }
+                });
+             }
+              
+              //var manualUploader=eval('manualUploader_paper_'+index)
+              //this.qqFineloader.push(manualUploader)
+              
+          //}
+        //}
+          
+
           var btnPrimary=document.getElementsByClassName("btn-primary-paper");
-          //console.log("aa"+index)
-          //console.log(btnPrimary)
-          qq(btnPrimary[index]).attach("click", function() {
-          	//console.log(111)
-            that.qqFineloader[index].uploadStoredFiles();
-            
-         	 $('.btn-primary-paper').eq(index).hide()
-          });
-          //console.log(that.qqFineloader)
+          
+          for(let i=0;i<btnPrimary.length;i++){
+            qq(btnPrimary[i]).attach("click", function() {
+              eval('manualUploader_paper_'+index).uploadStoredFiles();
+              $('.btn-primary-paper').eq(index).hide()
+            });
+          }
+          
+         var cancelSelector=document.getElementsByClassName("qq-upload-cancel-selector");
+         //var fileList=document.getElementsByClassName("")
+          // cancelSelector.onclick=function(){
+          //   console.log(123)
+          // }
+        //  qq(cancelSelector).attach("click",function(){
+        //     console.log(123)
+        //  })
       },
       paperEditKeep(index){//编辑状态，保存按钮
-        if(this.localPaper.paperName[index].trim().length!=0){
+        var that=this;
+        if(this.localPaper[index].paperTitle.trim().length!=0){
+          var url = MyAjax.urlsy+"/psnPaperPatent/updatePaper";
+          MyAjax.ajax({
+            type: "POST",
+            url:url,
+            data: JSON.stringify(that.localPaper[index]),
+            dataType: "json",
+            contentType: "application/json;charset=UTF-8",
+            
+          },function(data){
+            //console.log(data)
+          },function(err){
+            console.log(err)
+          })
+          that.getData();
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
-          this.paper[index].paperName=this.localPaper.paperName[index];
-          this.paper[index].info.time=this.localPaper.info.time[index];
-          this.paper[index].info.organ=this.localPaper.info.organ[index];
           /*如果是保存，把数据保存到Vuex中*/
         }
       },
       paperEditCancel(index){//编辑状态，取消按钮
+        //delete window['manualUploader_paper_'+index];
+        //console.log(window.eval('manualUploader_paper_'+index))
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        this.localPaper.paperName[index]=this.paper[index].paperName;
-        this.localPaper.info.organ[index]=this.paper[index].info.organ;
-        this.localPaper.info.time[index]=this.paper[index].info.time;
-
+        this.localPaper[index].paperTitle=this.paper[index].paperTitle;
+        this.localPaper[index].journal=this.paper[index].journal;
+        this.localPaper[index].publicTime=this.paper[index].publicTime;
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },
       paperEditDel(index){//编辑状态，删除按钮
-        this.paper.splice(index,1);
-        this.localPaper.paperName.splice(index,1);
-        this.localPaper.info.organ.splice(index,1);
-        this.localPaper.info.time.splice(index,1);
+        var that=this;
+        var url = MyAjax.urlsy+"/psnPaperPatent/delPaper/"+this.paper[index].paperID;
+        MyAjax.delete(url);
+        that.getData();
+
+        for(var i=0;i<this.paper.length;i++){
+          this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.paper[i].paperID);
+          this.qqTemplate.push("qq-template-manual-trigger-paper"+this.paper[i].paperID);
+          this.qqTriggerUpload.push("trigger-upload"+this.paper[i].paperID);
+        }
       },
       addPaper(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addPaper",false);
         Vue.set(this.reveal,"empty",false);
       },
       keepNewPaper(){//添加模式下的保存
-        if(this.newPaper.paperName.length!=0){
-          if(this.newPaper.paperName.trim().length!=0){
 
-            this.localPaper.paperName.push(this.newPaper.paperName);
-            this.localPaper.info.organ.push(this.newPaper.info.organ);
-            this.localPaper.info.time.push(this.newPaper.info.time);
-            //同步信息到执业资格首页
-            this.paper.push({paperName:this.newPaper.paperName,info:{time:this.newPaper.info.time,profession:"",introduce:"",level:"",organ:this.newPaper.info.organ,}})
-            /*同步信息到个人信息首页*/
+        if(this.newPaper.paperTitle.length!=0){
+          if(this.newPaper.paperTitle.trim().length!=0){
+
+            // this.localPaper.paperName.push(this.newPaper.paperName);
+            // this.localPaper.info.organ.push(this.newPaper.info.organ);
+            // this.localPaper.info.time.push(this.newPaper.info.time);
+            // //同步信息到执业资格首页
+            // this.paper.push({paperName:this.newPaper.paperName,info:{time:this.newPaper.info.time,profession:"",introduce:"",level:"",organ:this.newPaper.info.organ,}})
+            // /*同步信息到个人信息首页*/
+
+            var that=this;
+            var url = MyAjax.urlsy+"/psnPaperPatent/insertPaper";
+            MyAjax.ajax({
+              type: "POST",
+              url:url,
+      				data: JSON.stringify(that.newPaper),
+              dataType: "json",
+      			  contentType: "application/json;charset=UTF-8",
+              
+            },function(data){
+              //console.log(data)
+            },function(err){
+              console.log(err)
+            })
+            this.getData();
+            // 从新获取数据
+            for(var i=0;i<this.paper.length;i++){
+              this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.paper[i].paperID);
+              this.qqTemplate.push("qq-template-manual-trigger-paper"+this.paper[i].paperID);
+              this.qqTriggerUpload.push("trigger-upload"+this.paper[i].paperID);
+            }
             Vue.set(this.reveal,"addPaper",true);
             //视图切换到执业资格的首页
-            Vue.set(this.newPaper,"paperName","");
-            Vue.set(this.newPaper.info,"organ","");
-            Vue.set(this.newPaper.info,"time","");
-            /*清除数据，保证下次输入时输入框为空*/
             this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-            this.reveal.openOrPrivacy.push(false)//追加显示隐藏按钮状态
           }
         }
+
+        Vue.set(this.newPaper,"paperTitle","");
+        Vue.set(this.newPaper,"journal","");
+        Vue.set(this.newPaper,"publicTime","");
+        /*清除数据，保证下次输入时输入框为空*/
       },
+
       cancelNewPaper(){
+
         Vue.set(this.reveal,"addPaper",true);
         //视图切换到执业资格的首页
         //视图切换到执业资格的首页
-        Vue.set(this.newPaper,"paperName","");
-        Vue.set(this.newPaper.info,"organ","");
-        Vue.set(this.newPaper.info,"time","");
+        Vue.set(this.newPaper,"paperTitle","");
+        Vue.set(this.newPaper,"journal","");
+        Vue.set(this.newPaper,"publicTime","");
         /*清除数据，保证下次输入时输入框为空*/
       }
     }
@@ -567,13 +666,17 @@
           .paperInfoTitle{
             color: $themeColor;
             margin-top: 30px;
-            margin-bottom:19px;
+            margin-bottom:15px;
             h4{
               float: left;
+              height: 18px;
+              line-height: 18px;
+              font-size: 14px;
+              
             }
             ul{
+              height: 18px;
               float: right;
-              margin-top:2px;
               li{
                 float: left;
                 cursor: pointer;
@@ -615,9 +718,9 @@
           }
           .paperInfoBody{
             p{
-              height:20px;
-              margin:15px 0 ;
-              color: #353535;
+              height: 14px;
+              line-height: 14px;
+              color: rgb(53, 53, 53);
               span{
                 color: #757575;
                 margin-left:8px;
@@ -625,6 +728,8 @@
             }
             p:last-child{
               margin-bottom:17px;
+              color: rgb(117, 117, 117);
+              margin-top: 15px;
             }
           }
         }

@@ -7,15 +7,15 @@
     </div>
     <!--personaltitle结束-->
     <div class="awardContainer" v-show="reveal.addAward">
-      <div class="personal-empty" v-if="reveal.empty">（您尚未添加执业资格信息）</div>
+      <div class="personal-empty" v-if="reveal.empty">（您尚未添加收获奖励信息）</div>
       <!--显示、编辑已存在的信息开始-->
       <div class="awardInfo" v-for="(item,index) in this.award">
         <!--显示信息列表开始-->
         <div class="awardInfoList" v-show="!reveal.editInfo[index]">
           <div class="awardInfoTitle">
-            <h4 v-cloak>{{localAward.awardName[index]}}</h4>
+            <h4 v-cloak>{{award[index].awardName}}</h4>
             <ul>
-              <li v-bind:class="{openOrPrivacy:reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
+              <li v-bind:class="{openOrPrivacy:!award[index].ifVisable}" v-on:click="openOrPrivacy(index)">
                 <p>{{reveal.openOrPrivacyText[index]}}</p>
               </li>
               <li v-on:click="awardEdit(index)">
@@ -27,8 +27,8 @@
             </ul>
           </div>
           <div class="awardInfoBody">
-            <p v-cloak>发证机构：<span>{{localAward.info.organ[index]}}</span></p>
-            <p v-cloak>评定日期：<span>{{localAward.info.time[index]}}</span></p>
+            <p v-cloak>发证机构：<span>{{award[index].awardingBody}}</span></p>
+            <p v-cloak>评定日期：<span>{{award[index].awardingTime}}</span></p>
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -39,21 +39,20 @@
             <li>
               <label>
                 <h5>*&nbsp;奖励名称</h5>
-                <input v-model="localAward.awardName[index]" type="text" placeholder="请输入资格名称">
+                <input v-model="localAward[index].awardName" type="text" placeholder="请输入资格名称">
               </label>
             </li>
             <li>
               <label>
                 <h5>颁发机构</h5>
-                <input v-model="localAward.info.organ[index]" type="text" placeholder="请输入发证机构">
+                <input v-model="localAward[index].awardingBody" type="text" placeholder="请输入发证机构">
               </label>
             </li>
             <li>
               <label>
                 <h5>评定日期</h5>
-                <datepicker v-model="localAward.info.time[index]"></datepicker>
+                <datepicker v-model="localAward[index].awardingTime"></datepicker>
               </label>
-            </li>
             <li class="img-wrap">
 							<span class="wrap-left">图片展示</span>
 							<script type="text/template" id="qq-template-manual-trigger">
@@ -133,6 +132,7 @@
       </div>
     </div>
     <!--显示、编辑已存在的信息结束-->
+
     <div class="addAwardContainer" v-show="!reveal.addAward">
       <ul>
         <li>带&nbsp;*&nbsp;号为必选项</li>
@@ -145,14 +145,14 @@
         <li>
           <label>
             <h5>颁发机构</h5>
-            <input v-model="newAward.info.organ" type="text" placeholder="请输入注册单位">
+            <input v-model="newAward.organ" type="text" placeholder="请输入注册单位">
           </label>
         </li>
         <li>
           <label>
             <h5>获奖时间</h5>
             <!--<input v-model="newAward.info.time" type="month" placeholder="请输入注册单位">-->
-            <datepicker v-model="newAward.info.time"></datepicker>
+            <datepicker v-model="newAward.time"></datepicker>
           </label>
         </li>
         <li class="img-wrap">
@@ -240,7 +240,8 @@
   import {mapState} from "vuex"
   import datepicker from "../../units/Datepicker.vue"
   import qq from "fine-uploader"
-  
+  import MyAjax from "../../../assets/js/MyAjax.js"
+
   export default {
     name:"awardIndex",
     components:{
@@ -248,7 +249,7 @@
     },
     data(){
       return {
-        title:{text:"职称信息"},
+        title:{text:"所获奖励"},
         reveal:{
           empty:true,//是否显示执业资格信息尚未添加
           openOrPrivacy:[false,false],//信息是否公开显示,通过服务器获取的数据
@@ -257,19 +258,12 @@
           addAward:true,//是否添加信息
           keepAdd:true,//添加模式下，保存按钮是否可用
         },
-        localAward:{
-          awardName:[],
-          info:{
-            time:[],
-            organ:[]
-          }
-        },
+        award:[],
+        localAward:[],
         newAward:{
           awardName:"",
-          info:{
-            time:"",
-            organ:""
-          }
+          organ:"",
+          time:"",
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
@@ -277,15 +271,34 @@
       }
     },
     created(){
-    	for(var i=0;i<this.award.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger"+this.award[i].id);
-    		this.qqTemplate.push("qq-template-manual-trigger"+this.award[i].id);
-    		
-    	}
-    	//console.log(this.fineUploaderClass)
+      var that=this;
+      var url = MyAjax.urlsy+"/psnAwards/findByMySelf/"+"string";
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				
+			},function(data){
+        if(data.code==0){
+          that.award=data.msg
+          //console.log()
+        }else{
+          console.log("错误返回");
+        }
+				
+			},function(err){
+				console.log(err)
+      })
+      // 从服务器获取数据
+      this.localAward=JSON.parse(JSON.stringify(this.award));
+      //数据库的数据放本地一份
+      for(let i=0;i<this.localAward.length;i++){//拼接fineUploader的ID
+        this.fineUploaderId.push("fine-uploader-manual-trigger"+i);
+    		this.qqTemplate.push("qq-template-manual-trigger"+i);
+      }
     },
     mounted(){
-    	
+      
     	//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -324,7 +337,6 @@
 	//	                $('.stateTwo').show()
 	                
 	                $('#trigger-upload').hide()
-	                console.log(maybeXhr)
 	          	},
 	    	}
 	    });
@@ -337,23 +349,23 @@
       }else {
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
         for(let i=0;i<this.award.length;i++){
-          /*数据同步本地一份开始*/
-          this.localAward.awardName[i]=this.award[i].awardName;
-          this.localAward.info.time[i]=this.award[i].info.time;
-          this.localAward.info.organ[i]=this.award[i].info.organ;
+          // /*数据同步本地一份开始*/
+          // this.localAward.awardName[i]=this.award[i].awardName;
+          // this.localAward.info.time[i]=this.award[i].info.time;
+          // this.localAward.info.organ[i]=this.award[i].info.organ;
 
           /*数据同步本地一份结束*/
           this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
         }
       }
       /*以上是初始化*/
-      if(this.reveal.openOrPrivacy.length!=0){
-        for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
-          if(!this.reveal.openOrPrivacy[i]){
-            Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
+      if(this.award.length!=0){
+        for(let i=0;i<this.award.length;i++){
+          if(this.award[i].ifVisable==0){
+            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
             //this.reveal.openOrPrivacyText.push("显示")
           }else{
-            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
+            Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
             //this.reveal.openOrPrivacyText.push("隐藏")
           }
         }
@@ -377,17 +389,58 @@
       }
       /*控制保存按钮的背景颜色*/
     },
-    computed:mapState({
-      award:state=>state.personal.personalMessage.award,
-    }),
     methods:{
-      openOrPrivacy(index){//信息是否对外公开控制按钮
-        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);
-        if(!this.reveal.openOrPrivacy[index]){//显示文本的控制
-          Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
+      getData(){//用于每次信息更新后从新获取数据
+        var that=this;
+        var url = MyAjax.urlsy+"/psnAwards/findByMySelf/"+"string";
+            MyAjax.ajax({
+              type: "GET",
+              url:url,
+              dataType: "json",
+              
+            },function(data){
+              if(data.code==0){
+                that.award=data.msg
+                //console.log()
+              }else{
+                console.log("错误返回");
+              }
+              
+            },function(err){
+              console.log(err)
+            })
+            // 从服务器获取数据
+            this.localAward=JSON.parse(JSON.stringify(this.award));
+      },
+      openOrPrivacy(index){//信息是否对外公开控制按钮\
+        var that=this;
+        if(this.award[index].ifVisable==0){
+          Vue.set(this.award[index],"ifVisable",1);
         }else{
-          Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+          Vue.set(this.award[index],"ifVisable",0);
         }
+        
+        var url = MyAjax.urlsy+"/psnAwards/update/";
+          MyAjax.ajax({
+            type: "POST",
+            url:url,
+            data: JSON.stringify(that.award[index]),
+            dataType: "json",
+            contentType: "application/json;charset=UTF-8",
+            
+          },function(data){
+            //console.log(data)
+          },function(err){
+            console.log(err)
+          })
+          that.getData();
+          
+          if(this.award[index].ifVisable==0){
+            Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
+          }else{
+            Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
+          }
+          console.log(this.award)
       },
       awardEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
@@ -455,30 +508,50 @@
             that.qqFineloader[index].uploadStoredFiles();
             $('.btn-primary').eq(index).hide()
           });
-          console.log(that.qqFineloader)
+
       },
       keepAwardEdit(index){//编辑状态，保存按钮
-        if(this.localAward.awardName[index].trim().length!=0){
-          Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-          this.award[index].awardName=this.localAward.awardName[index];
-          this.award[index].info.time=this.localAward.info.time[index];
-          this.award[index].info.organ=this.localAward.info.organ[index];
+        var that=this;
+        if(this.localAward[index].awardName.trim().length!=0){
+          var url = MyAjax.urlsy+"/psnAwards/update/";
+          MyAjax.ajax({
+            type: "POST",
+            url:url,
+            data: JSON.stringify(that.localAward[index]),
+            dataType: "json",
+            contentType: "application/json;charset=UTF-8",
+            
+          },function(data){
+            //console.log(data)
+          },function(err){
+            console.log(err)
+          })
+          that.getData();
+          Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//取消编辑后视图切换回到原来查看页面
+          
           /*如果是保存，把数据保存到Vuex中*/
         }
       },
       cancelAwardEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        this.localAward.awardName[index]=this.award[index].awardName;
-        this.localAward.info.time[index]=this.award[index].info.time;
-        this.localAward.info.organ[index]=this.award[index].info.organ;
+        this.localAward[index].awardName=this.award[index].awardName;
+        this.localAward[index].awardingBody=this.award[index].awardingBody;
+        this.localAward[index].awardingTime=this.award[index].awardingTime;
 
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },
       awardDel(index){//编辑状态，删除按钮
-        this.award.splice(index,1);
-        this.localAward.awardName.splice(index,1);
-        this.localAward.info.time.splice(index,1);
-        this.localAward.info.organ.splice(index,1);
+        var that=this;
+        var url = MyAjax.urlsy+"/psnAwards/del/"+this.award[index].pkid;
+        MyAjax.delete(url);
+        
+        that.getData();
+        
+        // 从新获取数据
+        for(let i=0;i<this.localAward.length;i++){//拼接fineUploader的ID
+          this.fineUploaderId.push("fine-uploader-manual-trigger"+i);
+          this.qqTemplate.push("qq-template-manual-trigger"+i);
+        }
       },
       addInfo(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addAward",false);
@@ -486,31 +559,51 @@
       },
       keepAwardAdd(){//添加模式下的保存
         if(this.newAward.awardName.length!=0){
-          if(this.newAward.awardName.trim().length!=0){
 
-            this.localAward.awardName.push(this.newAward.awardName);
-            this.localAward.info.time.push(this.newAward.info.time);
-            this.localAward.info.organ.push(this.newAward.info.organ);
-            //同步信息到执业资格首页
-            this.award.push({awardName:this.newAward.awardName,info:{time:this.newAward.info.time,organ:this.newAward.info.organ}})
-            /*同步信息到个人信息首页*/
+          if(this.newAward.awardName.trim().length!=0){
             Vue.set(this.reveal,"addAward",true);
             //视图切换到执业资格的首页
-            Vue.set(this.newAward,"awardName","");
-            Vue.set(this.newAward.info,"time","");
-            Vue.set(this.newAward.info,"organ","");
-            /*清除数据，保证下次输入时输入框为空*/
-            this.reveal.openOrPrivacy.push(false)//设置是否对外显示
-            this.reveal.openOrPrivacyText.push("显示")//设置是否对外显示文本
+            
+            this.reveal.openOrPrivacyText.push("隐藏")//设置是否对外显示文本
+            var that=this;
+            var url = MyAjax.urlsy+"/psnAwards/insert";
+            MyAjax.ajax({
+              type: "POST",
+              url:url,
+      				data: JSON.stringify({
+                accountID:"string",
+                awardName:that.newAward.awardName,
+                awardingBody:that.newAward.organ,
+                awardingTime:that.newAward.time,
+              }),
+              dataType: "json",
+      			  contentType: "application/json;charset=UTF-8",
+              
+            },function(data){
+              //console.log(data)
+            },function(err){
+              console.log(err)
+            })
+            this.getData();
+            // 从新获取数据
+            for(let i=0;i<this.localAward.length;i++){//拼接fineUploader的ID
+              this.fineUploaderId.push("fine-uploader-manual-trigger"+i);
+              this.qqTemplate.push("qq-template-manual-trigger"+i);
+            }
           }
         }
+
+        Vue.set(this.newAward,"awardName","");
+        Vue.set(this.newAward,"time","");
+        Vue.set(this.newAward,"organ","");
+        /*清除数据，保证下次输入时输入框为空*/
       },
       cancelAwardAdd(){
         Vue.set(this.reveal,"addAward",true);
         //视图切换到执业资格的首页
         Vue.set(this.newAward,"awardName","");
-        Vue.set(this.newAward.info,"time","");
-        Vue.set(this.newAward.info,"organ","");
+        Vue.set(this.newAward,"time","");
+        Vue.set(this.newAward,"organ","");
         /*清除数据，保证下次输入时输入框为空*/
       }
     }

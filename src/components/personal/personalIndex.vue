@@ -3,8 +3,10 @@
     <div class="picture">
     	<div class="basicInfoImg">
     		<img v-bind:src="personal.personalPicture" alt="">
+        
     		<span class="meng" @click="croperShow">更换头像</span>
     	</div>
+
       <div id="modal-overlay" class="corpbox">
       	<div class="container">
 				  <div class="imageBox">
@@ -25,8 +27,10 @@
 				  <div class="cropped"></div>
 				</div>
       </div>
-      <p v-cloak>{{personalMessage.baseInfo.nickName}}</p>
+
+      <p v-cloak>{{this.psnMsg.personalbasicinfo.nickName}}</p>
     </div>
+
     <ul class="personalIndexList">
       <li>
         <h3 class="pi-title">基础信息</h3>
@@ -40,19 +44,19 @@
           <ul v-if="!empty.basicInfo">
             <li>
               <h5>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
-              <p>{{personalMessage.baseInfo.nickName}}</p>
+              <p>{{this.psnMsg.personalbasicinfo.nickName}}</p>
             </li>
             <li>
               <h5>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
-              <p>{{personalMessage.baseInfo.psnName}}</p>
+              <p>{{this.psnMsg.personalbasicinfo.psnName}}</p>
             </li>
             <li>
               <h5>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</h5>
-              <p>{{personalMessage.baseInfo.sex}}</p>
+              <p>{{this.psnMsg.personalbasicinfo.sex}}</p>
             </li>
             <li>
               <h5>手机号码：</h5>
-              <p>{{personalMessage.baseInfo.phoneNumber}}</p>
+              <p>{{this.psnMsg.personalbasicinfo.phoneNumber}}</p>
             </li>
           </ul>
         </div>
@@ -61,14 +65,14 @@
       <li>
         <h3 class="pi-title">教育背景</h3>
         <div class="infoContainer">
-          <div class="pi-empty" v-if="empty.education[0]">（此处暂无信息）</div>
+          <div class="pi-empty" v-if="empty.education">（此处暂无信息）</div>
 
-          <div v-for="(item,index) in this.personalMessage.education">
+          <div v-for="(item,index) in this.psnMsg.psnEduBackGrounds">
             <h4 v-cloak>{{item.schoolName}}</h4>
-            <div v-if="empty.education[index+2]">
-              <p v-cloak v-if="empty.education[1][index][0]">{{item.info.schoolTimeStart}}——{{item.info.schoolTimeEnd}}</p>
-              <p v-cloak v-if="empty.education[1][index][1]">{{item.info.profession}}</p>
-              <p v-cloak v-if="empty.education[1][index][2]">{{item.info.introduce}}</p>
+            <div>
+              <p v-cloak>{{item.schoolTimeUp}}——{{item.schoolTimeDown}}</p>
+              <p v-cloak>专业：{{item.professionName}}</p>
+              <p v-cloak>学历：{{item.education}}</p>
             </div>
           </div>
         </div>
@@ -77,17 +81,17 @@
       <li>
         <h3 class="pi-title">工作经历</h3>
         <div class="infoContainer">
-          <div class="pi-empty" v-if="empty.workExperience[0]">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.personalMessage.workExperience">
+          <div class="pi-empty" v-if="empty.psnWorkExperiences">（此处暂无信息）</div>
+          <div v-for="(item,index) in this.psnMsg.psnWorkExperiences">
             <h4 v-cloak>{{item.companyName}}</h4>
-            <div v-if="empty.workExperience[index+2]">
-              <p v-cloak v-if="empty.workExperience[1][index][0]">
-                <span>{{item.info.timeStart}}</span>
+            <div>
+              <p v-cloak>
+                <span>{{item.ocupationTimeUp}}</span>
                 <span>——</span>
-                <span>{{item.info.timeEnd}}</span>
+                <span>{{item.ocupationTimeDown}}</span>
               </p>
-              <p v-cloak v-if="empty.workExperience[1][index][1]">{{item.info.profession}}</p>
-              <p v-cloak v-if="empty.workExperience[1][index][2]">{{item.info.introduce}}</p>
+              <p v-cloak>任职职位：{{item.ocupation}}</p>
+              <p v-cloak>职位描述：{{item.jobDescription}}</p>
             </div>
           </div>
         </div>
@@ -96,17 +100,17 @@
       <li>
         <h3 class="pi-title">项目经历</h3>
         <div class="infoContainer">
-          <div class="pi-empty" v-if="empty.projectExperience[0]">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.personalMessage.projectExperience">
+          <div class="pi-empty" v-if="empty.psnProjExpes">（此处暂无信息）</div>
+          <div v-for="(item,index) in this.psnMsg.psnProjExpes">
             <h4 v-cloak>{{item.projectName}}</h4>
-            <div v-if="empty.projectExperience[index+2]">
-              <p v-cloak v-if="empty.projectExperience[1][index][0]">
-                <span>{{item.info.timeStart}}</span>
+            <div>
+              <p v-cloak>
+                <span>{{item.partakeTimeUp}}</span>
                 <span>——</span>
-                <span>{{item.info.timeEnd}}</span>
+                <span>{{item.partakeTimeDown}}</span>
               </p>
-              <p v-cloak v-if="empty.projectExperience[1][index][1]">{{item.info.profession}}</p>
-              <p v-cloak v-if="empty.projectExperience[1][index][2]">{{item.info.introduce}}
+              <p v-cloak>项目责任：{{item.takeOffice}}</p>
+              <p v-cloak>责任描述：{{item.detailDes}}
               </p>
               <p>查看更多>></p>
             </div>
@@ -117,13 +121,9 @@
       <li>
         <h3 class="pi-title">团队经历</h3>
         <div class="infoContainer">
-          <div class="pi-empty" v-if="empty.teamExperience[0]">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.personalMessage.teamExperience">
+          <div class="pi-empty" v-if="empty.teamExperience">（此处暂无信息）</div>
+          <div v-for="(item,index) in this.psnMsg.teamOrgaInfos">
             <h4 v-cloak>{{item.teamName}}</h4>
-            <div v-if="empty.teamExperience[index+2]">
-              <p v-cloak v-if="empty.teamExperience[1][index][0]">{{item.info.time}}</p>
-              <p v-cloak v-if="empty.teamExperience[1][index][1]">{{item.info.profession}}</p>
-            </div>
           </div>
         </div>
       </li>
@@ -131,13 +131,12 @@
       <li>
         <h3 class="pi-title">执业资格</h3>
         <div class="infoContainer">
-          <div class="pi-empty" v-if="empty.certificate[0]">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.personalMessage.certificate">
-            <h4 v-cloak>{{item.certificateName}}</h4>
-            <div v-if="empty.certificate[index+2]">
-              <p v-cloak v-if="empty.certificate[1][index][0]">{{item.info.time}}</p>
-              <p v-cloak v-if="empty.certificate[1][index][1]">{{item.info.profession}}</p>
-              <p v-cloak v-if="empty.certificate[1][index][2]">证书编号：{{item.info.introduce}}</p>
+          <div class="pi-empty" v-if="empty.psnQualifications">（此处暂无信息）</div>
+          <div v-for="(item,index) in this.psnMsg.psnQualifications">
+            <h4 v-cloak>{{item.qualificationName}}</h4>
+            <div>
+              <p v-cloak>注册单位：{{item.registeredUnit}}</p>
+              <p v-cloak>证书编号：{{item.certificateNumber}}</p>
             </div>
           </div>
         </div>
@@ -146,15 +145,15 @@
       <li>
         <h3 class="pi-title">职称信息</h3>
         <div class="infoContainer">
-          <div class="pi-empty" v-if="empty.jobInfo[0]">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.personalMessage.jobInfo">
-            <h4 v-cloak>{{item.jobInfoName}}</h4>
-            <div v-if="empty.jobInfo[index+2]">
-              <p v-cloak v-if="empty.jobInfo[1][index][1]">职称专业：&nbsp;&nbsp;{{item.info.profession}}</p>
-              <p v-cloak v-if="empty.jobInfo[1][index][3]">职称级别：&nbsp;&nbsp;{{item.info.level}}</p>
-              <p v-cloak v-if="empty.jobInfo[1][index][2]">证书编号：&nbsp;&nbsp;{{item.info.introduce}}</p>
-              <p v-cloak v-if="empty.jobInfo[1][index][0]">评定日期：&nbsp;&nbsp;{{item.info.time}}</p>
-              <p v-cloak v-if="empty.jobInfo[1][index][4]">发证机构：&nbsp;&nbsp;{{item.info.organ}}</p>
+          <div class="pi-empty" v-if="empty.psnTitleMessages">（此处暂无信息）</div>
+          <div v-for="(item,index) in this.psnMsg.psnTitleMessages">
+            <h4 v-cloak>{{item.professionalTitle}}</h4>
+            <div>
+              <p v-cloak>职称专业：&nbsp;&nbsp;{{item.titleName}}</p>
+              <p v-cloak>职称级别：&nbsp;&nbsp;{{item.titleLevel}}</p>
+              <p v-cloak>证书编号：&nbsp;&nbsp;{{item.certificateNumber}}</p>
+              <p v-cloak>评定日期：&nbsp;&nbsp;{{item.assessmentTime}}</p>
+              <p v-cloak>发证机构：&nbsp;&nbsp;{{item.certificateBody}}</p>
             </div>
           </div>
         </div>
@@ -163,12 +162,12 @@
       <li>
         <h3 class="pi-title">所获奖励</h3>
         <div class="infoContainer">
-          <div class="pi-empty" v-if="empty.award[0]">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.personalMessage.award">
+          <div class="pi-empty" v-if="empty.psnAwards">（此处暂无信息）</div>
+          <div v-for="(item,index) in this.psnMsg.psnAwards">
             <h4 v-cloak>{{item.awardName}}</h4>
-            <div v-if="empty.award[index+2]">
-              <p v-cloak v-if="empty.award[1][index][4]">颁发机构：&nbsp;&nbsp;{{item.info.organ}}</p>
-              <p v-cloak v-if="empty.award[1][index][0]">{{item.info.time}}</p>
+            <div>
+              <p v-cloak>颁发机构：&nbsp;&nbsp;{{item.awardingBody}}</p>
+              <p v-cloak>评定时间：{{item.awardingTime}}</p>
             </div>
           </div>
         </div>
@@ -178,18 +177,18 @@
         <h3 class="pi-title">论文专利</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.paperAndPatent">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.personalMessage.paperAndPatent.paper">
-            <h4 v-cloak>{{item.paperName}}</h4>
-            <div v-if="empty.paper[index+2]">
-              <p v-cloak v-if="empty.paper[1][index][4]">{{item.info.organ}}</p>
-              <p v-cloak v-if="empty.paper[1][index][0]">{{item.info.time}}</p>
+          <div v-for="(item,index) in this.psnMsg.psnPapers">
+            <h4 v-cloak>{{item.paperTitle}}</h4>
+            <div>
+              <p v-cloak>发表期刊：{{item.journal}}</p>
+              <p v-cloak>发表时间：{{item.publicTime}}</p>
             </div>
           </div>
-          <div v-for="(item,index) in this.personalMessage.paperAndPatent.patent">
+          <div v-for="(item,index) in this.psnMsg.psnPatents">
             <h4 v-cloak>{{item.patentName}}</h4>
-            <div v-if="empty.patent[index+2]">
-              <p v-cloak v-if="empty.patent[1][index][4]">{{item.info.organ}}</p>
-              <p v-cloak v-if="empty.patent[1][index][0]">{{item.info.time}}</p>
+            <div>
+              <p v-cloak>颁发机构：{{item.patentName}}</p>
+              <p v-cloak>有效期：{{validityTerm[index]}}</p>
             </div>
           </div>
         </div>
@@ -199,16 +198,16 @@
         <h3 class="pi-title">语言软件</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.otherSkill">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.personalMessage.otherSkill.language">
-            <h4 v-cloak>{{item.languageName}}</h4>
-            <div v-if="empty.language[index+2]">
-              <p v-cloak v-if="empty.language[1][index][4]">{{item.info.profession}}</p>
+          <div v-for="(item,index) in this.psnMsg.psnlanguages">
+            <h4 v-cloak>{{item.language}}</h4>
+            <div>
+              <p v-cloak>熟练程度：{{item.proficiency}}</p>
             </div>
           </div>
-          <div v-for="(item,index) in this.personalMessage.otherSkill.software">
-            <h4 v-cloak>{{item.softwareName}}</h4>
-            <div v-if="empty.software[index+2]">
-              <p v-cloak v-if="empty.software[1][index][4]">{{item.info.profession}}</p>
+          <div v-for="(item,index) in this.psnMsg.psnsoftwares">
+            <h4 v-cloak>{{item.software}}</h4>
+            <div>
+              <p v-cloak>熟练程度：{{item.proficiency}}</p>
             </div>
           </div>
         </div>
@@ -228,9 +227,26 @@
   
   export default{
     name: 'personalIndex',
-    data:function(){
+    data(){
       return {
-        empty:{basicInfo:false,education:[true],workExperience:[true],projectExperience:[true],teamExperience:[true],certificate:[true],jobInfo:[true],award:[true],patent:[true],paper:[true],paperAndPatent:true,language:[true],software:[true],otherSkill:true},
+        empty:{
+          basicInfo:false,
+          education:true,
+          psnWorkExperiences:true,
+          psnProjExpes:true,
+          teamOrgaInfos:true,
+          psnQualifications:true,
+          psnTitleMessages:true,
+          psnAwards:true,
+          // psnPapers:true,
+          // paper:[true],
+          paperAndPatent:true,
+          // language:[true],
+          // software:[true],
+          otherSkill:true
+        },
+        psnMsg:[],//用于存放服务器获取的数据
+        validityTerm:[],//validityTermS+validityTermE
         personal:{
           personalPicture:require("../../assets/img/personal/personalIndex/picture.png"),
           fileName:"",
@@ -238,8 +254,147 @@
         },
       }
     },
-    
+    created(){
+      var that=this;
+      var url = MyAjax.urlsy+"/psnHomePage/findByMySelf";
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				
+			},function(data){
+        if(data.code==0){
+          that.psnMsg=data.msg;
+        }else{
+          console.log("错误返回");
+        }
+				
+			},function(err){
+				console.log(err)
+      })
+      // 服务器获取首页所需的数据
+      function emptyText(text) {
+        if(text==null||text.length==0){
+          return "（暂无消息）";
+        }else{
+          return text;
+        }
+      }
+      // 为空的数据进行处理
+      var personalbasicinfo=this.psnMsg.personalbasicinfo;
+      if((personalbasicinfo.nickName==null||personalbasicinfo.nickName.length==0) && (personalbasicinfo.psnName==null||personalbasicinfo.psnName.length==0) && (personalbasicinfo.sex==null||personalbasicinfo.sex.length==0)){
+        Vue.set(this.empty,"basicInfo",true)
+      }
+      //基础信息部分数据空和非空切换
+      var psnEduBackGrounds=this.psnMsg.psnEduBackGrounds;
+      if(psnEduBackGrounds.length!=0){
+        Vue.set(this.empty,"education",false)
+        for (let item in psnEduBackGrounds){
+          psnEduBackGrounds[item].professionName=emptyText(psnEduBackGrounds[item].professionName);
+          psnEduBackGrounds[item].education=emptyText(psnEduBackGrounds[item].education);
+        }
+      }
+      //教育背景是否显示
+
+      var psnWorkExperiences=this.psnMsg.psnWorkExperiences;
+      if(psnWorkExperiences.length!=0){
+        Vue.set(this.empty,"psnWorkExperiences",false)
+        for (let item in psnWorkExperiences){
+          psnWorkExperiences[item].ocupation=emptyText(psnWorkExperiences[item].ocupation);
+          psnWorkExperiences[item].jobDescription=emptyText(psnWorkExperiences[item].jobDescription);
+        }
+      }
+      // 工作经历是否显示
+      var psnProjExpes=this.psnMsg.psnProjExpes;
+      if(psnProjExpes.length!=0){
+        Vue.set(this.empty,"psnProjExpes",false)
+        for (let item in psnProjExpes){
+          psnProjExpes[item].takeOffice=emptyText(psnProjExpes[item].takeOffice);
+          psnProjExpes[item].detailDes=emptyText(psnProjExpes[item].detailDes);
+        }
+      }
+      //项目经历是否显示
+      var teamOrgaInfos=this.psnMsg.teamOrgaInfos;
+      if(teamOrgaInfos.length!=0){
+        Vue.set(this.empty,"teamOrgaInfos",false)
+      }
+      //团队经历是否显示
+      var psnQualifications=this.psnMsg.psnQualifications;
+      if(psnQualifications.length!=0){
+        Vue.set(this.empty,"psnQualifications",false)
+        for (let item in psnQualifications){
+          psnQualifications[item].registeredUnit=emptyText(psnQualifications[item].registeredUnit);
+          psnQualifications[item].qualificationName=emptyText(psnQualifications[item].qualificationName);
+        }
+      }
+      //执业资格是否显示
+      var psnTitleMessages=this.psnMsg.psnTitleMessages;
+      if(psnTitleMessages.length!=0){
+        Vue.set(this.empty,"psnTitleMessages",false)
+        for (let item in psnTitleMessages){
+          psnTitleMessages[item].titleName=emptyText(psnTitleMessages[item].titleName);
+          psnTitleMessages[item].titleLevel=emptyText(psnTitleMessages[item].titleLevel);
+          psnTitleMessages[item].certificateNumber=emptyText(psnTitleMessages[item].certificateNumber);
+          psnTitleMessages[item].assessmentTime=emptyText(psnTitleMessages[item].assessmentTime);
+          psnTitleMessages[item].certificateBody=emptyText(psnTitleMessages[item].certificateBody);
+        }
+      }
+      //职称信息是否显示
+      var psnAwards=this.psnMsg.psnAwards;
+      if(psnAwards.length!=0){
+        Vue.set(this.empty,"psnAwards",false)
+        for (let item in psnAwards){
+          psnAwards[item].awardName=emptyText(psnAwards[item].awardName);
+          psnAwards[item].awardingBody=emptyText(psnAwards[item].awardingBody);
+          psnAwards[item].awardingTime=emptyText(psnAwards[item].awardingTime);
+        }
+      }
+      //所获奖励是否显示
+      var psnPapers=this.psnMsg.psnPapers;
+      if(psnPapers.length!=0){
+        for (let item in psnPapers){
+          psnPapers[item].journal=emptyText(psnPapers[item].journal);
+          psnPapers[item].publicTime=emptyText(psnPapers[item].publicTime);
+        }
+      }
+      var psnPatents=this.psnMsg.psnPatents;
+      
+      if(psnPatents.length!=0){
+        for (let item in psnPatents){
+          psnPatents[item].patentName=emptyText(psnPatents[item].patentName);
+          if((psnPatents[item].validityTermS!=null||psnPatents[item].validityTermS.length!=0)&&(psnPatents[item].validityTermE!=null||psnPatents[item].validityTermE.length!=0)){
+            this.validityTerm[item]= psnPatents[item].validityTermS+"-"+psnPatents[item].validityTermE
+          }else{
+            this.validityTerm[item]="（暂无消息）";
+          }
+          
+          //psnPatents[item].validityTermE=emptyText(psnPatents[item].validityTermE);
+        }
+      }
+      if(psnPapers.length!=0||psnPatents.length!=0){
+        Vue.set(this.empty,"paperAndPatent",false)
+      }
+      //论文专利是否显示
+
+      var psnlanguages=this.psnMsg.psnlanguages;
+      if(psnlanguages.length!=0){
+        for (let item in psnlanguages){
+          psnlanguages[item].proficiency=emptyText(psnlanguages[item].proficiency);
+        }
+      }
+      var psnsoftwares=this.psnMsg.psnsoftwares;
+      if(psnsoftwares.length!=0){
+        for (let item in psnsoftwares){
+          psnsoftwares[item].proficiency=emptyText(psnsoftwares[item].proficiency);
+        }
+      }
+      if(psnlanguages.length!=0||psnsoftwares.length!=0){
+        Vue.set(this.empty,"otherSkill",false)
+      }
+      //语言软件是否显示
+    },
     mounted(){
+
     	var that = this;
     	//获取当前页数据
 //  	var url = "";
@@ -328,108 +483,9 @@
 				
 			})
     	//上传头像end
-    	
-      if(this.personalMessage.baseInfo.nickName.length==0 && this.personalMessage.baseInfo.psnName.length==0 && this.personalMessage.baseInfo.sex.length==0){
-        Vue.set(this.empty,"basicInfo",true)
-      }
-      //基础信息部分数据空和非空切换
-      function Message(message,empty) {
-        this.message = message;
-        this.empty=empty;
-      }
-      Message.prototype.setEmpty=function () {
-
-        if(this.message.length!=0){
-          Vue.set(this.empty,[0],false)
-
-          this.empty.push([]);//push个空数组存放教育时间，背景，学历的状态
-
-          for(var i = 0 ; i< this.message.length;i++){
-            var arrLength = Object.keys(this.message[i].info).length;//获取对象长度
-
-            this.empty.push([true]);//存放教育信息的状态
-            this.empty[1].push([]);
-
-            for(var j=0 ; j<arrLength ; j++){
-              this.empty[1][i].push(true);
-            }
-            if(this.message[i].info.introduce=="" && this.message[i].info.profession=="" && this.message[i].info.time=="" && this.message[i].info.level=="" && this.message[i].info.organ==""){
-              Vue.set(this.empty,[i+2],false)
-            }else if(this.message[i].info.time==""){
-              Vue.set(this.empty[1][i],[0],false)
-
-            }else if(this.message[i].info.profession==""){
-              Vue.set(this.empty[1][i],[1],false)
-
-            }else if(this.message[i].info.introduce==""){
-
-              Vue.set(this.empty[1][i],[2],false)
-            }else if(this.message[i].info.level==""){
-
-              Vue.set(this.empty[1][i],[3],false)
-            }else if(this.message[i].info.organ==""){
-              Vue.set(this.empty[1][i],[4],false)
-            }
-
-          }
-
-        }
-      }
-      //显示数据切换对象
-      var education = new Message(this.personalMessage.education,this.empty.education);
-      education.setEmpty();
-      //教育背景部分数据的显示
-      var workExperience = new Message(this.personalMessage.workExperience,this.empty.workExperience);
-      workExperience.setEmpty();
-      //工作经历部分数据的显示
-      var projectExperience = new Message(this.personalMessage.projectExperience,this.empty.projectExperience);
-      projectExperience.setEmpty();
-      //项目经历部分数据显示
-      var teamExperience = new Message(this.personalMessage.teamExperience,this.empty.teamExperience);
-      teamExperience.setEmpty();
-      //团队经历部分数据显示
-      var certificate = new Message(this.personalMessage.certificate,this.empty.certificate);
-      certificate.setEmpty();
-      //执业资格部分数据显示
-      var jobInfo = new Message(this.personalMessage.jobInfo,this.empty.jobInfo);
-      jobInfo.setEmpty();
-      //执业资格部分数据显示
-      var award = new Message(this.personalMessage.award,this.empty.award);
-      award.setEmpty();
-      //所获奖励部分数据显示
-      var patent = new Message(this.personalMessage.paperAndPatent.patent,this.empty.patent);
-      patent.setEmpty();
-      var paper = new Message(this.personalMessage.paperAndPatent.paper,this.empty.paper);
-      paper.setEmpty();
-      //所获奖励部分数据显示
-      var language = new Message(this.personalMessage.otherSkill.language,this.empty.language);
-      language.setEmpty();
-      var software = new Message(this.personalMessage.otherSkill.software,this.empty.software);
-      software.setEmpty();
-      //语言软件部分数据显示
-      /*论文专利为空显示开始*/
-      if(this.personalMessage.paperAndPatent.paper.length==0&&this.personalMessage.paperAndPatent.patent.length==0){
-        Vue.set(this.empty,"paperAndPatent",true)
-      }else{
-        Vue.set(this.empty,"paperAndPatent",false)
-      }
-      /*论文专利为空显示结束*/
-      /*语言软件为空显示开始*/
-      if(this.personalMessage.otherSkill.software.length==0&&this.personalMessage.otherSkill.language.length==0){
-        Vue.set(this.empty,"otherSkill",true)
-      }else{
-        Vue.set(this.empty,"otherSkill",false)
-      }
-      /*语言软件为空显示结束*/
     },
-    computed:mapState({
-      personalMessage:state=>state.personal.personalMessage,
-      /*获取数据*/
-
-    }),
     methods:{
     	croperShow(){
-    		
     		Modal.makeText($('.corpbox'))
     	}
     },
@@ -701,13 +757,19 @@
               padding-right:0;
               color: rgb(53,53,53);
             }
-            p:last-child{
-
-            }
           }
         }
       }
       li:nth-child(7){
+        .infoContainer{
+          div{
+            p{
+              width:800px;
+            }
+          }
+        }
+      }
+      li:nth-child(8){
         .infoContainer{
           div{
             p{

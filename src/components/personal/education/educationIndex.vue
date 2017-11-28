@@ -19,7 +19,7 @@
             </ul>
           </div>
           <div v-show="!editEdu.edit[0][index]">
-            <p v-cloak >在校时间 :  {{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
+            <p v-cloak >Time :  {{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
             <p v-cloak >专业：{{item.professionName}}</p>
             <p v-cloak >学历：{{item.education}}</p>
           </div>
@@ -47,7 +47,7 @@
             <li class="img-wrap" >
 							<span class="wrap-left">图片展示</span>
 
-							<script type="text/template" :id="qqTemplate[index]">
+							<script type="text/template" id="qq-template-manual-trigger">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 						            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
 						                <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
@@ -56,7 +56,7 @@
 						                <span class="qq-upload-drop-area-text-selector"></span>
 						            </div>
 						            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-						                <li class="list">
+						                <li>
 						                    <div class="qq-progress-bar-container-selector">
 						                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 						                    </div>
@@ -161,7 +161,7 @@
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
 			            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-			                <li class="list">
+			                <li>
 			                    <div class="qq-progress-bar-container-selector">
 			                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 			                    </div>
@@ -282,8 +282,7 @@
 
     mounted(){
 			
-      this.updateData();
-      
+			this.updateData();
 			//上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
@@ -305,15 +304,9 @@
 	        autoUpload: false,
 	        debug: true,
 	        callbacks:{
-	        	onSubmit:  function(id,  fileName){
-              $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").show()
-            },
-            onCancel: function(){
-							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
-              if(imgList.length<=1){
-								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
-							}
-						},
+	        	onSubmit:  function(id,  fileName)  {
+	        		$('#trigger-upload').show()
+	        	},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	                //alert('This is onComplete function.');
 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
@@ -327,7 +320,8 @@
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
 	                
-	                $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+	                $('#trigger-upload').hide()
+	                console.log(maybeXhr)
 	          	},
 	    	}
 	    });
@@ -357,13 +351,14 @@
         }
         //为每一个对象添加一个独有的状态
       }
+
     },
     
 
     methods:{
     	updateData(){//更新本地数据
     		var that = this;
-	    	var url = MyAjax.urlsy+"/psnEduBackGround/findByMySelf/"+"string";
+	    	var url = "http://10.1.31.16:8080/psnEduBackGround/findByMySelf/"+"string";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -403,11 +398,7 @@
 		        that.openOrPrivacy.push(false);
 	    			that.openOrPrivacyText.push("隐藏")
 		      }
-        }
-        
-        if(this.education.length==0){//数据完全删除后显示无数据提示
-          Vue.set(this.empty,"promote",true);
-        }
+	    	}
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
@@ -433,7 +424,7 @@
         	}
         }
         var that = this;
-        var url = MyAjax.urlsy+"/psnEduBackGround/update"
+        var url = "http://10.1.31.16:8080/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -500,6 +491,7 @@
             eval('manualUploader'+index).uploadStoredFiles();
             btnPrimary.hide()
           });
+          console.log(that.qqFineloader)
           
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
@@ -507,9 +499,26 @@
         //console.log("ok")
       },
       deleteEduExist(index){//删除按钮事件
+      	
+//      Vue.set(this.editEdu.delete[0],[index],false);
+//      this.education.splice(index,1)
+//      Vue.set(this.editEdu.delete[0],[index],true)//为了解决删除一项后一项不会显示问题
+        if(this.education.length==0){//数据完全删除后显示无数据提示
+          Vue.set(this.empty,"promote",true);
+        }
         var that = this;
-        var url = MyAjax.urlsy+"/psnEduBackGround/del/"+that.education[index].pkid;
-        MyAjax.delete(url);
+        console.log(that.education[index].pkid)
+        var url = "http://10.1.31.16:8080/psnEduBackGround/del/"+that.education[index].pkid;
+        MyAjax.ajax({
+					type: "DELETE",
+					url:url,
+					dataType: "json",
+					contentType: "application/json;charset=UTF-8",
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
         that.updateData();
       },
       //以上是状态的改变
@@ -543,7 +552,7 @@
 				
 //      var judgUpDate=this.education[index].schoolName==this.inputValue.schoolText[index]&&this.education[index].info.profession==this.inputValue.professionText[index]&&this.education[index].info.schoolTimeStart==this.inputValue.schoolTimeStart[index]&&this.education[index].info.schoolTimeEnd==this.inputValue.schoolTimeEnd[index]&&this.education[index].info.introduce == this.inputValue.introduce[index];/*数据是否更改的判断条件*/
 				var that = this;
-        var url = MyAjax.urlsy+"/psnEduBackGround/update"
+        var url = "http://10.1.31.16:8080/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -618,7 +627,7 @@
         
         var that = this;
         console.log(JSON.stringify(that.newInputValue))
-        var url = MyAjax.urlsy+"/psnEduBackGround/insert";
+        var url = "http://10.1.31.16:8080/psnEduBackGround/insert";
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",

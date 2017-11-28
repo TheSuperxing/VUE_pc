@@ -17,32 +17,39 @@
         <li>
           <h5>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
           <p>{{baseInfo.nickName}}</p>
+          <p v-if="noBaseInfo">（暂无信息）</p>
 
         </li>
         <li>
           <h5>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p>{{baseInfo.psnName}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[0]}" v-on:click="openOrPrivacy(0)"></strong>
+          <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
         <li>
           <h5>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</h5>
           <p>{{baseInfo.sex}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[1]}" v-on:click="openOrPrivacy(1)"></strong>
+          <p v-if="noBaseInfo">（暂无信息）</p>
+          
         </li>
         <li>
           <h5>出生日期：</h5>
           <p>{{baseInfo.dateOfBirth}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[2]}" v-on:click="openOrPrivacy(2)"></strong>
+          <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
         <li>
           <h5>手机号码：</h5>
           <p>{{baseInfo.phoneNumber}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[3]}" v-on:click="openOrPrivacy(3)"></strong>
+          <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
         <li>
           <h5>联系邮箱：</h5>
           <p>{{baseInfo.psnMail}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[4]}" v-on:click="openOrPrivacy(4)"></strong>
+          <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
       </ul>
 
@@ -218,7 +225,10 @@
           nickName:0,
           psnName:0
         },
-        baseInfo:{},
+        noBaseInfo:false,
+        baseInfo:{
+        	
+        },
         localBaseInfo:{
           nickName:"",
           psnName:"",
@@ -264,7 +274,7 @@
 	            itemLimit: 5,
 	            sizeLimit: 1500000
 	        },
-	        autoUpload: false,
+	        autoUpload: true,
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,  fileName)  {
@@ -315,11 +325,29 @@
 					
 				},function(data){
 					console.log(data)
-					data = data.msg;
-					that.baseInfo = data;
+					if(data.code==0){
+						that.baseInfo = data.msg;
+					}else if(data.code == -1){
+						if(data.msg == "null"){
+			    		that.noBaseInfo = true;
+			    	}else{
+			    		that.noBaseInfo = false;
+			    	}
+			    	
+					}
+					
+					
+					
 				},function(err){
 					console.log(err)
 				})
+	    	//判断用户的全部信息为空值
+	    	if(that.baseInfo.sex=="2"){
+	    		that.baseInfo.sex = "男"
+	    	}else if(that.baseInfo.sex=="1"){
+	    		that.baseInfo.sex = "女"
+	    	}/*设置性别的初始勾选状态*/
+	    	
 	    	if(that.localBaseInfo.sex==null){
 			    Vue.set(that.reveal,'selectSex',true);
 			  }else if(that.localBaseInfo.sex.trim()=="女"){
@@ -327,7 +355,7 @@
 			  }else if(that.localBaseInfo.sex.trim()=="男"){
 			    Vue.set(that.reveal,'selectSex',true);
 			  }
-			  /*设置性别的初始勾选状态*/
+			  
 			  if(that.baseInfo.ifRNA){
 			    that.reveal.throughRealName=true;
 			  }
@@ -339,6 +367,7 @@
 			      return text;
 			    }
 			  }
+	    	
 	      that.baseInfo.nickName=emptyText(this.baseInfo.nickName);
 	      that.baseInfo.psnName=emptyText(this.baseInfo.psnName);
 	      that.baseInfo.sex=emptyText(this.baseInfo.sex);
@@ -468,6 +497,11 @@
 	    	this.localBaseInfo.ageVisable = this.reveal.openOrPrivacy[2];
 	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
+	    	if(this.localBaseInfo.sex=='男'){
+	    		this.localBaseInfo.sex = "2";
+	    	}else if(this.localBaseInfo.sex=='女'){
+	    		this.localBaseInfo.sex = "1";
+	    	}
 	    	var that = this;
 	    	var url = MyAjax.urlhw+"/personalbasicinfo/update";
 	    	$.ajaxSetup({ contentType : 'application/json' });

@@ -119,7 +119,7 @@
 				
 				//首页请求信息
 				var that = this;
-				var url = "http://10.1.31.7:8080/accountmanainfo/home";
+				var url = MyAjax.urlhw +"/accountmanainfo/home";
 				MyAjax.ajax({
 						type: "GET",
 						url:url,
@@ -130,7 +130,9 @@
 					},function(data){
 						console.log(data)
 						data = data.msg;
-						that.baseInfo = data;
+						if(data == "100004"){
+							router.push("/login")
+						}
 					},function(err){
 						console.log(err)
 					})

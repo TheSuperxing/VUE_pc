@@ -45,28 +45,7 @@
 						</li>
 					</ul>
 				</div>
-				<!--<div id="modal-overlay" class="imgShow">
-					<div class="modal-wrap">
-						<h5></h5>
-						<span class="modalChaBtn" @click="closeModal"></span>
-						<div class="main">
-							<div>
-								<ul class="pics">
-									<li v-for="(item,$index) in imgInfo">
-										<img :src="item.src" />
-									</li>
-								</ul>
-							</div>
-							
-						</div>
-						
-						<div class="imgNav">
-							<span class="left-bar"></span>
-							<span>{{imgIndex}}/{{imgSize}}</span>
-							<span class="right-bar"></span>
-						</div>
-					</div>
-				</div>-->
+				
 				
 			</li>
 			<li class="pro-companies">

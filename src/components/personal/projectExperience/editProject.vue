@@ -190,7 +190,7 @@
 	    },
 	   
 		mounted(){
-			
+			$(document.body).css("overflow-y","scroll");
 			var that = this;
 			that.projectID = that.$route.query.proId;
 			that.psnProExpeID = that.$route.query.psnId;
@@ -314,11 +314,6 @@
 				Modal.closeModal(modal)
 			},
 			saveEdit(){
-//				var str = JSON.stringify(this.project);
-//				var data = JSON.parse(str);
-//				this.companyProInfo[this.index-1] = data;/*将修改过得数据放在vuex里*/
-//				console.log(this.companyProInfo)
-////				router.push("/yhzx/company/info/companyProject/index")
 				var that = this;
 			    console.log(JSON.stringify(that.project))
 			    var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe";

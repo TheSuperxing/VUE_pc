@@ -15,6 +15,7 @@
 				<span class="table-wrap-left">* 项目地址</span>
 				<provinces-city v-on:accpt-province-change="changeProjectAds"></provinces-city>
 				
+				
 			</li>
 			<li class="status-wrap">
 				<span class="table-wrap-left">项目状态</span>
@@ -170,7 +171,7 @@
 	    },
 	    data:function(){
 	      return {
-	        title:"编辑公司参加项目信息",
+	        title:"自定义添加项目并编辑项目经历",
 	        state:"",
 	        time:{value:"2018-7"},
 	        editSeniorShow:false,
@@ -186,7 +187,7 @@
 	        complated:false,//项目状态在建或者是建成的标志，控制建成时间的可操作性
 	        projectInfo:{//新增的项目信息采集
 	        	projectName:"",//同步到项目主页的信息 (必填*)
-				projectPlaceObj:"",//项目地址
+				projectPlaceObj:{},//项目地址
 				projectState:"",//项目状态projectState
 				compalteTime:"",//同步到项目主页的信息 (必填*)
 				architectFunctions:[],//建筑功能种类projectType
@@ -280,7 +281,7 @@
 		    changeProjectAds(val){//通过事件同步子组件信息
 		        this.projectInfo.projectPlaceObj=val;
 		        console.log(this.projectInfo.projectPlaceObj)
-		     },
+		    },
 		    changeProjectStateColor(index){//添加模式下，标记项目状态选中
 			    for(var i=0 ; i<this.addNewProject.projectState.length ; i++){
 			      if(i==index){
@@ -364,7 +365,7 @@
 				}else{
 					this.showAlert.takeOffice = false;
 				};//判断项目职责不能为空
-				if(this.complated=false){
+				if(this.complated=false){//判断是否为在建，在建的话建成时间为必填
 					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.compalteTime.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
 					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0&&this.projectInfo.projectPlaceObj.street.trim().length!=0){
 						var that = this;
@@ -427,6 +428,7 @@
 			}
 	    },
 	    updated(){
+	    	
 	    	var num1 = this.projectInfo.takeOffice.length;//公司职责
 	    	this.dutycont = num1;//公司职责限制字数
 	    	var num2 = this.projectInfo.detailDes.length;//职责详细描述
@@ -542,6 +544,7 @@ $activeColor: rgb(242,117,25);
 					}
 				}
 				&.place-wrap{
+					width: 880px;
 					color: $activeColor;
 					.table-wrap-left{
 						height: 35px;
@@ -563,6 +566,14 @@ $activeColor: rgb(242,117,25);
 						display: inline-block;
 						color: rgb(53,53,53);
 					}
+					.provincesCity{
+						position: relative;
+						.alet_container{
+							position: absolute !important;
+							right: -20px;
+						}
+					}
+					
 					
 				}
 				&.status-wrap{

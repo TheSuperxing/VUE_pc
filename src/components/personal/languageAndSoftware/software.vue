@@ -271,7 +271,7 @@
 	        element: document.getElementById('fine-template-manual-trigger-software'),
 	        template: 'qq-template-manual-trigger-software',
 	        request: {
-	            endpoint: 'http://10.1.31.6:8080/psnsoftware/batchUpload'
+	            endpoint: 'http://10.1.31.7:8080/psnsoftware/batchUpload'
 	        },
 	        thumbnails: {
 	//	                placeholders: {
@@ -288,12 +288,12 @@
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,fileName)  {
-	        		$("#fine-template-manual-trigger-software div .qq-uploader-selector .buttons .btn-primary-software").show()
+	        		$("#fine-template-manual-trigger-software .qq-uploader-selector .buttons .btn-primary-software").show()
             },
             onCancel: function(){
-							var imgList=$("#fine-template-manual-trigger-software div .qq-uploader-selector .qq-upload-list-selector .list")
+							var imgList=$("#fine-template-manual-trigger-software .qq-uploader-selector .qq-upload-list-selector .list")
 							if(imgList.length<=1){
-								$("#fine-template-manual-trigger-software div .qq-uploader-selector .buttons .btn-primary-software").hide()
+								$("#fine-template-manual-trigger-software .qq-uploader-selector .buttons .btn-primary-software").hide()
 							}
 						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
@@ -309,13 +309,13 @@
 //	                $('.stateOne').hide();
 //	                $('.stateTwo').show()
                 
-                $("#fine-template-manual-trigger-software div .qq-uploader-selector .buttons .btn-primary-software").hide()
+                $("#fine-template-manual-trigger-software .qq-uploader-selector .buttons .btn-primary-software").hide()
                 console.log(maybeXhr)
           	},
 	    	}
 	    });
 			qq(document.getElementById("trigger-upload-software")).attach("click", function() {
-	        manualUploader.uploadStoredFiles();
+	      manualUploader.uploadStoredFiles();
 	    });
 	    
 //    if(this.software.length!=0){
@@ -423,7 +423,7 @@
             element: document.getElementById(this.fineUploaderId[index]),
             template: this.qqTemplate[index],
             request: {
-              endpoint: '/server/uploads'
+              endpoint: 'http://10.1.31.7:8080/psnsoftware/batchUpload'
             },
             thumbnails: {
             },
@@ -436,12 +436,12 @@
             debug: true,
             callbacks:{
               onSubmit:  function(id,fileName){
-                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software").show()
+                $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software").show()
               },
               onCancel: function(){
-                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                var imgList=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .qq-upload-list-selector .list")
                 if(imgList.length<=1){
-                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software").hide()
+                  $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software").hide()
                 }
               },
               onComplete: function (id, fileName, responseJSON, maybeXhr) {
@@ -450,7 +450,7 @@
             }
           });
         }
-        var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software");
+        var btnPrimary=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software");
         qq(btnPrimary[0]).attach("click", function() {
           eval('manualUploader_software_'+index).uploadStoredFiles();
           btnPrimary.hide()

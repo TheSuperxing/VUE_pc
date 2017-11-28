@@ -190,7 +190,7 @@
 	    },
 	   
 		mounted(){
-			
+			$(document.body).css("overflow-y","scroll");
 			var that = this;
 			that.projectID = that.$route.query.proId;
 			that.psnProExpeID = that.$route.query.psnId;
@@ -203,7 +203,7 @@
 				that.projectID = '""';
 			}
 			console.log(that.projectID,that.psnProExpeID)
-			var url = MyAjax.urlhw+"/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
+			var url = MyAjax.urlsy+"/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
 	    	MyAjax.ajax({
 				type: "GET",
 				url:url,
@@ -315,14 +315,9 @@
 				Modal.closeModal(modal)
 			},
 			saveEdit(){
-//				var str = JSON.stringify(this.project);
-//				var data = JSON.parse(str);
-//				this.companyProInfo[this.index-1] = data;/*将修改过得数据放在vuex里*/
-//				console.log(this.companyProInfo)
-////				router.push("/yhzx/company/info/companyProject/index")
 				var that = this;
 			    console.log(JSON.stringify(that.project))
-			    var url = MyAjax.urlhw+"/psnProjExpe/insertOrUpdateProjExpe";
+			    var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe";
 			    $.ajaxSetup({ contentType : 'application/json' });
 			    MyAjax.ajax({
 					type: "POST",

@@ -397,30 +397,9 @@
 
     	var that = this;
     	//获取当前页数据
-//  	var url = "";
-//  	MyAjax.ajax({
-//				type: "GET",
-//				url:url,
-//				data: {tel:that.personalRegInput.tel, messageConfirm:that.personalRegInput.picConfirm},
-//				dataType: "json",
-//				content-type: "text/plain;charset=UTF-8",
-//				
-//			}, function(data){
-//				console.log(data)
-////					data = data.replace("callback(","").slice(0,-1);
-////				data = data.slice(0,-1);
-////					data = JSON.parse(data);
-//				console.log(data)
-////					that.dataInfo = data
-////					console.log(that.dataInfo)
-//			},function(err){
-//				console.log(err)
-//			})
-    	//上传头像
-//  	console.log(cropbox)
+//
 
     
-//  	console.log(that.personal.personalPicture)
     	var options =
 			{
 				thumbBox: '.thumbBox',
@@ -457,7 +436,7 @@
 				var fd = new FormData();
 				fd.append('file',Blob);
 				console.log(fd)
-				var url = urlsy+"/personalbasicinfo/uploadBase64";
+				var url = MyAjax.urlhw+"/personalbasicinfo/uploadBase64";
 //	    	$.ajax({
 //					type: "POST",
 //					url:url,
@@ -491,7 +470,7 @@
     },
     destroyed(){
     	var that = this;
-    	var url = urlsy+"/personalbasicinfo/uploadBase64";
+    	var url = MyAjax.urlhw+"/personalbasicinfo/uploadBase64";
 //  	var url = "http://10.1.31.6:8080/psnsoftware/upload";
     	
     	$.ajax({

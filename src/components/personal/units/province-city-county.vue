@@ -14,12 +14,15 @@
       <option value="0" v-for="item in province.countyData" v-bind:value="item.name">{{item.name}}</option>
     </select>
     <p>区</p>
-    <p class="street"><input type="text" placeholder="" v-model="accptProvince.street" v-bind:value='accptProvince.street'/>路</p>
+    <p class="street"><input type="text" placeholder="" v-model="accptProvince.street" v-bind:value='accptProvince.street' @blur="streetMust"/>路</p>
+  	<alertTip v-if="showAlert.street" :showHide="showAlert.street" :alertText="alertText.street"></alertTip>
   </div>
 </template>
 <script>
   import Vue from "vue"
   import {mapState} from "vuex"
+	import alertTip from "./alertTip.vue"
+  
   var provinceArr=[
       {
         "code": "110000",
@@ -14837,9 +14840,16 @@
           province:provinceArr[0].name,//初始化，省份、城市、市区
           city:provinceArr[0].children[0].name,
           county:provinceArr[0].children[0].children[0].name,
-        }
+          street:"",
+        },
+        showAlert:{street:false,},
+        alertText:{street:null,}
+        
       }
     },
+    components:{
+	    alertTip
+	  },
     watch:{
       /*accptProvince:function (val) {
         this.$emit("accpt-province-change",val);
@@ -14885,6 +14895,15 @@
         }
 
       },
+      streetMust(){
+      	if(this.accptProvince.street.trim().length==0){
+      		this.showAlert.street = true;
+      		this.alertText.street = "请填写路名";
+      	}else{
+      		this.showAlert.street = false;
+      		
+      	}
+      }
     }
   }
 </script>

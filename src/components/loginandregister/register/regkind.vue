@@ -83,7 +83,7 @@
 </template>
 
 <script>
-	import Router from "../../../router"
+	import router from "../../../router"
 	import Vue from "vue";
 	import alertTip from '../alertTip'
 	import MyAjax from "../../../assets/js/MyAjax.js"
@@ -216,6 +216,10 @@
 								case "100006":
 									that.showAlert = true;
 									that.alertText = "短信验证码错误";
+									break;
+								case "100007":
+									that.showAlert = true;
+									that.alertText = "该手机号已注册";
 									break;
 								default:
 									break;

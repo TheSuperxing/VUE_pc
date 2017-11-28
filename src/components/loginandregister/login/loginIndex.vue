@@ -50,7 +50,10 @@
     },
     mounted(){
     	console.log(sessionStorage.getItem("state"))
-    	this.loginTog(sessionStorage.getItem("state"))
+    	if(sessionStorage.getItem("state")==null){
+    		sessionStorage.setItem("state",0)
+    	}
+    	this.loginTog(sessionStorage.getItem("state"))//自调用点击切换事件 刷新之后还在当前登录类别
     	
       var modeal= new ModalOpp("#modal-overlay");
       modeal.makeText();

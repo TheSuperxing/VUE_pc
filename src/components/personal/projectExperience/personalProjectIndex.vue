@@ -49,6 +49,7 @@
   	</div>
   	<!--搜索项目模态框-->
     <h3 class="c-title"><span>{{title}}</span></h3>
+    <div class="stateNull" v-if="stateNone">暂无项目经历信息</div>
     <div class="projectTable" v-for="(item,$index) in proInfo">
     	<router-link :to="{name:'ProjectDetail',query:{id:item.id}}" class="tableTitle" >{{item.projectName}}</router-link>
     	<div class="toolsBox">
@@ -111,7 +112,7 @@
     data:function(){
       return {
         title:"个人项目信息",
-//      updown:"view-down",
+        stateNone:false,
         updowntxt:[],
         show:{
         	tag:[],
@@ -132,6 +133,13 @@
 //  }),
     mounted(){
     	this.updateData();
+    },
+    updated(){
+    	if(this.proInfo.length==0){
+    		this.stateNone = true;
+    	}else{
+    		this.stateNone = false;
+    	}
     },
     methods:{
     	updateData(){
@@ -158,6 +166,9 @@
 			      return text;
 			    }
 			  }
+	    	
+	    	//判断有无项目经历信息
+	    	
 			that.localProInfo=JSON.parse(JSON.stringify(that.proInfo));
 			that.show.tag = [];
 			that.updowntxt = [];
@@ -537,6 +548,13 @@ $activeColor: rgb(242,117,25);
 	    	background: url(../../../assets/img/personal/education/add.png) no-repeat left center;
 	    	
 	    }
+		}
+		.stateNull{
+			height: 50px;
+			line-height: 50px;
+			font-size: 18px;
+			color: #7C7C7C;
+			text-align: center;
 		}
 		.projectTable{
 			padding: 30px 20px;

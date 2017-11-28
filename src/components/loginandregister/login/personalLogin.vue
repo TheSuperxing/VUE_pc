@@ -2,7 +2,7 @@
   <div class="personalLogin">
     <ul class="loginInput">
       <li>
-        <input v-model="personalLoginInput.tel" type="tel" placeholder="手机号" @blur="personTelCfm">
+        <input v-model="personalLoginInput.tel" type="text" placeholder="手机号" @blur="personTelCfm">
       </li>
       <li>
         <input v-model="personalLoginInput.picConfirm" @blur="picConfirm" type="text" placeholder="图形验证码">
@@ -11,7 +11,7 @@
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
       <li>
-        <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" maxlength="8"/>
+        <input v-model="personalLoginInput.messageConfirm" type="password" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus />
         <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
       </li>
     </ul>
@@ -69,8 +69,6 @@
         Vue.set(this.makeRandom,"num",parseInt(Math.random()*10000))
       }while (this.makeRandom.num<1000);
 
-      sessionStorage.setItem("account","15612345678")
-      
       Vue.set(this.user,'userState',2)
       sessionStorage.setItem("state",this.user.userState)
       
@@ -114,7 +112,6 @@
 	    	this.picSrc = "http://10.1.31.7:8080/captcha.jpg"
 	    	$(".picConfirm").attr("src",this.picSrc)
 	    },
-	    
       picConfirm(){
       	//图片验证不能为空
       	if(this.personalLoginInput.picConfirm.trim().length==0){
@@ -125,11 +122,30 @@
       	}
         
       },
+      msgConfirm(){
+      	if(this.personalLoginInput.messageConfirm.trim().length==0){
+      		this.showAlert = true;
+      		this.alertText  = "短信验证码不能为空";
+      	}else{
+      		this.showAlert = false;
+      	}
+      },
       getMessageConfirm(){
         Vue.set(this.reveal,"buttonDisabled",true)
         Vue.set(this.messageConfirm,"confirmText","60s");
         //Vue.set(this.messageConfirm,"confirmText",);
         var self =this;
+        var url = MyAjax.urlhw + "/accountmanainfo/mobileCode/" + self.personalLoginInput.tel;
+        MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
         var timer=setInterval(
           function () {
             if(parseInt(self.messageConfirm.confirmText)>1){
@@ -141,6 +157,7 @@
             }
 
           },1000);
+        
       },
       personalLogin(){
       	
@@ -161,14 +178,18 @@
 							router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
-								case "100001":
+								case "100008":
 									console.log(222)
 									that.showAlert = true;
-									that.alertText = "手机号或者短信验证码错误";
+									that.alertText = "手机号未注册";
 									break;
 								case "100005":
 									that.showAlert = true;
 									that.alertText = "图片验证码不一致";
+									break;
+								case "100006":
+									that.showAlert = true;
+									that.alertText = "短信验证码错误";
 									break;
 								default:
 									break;

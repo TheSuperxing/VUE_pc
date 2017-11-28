@@ -245,7 +245,7 @@
       this.updateData();
     },
     mounted(){
-    	
+    	console.log(this.baseInfo)
       //上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),

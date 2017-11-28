@@ -14,7 +14,7 @@
 			<input type="text" placeholder="请再次输入密码" v-model="comRegInput.passWordCfm" @blur="samePwd"/>
 		</li>
 		<alertTip v-if="comRegInput.showAlert" :showHide="comRegInput.showAlert" @closeTip="closeTip" :alertText="comRegInput.alertText"></alertTip>
-		<div class="regBtn" @click="goRegisterDone">
+		<div class="regBtn" @click="goRegisterDoneCom">
 			注册
 		</div>
 		<p class="notice">
@@ -38,7 +38,7 @@
 			<input type="text" placeholder="请确认密码" v-model="teamRegInput.passWordCfm" @blur="samePwd"/>
 		</li>
 		<alertTip v-if="teamRegInput.showAlert" :showHide="teamRegInput.showAlert" @closeTip="closeTip" :alertText="teamRegInput.alertText"></alertTip>
-		<div class="regBtn" @click="goRegisterDone">
+		<div class="regBtn" @click="goRegisterDoneTeam">
 			注册
 		</div>
 		<p class="notice">
@@ -53,24 +53,22 @@
 			<input type="text"  placeholder="请输入手机号" v-model="personalRegInput.tel" @blur="personTelCfm"/>
 		</li>
 		<li>
-			<!--<input type="text" placeholder="请输入图形验证码"/>
-			<span class="picConfirm"></span>-->
+			
 			<input v-model="personalRegInput.picConfirm" @blur="picConfirm" type="text" placeholder="图形验证码">
-		    <p v-cloak @click="random">{{makeRandom.num}}</p>
+		    <!--<p v-cloak @click="random">{{makeRandom.num}}</p>-->
+		    <img class="picConfirm" :src="picSrc" alt="" @click="changePic"/>
 		    <span v-if="reveal.error">图片验证码错误</span>
 		</li>
 		<li>
-			<input type="text" placeholder="请确认短信验证码"/>
+			<input type="text" placeholder="请确认短信验证码" v-model="personalRegInput.messageConfirm" @blur="personalMsgCfm"/>
 			<button @click="settime" class="msgConfirm" :disabled="!show">
 			     <span v-if="show">获取验证码</span>
 			     <span v-if="!show" class="count">{{count}} s</span>
 			 </button>
 		</li>
 		<alertTip v-if="personalRegInput.showAlert" :showHide="personalRegInput.showAlert" @closeTip="closeTip" :alertText="personalRegInput.alertText"></alertTip>
-		<div class="regBtn" @click="goRegisterDone">
-			<!--<router-link to='/index' class="regBtn">-->
-				注册
-			<!--</router-link>-->
+		<div class="regBtn" @click="goRegisterDonePer">
+			注册
 		</div>
 		<p class="notice">
 			<span v-bind:class="{'selected':agree[2]}" @click="agreeDeal" class="agreeBtn"></span>
@@ -89,6 +87,8 @@
 	import Vue from "vue";
 	import alertTip from '../alertTip'
 	import MyAjax from "../../../assets/js/MyAjax.js"
+    import {cookieTool} from "../../../assets/js/cookieTool.js"
+	
 	
 	export default{
 		name:"Regkind",
@@ -99,6 +99,7 @@
 				timer:null,
 				show:true,
 				agree:[false,false,false],/*同意协议与否*/
+				picSrc:"",
 				comRegInput:{
 					name:"",
 					email:null,
@@ -148,7 +149,7 @@
         },
 		mounted(){
 			
-			
+			this.changePic();//图形验证码
 			var id = this.$route.params.id
 //			console.log(id)
 			this.state = id;
@@ -175,63 +176,57 @@
                 }, 1000)
               }
 			},
-			goRegisterDone(){
+			changePic(){
+		    	console.log(777)
+		    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
+		    	$(".picConfirm").attr("src",this.picSrc)
+		    },
+		    goRegisterDoneCom(){
+		    	
+		    },
+		    goRegisterDoneTeam(){
+		    	
+		    },
+			goRegisterDonePer(){
 				var that = this;
-//				var data = JSON.parse({tel:that.personalRegInput.tel,picConfirm:that.personalRegInput.picConfirm})
-//				console.log(data)
-				var url = "http://10.1.31.6:8080/accountmanainfo/register";	
-//				console.log(that.personalRegInput)
-				
-				$.ajax({
-			        type: "POST",
-			        url: url,
-			        data: {tel:that.personalRegInput.tel,messageConfirm:that.personalRegInput.picConfirm},
-			        dataType: "json",
-//			        contentType: "application/json; charset=utf-8",
-					async: true, //使用同步方式
-			        success: function(data){
-						console.log(data);
-			        },error:function(error){
-			         	console.log(error+"error")
-			         	
-			        }
-			    });
-//				console.log({tel:that.personalRegInput.tel,messageConfirm:that.personalRegInput.picConfirm})
-//			    $.post(url, {tel:that.personalRegInput.tel,messageConfirm:that.personalRegInput.picConfirm},
-//			   	function(data){
-//			     	alert("Data Loaded: " + data);
-//			   	});
-//			    
-//				Router.push({name:"RegisterDone",params:{id:this.state}})
-//				MyAjax.ajax({
-//					type: "POST",
-//					url:url,
-//					data: {tel:that.personalRegInput.tel, messageConfirm:that.personalRegInput.picConfirm},
-//					dataType: "jsonp",
-//					content-type: "text/plain;charset=UTF-8",
-//					
-//				}, function(data){
-//					console.log(data)
-////					data = data.replace("callback(","").slice(0,-1);
-//	//				data = data.slice(0,-1);
-////					data = JSON.parse(data);
-//					console.log(data)
-////					that.dataInfo = data
-////					console.log(that.dataInfo)
-//				},function(err){
-//					console.log(err)
-//				})
-//				MyAjax.fetch(url, function(data){
-//					
-//					console.log(data)
-////					data = data.replace("callback(","");
-//	//				Vue.set(this,"dataInfo",data);
-//	//				console.log(this.dataInfo);
-////					console.log(data)
-//				},function(err){
-//					console.log(err)
-//				})
+				var url = MyAjax.urlhw+"/accountmanainfo/register";
+				if(that.personalRegInput.tel.trim().length!=0&&that.personalRegInput.picConfirm.trim().length!=0&&that.personalRegInput.messageConfirm.trim().length!=0){
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: {tel:that.personalRegInput.tel,pwd:that.personalRegInput.messageConfirm,verifyCode:that.personalRegInput.picConfirm},
+						dataType: "json",
+					}, function(data){
+						console.log(data)
+						console.log(data.token)
+						cookieTool.setCookie("token",data.token)
+						if(data.code==0){
+							router.push("/login")
+						}else if(data.code==-1){
+							switch (data.msg){
+								case "100002":
+									console.log(222)
+									that.showAlert = true;
+									that.alertText = "注册失败";
+									break;
+								case "100005":
+									that.showAlert = true;
+									that.alertText = "图片验证码不一致";
+									break;
+								case "100006":
+									that.showAlert = true;
+									that.alertText = "短信验证码错误";
+									break;
+								default:
+									break;
+							}
+						}
+					},function(err){
+						console.log(err)
+					})
+				}
 			},
+			
 			agreeDeal(){
 				for(var i=0;i<this.agree.length;i++){
 					if(this.agree[i]!= true){
@@ -255,10 +250,11 @@
 			    }
 			},
 			picConfirm(){
-		        if(this.personalRegInput.picConfirm!=this.makeRandom.num){
-		          Vue.set(this.reveal,"error",true)
-		        }else {
-		          Vue.set(this.reveal,"error",false)
+		        if(this.personalRegInput.picConfirm.trim().length==0){
+		            this.personalRegInput.showAlert = true;
+		    		this.personalRegInput.alertText = '请输入图形验证码';
+		    	}else{
+		    		this.personalRegInput.showAlert = false;
 		        };
 		        
 		       
@@ -330,9 +326,17 @@
 		    },
 		    personTelCfm(){/*验证个人登录的手机号*/
 		    	if(!/^1[34578]\d{9}$/gi.test(this.personalRegInput.tel)){
-		    		console.log(11)
 		    		this.personalRegInput.showAlert = true;
 		    		this.personalRegInput.alertText = '您输入的手机号码格式不正确';
+		    	}else{
+		    		this.personalRegInput.showAlert = false;
+		    	}
+		    },
+		    personalMsgCfm(){
+		    	console.log(99)
+		    	if(this.personalRegInput.messageConfirm.trim().length==0){
+		    		this.personalRegInput.showAlert = true;
+		    		this.personalRegInput.alertText = '请输入短信验证码验证码';
 		    	}else{
 		    		this.personalRegInput.showAlert = false;
 		    	}
@@ -515,6 +519,11 @@
 						color:rgb(242,117,25);
 					}
 				}
+				
+			}
+			.alet_container{
+				bottom: 120px;
+				left: 50px;
 			}
 			.regBtn{
 				display: block;

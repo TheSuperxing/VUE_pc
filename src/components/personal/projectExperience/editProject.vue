@@ -202,8 +202,7 @@
 			if(that.projectID == undefined){
 				that.projectID = '""';
 			}
-			console.log(that.projectID,that.psnProExpeID)
-			var url = MyAjax.urlhw+"/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
+			var url = MyAjax.urlsy+"/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
 	    	MyAjax.ajax({
 				type: "GET",
 				url:url,
@@ -322,7 +321,7 @@
 ////				router.push("/yhzx/company/info/companyProject/index")
 				var that = this;
 			    console.log(JSON.stringify(that.project))
-			    var url = MyAjax.urlhw+"/psnProjExpe/insertOrUpdateProjExpe";
+			    var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe";
 			    $.ajaxSetup({ contentType : 'application/json' });
 			    MyAjax.ajax({
 					type: "POST",

@@ -72,9 +72,9 @@
 				<span class="table-wrap-left">图片展示</span>
 				<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
-			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
+			            <!-- <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
 			                <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
-			            </div>-->
+			            </div> -->
 			            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
@@ -97,7 +97,6 @@
 			            </ul>
 			            <div class="buttons">
 			                <div class="qq-upload-button-selector qq-upload-button">
-			                	
 			                    <span>请上传图片</span>
 			                </div>
 			                <button type="button"  class="btn btn-primary"  id="trigger-upload">
@@ -196,11 +195,20 @@
 				partakeTimeDown:"",// (必填*)
 				takeOffice:"",//公司职责(必填*)
 				detailDes:"",//职责详细描述
-			    "ifVisable": 1,
+				"ifVisable": 1,
+				picId:[],//上传图片返回的ID
 	        }
 	      }
 	    },
 	    mounted(){
+			//载入页面的时候就把项目地址的onchange事件调用一次  完成赋值
+	    	this.projectInfo.projectPlaceObj = {
+				city:"北京市",
+				county:"东城区",
+				province:"北京市",
+				street:"",
+	    	}
+			var that=this;
 	    	$(document.body).css("overflow","scroll");
 	    	for(var i=0;i<this.addNewProject.projectState.length;i++){
 	    		this.projectStateColor.push(false)
@@ -214,8 +222,9 @@
 	            element: document.getElementById('fine-uploader-manual-trigger'),
 	            template: 'qq-template-manual-trigger',
 	            request: {
-	                endpoint: '/server/uploads'
-	            },
+	                endpoint:MyAjax.urlsy+'/psnProjExpe/batchUpload'
+				},
+				multiple: true,
 	            thumbnails: {
 	                placeholders: {
 //	                    waitingPath: '/source/placeholders/waiting-generic.png',
@@ -223,33 +232,48 @@
 	                }
 	            },
 	            validation: {
-	                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png']
+					allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+					sizeLimit: 1024* 1024* 1024 * 1024 * 1024 
 	            },
-	            autoUpload: false,
+				autoUpload: false,
+				chunking: {
+					enabled: true
+				},
+				resume: {
+					enabled: true
+				},
 	            debug: true,
 	            callbacks:{
 		        	onSubmit:  function(id,  fileName)  {
 		        		$('#trigger-upload').show()
-		        	},
+					},
+					onProgress:function(id,fileName,loaded,total){
+						//console.log(loaded)
+					},
 		        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 		                //alert('This is onComplete function.');
 										//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-		                $('#message').append(responseJSON.msg);
+		                //$('#message').append(responseJSON.msg);
 	//	                $('#progress').hide();//隐藏进度动画
 		                //清除已上传队列
-		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
+		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
 		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
 		                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
 		                
-		                $('#trigger-upload').hide()
-		                console.log(maybeXhr)
+						$('#trigger-upload').hide()
+						that.projectInfo.picId.push(responseJSON.msg)
+						//console.log(that.projectInfo.picId)
 		          	},
 	        	}
 	        });
 			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	            manualUploader.uploadStoredFiles();
+				// fielduploader.setParams({             //fielduploader对象--携带---form表单的参数  
+				// 	anotherParam: '123321',  
+				// 	abcdef:$("#。。。").val()  
+				// });  
+				manualUploader.uploadStoredFiles();
 	        });
 		},
 		methods: {
@@ -342,7 +366,7 @@
 				};//判断项目职责不能为空
 				if(this.complated=false){
 					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.compalteTime.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
-					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0){
+					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0&&this.projectInfo.projectPlaceObj.street.trim().length!=0){
 						var that = this;
 					    console.log(JSON.stringify(that.projectInfo))
 					    var url = MyAjax.urlsy+"/psnProjExpe/insertProjAndProjExpe";
@@ -366,7 +390,7 @@
 					}
 				}else{
 					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
-					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0){
+					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0&&this.projectInfo.projectPlaceObj.street.trim().length!=0){
 						var that = this;
 					    console.log(JSON.stringify(that.projectInfo))
 					    var url = MyAjax.urlsy+"/psnProjExpe/insertProjAndProjExpe";
@@ -389,7 +413,7 @@
 						
 					}
 				}
-				
+				console.log(this.projectInfo.picId)
 			},
 			closeTip(){  /*关闭提示框*/
                 this.showAlert.name= false;

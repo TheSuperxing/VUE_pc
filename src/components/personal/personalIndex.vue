@@ -1,5 +1,6 @@
 <template>
   <div class="personalIndex">
+    <div class="psnCont">
     <div class="picture">
     	<div class="basicInfoImg">
     		<img v-bind:src="personal.personalPicture" alt="">
@@ -214,6 +215,7 @@
       </li>
 
     </ul>
+    </div>
   </div>
 </template>
 
@@ -263,15 +265,104 @@
 				dataType: "json",
 				
 			},function(data){
-        if(data.code==0){
-          that.psnMsg=data.msg;
-        }else{
-          console.log("错误返回");
-        }
+        that.psnMsg=data.msg;
 				
 			},function(err){
 				console.log(err)
       })
+      
+    },
+    mounted(){
+
+    	var that = this;
+    	//获取当前页数据
+//  	var url = "";
+//  	MyAjax.ajax({
+//				type: "GET",
+//				url:url,
+//				data: {tel:that.personalRegInput.tel, messageConfirm:that.personalRegInput.picConfirm},
+//				dataType: "json",
+//				content-type: "text/plain;charset=UTF-8",
+//				
+//			}, function(data){
+//				console.log(data)
+////					data = data.replace("callback(","").slice(0,-1);
+////				data = data.slice(0,-1);
+////					data = JSON.parse(data);
+//				console.log(data)
+////					that.dataInfo = data
+////					console.log(that.dataInfo)
+//			},function(err){
+//				console.log(err)
+//			})
+    	//上传头像
+//  	console.log(cropbox)
+
+    
+//  	console.log(that.personal.personalPicture)
+    	var options =
+			{
+				thumbBox: '.thumbBox',
+				spinner: '.spinner',
+				imgSrc: that.personal.personalPicture
+			}
+			var cropper = $('.imageBox').cropbox(options);
+			$('#upload-file').on('change', function(){
+				var reader = new FileReader();
+				reader.onload = function(e){
+				options.imgSrc = e.target.result;
+				cropper = $('.imageBox').cropbox(options);
+//					console.log(e.target.result)
+				}
+				var files=document.getElementById("upload-file").files[0];
+				reader.readAsDataURL(files);
+				console.log(files.name)
+				that.fileName = files.name;
+				
+			})
+			$('#btnCrop').on('click', function(){
+				var img = cropper.getDataURL();
+//				console.log(img)
+//				console.log(cropper.image)
+				that.personal.personalPicture = img;
+//				console.log(that.personal.personalPicture)
+
+				$('.cropped').html('');
+				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
+				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
+				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+				
+				var Blob = cropper.getBlob();
+				var fd = new FormData();
+				fd.append('file',Blob);
+				console.log(fd)
+				var url = urlsy+"/personalbasicinfo/uploadBase64";
+//	    	$.ajax({
+//					type: "POST",
+//					url:url,
+//					data:{base64Data:that.personal.personalPicture,fileName:that.fileName},
+//					dataType: "json",
+//	//				content-type: "text/plain;charset=UTF-8",
+//					success: function(data){
+//	        	data = JSON.stringify(data)
+//	            console.log(data +"suceed")
+//	        },error:function(error){
+//	         	console.log(error+"error")
+//	        }
+//				})
+				Modal.closeModal($('.corpbox'))
+				
+				
+			})
+			$('#btnZoomIn').on('click', function(){
+				cropper.zoomIn();
+			})
+			$('#btnZoomOut').on('click', function(){
+				cropper.zoomOut();
+				
+			})
+      //上传头像end
+      
       // 服务器获取首页所需的数据
       function emptyText(text) {
         if(text==null||text.length==0){
@@ -393,97 +484,6 @@
       }
       //语言软件是否显示
     },
-    mounted(){
-
-    	var that = this;
-    	//获取当前页数据
-//  	var url = "";
-//  	MyAjax.ajax({
-//				type: "GET",
-//				url:url,
-//				data: {tel:that.personalRegInput.tel, messageConfirm:that.personalRegInput.picConfirm},
-//				dataType: "json",
-//				content-type: "text/plain;charset=UTF-8",
-//				
-//			}, function(data){
-//				console.log(data)
-////					data = data.replace("callback(","").slice(0,-1);
-////				data = data.slice(0,-1);
-////					data = JSON.parse(data);
-//				console.log(data)
-////					that.dataInfo = data
-////					console.log(that.dataInfo)
-//			},function(err){
-//				console.log(err)
-//			})
-    	//上传头像
-//  	console.log(cropbox)
-
-    
-//  	console.log(that.personal.personalPicture)
-    	var options =
-			{
-				thumbBox: '.thumbBox',
-				spinner: '.spinner',
-				imgSrc: that.personal.personalPicture
-			}
-			var cropper = $('.imageBox').cropbox(options);
-			$('#upload-file').on('change', function(){
-				var reader = new FileReader();
-				reader.onload = function(e){
-				options.imgSrc = e.target.result;
-				cropper = $('.imageBox').cropbox(options);
-//					console.log(e.target.result)
-				}
-				var files=document.getElementById("upload-file").files[0];
-				reader.readAsDataURL(files);
-				console.log(files.name)
-				that.fileName = files.name;
-				
-			})
-			$('#btnCrop').on('click', function(){
-				var img = cropper.getDataURL();
-//				console.log(img)
-//				console.log(cropper.image)
-				that.personal.personalPicture = img;
-//				console.log(that.personal.personalPicture)
-
-				$('.cropped').html('');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
-				
-				var Blob = cropper.getBlob();
-				var fd = new FormData();
-				fd.append('file',Blob);
-				console.log(fd)
-				var url = urlsy+"/personalbasicinfo/uploadBase64";
-//	    	$.ajax({
-//					type: "POST",
-//					url:url,
-//					data:{base64Data:that.personal.personalPicture,fileName:that.fileName},
-//					dataType: "json",
-//	//				content-type: "text/plain;charset=UTF-8",
-//					success: function(data){
-//	        	data = JSON.stringify(data)
-//	            console.log(data +"suceed")
-//	        },error:function(error){
-//	         	console.log(error+"error")
-//	        }
-//				})
-				Modal.closeModal($('.corpbox'))
-				
-				
-			})
-			$('#btnZoomIn').on('click', function(){
-				cropper.zoomIn();
-			})
-			$('#btnZoomOut').on('click', function(){
-				cropper.zoomOut();
-				
-			})
-    	//上传头像end
-    },
     methods:{
     	croperShow(){
     		Modal.makeText($('.corpbox'))
@@ -491,7 +491,7 @@
     },
     destroyed(){
     	var that = this;
-    	var url = urlsy+"/personalbasicinfo/uploadBase64";
+    	var url = MyAjax.urlsy+"/personalbasicinfo/uploadBase64";
 //  	var url = "http://10.1.31.6:8080/psnsoftware/upload";
     	
     	$.ajax({
@@ -525,6 +525,7 @@
     background-color: $bfColor;
     float: left;
     border-radius: 5px;
+    min-height:500px;
     .pi-title{
       padding:25px 0 11px 0;
       font-size: 18px;

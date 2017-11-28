@@ -50,7 +50,7 @@
   .personalSlider{
     width:240px;
     background:$bfColor;
-    float:left;
+    float:right;
     margin-left:20px;
     border-radius:5px;
 

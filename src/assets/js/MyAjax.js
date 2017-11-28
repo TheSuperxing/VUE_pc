@@ -16,7 +16,7 @@ var MyAjax = {
 			data: option.data,
 			dataType: option.dataType,
 			contentType: option.contentType, 
-			xhrFieldes:{withCredentials:true},
+			xhrFields: {withCredentials: true},
 			async: false, // 使用同步方式  
 			success: function(data) {		
 				callback(data);

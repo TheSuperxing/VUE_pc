@@ -420,8 +420,8 @@
         var that = this
 	      if(window['manualUploader_software_'+index]==undefined){
           window['manualUploader_software_'+index]= new qq.FineUploader({
-            element: document.getElementById(this.fineUploaderId[index]),
-            template: this.qqTemplate[index],
+            element: document.getElementById(that.fineUploaderId[index]),
+            template: that.qqTemplate[index],
             request: {
               endpoint: '/server/uploads'
             },
@@ -436,12 +436,12 @@
             debug: true,
             callbacks:{
               onSubmit:  function(id,fileName){
-                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software").show()
+                $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software").show()
               },
               onCancel: function(){
-                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                var imgList=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .qq-upload-list-selector .list")
                 if(imgList.length<=1){
-                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software").hide()
+                  $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software").hide()
                 }
               },
               onComplete: function (id, fileName, responseJSON, maybeXhr) {
@@ -450,7 +450,7 @@
             }
           });
         }
-        var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-software");
+        var btnPrimary=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software");
         qq(btnPrimary[0]).attach("click", function() {
           eval('manualUploader_software_'+index).uploadStoredFiles();
           btnPrimary.hide()

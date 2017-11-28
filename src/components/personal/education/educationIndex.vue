@@ -458,8 +458,6 @@
         if(this.localEdu[index].schoolName.length!=0){
           Vue.set(this.buttonColor.exist,[index],false)
         }
-        /***************************/
-        //var arr=[];
         var that = this;
 
         //上传图片
@@ -496,7 +494,7 @@
             }
           });
         }
-        
+
           var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary");
           qq(btnPrimary[0]).attach("click", function() {
             eval('manualUploader'+index).uploadStoredFiles();

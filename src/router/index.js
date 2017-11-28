@@ -11,7 +11,6 @@ import Register from "../components/loginandregister/register/Register.vue"
 import Login from "../components/loginandregister/login/loginIndex.vue"
 import Regkind from "../components/loginandregister/register/regkind.vue"
 import RegisterDone from "../components/loginandregister/register/registerDone.vue"
-
 /*用户部分路由开始*/
 
 /*|获取公司部分路由|*/
@@ -27,24 +26,13 @@ import RegisterDone from "../components/loginandregister/register/registerDone.v
 //获取不同用户 对应不同用户的处理结果 
 /*路由逻辑开始*/
 import {userRouter} from "../assets/js/router"
-//var state = RegisterDone.data().state;
-//var userType=[
-//[companyRouter()[0],companyRouter()[1],companyRouter()[2]],
-//[personalRouter()[0],personalRouter()[1],personalRouter()[2]],
-//[teamRouter()[0],teamRouter()[1],teamRouter()[2]]
-//
-//];
-//var userRouter = new UserRouter(userType,state);
-//userRouter.changeRouter();
-
-//var routerPath=userRouter.changeRouter()[0];
-//var routerComponent=userRouter.changeRouter()[1];
 var routerChildren = userRouter();
-
 /*路由逻辑结束*/
-
+/*通知部分路由开始*/
+import {noticeRouter} from "./notice/notice"
+var notice=noticeRouter();
+/*通知部分路由结束*/
 /*主体路由开始*/
-
 Vue.use(Router)
 
 export default new Router({
@@ -87,23 +75,8 @@ export default new Router({
     {
       path:"/yhzx", name:"Users",component:Users,
       children:routerChildren
-//    children:[
-//
-//    	{
-//		  		path: companyRouter()[0],component: companyRouter()[1],
-//		  		children:companyRouter()[2]
-//		  	},
-//		  	{
-//		  		path: teamRouter()[0],component: teamRouter()[1],
-//		  		children:teamRouter()[2]
-//		  	},
-//		  	{
-//		  		path: personalRouter()[0],component: personalRouter()[1],
-//		  		children:personalRouter()[2]
-//		  	},
-//		  	
-//    ]
-    },
+	},
+	notice,
   ],
   scrollBehavior (to,from,savedPosition) {
 	  if (savedPosition) {

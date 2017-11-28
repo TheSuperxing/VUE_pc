@@ -4,13 +4,13 @@
       <h2>{{petName}}</h2>
       <ul class="topRight">
         <li>
-          <p v-on:mouseover="outTogOver(tog)" v-on:mouseout="outTogOut(tog)">
+          <!-- <p v-on:mouseover="outTogOver(tog)" v-on:mouseout="outTogOut(tog)">
             <span>设置</span>
-          </p>
-          <div class="tuichu" v-if="tog.value">
+          </p> -->
+          <!-- <div class="tuichu" v-if="tog.value">
             <span></span>
             <p><em>退出登录</em></p>
-          </div>
+          </div> -->
         </li>
         <li>
           <p>
@@ -116,6 +116,8 @@
 	  mounted(){
 
 				this.user.userState = sessionStorage.getItem("state");
+				
+				//首页请求信息
 				var that = this;
 				var url = "http://10.1.31.7:8080/accountmanainfo/home";
 				MyAjax.ajax({

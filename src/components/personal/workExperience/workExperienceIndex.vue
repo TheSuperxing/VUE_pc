@@ -481,7 +481,7 @@
 					console.log(err)
 				})
         that.updateData();
-
+				$('.qq-upload-success').hide();
       },
       cancelAdd(){
         Vue.set(this.reveal,"addOrShow",true)//切换到显示信息页
@@ -491,7 +491,7 @@
           Vue.set(this.reveal,"empty",false)
         }
         Vue.set(this.reveal,"addOrShow",true)//切换到显示信息页
-        
+        $('.qq-upload-success').hide();
         /*取消添加后信息的清除*/
       }
     }

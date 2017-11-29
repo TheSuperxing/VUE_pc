@@ -595,13 +595,13 @@
         if(that.localCertificate[index].qualificationName.trim().length!=0){
           Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
         }
-        
+        $('.qq-upload-success').hide();
         
       },
       cancelCertificateInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
         this.localCertificate[index]=JSON.parse(JSON.stringify(this.certificate[index]));
-        
+        $('.qq-upload-success').hide();
       },
       certificateInfoDel(index){//编辑状态，删除按钮
         var that = this;

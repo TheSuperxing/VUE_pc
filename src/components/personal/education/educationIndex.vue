@@ -585,6 +585,7 @@
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit[0],[index],false);
+        $('.qq-upload-success').hide();
         //console.log("ok")
       },
       deleteEduExist(index){//删除按钮事件
@@ -657,11 +658,8 @@
 				})//更新到服务器
 				//保存之后再重新拉取数据
 				that.updateData();
-//      if(this.localEdu[index].schoolName.length!=0){
 				Vue.set(this.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
-//        
-
-//      }
+				$('.qq-upload-success').hide();
         //提交编辑后的数据
         
 

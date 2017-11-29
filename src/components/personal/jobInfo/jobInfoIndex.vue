@@ -656,13 +656,14 @@
 				})//更新到服务器
 				//保存之后再重新拉取数据
 				that.updateData();
-        
+        $('.qq-upload-success').hide();
         
       },
       cancelJobInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
          this.localTitleInfo[index]=JSON.parse(JSON.stringify(this.titleInfo[index]));
         /*如果是取消编辑，从新从Vuex中得到数据*/
+        $('.qq-upload-success').hide();
       },
       jobInfoDel(index){//编辑状态，删除按钮
         var that = this;
@@ -704,6 +705,7 @@
 					console.log(err)
 				})
         that.updateData();
+        $('.qq-upload-success').hide();
       },
       cancelJobInfoAdd(){
         Vue.set(this.reveal,"addJobInfo",true);
@@ -715,6 +717,7 @@
         Vue.set(this.newTitleInfo,"titleLevel","");
         Vue.set(this.newTitleInfo,"certificateBody","");
         /*清除数据，保证下次输入时输入框为空*/
+        $('.qq-upload-success').hide();
       }
     }
   }

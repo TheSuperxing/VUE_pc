@@ -548,7 +548,7 @@
           })
           that.getData();
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//取消编辑后视图切换回到原来查看页面
-          
+          $('.qq-upload-success').hide();
           /*如果是保存，把数据保存到Vuex中*/
         }
       },
@@ -577,7 +577,7 @@
         this.localAward[index].awardName=this.award[index].awardName;
         this.localAward[index].awardingBody=this.award[index].awardingBody;
         this.localAward[index].awardingTime=this.award[index].awardingTime;
-
+				$('.qq-upload-success').hide();
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },
       awardDel(index){//编辑状态，删除按钮
@@ -636,6 +636,8 @@
         Vue.set(this.newAward,"awardName","");
         Vue.set(this.newAward,"time","");
         Vue.set(this.newAward,"organ","");
+        
+        $('.qq-upload-success').hide();
         /*清除数据，保证下次输入时输入框为空*/
       },
       cancelAwardAdd(){
@@ -645,6 +647,7 @@
         Vue.set(this.newAward,"time","");
         Vue.set(this.newAward,"organ","");
         /*清除数据，保证下次输入时输入框为空*/
+       	$('.qq-upload-success').hide();
       }
     }
   }

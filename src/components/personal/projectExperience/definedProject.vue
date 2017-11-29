@@ -27,8 +27,8 @@
 			</li>
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 建成时间</span>
-				<datepicker class="datePicker" v-model="projectInfo.compalteTime"></datepicker>
-				<alertTip v-if="showAlert.compalteTime" :showHide="showAlert.compalteTime" @closeTip="closeTip" :alertText="alertText.compalteTime"></alertTip>
+				<datepicker class="datePicker" v-model="projectInfo.completeTime"></datepicker>
+				<alertTip v-if="showAlert.completeTime" :showHide="showAlert.completeTime" @closeTip="closeTip" :alertText="alertText.completeTime"></alertTip>
 				<div class="timeGray" v-if="complated">
 					<span class="table-wrap-left">* 建成时间</span>
 					<span class="picker"></span>
@@ -175,8 +175,8 @@
 	        state:"",
 	        time:{value:"2018-7"},
 	        editSeniorShow:false,
-	        showAlert:{name:false,compalteTime:false,parTakeTime:false,takeOffice:false},//提示框显隐
-	        alertText:{name:null,compalteTime:null,parTakeTime:null,takeOffice:null},
+	        showAlert:{name:false,completeTime:false,parTakeTime:false,takeOffice:false},//提示框显隐
+	        alertText:{name:null,completeTime:null,parTakeTime:null,takeOffice:null},
 	        dutycont:0,//职责字数
 	        detailcont:0,//职责详细描述字数
 	        procont:0,//项目描述字数
@@ -189,7 +189,7 @@
 	        	projectName:"",//同步到项目主页的信息 (必填*)
 				projectPlaceObj:{},//项目地址
 				projectState:"",//项目状态projectState
-				compalteTime:"",//同步到项目主页的信息 (必填*)
+				completeTime:"",//同步到项目主页的信息 (必填*)
 				architectFunctions:[],//建筑功能种类projectType
 				projectDescription:"",////项目详细描述文案
 				partakeTimeUp:"",// (必填*)
@@ -345,11 +345,11 @@
 					this.showAlert.name = false;
 				};//判断项目名称不能为空
 				
-				if(this.projectInfo.compalteTime.trim().length==0&&this.complated==false){
-					this.showAlert.compalteTime = true;
-					this.alertText.compalteTime = "项目建成时间为必填项"
+				if(this.projectInfo.completeTime.trim().length==0&&this.complated==false){
+					this.showAlert.completeTime = true;
+					this.alertText.completeTime = "项目建成时间为必填项"
 				}else{
-					this.showAlert.compalteTime = false;
+					this.showAlert.completeTime = false;
 				};//判断建成时间不能为空
 				
 				if(this.projectInfo.partakeTimeUp.trim().length==0||this.projectInfo.partakeTimeDown.trim().length==0){
@@ -366,7 +366,7 @@
 					this.showAlert.takeOffice = false;
 				};//判断项目职责不能为空
 				if(this.complated=false){//判断是否为在建，在建的话建成时间为必填
-					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.compalteTime.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
+					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.completeTime.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
 					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0&&this.projectInfo.projectPlaceObj.street.trim().length!=0){
 						var that = this;
 					    console.log(JSON.stringify(that.projectInfo))
@@ -423,7 +423,6 @@
                 this.showAlert.takeOffice= false;
             },
             cancelEdit(){
-            	console.log(44)
 				router.push("/yhzx/personal/info/personalProject/index")
 			}
 	    },
@@ -436,7 +435,7 @@
 	    	var num3 = this.projectInfo.projectDescription.length;//项目描述
 	    	this.procont = num3;
             if(this.projectInfo.projectState=="在建"||this.projectInfo.projectState=="未建"){
-            	this.complated = true;
+            	this.complated = true;//true表示在建状态  建成时间不可选
             }else{
             	this.complated = false;
             }

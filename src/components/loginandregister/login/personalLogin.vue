@@ -2,18 +2,19 @@
   <div class="personalLogin">
     <ul class="loginInput">
       <li>
-        <input v-model="personalLoginInput.tel" type="text" placeholder="手机号" @blur="personTelCfm">
+        <input v-model="personalLoginInput.tel" type="text" placeholder="手机号" @blur="personTelCfm" autofocus />
       </li>
       <li>
-        <input v-model="personalLoginInput.picConfirm" @blur="picConfirm" type="text" placeholder="图形验证码">
+        <input v-model="personalLoginInput.picConfirm" @blur="picConfirm"  type="text" placeholder="图形验证码" autofocus />
         <img class="picConfirm" :src="picSrc" alt="" @click="changePic"/>
         <!--<p v-cloak @click="random">{{makeRandom.num}}</p>-->
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
       <li>
-        <input v-model="personalLoginInput.messageConfirm" type="password" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus />
+        <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus />
         <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
       </li>
+      
     </ul>
 		<alertTip v-if="showAlert" :showHide="showAlert" @closeTip="closeTip" :alertText="alertText"></alertTip>
     
@@ -72,19 +73,7 @@
       Vue.set(this.user,'userState',2)
       sessionStorage.setItem("state",this.user.userState)
       
-      var that = this;
-    	var url = "http://10.1.31.7:8080/hello"
-    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-//					token:document.cookie,
-			}, function(data){
-				console.log(data)
-				
-			},function(err){
-				console.log(err)
-			})
+      
     },
     methods:{
       random(){
@@ -135,7 +124,7 @@
         Vue.set(this.messageConfirm,"confirmText","60s");
         //Vue.set(this.messageConfirm,"confirmText",);
         var self =this;
-        var url = MyAjax.urlhw + "/accountmanainfo/mobileCode/" + self.personalLoginInput.tel;
+        var url = MyAjax.urlhw + "/accountmanainfo/loginMobileCode/" + self.personalLoginInput.tel;
         MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -143,20 +132,34 @@
 					
 				},function(data){
 					console.log(data)
+					if(data.code==-1){
+						switch (data.msg){
+							case "100008":
+								console.log(222)
+								self.showAlert = true;
+								self.alertText = "手机号未注册";
+								break;
+							
+							default:
+								break;
+						}
+					}else{
+						var timer=setInterval(
+				      function () {
+				        if(parseInt(self.messageConfirm.confirmText)>1){
+				          self.messageConfirm.confirmText=parseInt(self.messageConfirm.confirmText)-1+"s";
+				        }else {
+				          clearInterval(timer);
+				          self.reveal.buttonDisabled=true;
+				          self.messageConfirm.confirmText="重新获取验证码";
+				        }
+				
+				      },1000);
+					}
 				},function(err){
 					console.log(err)
 				})
-        var timer=setInterval(
-          function () {
-            if(parseInt(self.messageConfirm.confirmText)>1){
-              self.messageConfirm.confirmText=parseInt(self.messageConfirm.confirmText)-1+"s";
-            }else {
-              clearInterval(timer);
-              self.reveal.buttonDisabled=true;
-              self.messageConfirm.confirmText="重新获取验证码";
-            }
-
-          },1000);
+        
         
       },
       personalLogin(){

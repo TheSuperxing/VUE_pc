@@ -18,8 +18,8 @@
         <ul class="modal-container" v-bind:class="{ modalContainerShow : reveal.modal,modalContainerEmpty: !reveal.modal}">
           <li v-bind:class="{beforeSearch:!reveal.searchShow}">
             <h6>公司名称</h6>
-            <input type="text" autocomplete="off"/>
-            <!-- <input v-model="input.value" type="text" placeholder="请输入公司名称"/> -->
+            <!--<input type="text" autocomplete="off"/>-->
+             <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
             <button  v-on:click="search">
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>

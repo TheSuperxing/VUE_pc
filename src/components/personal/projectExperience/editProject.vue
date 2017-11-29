@@ -244,8 +244,8 @@
 	    	that.project.partakeTimeDown = emptyText2(that.project.partakeTimeDown);
 	    	that.project.takeOffice = emptyText2(that.project.takeOffice);
 	    	that.project.detailDes = emptyText2(that.project.detailDes);
-	    	if(that.project.architectFunctions == null){
-	    		that.project.architectFunctions = [];
+	    	if(that.project.architectFunctions[0]==""){
+//	    		that.project.architectFunctions = [];
 	    		that.project.architectFunctions[0] = "（暂无信息）"
 	    	}
 	    	//空值的处理
@@ -314,6 +314,19 @@
 				Modal.closeModal(modal)
 			},
 			saveEdit(){
+				function emptyText(text) {
+				    if(text=="（暂无信息）"){
+				      return " ";
+				    }else {
+				      return text;
+				    }
+				}
+				this.project.completeTime = emptyText(this.project.completeTime);
+		    	this.project.projectState = emptyText(this.project.projectState);
+		    	this.project.projectDescription = emptyText(this.project.projectDescription);
+		    	if(this.project.architectFunctions[0] = "（暂无信息）"){
+		    		this.project.architectFunctions = [];
+		    	}
 				var that = this;
 			    console.log(JSON.stringify(that.project))
 			    var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe";

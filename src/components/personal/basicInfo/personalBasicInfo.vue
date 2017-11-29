@@ -103,8 +103,9 @@
       <div class="realName">
         <div class="realNameTop">
           <h5>实名认证：</h5>
-          <p v-if="!localBaseInfo.ifRNA" v-bind:class="{throughRealName:reveal.throughRealName}">（暂未上传认证文件）</p>
+          <p v-if="!localBaseInfo.haveUploaded" v-bind:class="{throughRealName:reveal.throughRealName}">（暂未上传认证文件）</p>
         </div>
+        <p v-show="haveUploaded" style="line-height: 40px;color: rgb(242,117,25);">上传认证证件成功，已进入审核阶段。可继续上传。</p>
         <div class="realNameMain">
         	<ul>
         		<li>
@@ -175,17 +176,16 @@
 				    </script>
 				    <div id="fine-uploader-manual-trigger"></div>
         		</li>
-        		<li v-for="item in localBaseInfo.ifRNA"  v-if="localBaseInfo.ifRNA">
-        			<img src="" alt=""/>
-        		</li>
+        		
+        		
         		<p  v-if="localBaseInfo.ifRNA">您已通过实名认证</p>
             <p  v-if="localBaseInfo.ifRNA">您可点击“添加”继续上传，不会影响您已上传的实名认证文件</p>
         	</ul>
           <ul class="addFile" >
            
             <li>
-              <p>请上传本人手持身份证照片一面的免冠近照，支持JPG、PNG,不超过2M</p>
-              <p>请确认身份证姓名与您填写的姓名一致，以免影响审核结果</p>
+              <p>请上传本人手持身份证照片一面的免冠近照，支持JPG、JEPG、PNG，不超过5M</p>
+              <p>请确认身份证姓名与您填写的姓名一致，以免影响审核结果。</p>
             </li>
           </ul>
 
@@ -226,6 +226,7 @@
           psnName:0
         },
         noBaseInfo:false,
+        haveUploaded:false,//实名认证图片已经上传，false代表还没上传
         baseInfo:{
         	
         },
@@ -256,12 +257,13 @@
     },
     mounted(){
     	console.log(this.baseInfo)
+    	var that = this;
       //上传图片
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
 	        template: 'qq-template-manual-trigger',
 	        request: {
-	            endpoint: '/server/uploads'
+	            endpoint: MyAjax.urlsy+'/personalbasicinfo/batchUpload'
 	        },
 	        thumbnails: {
 	//	                placeholders: {
@@ -270,11 +272,11 @@
 	//	                }
 	        },
 	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+	            allowedExtensions: ['jpeg', 'jpg', 'png'],
 	            itemLimit: 5,
-	            sizeLimit: 1500000
+	            sizeLimit: 2400*2400*2400*2400*2400
 	        },
-	        autoUpload: true,
+	        autoUpload: false,
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,  fileName)  {
@@ -282,26 +284,24 @@
             },
             onCancel: function(){
               
-							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
+							var imgList=$("#fine-uploader-manual-trigger .qq-uploader-selector .qq-upload-list-selector .list")
               if(imgList.length<=1){
-								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+								$("#fine-uploader-manual-trigger .qq-uploader-selector .buttons .btn-primary").hide()
 							}
 						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	            //alert('This is onComplete function.');
-								//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-	            //console.log(responseJSON)
+	          
+	            console.log(responseJSON)
+	            if(responseJSON.success==true){
+	            	$(".qq-upload-list").hide()
+	            	that.haveUploaded = true;
+	            }
+	            
 	            $('#message').append(responseJSON.msg);
-	//	                $('#progress').hide();//隐藏进度动画
-	            //清除已上传队列
+
 	            $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-	            //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-	            //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-	//	                $('.stateOne').hide();
-	//	                $('.stateTwo').show()
 	            
 	            $('#trigger-upload').hide()
-            //console.log(maybeXhr)
 	      	},
 	    	}
 	    });

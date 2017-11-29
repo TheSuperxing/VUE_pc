@@ -25,19 +25,6 @@
 										
 									</span>
 								</li>
-								<li v-for="">
-									<router-link :to="{name:'ProjectDetail',query:{id:'2'}}">王大麻子</router-link>
-									<span class="choseBtn" @click="choseThis($event)">
-										
-									</span>
-								</li>
-								<li v-for="">
-									<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-									<span class="choseBtn" @click="choseThis($event)">
-										
-									</span>
-								</li>
-								
 							</ul>
 							<router-link to="/yhzx/personal/info/personalProject/definedProject" @click="closeModal">
 								<div class="goToDefinedPro">自定义添加项目</div>
@@ -91,8 +78,7 @@
     	</div>
     	<div class="viewMore">
     		<p v-bind:class="{viewDown:show.tag[$index],viewUp:!show.tag[$index]}" @click="upDown($index)">
-    			<!--<img src="../../../assets/img/company/double-bottom-down.png" />
-					<img src="../../../assets/img/company/double-bottom-up.png" />-->
+    			
 					<span>{{updowntxt[$index]}}</span>
     		</p>
     	</div>
@@ -179,7 +165,7 @@
 	//  	console.log(this.show.tag.length)
 	    	for(var i=0;i<this.proInfo.length;i++){
 	    		that.proInfo[i].takeOffice = emptyText(that.proInfo[i].takeOffice);
-	    	  	that.proInfo[i].detailDes = emptyText(that.proInfo[i].detailDes);
+	    	  that.proInfo[i].detailDes = emptyText(that.proInfo[i].detailDes);
 	    		that.show.tag[i]=true;
 	    		that.updowntxt.push("展开查看更多");
 	    		that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名

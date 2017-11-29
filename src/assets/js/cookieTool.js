@@ -23,7 +23,7 @@ export var cookieTool = {
     delCookie: function (name) {
         var exp = new Date();
         exp.setTime(exp.getTime() - 1);
-        var cval = cookieFun.getCookie(name);
+        var cval = cookieTool.getCookie(name);
         if (cval != null)
             document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString()+";path=/";
     }

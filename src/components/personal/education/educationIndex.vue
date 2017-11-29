@@ -23,6 +23,18 @@
             <p v-cloak >专业：{{item.professionName}}</p>
             <p v-cloak >学历：{{item.education}}</p>
           </div>
+          <ul class="morePics" v-if="!show.tag[index]" v-show="!editEdu.edit[0][index]">
+						<li v-for="item in picArr[index]">
+							<img :src="item.pic"/>
+						</li>
+								
+		    	</ul>
+					<div class="viewMore" v-show="!editEdu.edit[0][index]">
+						<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
+							
+								<span>{{updowntxt[index]}}</span>
+						</p>
+					</div>
 
           <ul class="editEduInfo" v-show="editEdu.edit[0][index]">
             <li>
@@ -46,8 +58,15 @@
             </li>
             <li class="img-wrap" >
 							<span class="wrap-left">图片展示</span>
-
-							<script type="text/template" id="qq-template-manual-trigger">
+							<ul class="imgShow">
+								<li v-for="(item,$ind) in picArr[index]">
+									<img :src="item.pic"/>
+									<span class="delePic" @click="deleThisPic(item.id,index,$ind)"></span>
+								</li>
+								
+							</ul>
+							
+							<script type="text/template" :id="qqTemplate[index]">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 						            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
 						                <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
@@ -152,6 +171,7 @@
         </li>
         <li class="img-wrap">
 					<span class="wrap-left">图片展示</span>
+					
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -234,7 +254,7 @@
 <script>
   import {mapState} from "vuex"
   import Vue  from "vue"
-  import datepicker from "../../units/Datepicker.vue"
+  import datepicker from "../units/Datepicker.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   
@@ -248,6 +268,10 @@
       return {
         title:"教育背景",
         empty:{promote:true},
+        updowntxt:[],
+        show:{
+        	tag:[],
+        },
         editEdu:{add:false,edit:[[]],delete:[[]]},
         //状态部分
         textLeng:{schoolName:[],profession:[]},
@@ -268,8 +292,10 @@
 		      "educationCode": "",
 		      "education": "",
 		      "ifVisable": 1,
-		      "accountID": ""
+		      "accountID": "",
+		      picId:[],
         },
+        picArr:[],//图片展示的数组
         buttonColor:{exist:[],add:true},
         //按钮颜色
         //实例化上传图像的element根据信息条数添加className
@@ -284,11 +310,12 @@
 			
 			this.updateData();
 			//上传图片
+			var that = this;
 			var manualUploader = new qq.FineUploader({
 	        element: document.getElementById('fine-uploader-manual-trigger'),
 	        template: 'qq-template-manual-trigger',
 	        request: {
-	            endpoint: '/server/uploads'
+	            endpoint: MyAjax.urlsy+'/psnEduBackGround/batchUpload'
 	        },
 	        thumbnails: {
 	//	                placeholders: {
@@ -297,9 +324,9 @@
 	//	                }
 	        },
 	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+	            allowedExtensions: ['jpeg', 'jpg', 'png'],
 	            itemLimit: 5,
-	            sizeLimit: 1500000
+	            sizeLimit: 2400*2400*2400*2400*2400
 	        },
 	        autoUpload: false,
 	        debug: true,
@@ -308,18 +335,11 @@
 	        		$('#trigger-upload').show()
 	        	},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	                //alert('This is onComplete function.');
-									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
 	                console.log(responseJSON)
-	                $('#message').append(responseJSON.msg);
-	//	                $('#progress').hide();//隐藏进度动画
-	                //清除已上传队列
-//	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-	//	                $('.stateOne').hide();
-	//	                $('.stateTwo').show()
-	                
+	                if(responseJSON.success==true){
+	                	that.newInputValue.picId.push(responseJSON.msg)
+	                }
+	                console.log(that.newInputValue.picId)
 	                $('#trigger-upload').hide()
 	                console.log(maybeXhr)
 	          	},
@@ -338,6 +358,8 @@
           this.textLeng.schoolName.push(0);
           this.textLeng.profession.push(0);
           this.buttonColor.exist.push(true);
+          this.show.tag[i]=true;
+	    		this.updowntxt.push("展开查看更多");
           /*初始化本地数据开始*/
 //        
           /*初始化本地数据结束*/
@@ -386,11 +408,15 @@
 	      that.openOrPrivacyText = [];
 	      that.fineUploaderId = [];
 	      that.qqTemplate = [];
+	      that.show.tag=[];
+	    	that.updowntxt=[];
 	    	for(var i=0;i<that.education.length;i++){
 	    		that.education[i].professionName = emptyText(that.education[i].professionName);//空值判断
 	    		that.education[i].education = emptyText(that.education[i].education);
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
+	    		that.show.tag[i]=true;
+	    		that.updowntxt.push("展开查看更多");
 	    		if(that.education[i].ifVisable==1){
 	    			that.openOrPrivacy.push(true);
 	    			that.openOrPrivacyText.push("显示")
@@ -399,6 +425,38 @@
 	    			that.openOrPrivacyText.push("隐藏")
 		      }
 	    	}
+    	},
+    	getPicture(index){
+    		var that = this;
+    		var url = MyAjax.urlsy+"/psnEduBackGround/findPicsById/"+that.education[index].pkid;
+    		MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					Vue.set(that.picArr,[index],data.msg)
+//					that.picArr[index] = 
+					console.log(that.picArr)
+				},function(err){
+					console.log(err)
+				})
+    	},
+    	upDown(index){
+				console.log(this.show.tag[index])
+				if(this.show.tag[index]==true){
+					Vue.set(this.show.tag,[index],false)
+					this.updowntxt[index] = "收起图片"
+				}else{
+					Vue.set(this.show.tag,[index],true)
+					this.updowntxt[index] = "展开查看更多" 
+				}
+    		this.show.tag[index] == true? false:true;
+    		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+    		this.getPicture(index);
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
@@ -424,7 +482,7 @@
         	}
         }
         var that = this;
-        var url = "http://10.1.31.16:8080/psnEduBackGround/update"
+        var url = MyAjax.urlsy +"/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -449,21 +507,21 @@
         if(this.localEdu[index].schoolName.length!=0){
           Vue.set(this.buttonColor.exist,[index],false)
         }
-        var that = this;
+        this.getPicture(index);
 
         //上传图片
-        
+        var that = this;
         if(window['manualUploader'+index]==undefined){
           window['manualUploader'+index]= new qq.FineUploader({
             element: document.getElementById(that.fineUploaderId[index]),
             template: this.qqTemplate[index],
             request: {
-              endpoint: '/server/uploads'
+              endpoint: MyAjax.urlsy+'/psnEduBackGround/batchUpload'
             },
             thumbnails: {
             },
             validation: {
-              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+              allowedExtensions: ['jpeg', 'jpg', 'png'],
               itemLimit: 5,
               sizeLimit: 2000000
             },
@@ -471,28 +529,59 @@
             debug: true,
             callbacks:{
               onSubmit:  function(id,fileName){
-                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary").show()
+                $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary").show()
               },
               onCancel: function(){
-                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                var imgList=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .qq-upload-list-selector .list")
                 if(imgList.length<=1){
-                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary").hide()
+                  $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary").hide()
                 }
               },
               onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                
+                console.log(responseJSON)
+                if(responseJSON.success==true){
+                	if(that.localEdu[index].picId == null){
+                		that.localEdu[index].picId = [];
+                	  that.localEdu[index].picId.push(responseJSON.msg)
+                	}else{
+                		that.localEdu[index].picId.push(responseJSON.msg)
+                	}
+                	console.log(that.localEdu[index].picId)
+                }
               },
             }
           });
         }
 
-          var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary");
+          var btnPrimary=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .btn-primary");
+//         console.log($("#"+that.fineUploaderId[index]+" .qq-uploader-selector"))
           qq(btnPrimary[0]).attach("click", function() {
             eval('manualUploader'+index).uploadStoredFiles();
             btnPrimary.hide()
           });
-          console.log(that.qqFineloader)
+         
           
+      },
+      deleThisPic(id,index,$ind){//删除图片
+      	var that = this;
+      	var url = MyAjax.urlsy + "/psnEduBackGround/delPic/"+ id
+      	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+//						that.picArr[index].splice($ind,1)
+						that.getPicture(index);
+					}
+				},function(err){
+					console.log(err)
+				})
+      	
+      	
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit[0],[index],false);
@@ -655,13 +744,13 @@
   $emptyColor:#9c9c9c;
   $themeColor:rgb(242,117,25);
   #fine-uploader-manual-trigger{
-  	float: left;
-  	width: 680px;
+  	float: right !important;
   }
   .educationIndex{
     width:940px;
     float: left;
     padding:0 40px;
+    padding-bottom: 40px;
     background: $bfColor;
     min-height: 671px;
     .title{
@@ -695,11 +784,13 @@
     }
     /*信息为空提示*/
     .educationContainer{
+    	
       padding:0 20px;
       .eduInfo{
         padding-top:25px;
 
         .eduInfoContainer{
+        	&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
           border-bottom: 1px solid $borderColor;
           div:nth-child(1){
             color: $themeColor;
@@ -752,6 +843,61 @@
               height: 21px;
             }
           }
+          .morePics{
+						overflow: hidden;
+						margin-top: 15px;
+						float: left;
+						&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+						li{
+							float: left;
+							position: relative;
+							&:hover{
+								.delePic{
+									display: block;
+									
+								}
+							}
+							img{
+								float: left;
+								width: 160px;
+								height: 100px;
+								margin-right: 15px;
+								margin-bottom: 15px;
+								
+							}
+							
+						}
+						
+					}
+					.viewMore{
+						float: left;
+						width: 100%;
+						height: 14px;
+						line-height: 14px;
+						color: $activeColor;
+						margin-top: 15px;
+						margin-bottom: 20px;
+						cursor: pointer;
+						.viewDown{
+							width: 120px;
+							height: 100%;
+							padding-left: 20px;
+							margin: 0 auto;
+							background: url(../../../assets/img/personal/projectexperience/icon_lookmore.png) no-repeat left center;
+						}
+						.viewUp{
+							width: 120px;
+							height: 100%;
+							padding-left: 20px;
+							margin: 0 auto;
+							background: url(../../../assets/img/personal/projectexperience/icon_revoke_075.3.png) no-repeat left center;
+						}
+						img{
+							vertical-align: middle;
+							margin-bottom: 3px;
+							margin-right: 5px;
+						}
+					}
         }
       }
 
@@ -829,10 +975,46 @@
         }
         li.img-wrap{
         	/*padding-left: 30px;*/
-        	>div{
-        		width: 680px;
-        		float: left;
+        	.imgShow{
+        		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+        		width: 700px;
+        		float: right;
+        		li{
+        			float: left;
+        			height: 120px;
+							position: relative;
+							&:hover{
+								.delePic{
+									display: block;
+									
+								}
+							}
+							img{
+								width: 160px;
+								height: 100px;
+								margin-right: 15px;
+								margin-bottom: 15px;
+								
+							}
+							.delePic{
+								width: 21px;
+								height: 21px;
+								position: absolute;
+								right: 20px; top: 15px;
+								background: url(../../../assets/img/personal/education/delePic.png) no-repeat;
+								display: none;
+								cursor: pointer;
+							}
+        		}
+        		
         	}
+        	
+        	>div{
+        		width: 700px;
+        		float: right;
+        		
+        	}
+        	
         }
         li.tip-wrap{
         	padding-left: 110px;

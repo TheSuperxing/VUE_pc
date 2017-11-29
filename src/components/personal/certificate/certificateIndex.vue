@@ -30,11 +30,22 @@
             <p v-cloak>注册单位  : {{item.registeredUnit}}</p>
             <p v-cloak>证书编号  ：{{item.certificateNumber}}</p>
           </div>
+          <ul class="morePics" v-if="!show.tag[index]">
+		    		<li v-for="item in picArr[index]">
+							<img :src="item.pic"/>
+						</li>
+		    	</ul>
+					<div class="viewMore" >
+						<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
+							
+								<span>{{updowntxt[index]}}</span>
+						</p>
+					</div>
         </div>
         <!--显示信息列表结束-->
         <!--编辑显示信息列表开始-->
         <div class="certificateInfoEdit" v-show="reveal.editInfo[index]">
-          <ul>
+          <ul class="edit-wrap">
             <li>带&nbsp;*&nbsp;号为必选项</li>
             <li>
               <label>
@@ -56,6 +67,13 @@
             </li>
             <li class="img-wrap" >
 							<span class="wrap-left">图片展示</span>
+							<ul class="imgShow">
+								<li v-for="(item,$ind) in picArr[index]">
+									<img :src="item.pic"/>
+									<span class="delePic" @click="deleThisPic(item.id,index,$ind)"></span>
+								</li>
+								
+							</ul>
 
 							<script type="text/template" :id="qqTemplate[index]">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -258,6 +276,10 @@
           addCertificate:true,//是否添加信息
           keepAdd:true,//添加模式下，保存按钮是否可用
         },
+        updowntxt:[],
+        show:{
+        	tag:[],
+        },
         certificate:[],
         localCertificate:[],
         newCertificate:{
@@ -268,17 +290,17 @@
 				  "ifVisable": 1,
 				  "pkid": "",
 				  "qualificationName": "",
-				  "registeredUnit": ""
+				  "registeredUnit": "",
+				  picId:[],
         },
+        picArr:[],//图片展示的数组
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
         
       }
     },
-    computed:mapState({
-//    certificate:state=>state.personal.personalMessage.certificate,
-    }),
+
     mounted(){
     	this.updateData();
     	//上传图片
@@ -286,7 +308,7 @@
 	        element: document.getElementById('fine-uploader-manual-trigger'),
 	        template: 'qq-template-manual-trigger',
 	        request: {
-	            endpoint: '/server/uploads'
+	            endpoint: MyAjax.urlsy+"/psnQualification/batchUpload"
 	        },
 	        thumbnails: {
 	//	                placeholders: {
@@ -295,26 +317,30 @@
 	//	                }
 	        },
 	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+	            allowedExtensions: ['jpeg', 'jpg', 'png'],
 	            itemLimit: 5,
-	            sizeLimit: 1500000
+	            sizeLimit: 2400*2400*2400*2400*2400
 	        },
 	        autoUpload: false,
 	        debug: true,
 	        callbacks:{
 	        	onSubmit:  function(id,  fileName)  {
-	        		$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").show()
+	        		$("#fine-uploader-manual-trigger .qq-uploader-selector .buttons .btn-primary").show()
             },
             onCancel: function(){
-							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
+							var imgList=$("#fine-uploader-manual-trigger .qq-uploader-selector .qq-upload-list-selector .list")
               if(imgList.length<=1){
-								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+								$("#fine-uploader-manual-trigger .qq-uploader-selector .buttons .btn-primary").hide()
 							}
 						},
 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
 	                //alert('This is onComplete function.');
 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
 	                console.log(responseJSON)
+	               
+	                if(responseJSON.success==true){
+	                	that.newCertificate.picId.push(responseJSON.msg)
+	                }
 	                $('#message').append(responseJSON.msg);
 	//	                $('#progress').hide();//隐藏进度动画
 	                //清除已上传队列
@@ -324,7 +350,7 @@
 	//	                $('.stateOne').hide();
 	//	                $('.stateTwo').show()
 	                
-	                $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+	                $("#fine-uploader-manual-trigger .qq-uploader-selector .buttons .btn-primary").hide()
 	                console.log(maybeXhr)
 	          	},
 	    	}
@@ -390,17 +416,54 @@
 	    	that.qqTemplate = [];
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
+	    	that.show.tag=[];
+	    	that.updowntxt=[];
 	    	for(var i=0;i<that.certificate.length;i++){
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.localCertificate[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.localCertificate[i].pkid);
+	    		that.show.tag[i]=true;
+	    		that.updowntxt.push("展开查看更多");
 	    		if(that.certificate[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
-	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
+	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值	
+	        	
 	    		}else{
 	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
 	    		}
 	    	}
+    	},
+    	getPicture(index){
+    		var that = this;
+    		var url = MyAjax.urlsy+"/psnQualification/findPicsById/"+that.certificate[index].pkid;
+    		MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+					
+				},function(data){
+					console.log(data)
+					Vue.set(that.picArr,[index],data.msg)
+					console.log(that.picArr)
+				},function(err){
+					console.log(err)
+				})
+    	},
+    	upDown(index){
+//  		Vue.set(this.show,"tag[index]",false)
+				console.log(this.show.tag[index])
+				if(this.show.tag[index]==true){
+					Vue.set(this.show.tag,[index],false)
+					this.updowntxt[index] = "收起图片"
+				}else{
+					Vue.set(this.show.tag,[index],true)
+					this.updowntxt[index] = "展开查看更多" 
+				}
+    		this.show.tag[index] == true? false:true;
+    		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+    		this.getPicture(index);
     	},
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
@@ -448,39 +511,68 @@
             element: document.getElementById(this.fineUploaderId[index]),
             template: this.qqTemplate[index],
             request: {
-              endpoint: '/server/uploads'
+              endpoint:MyAjax.urlsy+"/psnQualification/batchUpload"
             },
             thumbnails: {
             },
             validation: {
-              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+              allowedExtensions: ['jpeg', 'jpg',  'png'],
               itemLimit: 5,
-              sizeLimit: 2000000
+              sizeLimit: 2400*2400*2400*2400*2400
             },
             autoUpload: false,
             debug: true,
             callbacks:{
               onSubmit:  function(id,fileName){
-                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary").show()
+                $("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .buttons .btn-primary").show()
               },
               onCancel: function(){
-                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+                var imgList=$("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .qq-upload-list-selector .list")
                 if(imgList.length<=1){
-                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary").hide()
+                  $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary").hide()
                 }
               },
               onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                
+                if(responseJSON.success==true){
+                	if(that.localCertificate[index].picId == null){
+                		that.localCertificate[index].picId = [];
+                	  that.localCertificate[index].picId.push(responseJSON.msg)
+                	}else{
+                		that.localCertificate[index].picId.push(responseJSON.msg)
+                	}
+                	console.log(that.localCertificate[index].picId)
+                }
               },
             }
           });
         }
           
-          var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary");
+          var btnPrimary=$("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .buttons .btn-primary");
           qq(btnPrimary[0]).attach("click", function() {
             eval('manualUploader'+index).uploadStoredFiles();
             btnPrimary.hide()
           });
+      },
+      deleThisPic(id,index,$ind){//删除图片
+      	var that = this;
+      	var url = MyAjax.urlsy + "/psnEduBackGround/delPic/"+ id
+      	MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+//						that.picArr[index].splice($ind,1)
+						that.getPicture(index);
+					}
+				},function(err){
+					console.log(err)
+				})
+      	
+      	
       },
       keepCertificateInfoEdit(index){//编辑状态，保存按钮
       	var that = this;
@@ -675,12 +767,58 @@
               margin-bottom:17px;
             }
           }
+          .morePics{
+						overflow: hidden;
+						margin-top: 15px;
+						float: left;
+						&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+						li{
+							float: left;
+							img{
+								width: 160px;
+								height: 100px;
+								margin-right: 15px;
+								margin-bottom: 15px;
+								
+							}
+						}
+						
+					}
+					.viewMore{
+						float: left;
+						width: 100%;
+						height: 14px;
+						line-height: 14px;
+						color: $activeColor;
+						margin-top: 15px;
+						margin-bottom: 20px;
+						cursor: pointer;
+						.viewDown{
+							width: 120px;
+							height: 100%;
+							padding-left: 20px;
+							margin: 0 auto;
+							background: url(../../../assets/img/personal/projectexperience/icon_lookmore.png) no-repeat left center;
+						}
+						.viewUp{
+							width: 120px;
+							height: 100%;
+							padding-left: 20px;
+							margin: 0 auto;
+							background: url(../../../assets/img/personal/projectexperience/icon_revoke_075.3.png) no-repeat left center;
+						}
+						img{
+							vertical-align: middle;
+							margin-bottom: 3px;
+							margin-right: 5px;
+						}
+					}
         }
         /*信息列表结束*/
         /*编辑信息列表开始*/
         .certificateInfoEdit{
-          ul{
-            li{
+          .edit-wrap{
+            >li{
               margin:20px 0;
               .wrap-left{
 				      	/*width: 80px;*/
@@ -710,12 +848,12 @@
                 cursor: pointer;
               }
             }
-            li:nth-child(1){
+            >li:nth-child(1){
               color: #909090;
               margin-top:30px;
               margin-bottom:20px;
             }
-            li:nth-child(2){
+            >li:nth-child(2){
               h5{
                 margin-left:-12px;
               }
@@ -726,13 +864,46 @@
 		        }
             li.img-wrap{
 				    	/*padding-left: 30px;*/
-				    	
+				    	.imgShow{
+		        		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+		        		width: 700px;
+		        		float: left;
+		        		>li{
+		        			float: left;
+		        			height: 100px;
+									position: relative;
+									margin-right: 15px;
+										margin-bottom: 15px;
+									&:hover{
+										.delePic{
+											display: block;
+											
+										}
+									}
+									img{
+										width: 160px;
+										height: 100px;
+										
+										
+									}
+									.delePic{
+										width: 21px;
+										height: 21px;
+										position: absolute;
+										right: 5px; top: 5px;
+										background: url(../../../assets/img/personal/education/delePic.png) no-repeat;
+										display: none;
+										cursor: pointer;
+									}
+		        		}
+		        		
+		        	}
 				    	>div{
-				    		width: 680px;
-				    		float: left;
+				    		width: 700px;
+				    		float: right;
 				    	}
 				    }
-            li:last-child{
+            >li:last-child{
               padding-left:52px;
               button{
             height: 33px;

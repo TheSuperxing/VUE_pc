@@ -26,9 +26,8 @@
         <h1>LOGO</h1>
         <ul class="navlist" v-bind:class="{'comStyle':user.userState==0}">
           <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[0]" @click="getState">{{item.text}}</router-link></li>
-        	<li class="primary" >
-        		<div  @click="redirect"><router-link to="/yhzx">用户中心</router-link></div>
-
+        	<li class="primary">
+        		<div @click="redirect"><router-link to="/yhzx">用户中心</router-link></div>
         		<ul class="userNav">
 		        	<li><router-link to="/yhzx/company/info">我的资料</router-link></li>
 		        	<li><router-link to="/yhzx/demand">我的需求</router-link></li>
@@ -82,6 +81,7 @@
   import {mapState} from "vuex"
   import router from "../router"
   import MyAjax from "../assets/js/MyAjax.js"
+  import {cookieTool} from "../assets/js/cookieTool.js"
   
   export default {
     name: 'hello',
@@ -114,28 +114,30 @@
 	    }),
 
 	  mounted(){
-
+				console.log(cookieTool.getCookie("token"))
+				
 				this.user.userState = sessionStorage.getItem("state");
 				
 				//首页请求信息
 				var that = this;
 				var url = MyAjax.urlhw +"/accountmanainfo/home";
 				MyAjax.ajax({
-						type: "GET",
-						url:url,
-				//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-						dataType: "json",
-				//				contentType:"application/json;charset=utf-8",
-						
-					},function(data){
-						console.log(data)
-						data = data.msg;
-						if(data == "100004"){
-							router.push("/login")
-						}
-					},function(err){
-						console.log(err)
-					})
+					type: "GET",
+					url:url,
+			//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+			//				contentType:"application/json;charset=utf-8",
+					
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					if(data == "100004"){
+						cookieTool.delCookie("token")
+						router.push("/login")
+					}
+				},function(err){
+					console.log(err)
+				})
 
 	  },
 	  updated(){
@@ -158,7 +160,9 @@
 
 	     redirect(){
 	     	//console.log(this.user.userState)
-
+				if(cookieTool.getCookie("token")==null){
+					router.push("/login")
+				}
 				switch (this.user.userState){
 					case '0':
 						router.push("/yhzx/company/overview")

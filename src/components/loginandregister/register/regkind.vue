@@ -64,7 +64,7 @@
 			<button @click="settime" class="msgConfirm" :disabled="!show">
 			     <span v-if="show">获取验证码</span>
 			     <span v-if="!show" class="count">{{count}} s</span>
-			 </button>
+			</button>
 		</li>
 		<alertTip v-if="personalRegInput.showAlert" :showHide="personalRegInput.showAlert" @closeTip="closeTip" :alertText="personalRegInput.alertText"></alertTip>
 		<div class="regBtn" @click="goRegisterDonePer">
@@ -162,19 +162,44 @@
 		methods:{
 			settime(e) {
 				
-				if (!this.timer) {
-                this.count = 60;
-                this.show = false;
-                this.timer = setInterval(() => {
-                  if (this.count > 0 && this.count <= 60) {
-                    this.count--;
-                  } else {
-                    this.show = true;
-                    clearInterval(this.timer);
-                    this.timer = null;
-                  }
-                }, 1000)
-              }
+				
+				var that = this;
+				var url = MyAjax.urlhw + "/accountmanainfo/registorMobileCode/" + that.personalRegInput.tel;
+		        MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					
+				},function(data){
+					console.log(data)
+					if(data.code==-1){
+						switch (data.msg){
+							case "100007":
+								that.personalRegInput.showAlert = true;
+								that.personalRegInput.alertText = "手机号已注册";
+								break;
+							
+							default:
+								break;
+						}
+					}else{
+						if (!this.timer) {
+			                this.count = 60;
+			                this.show = false;
+			                this.timer = setInterval(() => {
+			                  if (this.count > 0 && this.count <= 60) {
+			                    this.count--;
+			                  } else {
+			                    this.show = true;
+			                    clearInterval(this.timer);
+			                    this.timer = null;
+			                  }
+			                }, 1000)
+		              	}
+					}
+				},function(err){
+					console.log(err)
+				})
 			},
 			changePic(){
 		    	console.log(777)
@@ -206,21 +231,18 @@
 							switch (data.msg){
 								case "100002":
 									console.log(222)
-									that.showAlert = true;
-									that.alertText = "注册失败";
+									that.personalRegInput.showAlert = true;
+									that.personalRegInput.alertText = "注册失败";
 									break;
 								case "100005":
-									that.showAlert = true;
-									that.alertText = "图片验证码不一致";
+									that.personalRegInput.showAlert = true;
+									that.personalRegInput.alertText = "图片验证码不一致";
 									break;
 								case "100006":
-									that.showAlert = true;
-									that.alertText = "短信验证码错误";
+									that.personalRegInput.showAlert = true;
+									that.personalRegInput.alertText = "短信验证码错误";
 									break;
-								case "100007":
-									that.showAlert = true;
-									that.alertText = "该手机号已注册";
-									break;
+								
 								default:
 									break;
 							}

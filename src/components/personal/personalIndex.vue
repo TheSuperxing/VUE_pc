@@ -29,7 +29,7 @@
 				</div>
       </div>
 
-      <p v-cloak>{{this.psnMsg.personalbasicinfo.nickName}}</p>
+      <p v-cloak>{{psnMsg.personalbasicinfo.nickName}}</p>
     </div>
 
     <ul class="personalIndexList">
@@ -45,19 +45,19 @@
           <ul v-if="!empty.basicInfo">
             <li>
               <h5>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
-              <p>{{this.psnMsg.personalbasicinfo.nickName}}</p>
+              <p>{{psnMsg.personalbasicinfo.nickName}}</p>
             </li>
             <li>
               <h5>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
-              <p>{{this.psnMsg.personalbasicinfo.psnName}}</p>
+              <p>{{psnMsg.personalbasicinfo.psnName}}</p>
             </li>
             <li>
               <h5>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</h5>
-              <p>{{this.psnMsg.personalbasicinfo.sex}}</p>
+              <p>{{psnMsg.personalbasicinfo.sex}}</p>
             </li>
             <li>
               <h5>手机号码：</h5>
-              <p>{{this.psnMsg.personalbasicinfo.phoneNumber}}</p>
+              <p>{{psnMsg.personalbasicinfo.phoneNumber}}</p>
             </li>
           </ul>
         </div>
@@ -265,8 +265,8 @@
 				dataType: "json",
 				
 			},function(data){
+        
         that.psnMsg=data.msg;
-				
 			},function(err){
 				console.log(err)
       })
@@ -274,7 +274,7 @@
     },
     mounted(){
 
-    	var that = this;
+      var that = this;
     	//获取当前页数据
 //  	var url = "";
 //  	MyAjax.ajax({
@@ -335,8 +335,7 @@
 				var Blob = cropper.getBlob();
 				var fd = new FormData();
 				fd.append('file',Blob);
-				console.log(fd)
-				var url = urlsy+"/personalbasicinfo/uploadBase64";
+//				var url = urlsy+"/personalbasicinfo/uploadBase64";
 //	    	$.ajax({
 //					type: "POST",
 //					url:url,

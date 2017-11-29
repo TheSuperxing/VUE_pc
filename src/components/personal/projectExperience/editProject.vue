@@ -77,6 +77,13 @@
 		
 			<li class="img-wrap">
 				<span class="table-wrap-left">图片展示</span>
+				<div class="picListCont">
+					<div class="picList" v-for="(item,$index) in picList">
+						<img :src="item.pic" alt="">
+						<button @click="deletePic(index,$index)"></button>
+					</div>
+				</div>
+				
 				<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -164,7 +171,7 @@
 	import router from "../../../router"
 	import qq from "fine-uploader"
     import MyAjax from "../../../assets/js/MyAjax.js"
-	
+	import {singleManualUploader} from "../../../assets/js/manualUploader.js"
 	
 	export default {
 	    name:"editProject",
@@ -185,17 +192,19 @@
 	        projectPlaceObj:{},
 	        index:"",
 	        compalteTime:[],
-	        parTakeTime:[]
+			parTakeTime:[],
+			picList:[]
 	      }
 	    },
 	   
 		mounted(){
+			
 			$(document.body).css("overflow-y","scroll");
 			var that = this;
 			that.projectID = that.$route.query.proId;
 			that.psnProExpeID = that.$route.query.psnId;
 			
-			console.log(that.projectID,that.psnProExpeID)
+			//console.log(that.projectID,that.psnProExpeID)
 			if(that.psnProExpeID == undefined){
 				that.psnProExpeID = '""';
 			}
@@ -210,12 +219,16 @@
 				dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
 			},function(data){
-				console.log(data)
 				data = data.msg;
 				that.project = data;
+				that.project.picId=[];
+				console.log(that.project)
 			},function(err){
 				console.log(err)
 			})
+			// 获取数据信息
+			this.getPic(that.psnProExpeID)
+			//获取图片
 			if(this.project.ifPublish==false){
 				this.isMine = true;
 			}else{
@@ -236,7 +249,7 @@
 			    }
 			}
 	    	that.projectPlaceObj = that.project.projectPlaceObj;
-			console.log(that.project.projectPlaceObj)
+			//console.log(that.project.projectPlaceObj)
 	    	that.project.completeTime = emptyText(that.project.completeTime);
 	    	that.project.projectState = emptyText(that.project.projectState);
 	    	that.project.projectDescription = emptyText(that.project.projectDescription);
@@ -252,59 +265,106 @@
 	    	
 			
 			//上传图片
-			var manualUploader = new qq.FineUploader({
-	            element: document.getElementById('fine-uploader-manual-trigger'),
-	            template: 'qq-template-manual-trigger',
-	            request: {
-	                endpoint: '/server/uploads'
-	            },
-	            thumbnails: {
-//	                placeholders: {
-//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-//	                }
-	            },
-	            validation: {
-	                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-	                itemLimit: 5,
-	                sizeLimit: 1500000
-	            },
-	            autoUpload: false,
-	            debug: true,
-	            callbacks:{
-		        	onSubmit:  function(id,  fileName)  {
-		        		$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").show()
-					},
-					onCancel: function(){
-							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
-							if(imgList.length<=1){
-								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
-							}
-						},
-		        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-		                //alert('This is onComplete function.');
-										//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-		                console.log(responseJSON)
-		                $('#message').append(responseJSON.msg);
-		//	                $('#progress').hide();//隐藏进度动画
-		                //清除已上传队列
-		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-		                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-		//	                $('.stateOne').hide();
-		//	                $('.stateTwo').show()
+// 			var manualUploader = new qq.FineUploader({
+// 	            element: document.getElementById('fine-uploader-manual-trigger'),
+// 	            template: 'qq-template-manual-trigger',
+// 	            request: {
+// 	                endpoint:MyAjax.urlsy+'/psnProjExpe/batchUpload'
+// 	            },
+// 	            thumbnails: {
+// //	                placeholders: {
+// //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
+// //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
+// //	                }
+// 	            },
+// 	            validation: {
+// 	                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+// 	                itemLimit: 5,
+// 	                sizeLimit: 1500000
+// 	            },
+// 	            autoUpload: false,
+// 	            debug: true,
+// 	            callbacks:{
+// 		        	onSubmit:  function(id,  fileName)  {
+// 		        		$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").show()
+// 						setTimeout(function(){
+// 							$(".qq-upload-cancel").css("background-image","url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RDAwRjA4RTVENEE0MTFFNzgyMzlCQTZGQTY0QzZEMTkiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RDAwRjA4RTZENEE0MTFFNzgyMzlCQTZGQTY0QzZEMTkiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpEMDBGMDhFM0Q0QTQxMUU3ODIzOUJBNkZBNjRDNkQxOSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpEMDBGMDhFNEQ0QTQxMUU3ODIzOUJBNkZBNjRDNkQxOSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pp1o6y4AAAGDSURBVHjaYvz//z8DDmAAxLFAbA3EskAsAsRvgPgxEB8F4sVAfAGrTpChaFgJiNcB8b//+ME/qDoldDPQDfQA4g//SQMfoPqwGuoHxH/+kwf+QPWjGKoKxJ//UwZA+tWQDd3+nzpgO8xQY6zSNSb//++ZgVv78ZX//1caYJMxBhnah1XTydX//0cxQDSjg3ObIXIH5mLT2Qsy9ARO11zZC9F8cg1C7OIOiNjp9bh0nQEZ+hRvKMEMuX/u//8XdzAtwQTvGIhKRk+v//+fwPX/fyzL//8PzhNUzgTMVJ8YCAF2bgaGPz8ZGP7+YWBgYSek+j3IpafxWnv9IMTLN4/+///kKoR9dhM+HWdwxz4I3D4OMeTQAiQtGyBi57fi0gWOfROsUue2QJPNPNzJ7fBibDpNcOcoUOLfMQm3Jw8v+v+/TBtnjmKA5llK8/4X9LxPk1IKhgPJcPFnqD6chTQIK0NLdGLAOqh6FDMYiaij7IFYGYgFgPgDEN8F4oP46iiAAAMAQnmMnKvzBWYAAAAASUVORK5CYII=')")
+// 						},10)
+// 					},
+// 					onCancel: function(){
+// 							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
+// 							if(imgList.length<=1){
+// 								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+// 							}
+// 						},
+// 		        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
+// 		                //alert('This is onComplete function.');
+// 										//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
+// 		                //console.log(responseJSON)
+// 		                //$('#message').append(responseJSON.msg);
+// 		//	                $('#progress').hide();//隐藏进度动画
+// 		                //清除已上传队列
+// 		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
+// 		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
+// 		                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
+// 		//	                $('.stateOne').hide();
+// 		//	                $('.stateTwo').show()
 		                
-		                $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
-		          	},
-	        	}
-	        });
-			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	            manualUploader.uploadStoredFiles();
-	        });
+// 		                $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
+// 						console.log(responseJSON.msg)
+// 						that.project.picId.push(responseJSON.msg)
+// 					  },
+// 	        	}
+// 	        });
+// 			qq(document.getElementById("trigger-upload")).attach("click", function() {
+// 	            manualUploader.uploadStoredFiles();
+// 	        });
 			
+			//background-image: url("../../../assets/img/personal/common/picDelete.png");
+			//console.log()
+			singleManualUploader({
+				element:"fine-uploader-manual-trigger",
+        		template: "qq-template-manual-trigger",
+				url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+				picIdCont:that.project.picId,
+				btnPrimary:".btn-primary"
+			})
 	    },
 	    methods:{
-	    	
+	    	getPic(psnProExpeID){
+				var that=this;
+				var url=MyAjax.urlsy+"/psnProjExpe/findById/"+psnProExpeID;
+				MyAjax.ajax({
+						type: "GET",
+						url:url,
+		//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+						dataType: "json",
+		//				content-type: "text/plain;charset=UTF-8",
+					},function(data){
+						Vue.set(that,"picList",data.msg)
+						//console.log(that.picList)
+					},function(err){
+						console.log(err)
+					})
+			},
+			deletePic(index,$index){
+				var that =this;
+				var url = MyAjax.urlsy+"/psnProjExpe/delPic/"+this.show.picList[$index].id
+				MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				},function(data){
+				// if(data.msg=="success"){
+				//   that.show.picList[index][$index]="";
+				// }
+				//console.log(data)
+				},function(err){
+				console.log(err)
+				})
+				that.psnProExpeID = that.$route.query.psnId;
+				this.getPic(that.psnProExpeID)
+			},
 	    	overlayA(){
 	    		var modal = $('.modal-a')
 				Modal.makeText(modal)
@@ -336,7 +396,7 @@
 				
 			},
 			cancelEdit(){
-				console.log(55)
+				//console.log(55)
 				router.push("/yhzx/personal/info/personalProject/index")
 			}
 	    },
@@ -378,6 +438,7 @@ $activeColor: rgb(242,117,25);
 #fine-uploader-manual-trigger .qq-uploader .qq-total-progress-bar-container {
     width: 60%;
 }
+
 .editProject{
 	width:940px; 
 	padding: 40px;
@@ -678,6 +739,35 @@ $activeColor: rgb(242,117,25);
 						float: left;
 						margin-top: 40px;
 					}
+					.picListCont{
+						width: 720px;
+						float: left;
+						.picList{
+							float: left;
+							width: 200px;
+							height: 200px;
+							padding: 8px;
+							background: rgba(210,210,210,.3);
+							border-radius: 10px;
+							margin-left: 10px;
+							margin-bottom: 10px;
+							position: relative;
+							img{
+								width: 182px;
+							}
+							button{
+								border-style: none;
+								width: 21px;
+								height: 21px;
+								position: absolute;
+								top: 10px;
+								right: 10px;
+								cursor: pointer;
+								background: url("../../../assets/img/personal/common/picDelete.png") no-repeat center;
+							}
+						}
+					}
+					
 					.img-show{
 						float: left;
 						width: 685px;

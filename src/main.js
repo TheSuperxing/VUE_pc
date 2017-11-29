@@ -27,10 +27,6 @@ import title from "./assets/js/directive/directive"
 import './assets/scss/main.scss'
 
 import './assets/js/common.js'
-import { Row, Col} from 'element-ui'
-
-Vue.use(Row)
-Vue.use(Col)
 /*fine-uploader*/
 import "./assets/js/units/fine-uploader/fine-uploader.css"
 import "./assets/js/units/fine-uploader/fine-uploader.js"

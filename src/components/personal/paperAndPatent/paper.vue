@@ -29,6 +29,19 @@
           <div class="paperInfoBody">
             <p v-cloak>{{paper[index].journal}}</p>
             <p v-cloak>{{paper[index].publicTime}}</p>
+
+            <div class="morePics" v-if="!show.tag[index]">
+                <img v-for="item in show.picList[index]" :src="item.pic" />
+                <!-- <img v-for="item in show.picList" :src="data:image/png;base64,item.pic" /> -->
+            </div>
+            <div class="viewMore">
+              <p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
+                <!--<img src="../../../assets/img/company/double-bottom-down.png" />
+                <img src="../../../assets/img/company/double-bottom-up.png" />-->
+                <span>{{updowntxt[index]}}</span>
+              </p>
+            </div>
+
           </div>
         </div>
         <!--显示信息列表结束-->
@@ -57,6 +70,14 @@
             </li>
             <li class="img-wrap">
 							<span class="wrap-left">图片展示</span>
+
+              <div class="picListCont">
+                <div class="picList" v-for="(item,$index) in show.picList[index]">
+                  <img :src="item.pic" alt="">
+                  <button @click="deletePic(index,$index)"></button>
+                </div>
+              </div>
+
 							<script type="text/template" :id="qqTemplate[index]">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 						            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
@@ -188,7 +209,7 @@
 			                	
 			                    <span>请上传图片</span>
 			                </div>
-			                <button type="button"  class="btn btn-primary" id="trigger-upload-paper">
+			                <button type="button"  class="btn btn-primary btn-primary-paper" id="trigger-upload-paper">
 			                    	 提交
 			                </button>
 			            </div>
@@ -242,6 +263,7 @@
   import datepicker from "../../units/Datepicker.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
+  import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 
   export default {
     name:"PaperIndex",
@@ -258,13 +280,21 @@
           addPaper:true,//是否添加信息
           keepAddPaper:true,//添加模式下，保存按钮是否可用
         },
+
+        updowntxt:[],
+        show:{
+          tag:[],
+          picList:[],
+        },
+
         paper:[],
         localPaper:[],
         newPaper:{
           accountID:"string",
           paperTitle:"",
           journal:"",
-          publicTime:""
+          publicTime:"",
+          picId:[],//上传图片返回的ID
         },
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
@@ -277,67 +307,69 @@
       this.getData();
     },
     mounted(){
-    	
-    	//上传图片
-			var manualUploader = new qq.FineUploader({
-	        element: document.getElementById('fine-uploader-manual-trigger-paper'),
-	        template: 'qq-template-manual-trigger-paper',
-	        request: {
-	            endpoint: '/server/uploads'
-	        },
-	        thumbnails: {
+    	var that = this;
+//     	//上传图片
+// 			var manualUploader = new qq.FineUploader({
+// 	        element: document.getElementById('fine-uploader-manual-trigger-paper'),
+// 	        template: 'qq-template-manual-trigger-paper',
+// 	        request: {
+// 	            endpoint: '/server/uploads'
+// 	        },
+// 	        thumbnails: {
 		                
-	        },
-	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-	            itemLimit: 5,
-	            sizeLimit: 1500000
-	        },
-	        autoUpload: false,
-	        debug: true,
-	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
-	        		$("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").show()
-            },
-            onCancel: function(){
-							var imgList=$("#fine-template-manual-trigger-paper div .qq-uploader-selector .qq-upload-list-selector .list")
-							if(imgList.length<=1){
-								$("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").hide()
-							}
-						},
-	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	                //alert('This is onComplete function.');
-									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-	                console.log(responseJSON)
-	                $('#message').append(responseJSON.msg);
-	//	                $('#progress').hide();//隐藏进度动画
-	                //清除已上传队列
-//	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-	//	                $('.stateOne').hide();
-	//	                $('.stateTwo').show()
+// 	        },
+// 	        validation: {
+// 	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+// 	            itemLimit: 5,
+// 	            sizeLimit: 1500000
+// 	        },
+// 	        autoUpload: false,
+// 	        debug: true,
+// 	        callbacks:{
+// 	        	onSubmit:  function(id,  fileName)  {
+// 	        		$("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").show()
+//             },
+//             onCancel: function(){
+// 							var imgList=$("#fine-template-manual-trigger-paper div .qq-uploader-selector .qq-upload-list-selector .list")
+// 							if(imgList.length<=1){
+// 								$("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").hide()
+// 							}
+// 						},
+// 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
+// 	                //alert('This is onComplete function.');
+// 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
+// 	                console.log(responseJSON)
+// 	                $('#message').append(responseJSON.msg);
+// 	//	                $('#progress').hide();//隐藏进度动画
+// 	                //清除已上传队列
+// //	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
+// 	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
+// 	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
+// 	//	                $('.stateOne').hide();
+// 	//	                $('.stateTwo').show()
 	                
-	                $("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").hide()
-	                console.log(maybeXhr)
-	          	},
-	    	}
-	    });
-			qq(document.getElementById("trigger-upload-paper")).attach("click", function() {
-	        manualUploader.uploadStoredFiles();
-	    });
+// 	                $("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").hide()
+// 	                console.log(maybeXhr)
+// 	          	},
+// 	    	}
+// 	    });
+// 			qq(document.getElementById("trigger-upload-paper")).attach("click", function() {
+// 	        manualUploader.uploadStoredFiles();
+// 	    });
 	    
 	    //实例化编辑状态的上传图片
-	   
+      singleManualUploader({
+        element:"fine-uploader-manual-trigger-paper",
+        template: "qq-template-manual-trigger-paper",
+        url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
+        picIdCont:that.newPaper.picId,
+        btnPrimary:".btn-primary-paper"
+      })
 	    
       if(this.paper.length!=0){
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
         for(let i=0;i<this.paper.length;i++){
-        //   /*数据同步本地一份开始*/
-        //   this.localPaper.paperName[i]=this.paper[i].paperName;
-        //   this.localPaper.info.organ[i]=this.paper[i].info.organ;
-        //   this.localPaper.info.time[i]=this.paper[i].info.time;
-        //   //论文数据
+
           this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
           
           this.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值
@@ -386,11 +418,28 @@
         // 从服务器获取数据
         this.localPaper=JSON.parse(JSON.stringify(this.paper));
         //数据库的数据放本地一份
+
         for(var i=0;i<this.paper.length;i++){
           this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.paper[i].paperID);
           this.qqTemplate.push("qq-template-manual-trigger-paper"+this.paper[i].paperID);
           this.qqTriggerUpload.push("trigger-upload"+this.paper[i].paperID);
+          that.show.tag[i]=true;
+          that.updowntxt.push("展开查看更多");
         }
+
+      },
+      getPic(pkid,index){
+        var that=this;
+        var url=MyAjax.urlsy+"/psnPaperPatent/findPicsById/"+pkid;
+        MyAjax.ajax({
+            type: "GET",
+            url:url,
+            dataType: "json",
+          },function(data){
+            Vue.set(that.show.picList,[index],data.msg)
+          },function(err){
+            console.log(err)
+          })
       },
       openOrPrivacy(index){//信息是否对外公开控制按钮
         var that=this;
@@ -422,55 +471,99 @@
           }
         //Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
       },
+      upDown(index){
+//  		Vue.set(this.show,"tag[index]",false)
+				if(this.show.tag[index]==true){
+					Vue.set(this.show.tag,[index],false)
+					this.updowntxt[index] = "收起图片"
+				}else{
+					Vue.set(this.show.tag,[index],true)
+					this.updowntxt[index] = "展开查看更多" 
+				}
+    		this.show.tag[index] == true? false:true;
+        this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+        this.getPic(this.paper[index].paperID,index)
+			  console.log(this.show.picList)
+    	},
       paperEdit(index){//编辑状态进入按钮
-      	var index=index;
       	//console.log(index)
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
                
-        if(window['manualUploader_paper_'+index]==undefined){
-          window['manualUploader_paper_'+index]= new qq.FineUploader({
-            element: document.getElementById(this.fineUploaderId[index]),
-            template: this.qqTemplate[index],
-            request: {
-              endpoint: '/server/uploads'
-            },
-            thumbnails: {
-            },
-            validation: {
-              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-              itemLimit: 5,
-              sizeLimit: 2000000
-            },
-            autoUpload: false,
-            debug: true,
-            callbacks:{
-              onSubmit:  function(id,fileName){
-                $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").show()
-              },
-              onCancel: function(){
-                var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
-                if(imgList.length<=1){
-                  $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").hide()
-                }
-              },
-              onComplete: function (id, fileName, responseJSON, maybeXhr) {
+        // if(window['manualUploader_paper_'+index]==undefined){
+        //   window['manualUploader_paper_'+index]= new qq.FineUploader({
+        //     element: document.getElementById(this.fineUploaderId[index]),
+        //     template: this.qqTemplate[index],
+        //     request: {
+        //       endpoint: '/server/uploads'
+        //     },
+        //     thumbnails: {
+        //     },
+        //     validation: {
+        //       allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
+        //       itemLimit: 5,
+        //       sizeLimit: 2000000
+        //     },
+        //     autoUpload: false,
+        //     debug: true,
+        //     callbacks:{
+        //       onSubmit:  function(id,fileName){
+        //         $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").show()
+        //       },
+        //       onCancel: function(){
+        //         var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
+        //         if(imgList.length<=1){
+        //           $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").hide()
+        //         }
+        //       },
+        //       onComplete: function (id, fileName, responseJSON, maybeXhr) {
                 
-              },
-            }
-          });
-        }
+        //       },
+        //     }
+        //   });
+        // }
           
 
-          var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper");
+        //   var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper");
           
-          qq(btnPrimary[0]).attach("click", function() {
-            eval('manualUploader_paper_'+index).uploadStoredFiles();
-            btnPrimary.hide()
-          });
+        //   qq(btnPrimary[0]).attach("click", function() {
+        //     eval('manualUploader_paper_'+index).uploadStoredFiles();
+        //     btnPrimary.hide()
+        //   });
+        
+        this.getPic(this.paper[index].paperID,index)
+
+        that.paper[index].picId=[];
+        moreManualUploader({
+          nameList:'manualUploader_paper_'+index,
+          element:that.fineUploaderId[index],
+          template: that.qqTemplate[index],
+          url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
+          picIdCont:that.paper[index].picId,
+          btnPrimary:".btn-primary-paper"
+        })
+
+      },
+      deletePic(index,$index){
+        var that =this;
+        var url = MyAjax.urlsy+"/psnPaperPatent/delPic/"+this.show.picList[index][$index].id
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+        },function(data){
+          // if(data.msg=="success"){
+          //   that.show.picList[index][$index]="";
+          // }
+          //console.log(data)
+        },function(err){
+          console.log(err)
+        })
+        this.getPic(this.paper[index].paperID,index)
       },
       paperEditKeep(index){//编辑状态，保存按钮
         var that=this;
+        that.localPaper[index].picId=this.paper[index].picId;
         if(this.localPaper[index].paperTitle.trim().length!=0){
           var url = MyAjax.urlsy+"/psnPaperPatent/updatePaper";
           MyAjax.ajax({
@@ -811,8 +904,8 @@
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{
-        		width: 680px;
-        		float: left;
+        		width: 720px;
+        		float: right;
         	}
         }
         li.tip-wrap{
@@ -852,5 +945,77 @@
       }
     }
     /*添加信息结束*/
+    .morePics{
+      overflow: hidden;
+      margin-top: 15px;
+      img{
+        float: left;
+        width: 160px;
+        height: 100px;
+        margin-right: 15px;
+        margin-bottom: 15px;
+        
+      }
+    }
+    .viewMore{
+				width: 100%;
+				height: 14px;
+				line-height: 14px;
+				margin-top: 15px;
+				cursor: pointer;
+        margin-bottom: 30px;
+				.viewDown{
+					width: 120px;
+					height: 100%;
+					padding-left: 20px;
+					margin: 0 auto!important;
+					background: url(../../../assets/img/personal/projectexperience/icon_lookmore.png) no-repeat left center;
+        }
+        span{
+          color: $themeColor!important;
+        }
+				.viewUp{
+					width: 120px;
+					height: 100%;
+					padding-left: 20px;
+					margin: 0 auto!important;
+					background: url(../../../assets/img/personal/projectexperience/icon_revoke_075.3.png) no-repeat left center;
+				}
+				img{
+					vertical-align: middle;
+					margin-bottom: 3px;
+					margin-right: 5px;
+				}
+			}
+      // 显示图片样式
+      .picListCont{
+        width: 720px;
+        float: left;
+        .picList{
+          float: left;
+          width: 200px;
+          height: 200px;
+          padding: 8px;
+          background: rgba(210,210,210,.3);
+          border-radius: 10px;
+          margin-left: 10px;
+          margin-bottom: 10px;
+          position: relative;
+          img{
+            width: 182px;
+          }
+          button{
+            border-style: none;
+            width: 21px;
+            height: 21px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            background: url("../../../assets/img/personal/common/picDelete.png") no-repeat center;
+          }
+        }
+      }
+      // 编辑显示已有图片样式
   }
 </style>

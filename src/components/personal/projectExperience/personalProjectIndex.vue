@@ -81,13 +81,8 @@
     	</div>
     	
     	<div class="morePics" v-if="!show.tag[$index]">
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		
+    		<img v-for="item in show.picList" :src="item.pic" />
+    		<!-- <img v-for="item in show.picList" :src="data:image/png;base64,item.pic" /> -->
     	</div>
     	<div class="viewMore">
     		<p v-bind:class="{viewDown:show.tag[$index],viewUp:!show.tag[$index]}" @click="upDown($index)">
@@ -115,7 +110,8 @@
         stateNone:false,
         updowntxt:[],
         show:{
-        	tag:[],
+			tag:[],
+			picList:"",
         },
         proInfo:[],
         localProInfo:[],
@@ -187,7 +183,22 @@
 		      	that.openOrPrivacyText.push("显示");
 		      /*对每一个循环列表的对外显示赋初始值*/
 	    	}
-    	},
+		},
+		getPic(psnProExpeID){
+			var that=this;
+			var url=MyAjax.urlsy+"/psnProjExpe/findById/"+psnProExpeID;
+			MyAjax.ajax({
+					type: "GET",
+					url:url,
+	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
+					dataType: "json",
+	//				content-type: "text/plain;charset=UTF-8",
+				},function(data){
+					that.show.picList=data.msg;
+				},function(err){
+					console.log(err)
+				})
+		},
     	goToEditPro(index,item){
     		console.log(item.projectID,item.psnProExpeID)
     		router.push({name:'editPerProject',query:{proId:item.projectID,psnId:item.psnProExpeID}})
@@ -205,7 +216,9 @@
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
-    		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+			this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+			this.getPic(this.proInfo[index].psnProExpeID)
+			console.log(this.show.picList[0])
     	},
     	OpenOrPrivacy(index){//显示隐藏按钮，通过这个按钮可以控制显示到别人查看信息页的信息
     		
@@ -634,33 +647,33 @@ $activeColor: rgb(242,117,25);
     			
     		}
     	}
-    	.viewMore{
-    		width: 100%;
-    		height: 14px;
-    		line-height: 14px;
-    		color: $activeColor;
-    		margin-top: 15px;
-    		cursor: pointer;
-    		.viewDown{
-    			width: 120px;
-    			height: 100%;
-    			padding-left: 20px;
-    			margin: 0 auto;
-    			background: url(../../../assets/img/personal/projectexperience/icon_lookmore.png) no-repeat left center;
-    		}
-    		.viewUp{
-    			width: 120px;
-    			height: 100%;
-    			padding-left: 20px;
-    			margin: 0 auto;
-    			background: url(../../../assets/img/personal/projectexperience/icon_revoke_075.3.png) no-repeat left center;
-    		}
-    		img{
-    			vertical-align: middle;
-    			margin-bottom: 3px;
-    			margin-right: 5px;
-    		}
-    	}
+			.viewMore{
+				width: 100%;
+				height: 14px;
+				line-height: 14px;
+				color: $activeColor;
+				margin-top: 15px;
+				cursor: pointer;
+				.viewDown{
+					width: 120px;
+					height: 100%;
+					padding-left: 20px;
+					margin: 0 auto;
+					background: url(../../../assets/img/personal/projectexperience/icon_lookmore.png) no-repeat left center;
+				}
+				.viewUp{
+					width: 120px;
+					height: 100%;
+					padding-left: 20px;
+					margin: 0 auto;
+					background: url(../../../assets/img/personal/projectexperience/icon_revoke_075.3.png) no-repeat left center;
+				}
+				img{
+					vertical-align: middle;
+					margin-bottom: 3px;
+					margin-right: 5px;
+				}
+			}
 		}
 	}
 

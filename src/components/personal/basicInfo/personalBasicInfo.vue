@@ -88,8 +88,9 @@
         </li>
         <li>
           <h5>手机号码：</h5>
-          <p>{{baseInfo.phoneNumber}}</p>
-          <span>(手机号为当前登录账户，不可自行修改，如需修改登录手机号，请联系管理员)</span>
+          <!--<p>{{baseInfo.phoneNumber}}</p>-->
+          <input type="text" v-model="localBaseInfo.phoneNumber" />
+          <!--<span>(手机号为当前登录账户，不可自行修改，如需修改登录手机号，请联系管理员)</span>-->
         </li>
         <li>
           <h5>联系邮箱：</h5>
@@ -342,7 +343,7 @@
 					console.log(err)
 				})
 	    	//判断用户的全部信息为空值
-	    	if(that.baseInfo.sex=="2"){
+	    	if(that.baseInfo.sex=="0"){
 	    		that.baseInfo.sex = "男"
 	    	}else if(that.baseInfo.sex=="1"){
 	    		that.baseInfo.sex = "女"
@@ -666,7 +667,7 @@
           input{
             border:1px solid $borderColor;
             padding-left:10px;
-            font-size: 12px;
+            font-size: 14px;
             line-height: 19px;
             border-radius: 5px;
           }
@@ -704,8 +705,9 @@
             width:384px;
           }
           i{
-            float: right;
-            margin-right:50px;
+            float: left;
+            margin-left:10px;
+            margin-top: 5px;
           }
 
         }
@@ -724,9 +726,10 @@
             float: right;
             color: $themeColor;
           }
-          i{
-            float: right;
-            margin-right:50px;
+           i{
+            float: left;
+            margin-left:10px;
+            margin-top: 5px;
           }
           input{
             width:384px;
@@ -760,6 +763,7 @@
           	width: 384px;
           	float: left;
           	margin-left: 20px;
+          	font-size: 14px;
           }
         }
         li:nth-child(5){
@@ -772,6 +776,11 @@
             color: $themeColor;
             line-height: 38px;
             
+          }
+          input{
+          	float: left;
+          	width:384px;
+          	margin-left: 20px;
           }
          
         }

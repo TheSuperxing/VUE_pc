@@ -3,7 +3,7 @@
     <div class="psnCont">
     <div class="picture">
     	<div class="basicInfoImg">
-    		<img v-bind:src="personal.personalPicture" alt="">
+    		<img v-bind:src="personal.personalPicture" alt=""/>
         
     		<span class="meng" @click="croperShow">更换头像</span>
     	</div>
@@ -21,11 +21,11 @@
 				      </a>
 				      <input type="file" class="" name="upload-file" id="upload-file" multiple/>
 				    </div>
-				    <input type="button" id="btnCrop"  class="Btnsty_peyton" value="确定">
+				    <input type="button" id="btnCrop"  class="Btnsty_peyton" value="确定" />
 				    <input type="button" id="btnZoomIn" class="Btnsty_peyton" value="+">
 				    <input type="button" id="btnZoomOut" class="Btnsty_peyton" value="-">
 				  </div>
-				  <div class="cropped"></div>
+				  <!--<div class="cropped"></div>-->
 				</div>
       </div>
 
@@ -250,7 +250,7 @@
         psnMsg:[],//用于存放服务器获取的数据
         validityTerm:[],//validityTermS+validityTermE
         personal:{
-          personalPicture:require("../../assets/img/personal/personalIndex/picture.png"),
+          personalPicture:"",
           fileName:"",
         	fd :"",
         },
@@ -275,28 +275,26 @@
     mounted(){
 
       var that = this;
-    	//获取当前页数据
-//  	var url = "";
-//  	MyAjax.ajax({
-//				type: "GET",
-//				url:url,
-//				data: {tel:that.personalRegInput.tel, messageConfirm:that.personalRegInput.picConfirm},
-//				dataType: "json",
+    	//获取头像
+    	var url = MyAjax.urlsy+"/psnHomePage/getAvatar";
+    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
 //				content-type: "text/plain;charset=UTF-8",
-//				
-//			}, function(data){
-//				console.log(data)
-////					data = data.replace("callback(","").slice(0,-1);
-////				data = data.slice(0,-1);
-////					data = JSON.parse(data);
-//				console.log(data)
-////					that.dataInfo = data
-////					console.log(that.dataInfo)
-//			},function(err){
-//				console.log(err)
-//			})
-    	//上传头像
-//  	console.log(cropbox)
+				
+			},function(data){
+				console.log(data)
+				if(data.code==0){
+					that.personal.personalPicture = data.msg.pic
+				}else if(data.code==-1){
+					that.personal.personalPicture = require("../../assets/img/personal/personalIndex/picture.png");
+				}
+				
+			},function(err){
+				console.log(err)
+			})
+    	
 
     
 //  	console.log(that.personal.personalPicture)
@@ -325,32 +323,32 @@
 //				console.log(img)
 //				console.log(cropper.image)
 				that.personal.personalPicture = img;
-//				console.log(that.personal.personalPicture)
 
 				$('.cropped').html('');
 				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
 				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
 				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
 				
-				var Blob = cropper.getBlob();
-				var fd = new FormData();
-				fd.append('file',Blob);
-//				var url = urlsy+"/personalbasicinfo/uploadBase64";
-//	    	$.ajax({
-//					type: "POST",
-//					url:url,
-//					data:{base64Data:that.personal.personalPicture,fileName:that.fileName},
-//					dataType: "json",
-//	//				content-type: "text/plain;charset=UTF-8",
-//					success: function(data){
-//	        	data = JSON.stringify(data)
-//	            console.log(data +"suceed")
-//	        },error:function(error){
-//	         	console.log(error+"error")
-//	        }
-//				})
+//				var Blob = cropper.getBlob();
+//				var fd = new FormData();
+//				fd.append('file',Blob);
 				Modal.closeModal($('.corpbox'))
-				
+				var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
+				console.log(that.personal.personalPicture)
+				$.ajax({
+						type: "POST",
+						url:url,
+						data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
+						dataType: "json",
+			//				content-type: "text/plain;charset=UTF-8",
+						success:function(data){
+						console.log(data)
+			//					that.dataInfo = data
+			//					console.log(that.dataInfo)
+						},error:function(err){
+							console.log(err)
+						}
+					})
 				
 			})
 			$('#btnZoomIn').on('click', function(){
@@ -492,28 +490,30 @@
     methods:{
     	croperShow(){
     		Modal.makeText($('.corpbox'))
-    	}
+    	},
+//  	uploadAvatar(){
+//  		var that = this;
+//				var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
+//				console.log(that.personal.personalPicture)
+//				$.ajax({
+//						type: "POST",
+//						url:url,
+//						data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
+//						dataType: "json",
+//			//				content-type: "text/plain;charset=UTF-8",
+//						success:function(data){
+//						console.log(data)
+//			//					that.dataInfo = data
+//			//					console.log(that.dataInfo)
+//						},error:function(err){
+//							console.log(err)
+//						}
+//					})
+//				//上传头像
+//  	}
     },
     destroyed(){
-    	var that = this;
-    	var url = MyAjax.urlsy+"/personalbasicinfo/uploadBase64";
-//  	var url = "http://10.1.31.6:8080/psnsoftware/upload";
     	
-    	$.ajax({
-				type: "POST",
-				url:url,
-				data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
-				dataType: "json",
-//				content-type: "text/plain;charset=UTF-8",
-				success:function(data){
-				console.log(data)
-//					that.dataInfo = data
-//					console.log(that.dataInfo)
-				},error:function(err){
-					console.log(err)
-				}
-			})
-    	//上传头像
     }
   }
 </script>
@@ -549,7 +549,7 @@
     .picture{
     	/*上传头像*/
     	.container{
-    		position:absolute;top:50%;left:42%; 
+    		position:absolute;top:50%;left:50%; 
 				transform:translate(-50%,-50%);
 				-webkit-transform:translate(-50%,-50%);
 				-moz-transform:translate(-50%,-50%);

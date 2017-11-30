@@ -11,7 +11,8 @@
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
       <li>
-        <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus />
+        <!-- <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus /> -->
+        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入文字" @blur="msgConfirm($event)" @focus="divFocus()"></div> 
         <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
       </li>
       
@@ -44,7 +45,8 @@
         },
         reveal:{	
           error:false,//图片验证码
-          buttonDisabled:false
+          buttonDisabled:false,
+          focus:false,//短信验证码获取焦点后的添加类名
         },
         personalLoginInput:{
           tel:"",
@@ -111,13 +113,20 @@
       	}
         
       },
-      msgConfirm(){
+      divFocus(){
+        Vue.set(this.reveal,"focus",true)
+      },
+      msgConfirm(event){
+        this.personalLoginInput.messageConfirm=event.currentTarget.innerText
       	if(this.personalLoginInput.messageConfirm.trim().length==0){
       		this.showAlert = true;
-      		this.alertText  = "短信验证码不能为空";
+          this.alertText  = "短信验证码不能为空";
+          Vue.set(this.reveal,"focus",false)
       	}else{
-      		this.showAlert = false;
-      	}
+          this.showAlert = false;
+        }
+        
+        console.log(1223333333)
       },
       getMessageConfirm(){
         Vue.set(this.reveal,"buttonDisabled",true)
@@ -221,6 +230,22 @@
 </script>
 <style scoped lang="scss">
   $personalThemeColor:rgb(242,117,25);
+  .input{  
+      width:200px;  
+      height:24px;  
+      line-height:24px;  
+      font-size:14px;  
+      text-align: left;
+      color: rgb(169, 169, 169);  
+      cursor: text;
+  }  
+  .focus{
+    color: rgb(53, 53, 53);  
+  }
+  .input:empty::before {  
+      content: attr(placeholder);  
+  }  
+
   .alet_container{
   	bottom:200px !important;
   	left: 100px;

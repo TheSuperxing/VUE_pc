@@ -291,76 +291,6 @@
 //  
     mounted(){
       this.updateData();
-      var that=this;
-    	//上传图片
-// 			var manualUploader = new qq.FineUploader({
-// 	        element: document.getElementById('fine-template-manual-trigger-software'),
-// 	        template: 'qq-template-manual-trigger-software',
-// 	        request: {
-// 	            endpoint: 'http://10.1.31.7:8080/psnsoftware/batchUpload'
-// 	        },
-// 	        thumbnails: {
-// 	//	                placeholders: {
-// 	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-// 	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-// 	//	                }
-// 	        },
-// 	        validation: {
-// 	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-// 	            itemLimit: 5,
-// 	            sizeLimit: 1500000
-// 	        },
-// 	        autoUpload: false,
-// 	        debug: true,
-// 	        callbacks:{
-// 	        	onSubmit:  function(id,fileName)  {
-// 	        		$("#fine-template-manual-trigger-software .qq-uploader-selector .buttons .btn-primary-software").show()
-//             },
-//             onCancel: function(){
-// 							var imgList=$("#fine-template-manual-trigger-software .qq-uploader-selector .qq-upload-list-selector .list")
-// 							if(imgList.length<=1){
-// 								$("#fine-template-manual-trigger-software .qq-uploader-selector .buttons .btn-primary-software").hide()
-// 							}
-// 						},
-// 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-//                 //alert('This is onComplete function.');
-// 								//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-//                 console.log(responseJSON)
-//                 $('#message').append(responseJSON.msg);
-// //	                $('#progress').hide();//隐藏进度动画
-//                 //清除已上传队列
-// //	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-//                 //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-//                 //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-// //	                $('.stateOne').hide();
-// //	                $('.stateTwo').show()
-                
-//                 $("#fine-template-manual-trigger-software .qq-uploader-selector .buttons .btn-primary-software").hide()
-//                 console.log(maybeXhr)
-//           	},
-// 	    	}
-// 	    });
-// 			qq(document.getElementById("trigger-upload-software")).attach("click", function() {
-// 	      manualUploader.uploadStoredFiles();
-// 	    });
-	    
-//    if(this.software.length!=0){
-//      Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
-//      for(let i=0;i<this.software.length;i++){
-//        //论文数据
-//        this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
-//      }
-//    }else{
-//      Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
-//    }
-//    console.log(that.reveal.openOrPrivacy)
-      singleManualUploader({
-        element:"fine-template-manual-trigger-software",
-        template: "qq-template-manual-trigger-software",
-				url:MyAjax.urlsy+'/psnsoftware/batchUpload',
-        picIdCont:that.newSoftware.picId,
-        btnPrimary:".btn-primary-software"
-			})
     },
     updated(){
       if(this.software.length!=0){
@@ -482,43 +412,6 @@
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         //上传图片
         var that = this
-	      // if(window['manualUploader_software_'+index]==undefined){
-        //   window['manualUploader_software_'+index]= new qq.FineUploader({
-        //     element: document.getElementById(that.fineUploaderId[index]),
-        //     template: that.qqTemplate[index],
-        //     request: {
-        //       endpoint: 'http://10.1.31.7:8080/psnsoftware/batchUpload'
-        //     },
-        //     thumbnails: {
-        //     },
-        //     validation: {
-        //       allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-        //       itemLimit: 5,
-        //       sizeLimit: 2000000
-        //     },
-        //     autoUpload: false,
-        //     debug: true,
-        //     callbacks:{
-        //       onSubmit:  function(id,fileName){
-        //         $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software").show()
-        //       },
-        //       onCancel: function(){
-        //         var imgList=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .qq-upload-list-selector .list")
-        //         if(imgList.length<=1){
-        //           $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software").hide()
-        //         }
-        //       },
-        //       onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                
-        //       },
-        //     }
-        //   });
-        // }
-        // var btnPrimary=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary-software");
-        // qq(btnPrimary[0]).attach("click", function() {
-        //   eval('manualUploader_software_'+index).uploadStoredFiles();
-        //   btnPrimary.hide()
-        // });
         this.getPic(this.software[index].pkid,index)
 
         that.software[index].picId=[];
@@ -530,7 +423,7 @@
           picIdCont:that.software[index].picId,
           btnPrimary:".btn-primary-software"
         })
-        console.log(that.software[index])
+        
       },
 
       deletePic(index,$index){
@@ -554,13 +447,14 @@
       softwareEditKeep(index){//编辑状态，保存按钮
         
         var that = this;
-        console.log(that.software[index])
+        console.log()
+        that.localSoftware[index]=that.software[index];
         var url = MyAjax.urlsy+"/psnsoftware/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
 					url:url,
-					data: JSON.stringify(that.software[index]),
+					data: JSON.stringify(that.localSoftware[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
 					
@@ -574,6 +468,8 @@
 				if(this.localSoftware[index].length!=0){
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
         }
+
+        $("#"+this.fineUploaderId[index]).html("")
       },
       
       softwareEditCancel(index){//编辑状态，取消按钮
@@ -582,6 +478,7 @@
         this.localSoftware[index]=JSON.parse(JSON.stringify(this.software[index]));
 
         /*如果是取消编辑，从新从Vuex中得到数据*/
+        $("#"+this.fineUploaderId[index]).html("")
       },
       softwareEditDel(index){//编辑状态，删除按钮
         
@@ -598,6 +495,17 @@
         this.newSoftware.proficiency = "";
         Vue.set(this.reveal,"addSoftware",false);
         Vue.set(this.reveal,"empty",false);
+        var that=this;
+
+        //上传图片
+        singleManualUploader({
+          element:"fine-template-manual-trigger-software",
+          template: "qq-template-manual-trigger-software",
+          url:MyAjax.urlsy+'/psnsoftware/batchUpload',
+          picIdCont:that.newSoftware.picId,
+          btnPrimary:".btn-primary-software"
+        })
+
       },
       keepNewSoftware(){//添加模式下的保存
         if(this.newSoftware.software.length!=0){
@@ -630,6 +538,8 @@
 					console.log(err)
 				})
         that.updateData();
+
+        $("#fine-template-manual-trigger-software").html("")
       },
       cancelNewSoftware(){
         Vue.set(this.reveal,"addSoftware",true);
@@ -637,6 +547,8 @@
         Vue.set(this.newSoftware,"software","");
         Vue.set(this.newSoftware,"proficiency","");
         /*清除数据，保证下次输入时输入框为空*/
+
+       $("#fine-template-manual-trigger-software").html("")
       }
     }
   }

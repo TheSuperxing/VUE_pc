@@ -262,7 +262,7 @@
           addLanguage:true,//是否添加信息
           keepAddLanguage:true,//添加模式下，保存按钮是否可用
         },
-        
+
         updowntxt:[],
         show:{
           tag:[],
@@ -285,71 +285,8 @@
       }
     },
     mounted(){
-      var that=this;
     	this.updateData();
-    	//上传图片
-// 			var manualUploader = new qq.FineUploader({
-// 	        element: document.getElementById('fine-template-manual-trigger-language'),
-// 	        template: 'qq-template-manual-trigger-language',
-// 	        request: {
-// 	            endpoint: MyAjax.urlsy+'/psnlanguage/batchUpload'
-// 	        },
-// 	        thumbnails: {
-// 	//	                placeholders: {
-// 	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-// 	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-// 	//	                }
-// 	        },
-// 	        validation: {
-// 	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-// 	            itemLimit: 5,
-// 	            sizeLimit: 1500000
-// 	        },
-// 	        autoUpload: false,
-// 	        debug: true,
-// 	        callbacks:{
-// 	        	onSubmit:  function(id,  fileName)  {
-// 	        		$("#fine-template-manual-trigger-language div .qq-uploader-selector .buttons .btn-primary-language").show()
-// 						},
-// 						onCancel: function(){
-// 							var imgList=$("#fine-template-manual-trigger-language div .qq-uploader-selector .qq-upload-list-selector .list")
-// 							if(imgList.length<=1){
-// 								$("#fine-template-manual-trigger-language div .qq-uploader-selector .buttons .btn-primary-language").hide()
-// 							}
-// 						},
-// 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-// 	                //alert('This is onComplete function.');
-// 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-// 	                console.log(responseJSON)
-// 	                $('#message').append(responseJSON.msg);
-// 	//	                $('#progress').hide();//隐藏进度动画
-// 	                //清除已上传队列
-// //	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-// 	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-// 	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-// 	//	                $('.stateOne').hide();
-// 	//	                $('.stateTwo').show()
-	                
-// 	                $("#fine-template-manual-trigger-language div .qq-uploader-selector .buttons .btn-primary-language").hide()
-// 	                console.log(maybeXhr)
-// 	          	},
-// 	    	}
-// 	    });
-// 			qq(document.getElementById("trigger-upload-language")).attach("click", function() {
-// 	        manualUploader.uploadStoredFiles();
-// 	    });
-
-      
-	    
-      
-      
-      singleManualUploader({
-        element:"fine-template-manual-trigger-language",
-        template: "qq-template-manual-trigger-language",
-				url:MyAjax.urlsy+'/psnlanguage/batchUpload',
-        picIdCont:that.newLanguage.picId,
-        btnPrimary:".btn-primary-language"
-			})
+      //上传图片
     },
     updated(){
       if(this.language.length!=0){
@@ -478,54 +415,6 @@
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
         //上传图片
-        // if(window['manualUploader_language_'+index]==undefined){
-        //   window['manualUploader_language_'+index]= new qq.FineUploader({
-        //     element: document.getElementById(this.fineUploaderId[index]),
-        //     template: this.qqTemplate[index],
-        //     request: {
-        //       endpoint: '/server/uploads'
-        //     },
-        //     thumbnails: {
-        //     },
-        //     validation: {
-        //       allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-        //       itemLimit: 5,
-        //       sizeLimit: 2000000
-        //     },
-        //     autoUpload: false,
-        //     debug: true,
-        //     callbacks:{
-        //       onSubmit:  function(id,fileName){
-        //         $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-language").show()
-        //         var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
-
-        //         console.log(imgList)
-        //         for(let i=0;i<=imgList.length;i++){
-        //             qq(imgList[i]).attach("click", function() {
-        //               if(!i>0){
-        //                 $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-language").hide()
-        //               }
-        //             });
-        //         }
-				// 			},
-				// 			onCancel: function(){
-        //         var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
-        //         if(imgList.length<=1){
-        //           $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-language").hide()
-        //         }
-        //       },
-        //       onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                
-        //       },
-        //     }
-        //   });
-        // }
-					
-				// 	var btnPrimary= $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-language");
-				// 	qq(btnPrimary[0]).attach("click", function() {
-				// 		eval('manualUploader_language_'+index).uploadStoredFiles();
-				// 		btnPrimary.hide()
-        // 	});
         this.getPic(this.language[index].pkid,index)
 
         that.language[index].picId=[];
@@ -580,6 +469,7 @@
 				if(this.localLanguage[index].length!=0){
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
         }
+        $("#"+this.fineUploaderId[index]).html("")
       },
       languageEditCancel(index){//编辑状态，取消按钮
        Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -587,6 +477,7 @@
         this.localLanguage[index]=JSON.parse(JSON.stringify(this.language[index]));
 
         /*如果是取消编辑，从新从Vuex中得到数据*/
+        $("#"+this.fineUploaderId[index]).html("")
       },
       languageEditDel(index){//编辑状态，删除按钮
         var that = this;
@@ -602,6 +493,15 @@
         Vue.set(this.newLanguage,"proficiency","");
         Vue.set(this.reveal,"addLanguage",false);
         Vue.set(this.reveal,"empty",false);
+
+        var that=this;
+        singleManualUploader({
+          element:"fine-template-manual-trigger-language",
+          template: "qq-template-manual-trigger-language",
+          url:MyAjax.urlsy+'/psnlanguage/batchUpload',
+          picIdCont:that.newLanguage.picId,
+          btnPrimary:".btn-primary-language"
+        })
       },
       keepNewLanguage(){//添加模式下的保存
         if(this.newLanguage.language.length!=0){
@@ -609,7 +509,7 @@
 //      	this.language.push(JSON.parse(JSON.stringify(this.newLanguage)))
 	        Vue.set(this.reveal,"addLanguage",true);
 	        this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-	        this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
+          this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
         }
         var that = this;
 //      console.log(that.software[index])
@@ -627,6 +527,8 @@
 					console.log(err)
 				})
         that.updateData();
+
+        $("#fine-template-manual-trigger-language").html("")
       },
       cancelNewLanguage(){
         Vue.set(this.reveal,"addLanguage",true);
@@ -634,6 +536,7 @@
         Vue.set(this.newLanguage,"language","");
         Vue.set(this.newLanguage,"proficiency","");
         /*清除数据，保证下次输入时输入框为空*/
+        $("#fine-template-manual-trigger-language").html("")
       }
     }
   }

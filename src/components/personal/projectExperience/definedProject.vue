@@ -220,63 +220,6 @@
 	    	}
 			
 			//上传图片
-// 			var manualUploader = new qq.FineUploader({
-// 	            element: document.getElementById('fine-uploader-manual-trigger'),
-// 	            template: 'qq-template-manual-trigger',
-// 	            request: {
-// 	                endpoint:MyAjax.urlsy+'/psnProjExpe/batchUpload'
-// 				},
-// 				multiple: true,
-// 	            thumbnails: {
-// 	                placeholders: {
-// //	                    waitingPath: '/source/placeholders/waiting-generic.png',
-// //	                    notAvailablePath: '/source/placeholders/not_available-generic.png'
-// 	                }
-// 	            },
-// 	            validation: {
-// 					allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-// 					sizeLimit: 1024* 1024* 1024 * 1024 * 1024 
-// 	            },
-// 				autoUpload: false,
-// 				chunking: {
-// 					enabled: true
-// 				},
-// 				resume: {
-// 					enabled: true
-// 				},
-// 	            debug: true,
-// 	            callbacks:{
-// 		        	onSubmit:  function(id,  fileName)  {
-// 		        		$('#trigger-upload').show()
-// 					},
-// 					onProgress:function(id,fileName,loaded,total){
-// 						//console.log(loaded)
-// 					},
-// 		        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-// 		                //alert('This is onComplete function.');
-// 										//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-// 		                //$('#message').append(responseJSON.msg);
-// 	//	                $('#progress').hide();//隐藏进度动画
-// 		                //清除已上传队列
-// 		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-// 		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-// 		                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-// 	//	                $('.stateOne').hide();
-// 	//	                $('.stateTwo').show()
-		                
-// 						$('#trigger-upload').hide()
-// 						that.projectInfo.picId.push(responseJSON.msg)
-// 						//console.log(that.projectInfo.picId)
-// 		          	},
-// 	        	}
-// 	        });
-// 			qq(document.getElementById("trigger-upload")).attach("click", function() {
-// 				// fielduploader.setParams({             //fielduploader对象--携带---form表单的参数  
-// 				// 	anotherParam: '123321',  
-// 				// 	abcdef:$("#。。。").val()  
-// 				// });  
-// 				manualUploader.uploadStoredFiles();
-// 	        });
 			singleManualUploader({
 				element:"fine-uploader-manual-trigger",
         		template: "qq-template-manual-trigger",
@@ -319,11 +262,10 @@
 							}
 						};
 						this.projectInfo.architectFunctions.remove(this.addNewProject.projectType[index])
-			      		
 			      	}
 			        
 			      }else{
-//			        Vue.set(this.projectTypeColor,[i],false);
+
 			      }
 			      
 			    }

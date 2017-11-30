@@ -78,7 +78,7 @@
 			<li class="img-wrap">
 				<span class="table-wrap-left">图片展示</span>
 				<div class="picListCont">
-					<div class="picList" v-for="(item,$index) in picList">
+					<div class="picList" v-for="(item,$index) in picList[0]">
 						<img :src="item.pic" alt="">
 						<button @click="deletePic(index,$index)"></button>
 					</div>
@@ -165,6 +165,7 @@
 
 </template>
 <script>
+	import Vue from "vue"
 	import {mapState} from "vuex"
 	import 	Modal from "../../../assets/js/modal.js"
 	import Datepicker from "../units/Datepicker.vue"
@@ -204,7 +205,6 @@
 			that.projectID = that.$route.query.proId;
 			that.psnProExpeID = that.$route.query.psnId;
 			
-			//console.log(that.projectID,that.psnProExpeID)
 			if(that.psnProExpeID == undefined){
 				that.psnProExpeID = '""';
 			}
@@ -215,9 +215,7 @@
 	    	MyAjax.ajax({
 				type: "GET",
 				url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 				dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
 			},function(data){
 				data = data.msg;
 				that.project = data;
@@ -265,63 +263,6 @@
 	    	
 			
 			//上传图片
-// 			var manualUploader = new qq.FineUploader({
-// 	            element: document.getElementById('fine-uploader-manual-trigger'),
-// 	            template: 'qq-template-manual-trigger',
-// 	            request: {
-// 	                endpoint:MyAjax.urlsy+'/psnProjExpe/batchUpload'
-// 	            },
-// 	            thumbnails: {
-// //	                placeholders: {
-// //	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-// //	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-// //	                }
-// 	            },
-// 	            validation: {
-// 	                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-// 	                itemLimit: 5,
-// 	                sizeLimit: 1500000
-// 	            },
-// 	            autoUpload: false,
-// 	            debug: true,
-// 	            callbacks:{
-// 		        	onSubmit:  function(id,  fileName)  {
-// 		        		$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").show()
-// 						setTimeout(function(){
-// 							$(".qq-upload-cancel").css("background-image","url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RDAwRjA4RTVENEE0MTFFNzgyMzlCQTZGQTY0QzZEMTkiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RDAwRjA4RTZENEE0MTFFNzgyMzlCQTZGQTY0QzZEMTkiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpEMDBGMDhFM0Q0QTQxMUU3ODIzOUJBNkZBNjRDNkQxOSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpEMDBGMDhFNEQ0QTQxMUU3ODIzOUJBNkZBNjRDNkQxOSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pp1o6y4AAAGDSURBVHjaYvz//z8DDmAAxLFAbA3EskAsAsRvgPgxEB8F4sVAfAGrTpChaFgJiNcB8b//+ME/qDoldDPQDfQA4g//SQMfoPqwGuoHxH/+kwf+QPWjGKoKxJ//UwZA+tWQDd3+nzpgO8xQY6zSNSb//++ZgVv78ZX//1caYJMxBhnah1XTydX//0cxQDSjg3ObIXIH5mLT2Qsy9ARO11zZC9F8cg1C7OIOiNjp9bh0nQEZ+hRvKMEMuX/u//8XdzAtwQTvGIhKRk+v//+fwPX/fyzL//8PzhNUzgTMVJ8YCAF2bgaGPz8ZGP7+YWBgYSek+j3IpafxWnv9IMTLN4/+///kKoR9dhM+HWdwxz4I3D4OMeTQAiQtGyBi57fi0gWOfROsUue2QJPNPNzJ7fBibDpNcOcoUOLfMQm3Jw8v+v+/TBtnjmKA5llK8/4X9LxPk1IKhgPJcPFnqD6chTQIK0NLdGLAOqh6FDMYiaij7IFYGYgFgPgDEN8F4oP46iiAAAMAQnmMnKvzBWYAAAAASUVORK5CYII=')")
-// 						},10)
-// 					},
-// 					onCancel: function(){
-// 							var imgList=$("#fine-uploader-manual-trigger div .qq-uploader-selector .qq-upload-list-selector .list")
-// 							if(imgList.length<=1){
-// 								$("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
-// 							}
-// 						},
-// 		        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-// 		                //alert('This is onComplete function.');
-// 										//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-// 		                //console.log(responseJSON)
-// 		                //$('#message').append(responseJSON.msg);
-// 		//	                $('#progress').hide();//隐藏进度动画
-// 		                //清除已上传队列
-// 		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-// 		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-// 		                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-// 		//	                $('.stateOne').hide();
-// 		//	                $('.stateTwo').show()
-		                
-// 		                $("#fine-uploader-manual-trigger div .qq-uploader-selector .buttons .btn-primary").hide()
-// 						console.log(responseJSON.msg)
-// 						that.project.picId.push(responseJSON.msg)
-// 					  },
-// 	        	}
-// 	        });
-// 			qq(document.getElementById("trigger-upload")).attach("click", function() {
-// 	            manualUploader.uploadStoredFiles();
-// 	        });
-			
-			//background-image: url("../../../assets/img/personal/common/picDelete.png");
-			//console.log()
 			singleManualUploader({
 				element:"fine-uploader-manual-trigger",
         		template: "qq-template-manual-trigger",
@@ -337,28 +278,22 @@
 				MyAjax.ajax({
 						type: "GET",
 						url:url,
-		//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 						dataType: "json",
-		//				content-type: "text/plain;charset=UTF-8",
 					},function(data){
-						Vue.set(that,"picList",data.msg)
-						//console.log(that.picList)
+						Vue.set(that.picList,[0],data.msg)
 					},function(err){
 						console.log(err)
 					})
 			},
 			deletePic(index,$index){
 				var that =this;
-				var url = MyAjax.urlsy+"/psnProjExpe/delPic/"+this.show.picList[$index].id
+				var url = MyAjax.urlsy+"/psnProjExpe/delPic/"+this.picList[0][$index].id
 				MyAjax.ajax({
 				type: "GET",
 				url:url,
 				dataType: "json",
 				},function(data){
-				// if(data.msg=="success"){
-				//   that.show.picList[index][$index]="";
-				// }
-				//console.log(data)
+				
 				},function(err){
 				console.log(err)
 				})

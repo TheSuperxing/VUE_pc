@@ -188,7 +188,7 @@
           <div v-for="(item,index) in this.psnMsg.psnPatents">
             <h4 v-cloak>{{item.patentName}}</h4>
             <div>
-              <p v-cloak>颁发机构：{{item.patentName}}</p>
+              <p v-cloak>颁发机构：{{item.awardingBody}}</p>
               <p v-cloak>有效期：{{validityTerm[index]}}</p>
             </div>
           </div>
@@ -371,7 +371,13 @@
         }
       }
       // 为空的数据进行处理
+      console.log(this.psnMsg.personalbasicinfo)
       var personalbasicinfo=this.psnMsg.personalbasicinfo;
+      if(personalbasicinfo.sex==0){
+        return personalbasicinfo.sex="男"
+      }else{
+        return personalbasicinfo.sex="女"
+      }
       if((personalbasicinfo.nickName==null||personalbasicinfo.nickName.length==0) && (personalbasicinfo.psnName==null||personalbasicinfo.psnName.length==0) && (personalbasicinfo.sex==null||personalbasicinfo.sex.length==0)){
         Vue.set(this.empty,"basicInfo",true)
       }

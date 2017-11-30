@@ -316,66 +316,6 @@
     	this.getData()
     },
     mounted(){
-    	var that=this;
-    	//上传图片
-// 			var manualUploader = new qq.FineUploader({
-// 	        element: document.getElementById('fine-uploader-manual-trigger-patent'),
-// 	        template: 'qq-template-manual-trigger-patent',
-// 	        request: {
-// 	            endpoint: '/server/uploads'
-// 	        },
-// 	        thumbnails: {
-// 	//	                placeholders: {
-// 	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-// 	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-// 	//	                }
-// 	        },
-// 	        validation: {
-// 	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-// 	            itemLimit: 5,
-// 	            sizeLimit: 1500000
-// 	        },
-// 	        autoUpload: false,
-// 	        debug: true,
-// 	        callbacks:{
-// 	        	onSubmit:  function(id,  fileName)  {
-// 	        		$("#fine-template-manual-trigger-patent div .qq-uploader-selector .buttons .btn-primary-patent").show()
-//             },
-//             onCancel: function(){
-// 							var imgList=$("#fine-template-manual-trigger-patent div .qq-uploader-selector .qq-upload-list-selector .list")
-// 							if(imgList.length<=1){
-// 								$("#fine-template-manual-trigger-patent div .qq-uploader-selector .buttons .btn-primary-patent").hide()
-// 							}
-// 						},
-// 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-// 	                //alert('This is onComplete function.');
-// 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-// 	                console.log(responseJSON)
-// 	                $('#message').append(responseJSON.msg);
-// 	//	                $('#progress').hide();//隐藏进度动画
-// 	                //清除已上传队列
-// //	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-// 	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-// 	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-// 	//	                $('.stateOne').hide();
-// 	//	                $('.stateTwo').show()
-	                
-// 	                $("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-patent").hide()
-// 	          	},
-// 	    	}
-// 	    });
-// 			qq(document.getElementById("trigger-upload-patent")).attach("click", function() {
-// 	        manualUploader.uploadStoredFiles();
-// 	    });
-      
-      //实例化编辑状态的上传图片
-      singleManualUploader({
-        element:"fine-uploader-manual-trigger-patent",
-        template: "qq-template-manual-trigger-patent",
-        url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
-        picIdCont:that.newPatent.picId,
-        btnPrimary:".btn-primary-patent"
-      })
       
       if(this.patent.length!=0){
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
@@ -498,44 +438,6 @@
         var that = this;
 
         //上传图片
-        // if(window['manualUploader_patent_'+index]==undefined){
-        //   window['manualUploader_patent_'+index]= new qq.FineUploader({
-        //     element: document.getElementById(that.fineUploaderId[index]),
-        //     template: this.qqTemplate[index],
-        //     request: {
-        //       endpoint: '/server/uploads'
-        //     },
-        //     thumbnails: {
-        //     },
-        //     validation: {
-        //       allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-        //       itemLimit: 5,
-        //       sizeLimit: 2000000
-        //     },
-        //     autoUpload: false,
-        //     debug: true,
-        //     callbacks:{
-        //       onSubmit:  function(id,fileName){
-        //         $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-patent").show()
-        //       },
-        //       onCancel: function(){
-        //         var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
-        //         if(imgList.length<=1){
-        //           $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-patent").hide()
-        //         }
-        //       },
-        //       onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                
-        //       },
-        //     }
-        //   });
-        // }
-
-        //   var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-patent")
-        //   qq(btnPrimary[0]).attach("click", function() {
-        //     eval('manualUploader_patent_'+index).uploadStoredFiles();
-        //     btnPrimary.hide()
-        //   });
 
         this.getPic(this.patent[index].pkid,index)
 
@@ -586,6 +488,8 @@
           that.getData();
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
         }
+
+        $("#"+this.fineUploaderId[index]).html("")
       },
       paperEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -595,6 +499,7 @@
         this.localPatent[index].validityTermE=this.patent[index].validityTermE;
        
         /*如果是取消编辑，从新从Vuex中得到数据*/
+         $("#"+this.fineUploaderId[index]).html("")
       },
       paperEditDel(index){//编辑状态，删除按钮
         var that=this;
@@ -606,10 +511,22 @@
           this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
     		  this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
         }
+       
       },
       addPatent(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addPatent",false);
         Vue.set(this.reveal,"empty",false);
+        var that=this;
+        //上传图片
+        
+        //实例化编辑状态的上传图片
+        singleManualUploader({
+          element:"fine-uploader-manual-trigger-patent",
+          template: "qq-template-manual-trigger-patent",
+          url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
+          picIdCont:that.newPatent.picId,
+          btnPrimary:".btn-primary-patent"
+        })
       },
       keepNewPatent(){//添加模式下的保存
         if(this.newPatent.patentName.length!=0){
@@ -646,6 +563,7 @@
         Vue.set(this.newPatent,"organ","");
         Vue.set(this.newPatent,"time","");
         /*清除数据，保证下次输入时输入框为空*/
+        $("#fine-uploader-manual-trigger-patent").html("")
       },
       cancelNewPatent(){
         Vue.set(this.reveal,"addPatent",true);
@@ -654,6 +572,7 @@
         Vue.set(this.newPatent,"organ","");
         Vue.set(this.newPatent,"time","");
         /*清除数据，保证下次输入时输入框为空*/
+        $("#fine-uploader-manual-trigger-patent").html("")
       }
     }
   }
@@ -847,7 +766,7 @@
 		        		width: 720px;
 		        		float: right;
 		        	}
-              
+
 		        }
 		        li.tip-wrap{
 				    	padding-left: 90px;

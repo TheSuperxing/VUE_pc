@@ -307,64 +307,6 @@
       this.getData();
     },
     mounted(){
-    	var that = this;
-//     	//上传图片
-// 			var manualUploader = new qq.FineUploader({
-// 	        element: document.getElementById('fine-uploader-manual-trigger-paper'),
-// 	        template: 'qq-template-manual-trigger-paper',
-// 	        request: {
-// 	            endpoint: '/server/uploads'
-// 	        },
-// 	        thumbnails: {
-		                
-// 	        },
-// 	        validation: {
-// 	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-// 	            itemLimit: 5,
-// 	            sizeLimit: 1500000
-// 	        },
-// 	        autoUpload: false,
-// 	        debug: true,
-// 	        callbacks:{
-// 	        	onSubmit:  function(id,  fileName)  {
-// 	        		$("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").show()
-//             },
-//             onCancel: function(){
-// 							var imgList=$("#fine-template-manual-trigger-paper div .qq-uploader-selector .qq-upload-list-selector .list")
-// 							if(imgList.length<=1){
-// 								$("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").hide()
-// 							}
-// 						},
-// 	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-// 	                //alert('This is onComplete function.');
-// 									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-// 	                console.log(responseJSON)
-// 	                $('#message').append(responseJSON.msg);
-// 	//	                $('#progress').hide();//隐藏进度动画
-// 	                //清除已上传队列
-// //	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-// 	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-// 	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-// 	//	                $('.stateOne').hide();
-// 	//	                $('.stateTwo').show()
-	                
-// 	                $("#fine-template-manual-trigger-paper div .qq-uploader-selector .buttons .btn-primary-paper").hide()
-// 	                console.log(maybeXhr)
-// 	          	},
-// 	    	}
-// 	    });
-// 			qq(document.getElementById("trigger-upload-paper")).attach("click", function() {
-// 	        manualUploader.uploadStoredFiles();
-// 	    });
-	    
-	    //实例化编辑状态的上传图片
-      singleManualUploader({
-        element:"fine-uploader-manual-trigger-paper",
-        template: "qq-template-manual-trigger-paper",
-        url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
-        picIdCont:that.newPaper.picId,
-        btnPrimary:".btn-primary-paper"
-      })
 	    
       if(this.paper.length!=0){
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
@@ -489,47 +431,6 @@
       	//console.log(index)
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
-               
-        // if(window['manualUploader_paper_'+index]==undefined){
-        //   window['manualUploader_paper_'+index]= new qq.FineUploader({
-        //     element: document.getElementById(this.fineUploaderId[index]),
-        //     template: this.qqTemplate[index],
-        //     request: {
-        //       endpoint: '/server/uploads'
-        //     },
-        //     thumbnails: {
-        //     },
-        //     validation: {
-        //       allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-        //       itemLimit: 5,
-        //       sizeLimit: 2000000
-        //     },
-        //     autoUpload: false,
-        //     debug: true,
-        //     callbacks:{
-        //       onSubmit:  function(id,fileName){
-        //         $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").show()
-        //       },
-        //       onCancel: function(){
-        //         var imgList=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .qq-upload-list-selector .list")
-        //         if(imgList.length<=1){
-        //           $("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper").hide()
-        //         }
-        //       },
-        //       onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                
-        //       },
-        //     }
-        //   });
-        // }
-          
-
-        //   var btnPrimary=$("#"+that.fineUploaderId[index]+" div .qq-uploader-selector .buttons .btn-primary-paper");
-          
-        //   qq(btnPrimary[0]).attach("click", function() {
-        //     eval('manualUploader_paper_'+index).uploadStoredFiles();
-        //     btnPrimary.hide()
-        //   });
         
         this.getPic(this.paper[index].paperID,index)
 
@@ -582,6 +483,7 @@
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
           /*如果是保存，把数据保存到Vuex中*/
         }
+        $("#"+this.fineUploaderId[index]).html("");
       },
       paperEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -589,6 +491,8 @@
         this.localPaper[index].journal=this.paper[index].journal;
         this.localPaper[index].publicTime=this.paper[index].publicTime;
         /*如果是取消编辑，从新从Vuex中得到数据*/
+        //console.log($("#"+this.fineUploaderId[index]+" .qq-uploader"))
+        $("#"+this.fineUploaderId[index]).html("");
       },
       paperEditDel(index){//编辑状态，删除按钮
         var that=this;
@@ -605,6 +509,18 @@
       addPaper(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addPaper",false);
         Vue.set(this.reveal,"empty",false);
+
+        var that = this;
+        //上传图片
+        //实例化编辑状态的上传图片
+        singleManualUploader({
+          element:"fine-uploader-manual-trigger-paper",
+          template: "qq-template-manual-trigger-paper",
+          url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
+          picIdCont:that.newPaper.picId,
+          btnPrimary:".btn-primary-paper"
+        })
+
       },
       keepNewPaper(){//添加模式下的保存
 
@@ -641,6 +557,7 @@
         Vue.set(this.newPaper,"journal","");
         Vue.set(this.newPaper,"publicTime","");
         /*清除数据，保证下次输入时输入框为空*/
+        $("#fine-uploader-manual-trigger-paper").html("")
       },
 
       cancelNewPaper(){
@@ -652,6 +569,7 @@
         Vue.set(this.newPaper,"journal","");
         Vue.set(this.newPaper,"publicTime","");
         /*清除数据，保证下次输入时输入框为空*/
+        $("#fine-uploader-manual-trigger-paper").html("")
       }
     }
   }
@@ -769,7 +687,7 @@
                 margin-left:8px;
               }
             }
-            p:last-child{
+            p:nth-child(2){
               margin-bottom:17px;
               color: rgb(117, 117, 117);
               margin-top: 15px;

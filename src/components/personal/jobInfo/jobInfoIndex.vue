@@ -227,7 +227,7 @@
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
 			            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-			                <li>
+			                <li class="list">
 			                    <div class="qq-progress-bar-container-selector">
 			                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 			                    </div>
@@ -302,6 +302,7 @@
   import Datepicker from "../units/Datepicker.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
+  import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
   
   
   export default {
@@ -349,52 +350,7 @@
     
     mounted(){
     	this.updateData();
-    	//上传图片
-			var manualUploader = new qq.FineUploader({
-	        element: document.getElementById('fine-uploader-manual-trigger'),
-	        template: 'qq-template-manual-trigger',
-	        request: {
-	            endpoint:MyAjax.urlsy+"/psnTitleMessage/batchUpload"
-	        },
-	        thumbnails: {
-	//	                placeholders: {
-	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-	//	                }
-	        },
-	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-	            itemLimit: 5,
-	            sizeLimit: 2400*2400*2400*2400*2400
-	        },
-	        autoUpload: false,
-	        debug: true,
-	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
-	        		$("#fine-uploader-manual-trigger  .qq-uploader-selector .buttons .btn-primary").show()
-            },
-            onCancel: function(){
-							var imgList=$("#fine-uploader-manual-trigger  .qq-uploader-selector .qq-upload-list-selector .list")
-              if(imgList.length<=1){
-								$("#fine-uploader-manual-trigger  .qq-uploader-selector .buttons .btn-primary").hide()
-							}
-						},
-	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	                //alert('This is onComplete function.');
-									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-	                console.log(responseJSON)
-	                if(responseJSON.success==true){
-	                	that.newTitleInfo.picId.push(responseJSON.msg)
-	                }
 
-	                
-	                $("#fine-uploader-manual-trigger  .qq-uploader-selector .buttons .btn-primary").hide()
-	          	},
-	    	}
-	    });
-			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	        manualUploader.uploadStoredFiles();
-	    });
 	    
       if(this.titleInfo.length==0){
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
@@ -417,6 +373,9 @@
           }
         }
       }
+      
+      
+      
       /*以上是是否对外显示文本信息初始化*/
     },
     updated(){
@@ -565,52 +524,17 @@
         var that = this;
 
         //上传图片
-        if(window['manualUploader'+index]==undefined){
-          window['manualUploader'+index]= new qq.FineUploader({
-            element: document.getElementById(that.fineUploaderId[index]),
-            template: this.qqTemplate[index],
-            request: {
-              endpoint: MyAjax.urlsy+"/psnTitleMessage/batchUpload"
-            },
-            thumbnails: {
-            },
-            validation: {
-              allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-              itemLimit: 5,
-              sizeLimit: 2400*2400*2400*2400*2400
-            },
-            autoUpload: false,
-            debug: true,
-            callbacks:{
-              onSubmit:  function(id,fileName){
-                $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary").show()
-              },
-              onCancel: function(){
-                var imgList=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .qq-upload-list-selector .list")
-                if(imgList.length<=1){
-                  $("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .buttons .btn-primary").hide()
-                }
-              },
-              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                if(responseJSON.success==true){
-                	if(that.localTitleInfo[index].picId == null){
-                		that.localTitleInfo[index].picId = [];
-                	  that.localTitleInfo[index].picId.push(responseJSON.msg)
-                	}else{
-                		that.localTitleInfo[index].picId.push(responseJSON.msg)
-                	}
-                	console.log(that.localEdu[index].picId)
-                }
-              },
-            }
-          });
-        }
-
-          var btnPrimary=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary");
-          qq(btnPrimary[0]).attach("click", function() {
-            eval('manualUploader'+index).uploadStoredFiles();
-            btnPrimary.hide()
-          });
+//      
+          
+        that.localTitleInfo[index].picId = [];
+	     	moreManualUploader({
+          nameList:'manualUploader'+index,
+          element:that.fineUploaderId[index],
+          template: that.qqTemplate[index],
+          url:MyAjax.urlsy+"/psnTitleMessage/batchUpload",
+          picIdCont:that.localTitleInfo[index].picId,
+          btnPrimary:".btn-primary"
+        })
       },
       deleThisPic(id,index,$ind){//删除图片
       	var that = this;
@@ -656,14 +580,15 @@
 				})//更新到服务器
 				//保存之后再重新拉取数据
 				that.updateData();
-        $('.qq-upload-success').hide();
+        $("#"+this.fineUploaderId[index]).html("")
         
       },
       cancelJobInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
          this.localTitleInfo[index]=JSON.parse(JSON.stringify(this.titleInfo[index]));
         /*如果是取消编辑，从新从Vuex中得到数据*/
-        $('.qq-upload-success').hide();
+        $("#"+this.fineUploaderId[index]).html("")
+        
       },
       jobInfoDel(index){//编辑状态，删除按钮
         var that = this;
@@ -680,6 +605,15 @@
         Vue.set(this.newTitleInfo,"assessmentTime","");
         Vue.set(this.newTitleInfo,"titleLevel","");
         Vue.set(this.newTitleInfo,"certificateBody","");
+        
+        
+        singleManualUploader({
+	        element:"fine-uploader-manual-trigger",
+					template: "qq-template-manual-trigger",
+	        url:MyAjax.urlsy+"/psnTitleMessage/batchUpload",
+	        picIdCont:this.newTitleInfo.picId,
+	        btnPrimary:".btn-primary"
+	      })
       },
       keepJobInfoAdd(){//添加模式下的保存
         if(this.newTitleInfo.titleName.length!=0){
@@ -705,7 +639,7 @@
 					console.log(err)
 				})
         that.updateData();
-        $('.qq-upload-success').hide();
+        $("#fine-uploader-manual-trigger").html("")
       },
       cancelJobInfoAdd(){
         Vue.set(this.reveal,"addJobInfo",true);
@@ -717,7 +651,7 @@
         Vue.set(this.newTitleInfo,"titleLevel","");
         Vue.set(this.newTitleInfo,"certificateBody","");
         /*清除数据，保证下次输入时输入框为空*/
-        $('.qq-upload-success').hide();
+        $("#fine-uploader-manual-trigger").html("")
       }
     }
   }
@@ -1062,7 +996,7 @@
         li.img-wrap{
 		    	/*padding-left: 30px;*/
 		    	>div{
-		    		width: 680px;
+		    		width: 700px;
 		    		float: left;
 		    	}
 		    }

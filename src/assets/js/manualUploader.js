@@ -45,7 +45,7 @@ var manualUploader = new qq.FineUploader({
 }
 function moreManualUploader(option){
     //console.log(option.element)
-    if(window[option.nameList]==undefined){
+    //if(window[option.nameList]==undefined){
         window[option.nameList]= new qq.FineUploader({
           element: document.getElementById(option.element),
           template: option.template,
@@ -89,7 +89,7 @@ function moreManualUploader(option){
             },
           }
         });
-      }
+      //}
                   
     var btnPrimary= $("#"+option.element+" .qq-uploader-selector .buttons "+option.btnPrimary);
     qq(btnPrimary[0]).attach("click", function() {

@@ -75,7 +75,7 @@
 						                <span class="qq-upload-drop-area-text-selector"></span>
 						            </div>
 						            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-						                <li>
+						                <li class="list">
 						                    <div class="qq-progress-bar-container-selector">
 						                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 						                    </div>
@@ -181,7 +181,7 @@
 			                <span class="qq-upload-drop-area-text-selector"></span>
 			            </div>
 			            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
-			                <li>
+			                <li class="list">
 			                    <div class="qq-progress-bar-container-selector">
 			                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 			                    </div>
@@ -203,7 +203,7 @@
 			                    <span>请上传图片</span>
 			                </div>
 			                <button type="button"  class="btn btn-primary" id="trigger-upload">
-			                    	 提交
+			                                      提交
 			                </button>
 			            </div>
 			            <span class="qq-drop-processing-selector qq-drop-processing">
@@ -257,7 +257,7 @@
   import datepicker from "../units/Datepicker.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
-  
+  import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 
   export default {
     name: 'educationIndex',
@@ -311,43 +311,6 @@
 			this.updateData();
 			//上传图片
 			var that = this;
-			var manualUploader = new qq.FineUploader({
-	        element: document.getElementById('fine-uploader-manual-trigger'),
-	        template: 'qq-template-manual-trigger',
-	        request: {
-	            endpoint: MyAjax.urlsy+'/psnEduBackGround/batchUpload'
-	        },
-	        thumbnails: {
-	//	                placeholders: {
-	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-	//	                }
-	        },
-	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg', 'png'],
-	            itemLimit: 5,
-	            sizeLimit: 2400*2400*2400*2400*2400
-	        },
-	        autoUpload: false,
-	        debug: true,
-	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload').show()
-	        	},
-	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	                console.log(responseJSON)
-	                if(responseJSON.success==true){
-	                	that.newInputValue.picId.push(responseJSON.msg)
-	                }
-	                console.log(that.newInputValue.picId)
-	                $('#trigger-upload').hide()
-	                console.log(maybeXhr)
-	          	},
-	    	}
-	    });
-			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	      manualUploader.uploadStoredFiles();
-	    });
 
       if(this.education.length!==0){
         Vue.set(this.empty,"promote",false)
@@ -373,6 +336,8 @@
         }
         //为每一个对象添加一个独有的状态
       }
+      
+      
 
     },
     
@@ -380,7 +345,7 @@
     methods:{
     	updateData(){//更新本地数据
     		var that = this;
-	    	var url = "http://10.1.31.16:8080/psnEduBackGround/findByMySelf/"+"string";
+	    	var url = MyAjax.urlsy +"/psnEduBackGround/findByMySelf/"+"string";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -466,6 +431,15 @@
         Vue.set(this.newInputValue,"schoolTimeDown","")
         Vue.set(this.newInputValue,"professionName","")
         Vue.set(this.newInputValue,"education","")
+        
+        singleManualUploader({
+	        element:"fine-uploader-manual-trigger",
+					template: "qq-template-manual-trigger",
+	        url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+	        picIdCont:that.newInputValue.picId,
+	        btnPrimary:".btn-primary"
+	      })
+        
       },
       openOrPrivacyInfo(index){//是否显示隐藏按钮的事件
         Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index]);//通过类名控制图片和文字颜色
@@ -511,56 +485,15 @@
 
         //上传图片
         var that = this;
-        if(window['manualUploader'+index]==undefined){
-          window['manualUploader'+index]= new qq.FineUploader({
-            element: document.getElementById(that.fineUploaderId[index]),
-            template: this.qqTemplate[index],
-            request: {
-              endpoint: MyAjax.urlsy+'/psnEduBackGround/batchUpload'
-            },
-            thumbnails: {
-            },
-            validation: {
-              allowedExtensions: ['jpeg', 'jpg', 'png'],
-              itemLimit: 5,
-              sizeLimit: 2000000
-            },
-            autoUpload: false,
-            debug: true,
-            callbacks:{
-              onSubmit:  function(id,fileName){
-                $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary").show()
-              },
-              onCancel: function(){
-                var imgList=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .qq-upload-list-selector .list")
-                if(imgList.length<=1){
-                  $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary").hide()
-                }
-              },
-              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                console.log(responseJSON)
-                if(responseJSON.success==true){
-                	if(that.localEdu[index].picId == null){
-                		that.localEdu[index].picId = [];
-                	  that.localEdu[index].picId.push(responseJSON.msg)
-                	}else{
-                		that.localEdu[index].picId.push(responseJSON.msg)
-                	}
-                	console.log(that.localEdu[index].picId)
-                }
-              },
-            }
-          });
-        }
-
-          var btnPrimary=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .btn-primary");
-//         console.log($("#"+that.fineUploaderId[index]+" .qq-uploader-selector"))
-          qq(btnPrimary[0]).attach("click", function() {
-            eval('manualUploader'+index).uploadStoredFiles();
-            btnPrimary.hide()
-          });
-         
-          
+	      that.localEdu[index].picId = [];
+	     	moreManualUploader({
+          nameList:'manualUploader'+index,
+          element:that.fineUploaderId[index],
+          template: that.qqTemplate[index],
+          url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+          picIdCont:that.localEdu[index].picId,
+          btnPrimary:".btn-primary"
+        })
       },
       deleThisPic(id,index,$ind){//删除图片
       	var that = this;
@@ -585,7 +518,7 @@
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit[0],[index],false);
-        $('.qq-upload-success').hide();
+        $("#"+this.fineUploaderId[index]).html("")
         //console.log("ok")
       },
       deleteEduExist(index){//删除按钮事件
@@ -659,9 +592,8 @@
 				//保存之后再重新拉取数据
 				that.updateData();
 				Vue.set(this.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
-				$('.qq-upload-success').hide();
         //提交编辑后的数据
-        
+        $("#"+this.fineUploaderId[index]).html("")
 
       },
       //提交数据
@@ -675,6 +607,7 @@
         Vue.set(this.newInputValue,"schoolTimeDown","")
         Vue.set(this.newInputValue,"professionName","")
         Vue.set(this.newInputValue,"education","")
+        $("#fine-uploader-manual-trigger").html("")
         /*取消添加后，清除之前添加的数据*/
       },
       addShoolName(){//添加模式下，添加校名
@@ -728,7 +661,8 @@
 					console.log(err)
 				})
         that.updateData();
-	        
+        
+	      $("#fine-uploader-manual-trigger").html("")  
 	    }
 	      
       //新建部分
@@ -902,7 +836,7 @@
       .editEduInfo{
         padding:20px 0;
         color: $themeColor;
-        border-bottom:1px solid $borderColor;
+        /*border-bottom:1px solid $borderColor;*/
         li{
           padding:10px 0;
           .wrap-left{

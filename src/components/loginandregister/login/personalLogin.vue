@@ -12,7 +12,7 @@
       </li>
       <li>
         <!-- <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus /> -->
-        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入文字" @blur="msgConfirm($event)" @focus="divFocus()"></div> 
+        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入文字" @blur="msgConfirm($event)" @focus="divFocus()" @keyup.enter="keydownEnter"></div> 
         <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
       </li>
       

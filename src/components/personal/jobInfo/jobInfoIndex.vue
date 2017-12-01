@@ -407,7 +407,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 					data = data.msg;
@@ -459,7 +459,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async:true,
 				},function(data){
 					console.log(data)
 					Vue.set(that.picArr,[index],data.msg)
@@ -507,7 +507,7 @@
 					data: JSON.stringify(that.localTitleInfo[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -545,10 +545,10 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
+					
 				},function(data){
 					console.log(data)
 					if(data.code==0){
-//						that.picArr[index].splice($ind,1)
 						that.getPicture(index);
 					}
 				},function(err){
@@ -572,7 +572,7 @@
 					data: JSON.stringify(that.localTitleInfo[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -632,7 +632,7 @@
 					url:url,
 					data:JSON.stringify(that.newTitleInfo),
 					dataType: "json",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){

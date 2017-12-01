@@ -261,6 +261,7 @@
   import {mapState} from "vuex"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
+  import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
   
   
   export default {
@@ -304,61 +305,7 @@
     mounted(){
     	this.updateData();
     	//上传图片
-			var manualUploader = new qq.FineUploader({
-	        element: document.getElementById('fine-uploader-manual-trigger'),
-	        template: 'qq-template-manual-trigger',
-	        request: {
-	            endpoint: MyAjax.urlsy+"/psnQualification/batchUpload"
-	        },
-	        thumbnails: {
-	//	                placeholders: {
-	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-	//	                }
-	        },
-	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg', 'png'],
-	            itemLimit: 5,
-	            sizeLimit: 2400*2400*2400*2400*2400
-	        },
-	        autoUpload: false,
-	        debug: true,
-	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
-	        		$("#fine-uploader-manual-trigger .qq-uploader-selector .buttons .btn-primary").show()
-            },
-            onCancel: function(){
-							var imgList=$("#fine-uploader-manual-trigger .qq-uploader-selector .qq-upload-list-selector .list")
-              if(imgList.length<=1){
-								$("#fine-uploader-manual-trigger .qq-uploader-selector .buttons .btn-primary").hide()
-							}
-						},
-	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	                //alert('This is onComplete function.');
-									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-	                console.log(responseJSON)
-	               
-	                if(responseJSON.success==true){
-	                	that.newCertificate.picId.push(responseJSON.msg)
-	                }
-	                $('#message').append(responseJSON.msg);
-	//	                $('#progress').hide();//隐藏进度动画
-	                //清除已上传队列
-//	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-	//	                $('.stateOne').hide();
-	//	                $('.stateTwo').show()
-	                
-	                $("#fine-uploader-manual-trigger .qq-uploader-selector .buttons .btn-primary").hide()
-	                console.log(maybeXhr)
-	          	},
-	    	}
-	    });
-			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	        manualUploader.uploadStoredFiles();
-	    });
-	    
+			
       if(this.certificate.length==0){
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }else {
@@ -402,7 +349,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 					data = data.msg;
@@ -442,7 +389,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async:true,
 				},function(data){
 					console.log(data)
 					Vue.set(that.picArr,[index],data.msg)
@@ -456,14 +403,15 @@
 				console.log(this.show.tag[index])
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+					this.updowntxt[index] = "收起图片";
+					this.getPicture(index);
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
     		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-    		this.getPicture(index);
+    		
     	},
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
@@ -493,7 +441,7 @@
 					data: JSON.stringify(that.certificate[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -506,52 +454,16 @@
 
         //上传图片
         
-        if(window['manualUploader'+index]==undefined){
-          window['manualUploader'+index]= new qq.FineUploader({
-            element: document.getElementById(this.fineUploaderId[index]),
-            template: this.qqTemplate[index],
-            request: {
-              endpoint:MyAjax.urlsy+"/psnQualification/batchUpload"
-            },
-            thumbnails: {
-            },
-            validation: {
-              allowedExtensions: ['jpeg', 'jpg',  'png'],
-              itemLimit: 5,
-              sizeLimit: 2400*2400*2400*2400*2400
-            },
-            autoUpload: false,
-            debug: true,
-            callbacks:{
-              onSubmit:  function(id,fileName){
-                $("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .buttons .btn-primary").show()
-              },
-              onCancel: function(){
-                var imgList=$("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .qq-upload-list-selector .list")
-                if(imgList.length<=1){
-                  $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary").hide()
-                }
-              },
-              onComplete: function (id, fileName, responseJSON, maybeXhr) {
-                if(responseJSON.success==true){
-                	if(that.localCertificate[index].picId == null){
-                		that.localCertificate[index].picId = [];
-                	  that.localCertificate[index].picId.push(responseJSON.msg)
-                	}else{
-                		that.localCertificate[index].picId.push(responseJSON.msg)
-                	}
-                	console.log(that.localCertificate[index].picId)
-                }
-              },
-            }
-          });
-        }
-          
-          var btnPrimary=$("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .buttons .btn-primary");
-          qq(btnPrimary[0]).attach("click", function() {
-            eval('manualUploader'+index).uploadStoredFiles();
-            btnPrimary.hide()
-          });
+       
+          moreManualUploader({
+	          nameList:'manualUploader'+index,
+	          element:that.fineUploaderId[index],
+	          template: that.qqTemplate[index],
+	          url:MyAjax.urlsy+"/psnQualification/batchUpload",
+	          picIdCont:that.localCertificate[index].picId,
+	          btnPrimary:".btn-primary"
+	        })
+          this.getPicture(index);
       },
       deleThisPic(id,index,$ind){//删除图片
       	var that = this;
@@ -559,13 +471,11 @@
       	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
+					async:false,
 				},function(data){
 					console.log(data)
 					if(data.code==0){
-//						that.picArr[index].splice($ind,1)
 						that.getPicture(index);
 					}
 				},function(err){
@@ -584,7 +494,7 @@
 					data: JSON.stringify(that.localCertificate[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -592,10 +502,11 @@
 				})//更新到服务器
 				//保存之后再重新拉取数据
 				that.updateData();
+        $("#"+this.fineUploaderId[index]).html("")
+				
         if(that.localCertificate[index].qualificationName.trim().length!=0){
           Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
         }
-        $('.qq-upload-success').hide();
         
       },
       cancelCertificateInfoEdit(index){//编辑状态，取消按钮
@@ -616,26 +527,26 @@
         Vue.set(this.newCertificate,"qualificationName","");
         Vue.set(this.newCertificate,"certificateNumber","");
         Vue.set(this.newCertificate,"registeredUnit","");
+        
+        singleManualUploader({
+	        element:"fine-uploader-manual-trigger",
+					template: "qq-template-manual-trigger",
+	        url:MyAjax.urlsy+"/psnQualification/batchUpload",
+	        picIdCont:this.newCertificate.picId,
+	        btnPrimary:".btn-primary"
+	      })
       },
       keepCertificateInfoAdd(){
         if(this.newCertificate.qualificationName.length!=0){
-						console.log(this.newCertificate);
-						
-            this.localCertificate.push(JSON.parse(JSON.stringify(this.newCertificate)));
-            //同步信息到编辑状态页
-            this.certificate.push(JSON.parse(JSON.stringify(this.newCertificate)))
-            
             /*同步信息到个人信息首页*/
             Vue.set(this.reveal,"addCertificate",true);
             //视图切换到执业资格的首页
             /*清除数据，保证下次输入时输入框为空*/
             this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
             this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
-            
         }
         
         var that = this;
-//      console.log(that.software[index])
         var url = MyAjax.urlsy+"/psnQualification/insert";
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
@@ -643,13 +554,14 @@
 					url:url,
 					data:JSON.stringify(that.newCertificate),
 					dataType: "json",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
 					console.log(err)
 				})
         that.updateData();
+        $("#fine-uploader-manual-trigger").html("")
       },
       cancelCertificateInfoAdd(){
         Vue.set(this.reveal,"addCertificate",true);
@@ -899,7 +811,7 @@
 		        		
 		        	}
 				    	>div{
-				    		width: 700px;
+				    		width: 730px;
 				    		float: right;
 				    	}
 				    }
@@ -938,7 +850,7 @@
     }
     /*添加信息开始*/
     .addCertificateContainer{
-      ul{
+      >ul{
         li{
           margin:20px 0;
           .wrap-left{
@@ -986,7 +898,7 @@
         li.img-wrap{
 				    	/*padding-left: 30px;*/
 				    	>div{
-				    		width: 680px;
+				    		width: 700px;
 				    		float: left;
 				    	}
 				    }

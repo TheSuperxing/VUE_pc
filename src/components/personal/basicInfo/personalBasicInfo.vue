@@ -57,7 +57,7 @@
       <ul v-if="!reveal.edit">
         <li>
           <h5><span>*</span>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
-          <p><input type="text" v-model="localBaseInfo.nickName" v-bind:value="localBaseInfo.nickName" v-on:input="changeNickName"></p>
+          <p><input type="text" v-model="localBaseInfo.nickName"  v-on:input="changeNickName"></p>
           <i>{{textLeng.nickName}}/30</i>
 				  <alertTip v-if="showAlert.nickName" :showHide="showAlert.nickName" @closeTip="closeTip" :alertText="alertText.nickName"></alertTip>
           
@@ -72,7 +72,7 @@
         </li>
         <li v-if="!baseInfo.ifRNA">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
-          <p><input type="text" v-model="localBaseInfo.psnName" v-bind:value="localBaseInfo.psnName" v-on:input="changeName"></p>
+          <p><input type="text" v-model="localBaseInfo.psnName"  v-on:input="changeName"></p>
           <i>{{textLeng.psnName}}/30</i>
         </li>
         <li>
@@ -94,7 +94,7 @@
         </li>
         <li>
           <h5>联系邮箱：</h5>
-          <p><input type="text" v-model="localBaseInfo.psnMail" v-bind:value="localBaseInfo.psnMail"></p>
+          <p><input type="text" v-model="localBaseInfo.psnMail" ></p>
         </li>
         <li class="cancelSubmit">
           <button v-on:click="cancelEdit">取消</button>
@@ -141,7 +141,7 @@
 				                    <span>请上传文件证件</span>
 				                </div>
 				                <button type="button"  class="btn btn-primary" id="trigger-upload">
-				                    	 提交
+				                    	提交
 				                </button>
 				            </div>
 				            <span class="qq-drop-processing-selector qq-drop-processing">
@@ -298,7 +298,6 @@
 	            	that.haveUploaded = true;
 	            }
 	            
-	            $('#message').append(responseJSON.msg);
 
 	            $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
 	            
@@ -307,11 +306,10 @@
 	    	}
 	    });
 	    
-		qq(document.getElementById("trigger-upload")).attach("click", function() {
-        manualUploader.uploadStoredFiles();
-    });
+			qq(document.getElementById("trigger-upload")).attach("click", function() {
+	        manualUploader.uploadStoredFiles();
+	    });
 
-      
     },
     methods:{
     	updateData(){

@@ -23,7 +23,7 @@
 			<p><span>项目名称</span><span class="">{{project.projectName}}</span></p>
 		</li>
 		<li class="proPlace">
-			<p><span>项目地址</span><span class="">{{projectPlaceObj.province}}{{projectPlaceObj.city}}{{projectPlaceObj.county}}{{projectPlaceObj.street}}</span></p>
+			<p><span>项目地址</span><span class="">{{project.projectPlaceObj.province}}{{project.projectPlaceObj.city}}{{project.projectPlaceObj.county}}{{project.projectPlaceObj.street}}</span></p>
 		</li>
 		<li class="proState">
 			<p><span>项目状态</span><span class="">{{project.projectState}}</span></p>
@@ -197,11 +197,8 @@
 			picList:[]
 	      }
 	    },
-	   
-		mounted(){
-			
-			$(document.body).css("overflow-y","scroll");
-			var that = this;
+	   	created(){
+	   		var that = this;
 			that.projectID = that.$route.query.proId;
 			that.psnProExpeID = that.$route.query.psnId;
 			
@@ -216,9 +213,11 @@
 				type: "GET",
 				url:url,
 				dataType: "json",
+				async:false,
 			},function(data){
 				data = data.msg;
-				that.project = data;
+//				that.project = data;
+				Vue.set(that,"project",data)
 				that.project.picId=[];
 				console.log(that.project)
 			},function(err){
@@ -233,7 +232,7 @@
 				this.isMine = false;
 			}
 	    	function emptyText(text) {
-			    if(text==null||text.length == 0){
+			    if(text == null||text.length == 0){
 			      return "（暂无信息）";
 			    }else {
 			      return text;
@@ -262,6 +261,11 @@
 	    	//空值的处理
 	    	
 			
+	   	},
+		mounted(){
+			
+			$(document.body).css("overflow-y","scroll");
+			var that = this;
 			//上传图片
 			singleManualUploader({
 				element:"fine-uploader-manual-trigger",
@@ -279,6 +283,7 @@
 						type: "GET",
 						url:url,
 						dataType: "json",
+						async:true,
 					},function(data){
 						Vue.set(that.picList,[0],data.msg)
 					},function(err){
@@ -292,6 +297,7 @@
 				type: "GET",
 				url:url,
 				dataType: "json",
+				async:false,
 				},function(data){
 				
 				},function(err){
@@ -331,7 +337,7 @@
 					url:url,
 					data:JSON.stringify(that.project),
 					dataType: "json",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 					if(data.code == 0){

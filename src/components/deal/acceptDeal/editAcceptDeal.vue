@@ -110,7 +110,7 @@
           <i>*</i>
           协议名称
         </h4>
-        <input v-model="localDealInfo.mainInfo.name" :value="localDealInfo.mainInfo.name" type="text" placeholder="请输入需求名称">
+        <input v-model="localDealInfo.mainInfo.name"  type="text" placeholder="请输入需求名称">
         <button v-bind:class="{unfold:reveal.dealContentUnfold.state}" @click="dealContentUnfold" v-cloak>{{reveal.dealContentUnfold.text}}</button>
       </dd>
 
@@ -130,7 +130,7 @@
             </h4>
             <!--<input v-model="localDealInfo.content.firstParty.name" :value="localDealInfo.content.firstParty.name" type="text" placeholder="甲方">-->
             <div class="dropDown">
-              <input v-model="localDealInfo.content.firstParty.name" :value="localDealInfo.content.firstParty.name" type="text" placeholder="甲方">
+              <input v-model="localDealInfo.content.firstParty.name"  type="text" placeholder="甲方">
               <span @click="firstPartyOption"></span>
               <ul v-if="reveal.partyOption.firstParty.option">
                 <li v-for="(item,index) in reveal.partyOption.firstParty.text" :class="{selected:reveal.partyOption.firstParty.select[index]}" @mouseenter="firstSelectTog(index)" @click="firstPartySelect(item)" v-cloak>{{item}}</li>
@@ -145,7 +145,7 @@
             </h4>
             <!--<input v-model="localDealInfo.content.secondParty.name" :value="localDealInfo.content.secondParty.name" type="text" placeholder="乙方">-->
             <div class="dropDown">
-              <input v-model="localDealInfo.content.secondParty.name" :value="localDealInfo.content.secondParty.name" type="text" placeholder="乙方">
+              <input v-model="localDealInfo.content.secondParty.name"  type="text" placeholder="乙方">
               <span @click="secondPartyOption"></span>
               <ul v-if="reveal.partyOption.secondParty.option">
 
@@ -159,7 +159,7 @@
               协议内容
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.content.partyContent" :value="localDealInfo.content.partyContent" placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.content.partyContent"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
           </dd>
           <dd class="stageTask">
             <h4>
@@ -170,10 +170,10 @@
               <ul v-for="(item,index) in localDealInfo.content.stageTask">
                 <h5>{{chineseNumber[index]}}、</h5>
                 <li>
-                  <input v-model="item.taskState" :value="item.taskState" type="text" placeholder="请输入阶段名称">
-                  <input v-model="item.time" :value="item.time" type="text" placeholder="请输入要求时间">
-                  <input v-model="item.taskDetail" :value="item.taskDetail" type="text" placeholder="请输入工作内容">
-                  <input v-model="item.price" :value="item.price" type="text" placeholder="请输入薪酬">
+                  <input v-model="item.taskState"  type="text" placeholder="请输入阶段名称">
+                  <input v-model="item.time"  type="text" placeholder="请输入要求时间">
+                  <input v-model="item.taskDetail"  type="text" placeholder="请输入工作内容">
+                  <input v-model="item.price"  type="text" placeholder="请输入薪酬">
                 </li>
               </ul>
               <span @click="addStageTask" class="add">添加</span>
@@ -185,7 +185,7 @@
               付款方式
               <span></span>
             </h4>
-            <input v-model="localDealInfo.content.modeOfPayment" :value="localDealInfo.content.modeOfPayment" type="text" placeholder="请输入付款方式">
+            <input v-model="localDealInfo.content.modeOfPayment"  type="text" placeholder="请输入付款方式">
           </dd>
           <dd>
             <h4>
@@ -193,7 +193,7 @@
               协议总额
               <span></span>
             </h4>
-            <input v-model="localDealInfo.content.cost" :value="localDealInfo.content.cost" type="text" placeholder="请输入协议总额">
+            <input v-model="localDealInfo.content.cost"  type="text" placeholder="请输入协议总额">
           </dd>
           <dd class="remarksInfo">
             <h4>
@@ -201,7 +201,7 @@
               备注信息
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.content.remarksInfo" :value="localDealInfo.content.remarksInfo" placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.content.remarksInfo"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
           </dd>
           <dd>
             <h4>

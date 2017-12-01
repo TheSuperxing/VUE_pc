@@ -2,10 +2,10 @@
   <div class="companyLogin">
     <ul class="loginInput">
       <li>
-        <input v-model="reveal.username" v-bind:value="reveal.username" type="text" placeholder="请输入您的邮箱">
+        <input v-model="reveal.username"  type="text" placeholder="请输入您的邮箱">
       </li>
       <li>
-        <input v-model="reveal.password" v-bind:value="reveal.password" type="password" placeholder="请输入您的密码">
+        <input v-model="reveal.password"  type="password" placeholder="请输入您的密码">
       </li>
     </ul>
     <ul class="loginSubmit">

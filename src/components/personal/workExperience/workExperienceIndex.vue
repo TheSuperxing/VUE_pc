@@ -78,7 +78,7 @@
           <ul v-if="!reveal.editInfo[index]">
             <li>
               <h5>*&nbsp;公司名称</h5>
-              <p v-if="reveal.editDetailInfo[index]">{{localWorkExperience.companyName[index]}}</p>
+              <p v-if="reveal.editDetailInfo[index]">{{localWorkExperience[index].companyName}}</p>
               <input v-if="!reveal.editDetailInfo[index]" type="text" v-model="localWorkExperience[index].companyName" placeholder="请输入公司名称">
             </li>
             <li  v-if="!reveal.editDetailInfo[index]" class="companyAddress">
@@ -87,7 +87,7 @@
             </li>
             <li>
               <h5>任职职位</h5>
-              <input type="text" v-model="localWorkExperience[index].ocupation" v-bind:value="localWorkExperience[index].ocupation">
+              <input type="text" v-model="localWorkExperience[index].ocupation" >
             </li>
             <li>
               <h5>*&nbsp;任职时间</h5>
@@ -97,7 +97,7 @@
             </li>
             <li class="textArea">
               <h5>职位描述</h5>
-              <textarea v-model="localWorkExperience[index].jobDescription" v-bind:value="localWorkExperience[index].jobDescription" cols="66" rows="6" v-on:input="textLength(index)"></textarea>
+              <textarea v-model="localWorkExperience[index].jobDescription"  cols="66" rows="6" v-on:input="textLength(index)"></textarea>
               <i>{{reveal.textLength[index]}}/500</i>
             </li>
             <li>
@@ -240,13 +240,15 @@
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
+					async:false,
 				},function(data){
 					console.log(data)
 					data = data.msg;
 					that.workExperience = data;
+					if(that.workExperience.length==0){
+	          Vue.set(that.reveal,"empty",true)
+	        }
 				},function(err){
 					console.log(err)
 				})
@@ -258,14 +260,10 @@
 			      return text;
 			    }
 			  }
-	    	
-	    	
-        that.localWorkExperience=JSON.parse(JSON.stringify(that.workExperience));
-       
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	for(var i=0;i<that.workExperience.length;i++){
-	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].takeOffice);
+	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
 	    		if(that.workExperience[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
@@ -275,10 +273,9 @@
 	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
 	    		}
         }
+	    	that.localWorkExperience=JSON.parse(JSON.stringify(that.workExperience));
 
-        if(this.workExperience.length==0){
-          Vue.set(this.reveal,"empty",true)
-        }
+        
       },
       closeAlert(){
         var modal= new ModalOpp("#modal-overlay");
@@ -399,17 +396,16 @@
 					console.log(data)
 					data = data.msg;
 					that.searchResult = data;
+					if(that.searchResult.length!=0){
+            Vue.set(that.reveal,"modal",true)
+          }else {
+            Vue.set(that.reveal,"modal",false)
+          }
 				},function(err){
 					console.log(err)
 				})
         if(that.input.value!=""){
           Vue.set(this.reveal,"searchShow",true)//点击搜索按钮后，展示搜索结果
-
-          if(this.searchResult.length!=0){
-            Vue.set(this.reveal,"modal",true)
-          }else {
-            Vue.set(this.reveal,"modal",false)
-          }
         }
 
         for(var i= 0 ; i< this.searchResult.length;i++){/*给每一个搜索出的公司的列表添加一个状态*/

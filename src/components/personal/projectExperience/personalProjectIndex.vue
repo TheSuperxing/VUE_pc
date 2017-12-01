@@ -68,7 +68,7 @@
     	</div>
     	
     	<div class="morePics" v-if="!show.tag[$index]">
-    		<img v-for="item in show.picList" :src="item.pic" />
+    		<img v-for="item in show.picList[$index]" :src="item.pic" />
     		<!-- <img v-for="item in show.picList" :src="data:image/png;base64,item.pic" /> -->
     	</div>
     	<div class="viewMore">
@@ -96,8 +96,8 @@
         stateNone:false,
         updowntxt:[],
         show:{
-			tag:[],
-			picList:"",
+					tag:[],
+					picList:[],
         },
         proInfo:[],
         localProInfo:[],
@@ -110,9 +110,7 @@
         openOrPrivacyText: [],//控制信息是否对外显示文本
       }
     },
-//  computed:mapState({
-//    companyProInfo:state=>state.company.companyMessage.companyProInfo/*获取vuex数据*/
-//  }),
+
     mounted(){
     	this.updateData();
     },
@@ -126,13 +124,14 @@
     methods:{
     	updateData(){
     		var that = this;
-			var url = MyAjax.urlsy+"/psnProjExpe/findProjExpe";//暂时先写成这样
+				var url = MyAjax.urlsy+"/psnProjExpe/findProjExpe";//暂时先写成这样
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
+					async:false,
 				},function(data){
 					console.log(data)
 					data = data.msg;
@@ -170,26 +169,26 @@
 		      /*对每一个循环列表的对外显示赋初始值*/
 	    	}
 		},
-		getPic(psnProExpeID){
+		getPic(psnProExpeID,index){
 			var that=this;
 			var url=MyAjax.urlsy+"/psnProjExpe/findById/"+psnProExpeID;
 			MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-				},function(data){
-					that.show.picList=data.msg;
-				},function(err){
-					console.log(err)
-				})
+				type: "GET",
+				url:url,
+				dataType: "json",
+				async:true,
+			},function(data){
+				console.log(data.msg)
+				Vue.set(that.show.picList,[index],data.msg)
+			},function(err){
+				console.log(err)
+			})
 		},
-    	goToEditPro(index,item){
-    		console.log(item.projectID,item.psnProExpeID)
-    		router.push({name:'editPerProject',query:{proId:item.projectID,psnId:item.psnProExpeID}})
-    		/*通过路由传值*/
-    	},
+			goToEditPro(index,item){
+				console.log(item.projectID,item.psnProExpeID)
+				router.push({name:'editPerProject',query:{proId:item.projectID,psnId:item.psnProExpeID}})
+				/*通过路由传值*/
+			},
     	
     	upDown(index){
 //  		Vue.set(this.show,"tag[index]",false)
@@ -197,14 +196,15 @@
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
 					this.updowntxt[index] = "收起图片"
+					this.getPic(this.proInfo[index].psnProExpeID,index)
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
-			this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-			this.getPic(this.proInfo[index].psnProExpeID)
-			console.log(this.show.picList[0])
+				this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+			
+				console.log(this.show.picList)
     	},
     	OpenOrPrivacy(index){//显示隐藏按钮，通过这个按钮可以控制显示到别人查看信息页的信息
     		
@@ -250,14 +250,14 @@
 			},
 			getData(){
 				var that = this;
-	    		var url = MyAjax.urlsy+"/psnProjExpe/findProjByName/"+that.searchText;
+	    	var url = MyAjax.urlsy+"/psnProjExpe/findProjByName/"+that.searchText;
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 					data = data.msg;

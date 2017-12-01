@@ -11,7 +11,8 @@ var MyAjax = {
 			type: option.type,
 			url: option.url,
 			beforeSend:function(request){
-				request.setRequestHeader("token",cookieTool.getCookie("token"))
+				request.setRequestHeader("token",cookieTool.getCookie("token"));
+//				request.withCredentials = true;
 			},
 			data: option.data,
 			dataType: option.dataType,

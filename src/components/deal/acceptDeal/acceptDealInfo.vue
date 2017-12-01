@@ -174,7 +174,7 @@
           <ul>
             <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentFirstParty(index)" :class="{selected:reveal.firstPartyComment.startSelected[index]}"></li>
           </ul>
-          <textarea v-model="localFirstPartyComment.text" :value="localFirstPartyComment.text" cols="63" rows="5" placeholder="你的评论"></textarea>
+          <textarea v-model="localFirstPartyComment.text"  cols="63" rows="5" placeholder="你的评论"></textarea>
           <div>
             <button @click="keepFirstPartyComment">保存</button>
             <button @click="cancelFirstPartyComment">取消</button>
@@ -210,7 +210,7 @@
               <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyTeam(index)" :class="{selected:reveal.secondPartyComment.teamComment.startSelected[index]}"></li>
             </ul>
 
-            <textarea v-model="localSecondPartyComment.teamComment.text" :value="localSecondPartyComment.teamComment.text" cols="63" rows="5" placeholder="你的评论"></textarea>
+            <textarea v-model="localSecondPartyComment.teamComment.text"  cols="63" rows="5" placeholder="你的评论"></textarea>
           </dd>
           <!--对团队整体评价的编辑-->
         </dl>
@@ -239,7 +239,7 @@
 
                   <dl v-if="!reveal.editMemberInfo[index]" class="editMemberResponse">
                     <dt>
-                      <input v-model="item.responsibilities" :value="item.responsibilities" type="text">
+                      <input v-model="item.responsibilities" type="text">
                     </dt>
                     <dd>
                       <button @click="keepEditMemberInfo(index)">保存</button>
@@ -290,7 +290,7 @@
                 <ul>
                   <li v-for="(item,$index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyMember(index,$index)" :class="{selected:reveal.secondPartyComment.memberComment.startSelected[index][$index]}"></li>
                 </ul>
-                <textarea v-model="localSecondPartyComment.memberComment.text[index]" :value="localSecondPartyComment.memberComment.text[index]" cols="63" rows="5" placeholder="你的评论"></textarea>
+                <textarea v-model="localSecondPartyComment.memberComment.text[index]"  cols="63" rows="5" placeholder="你的评论"></textarea>
               </dd>
               <!--以上是编辑乙方成员评价部分-->
             </dl>

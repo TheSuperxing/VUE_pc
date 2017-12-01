@@ -14,7 +14,7 @@
       <option value="0" v-for="item in province.countyData" v-bind:value="item.name">{{item.name}}</option>
     </select>
     <p>区</p>
-    <p class="street"><input type="text" placeholder="" v-model="accptProvince.street" v-bind:value='accptProvince.street' @blur="streetMust"/>路</p>
+    <p class="street"><input type="text" placeholder="" v-model="accptProvince.street"  @blur="streetMust"/>路</p>
   	<alertTip v-if="showAlert.street" :showHide="showAlert.street" :alertText="alertText.street"></alertTip>
   </div>
 </template>

@@ -390,7 +390,7 @@
               type: "GET",
               url:url,
               dataType: "json",
-              
+              async:false,
             },function(data){
               if(data.code==0){
                 that.award=data.msg
@@ -438,14 +438,15 @@
 				console.log(this.show.tag[index])
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+					this.updowntxt[index] = "收起图片";
+					this.getPicture(index);
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
     		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-    		this.getPicture(index);
+    		
     	},
       openOrPrivacy(index){//信息是否对外公开控制按钮\
         

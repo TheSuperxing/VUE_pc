@@ -352,7 +352,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async: false,
 				},function(data){
 					console.log(data)
 					data = data.msg;
@@ -400,7 +400,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async: true, 
 				},function(data){
 					console.log(data)
 					Vue.set(that.picArr,[index],data.msg)
@@ -431,7 +431,7 @@
         Vue.set(this.newInputValue,"schoolTimeDown","")
         Vue.set(this.newInputValue,"professionName","")
         Vue.set(this.newInputValue,"education","")
-        
+        var that=this;
         singleManualUploader({
 	        element:"fine-uploader-manual-trigger",
 					template: "qq-template-manual-trigger",
@@ -464,7 +464,7 @@
 					data: JSON.stringify(that.education[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async: true,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -503,7 +503,8 @@
 					url:url,
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
+  //				content-type: "text/plain;charset=UTF-8",
+          async: true,
 				},function(data){
 					console.log(data)
 					if(data.code==0){
@@ -536,7 +537,8 @@
 					type: "DELETE",
 					url:url,
 					dataType: "json",
-					contentType: "application/json;charset=UTF-8",
+          contentType: "application/json;charset=UTF-8",
+          async: true,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -583,7 +585,7 @@
 					data: JSON.stringify(that.localEdu[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async: true,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -654,7 +656,7 @@
 					url:url,
 					data:JSON.stringify(that.newInputValue),
 					dataType: "json",
-					
+					async: false,
 				},function(data){
 					console.log(data)
 				},function(err){

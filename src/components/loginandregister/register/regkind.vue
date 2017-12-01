@@ -202,7 +202,6 @@
 				})
 			},
 			changePic(){
-		    	console.log(777)
 		    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
 		    	$(".picConfirm").attr("src",this.picSrc)
 		    },

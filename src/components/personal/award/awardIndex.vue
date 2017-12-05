@@ -301,50 +301,7 @@
       this.getData()
     },
     mounted(){
-    	//上传图片
-//			var manualUploader = new qq.FineUploader({
-//	        element: document.getElementById('fine-uploader-manual-trigger'),
-//	        template: 'qq-template-manual-trigger',
-//	        request: {
-//	            endpoint: MyAjax.urlsy+"/psnAwards/batchUpload"
-//	        },
-//	        thumbnails: {
-//	//	                placeholders: {
-//	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-//	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-//	//	                }
-//	        },
-//	        validation: {
-//	            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-//	            itemLimit: 5,
-//	            sizeLimit: 1500000
-//	        },
-//	        autoUpload: false,
-//	        debug: true,
-//	        callbacks:{
-//	        	onSubmit:  function(id,  fileName)  {
-//	        		$("#fine-uploader-manual-trigger  .qq-uploader-selector .buttons .btn-primary").show()
-//          },
-//          onCancel: function(){
-//              var imgList=$("#fine-uploader-manual-trigger .qq-uploader-selector .qq-upload-list-selector .list")
-//              if(imgList.length<=1){
-//                $("#fine-uploader-manual-trigger  .qq-uploader-selector .buttons .btn-primary").hide()
-//              }
-//            },
-//	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-//	                //alert('This is onComplete function.');
-//									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-//	                console.log(responseJSON)
-//	                if(responseJSON.success==true){
-//	                	that.newAward.picId.push(responseJSON.msg)
-//	                }
-//	                $("#fine-uploader-manual-trigger .qq-uploader-selector .buttons .btn-primary").hide()
-//	          	},
-//	    	}
-//	    });
-//			qq(document.getElementById("trigger-upload")).attach("click", function() {
-//	        manualUploader.uploadStoredFiles();
-//	    });
+    	
 	    
       if(this.award.length==0){
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
@@ -364,6 +321,7 @@
         }
       }
       /*以上是是否对外显示文本信息初始化*/
+
     },
     updated(){
       if(this.award.length==0){
@@ -483,55 +441,6 @@
         this.getPicture(index);
         var that = this;
 
-        //上传图片
-//      if(window['manualUploader'+index]==undefined){
-//        window['manualUploader'+index]= new qq.FineUploader({
-//          element: document.getElementById(that.fineUploaderId[index]),
-//          template: this.qqTemplate[index],
-//          request: {
-//            endpoint: MyAjax.urlsy+"/psnAwards/batchUpload"
-//          },
-//          thumbnails: {
-//          },
-//          validation: {
-//            allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-//            itemLimit: 5,
-//            sizeLimit: 2000000
-//          },
-//          autoUpload: false,
-//          debug: true,
-//          callbacks:{
-//            onSubmit:  function(id,fileName){
-//              $("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .buttons .btn-primary").show()
-//            },
-//            onCancel: function(){
-//              var imgList=$("#"+that.fineUploaderId[index]+"  .qq-uploader-selector .qq-upload-list-selector .list")
-//              if(imgList.length<=1){
-//                $("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary").hide()
-//              }
-//            },
-//            onComplete: function (id, fileName, responseJSON, maybeXhr) {
-//            	console.log(responseJSON)
-//              if(responseJSON.success==true){
-//              	if(that.localAward[index].picId == null){
-//              		that.localAward[index].picId = [];
-//              	  that.localAward[index].picId.push(responseJSON.msg)
-//              	}else{
-//              		that.localAward[index].picId.push(responseJSON.msg)
-//              	}
-//              	console.log(that.localAward[index].picId)
-//              }
-//            },
-//          }
-//        });
-//      }
-//
-//      var btnPrimary=$("#"+that.fineUploaderId[index]+" .qq-uploader-selector .buttons .btn-primary");
-//      qq(btnPrimary[0]).attach("click", function() {
-//        eval('manualUploader'+index).uploadStoredFiles();
-//        btnPrimary.hide()
-//      });
-
 				that.localAward[index].picId = [];
 	     	moreManualUploader({
           nameList:'manualUploader'+index,
@@ -609,7 +518,7 @@
       addInfo(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addAward",false);
         Vue.set(this.reveal,"empty",false);
-        
+        //上传图片
         singleManualUploader({
 	        element:"fine-uploader-manual-trigger",
 					template: "qq-template-manual-trigger",

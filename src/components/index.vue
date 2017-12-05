@@ -25,7 +25,7 @@
     },
     mounted(){
     	var that = this;
-    	var url = "http://10.1.31.7:8080/accountmanainfo/home";
+    	var url = MyAjax.hw+"/accountmanainfo/home";
     	MyAjax.ajax({
 				type: "GET",
 				url:url,

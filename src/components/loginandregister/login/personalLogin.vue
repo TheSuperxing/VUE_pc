@@ -11,21 +11,16 @@
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
       <li>
-<<<<<<< HEAD
-        <!-- <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus /> -->
-        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入短信验证码" @blur="msgConfirm($event)" @keydown="keydown($event)"></div> 
-=======
         <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入短信验证码" @blur="msgConfirm($event)" @keydown="keydown($event)"
         	v-bind:html="personalLoginInput.messageConfirm"></div> 
->>>>>>> f2989b8d87c786e7f8b501e75e72937acd4ca78b
         <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
       </li>
       
     </ul>
 		<alertTip v-if="showAlert" :showHide="showAlert" :alertText="alertText"></alertTip>
-    <div class="b_tips">
+    <!-- <div class="b_tips">
     	<p><router-link to="/register">立即注册>></router-link></p>
-    </div>
+    </div> -->
     <ul class="loginSubmit">
       <li>
         <button @click="personalLogin"><router-link to="">登录</router-link></button>

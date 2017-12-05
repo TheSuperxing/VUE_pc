@@ -1,18 +1,16 @@
 <template>
   <div id="app">
     <div class="titleChange" v-title>edi</div>
-    <header-nav></header-nav>
-    <div id="center-content" class="clear">
-      <router-view></router-view>
-    </div>
-    <footer-nav></footer-nav>
+    <!-- <header-nav></header-nav> -->
+    <router-view></router-view>
+    <!-- <footer-nav></footer-nav> -->
   </div>
 </template>
 
 <script>
   import Vue from "vue";
-  import FooterNav from "./components/footer.vue";
-  import HeaderNav from "./components/header.vue";
+  // import FooterNav from "./components/footer.vue";
+  // import HeaderNav from "./components/header.vue";
   setInterval(function () {
     if($(".titleChange").text()=="edi"){
       $(".titleChange").text("建筑因您更美")
@@ -27,10 +25,10 @@ export default {
 
     }
   },
-  components:{
-    HeaderNav,
-    FooterNav
-  },
+  // components:{
+  //   HeaderNav,
+  //   FooterNav
+  // },
   /*created(){
   	$(document.body).css("overflow","scoll");
   },
@@ -41,4 +39,9 @@ export default {
 }
 
 </script>
+<style lang="scss" scoped>
+  .titleChange{
+    display:none;
+  }
+</style>
 

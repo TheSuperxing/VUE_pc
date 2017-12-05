@@ -9,43 +9,43 @@
       <p>{{header.titleName}}</p>
     </div>-->
     <div class="basicInfoContainer">
-      <div class="bic-title">
+      <div class="bic-title clear">
         <h2>基础信息</h2>
         <p v-on:click="editBasicInfo" v-if="reveal.edit">编辑</p>
       </div>
-      <ul v-if="reveal.edit">
-        <li>
+      <ul v-if="reveal.edit" class="bicInfo">
+        <li class="clear">
           <h5>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
           <p>{{baseInfo.nickName}}</p>
           <p v-if="noBaseInfo">（暂无信息）</p>
 
         </li>
-        <li>
+        <li class="clear">
           <h5>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p>{{baseInfo.psnName}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[0]}" v-on:click="openOrPrivacy(0)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
-        <li>
+        <li class="clear">
           <h5>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</h5>
           <p>{{baseInfo.sex}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[1]}" v-on:click="openOrPrivacy(1)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
           
         </li>
-        <li>
+        <li class="clear">
           <h5>出生日期：</h5>
           <p>{{baseInfo.dateOfBirth}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[2]}" v-on:click="openOrPrivacy(2)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
-        <li>
+        <li class="clear">
           <h5>手机号码：</h5>
           <p>{{baseInfo.phoneNumber}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[3]}" v-on:click="openOrPrivacy(3)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
-        <li>
+        <li class="clear">
           <h5>联系邮箱：</h5>
           <p>{{baseInfo.psnMail}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[4]}" v-on:click="openOrPrivacy(4)"></strong>
@@ -54,15 +54,15 @@
       </ul>
 
 
-      <ul v-if="!reveal.edit">
-        <li>
+      <ul v-if="!reveal.edit" class="bicInfo">
+        <li class="clear">
           <h5><span>*</span>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
           <p><input type="text" v-model="localBaseInfo.nickName"  v-on:input="changeNickName"></p>
           <i>{{textLeng.nickName}}/30</i>
 				  <alertTip v-if="showAlert.nickName" :showHide="showAlert.nickName" @closeTip="closeTip" :alertText="alertText.nickName"></alertTip>
           
         </li>
-        <li v-if="baseInfo.ifRNA">
+        <li v-if="baseInfo.ifRNA" class="clear">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p>{{baseInfo.psnName}}</p>
           <i>{{textLeng.psnName}}/30</i>
@@ -70,46 +70,46 @@
 				  <alertTip v-if="showAlert.psnName" :showHide="showAlert.psnName" @closeTip="closeTip" :alertText="alertText.psnName"></alertTip>
 					
         </li>
-        <li v-if="!baseInfo.ifRNA">
+        <li v-if="!baseInfo.ifRNA" class="clear">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p><input type="text" v-model="localBaseInfo.psnName"  v-on:input="changeName"></p>
           <i>{{textLeng.psnName}}/30</i>
         </li>
-        <li>
+        <li class="clear">
           <h5>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</h5>
           <p>
             <button v-bind:class="{selectSex:reveal.selectSex}" v-on:click="selectSexNan">男</button>
             <button v-bind:class="{selectSex:!reveal.selectSex}" v-on:click="selectSexNv">女</button>
           </p>
         </li>
-        <li>
+        <li class="clear">
           <h5>出生日期：</h5>
           <datepicker class="datePicker" v-model="localBaseInfo.dateOfBirth"></datepicker>
         </li>
-        <li>
+        <li class="clear">
           <h5>手机号码：</h5>
           <!--<p>{{baseInfo.phoneNumber}}</p>-->
           <input type="text" v-model="localBaseInfo.phoneNumber" />
           <!--<span>(手机号为当前登录账户，不可自行修改，如需修改登录手机号，请联系管理员)</span>-->
         </li>
-        <li>
+        <li class="clear">
           <h5>联系邮箱：</h5>
           <p><input type="text" v-model="localBaseInfo.psnMail" ></p>
         </li>
-        <li class="cancelSubmit">
+        <li class="cancelSubmit clear">
           <button v-on:click="cancelEdit">取消</button>
           <button v-on:click="submitEdit" v-bind:class="{submitBgColor:reveal.submitBgColor}">提交</button>
         </li>
       </ul>
       <div class="realName">
-        <div class="realNameTop">
+        <div class="realNameTop clear">
           <h5>实名认证：</h5>
           <p v-if="!localBaseInfo.haveUploaded" v-bind:class="{throughRealName:reveal.throughRealName}">（暂未上传认证文件）</p>
         </div>
         <p v-show="haveUploaded" style="line-height: 40px;color: rgb(242,117,25);">上传认证证件成功，已进入审核阶段。可继续上传。</p>
         <div class="realNameMain">
         	<ul>
-        		<li>
+        		<li class="clear">
         			<script type="text/template" id="qq-template-manual-trigger">
 				        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 				            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -257,7 +257,6 @@
       this.updateData();
     },
     mounted(){
-    	console.log(this.baseInfo)
     	var that = this;
       //上传图片
 			var manualUploader = new qq.FineUploader({
@@ -307,6 +306,7 @@
 	    });
 	    
 			qq(document.getElementById("trigger-upload")).attach("click", function() {
+        console.log("ok");
 	        manualUploader.uploadStoredFiles();
 	    });
 
@@ -321,7 +321,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				contentType:"application/json;charset=utf-8",
-					
+					async: false,
 				},function(data){
 					console.log(data)
 					if(data.code==0){
@@ -634,7 +634,7 @@
           background: url("../../../assets/img/personal/basicInfo/edit.png") left center no-repeat;
         }
       }
-      >ul{
+      .bicInfo{
         padding-left:20px;
         padding-top:31px;
         padding-bottom:15px;
@@ -663,6 +663,7 @@
             font-size:12px;
           }
           input{
+            float: left;
             border:1px solid $borderColor;
             padding-left:10px;
             font-size: 14px;

@@ -1,6 +1,6 @@
 <template>
   <div class="educationIndex">
-    <div  class="title">
+    <div  class="title clear">
       <h2 v-cloak>{{title}}</h2>
       <p v-on:click="addEdu">添加</p>
     </div>
@@ -9,8 +9,8 @@
 
       <div class="eduInfo" v-for="(item,index) in education" v-show="!editEdu.add">
 
-        <div class="eduInfoContainer" v-show="editEdu.delete[0][index]">
-          <div v-show="!editEdu.edit[0][index]">
+        <div class="eduInfoContainer clear" v-show="editEdu.delete[0][index]">
+          <div v-show="!editEdu.edit[0][index]" class="clear">
             <h4 v-cloak>{{item.schoolName}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!openOrPrivacy[index]}" v-on:click="openOrPrivacyInfo(index)">{{openOrPrivacyText[index]}}</li>
@@ -37,26 +37,26 @@
 					</div>
 
           <ul class="editEduInfo" v-show="editEdu.edit[0][index]">
-            <li>
+            <li class="clear">
               <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)"><span>{{textLeng.schoolName[index]}}/30</span>
             </li>
-            <li>
+            <li class="clear">
               <span class="wrap-left">*在校时间</span>
               <datepicker v-model="localEdu[index].schoolTimeUp"></datepicker>
               <span>——</span>
               <datepicker v-model="localEdu[index].schoolTimeDown"></datepicker>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <span class="wrap-left">专业名称</span><input v-model="localEdu[index].professionName" v-on:input="changeProfession(index)" type="text" placeholder="请输入专业名称"><span>{{textLeng.profession[index]}}/30</span>
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <span class="wrap-left">所获学历 </span><input v-model="localEdu[index].education" type="text" placeholder="请选择学校">
               </label>
             </li>
-            <li class="img-wrap" >
+            <li class="img-wrap clear" >
 							<span class="wrap-left">图片展示</span>
 							<ul class="imgShow">
 								<li v-for="(item,$ind) in picArr[index]">
@@ -148,28 +148,28 @@
       </div>
 
       <ul class="editEduInfo" v-show="editEdu.add">
-        <li>
+        <li class="clear">
           <label>
            <span class="wrap-left">*学校名称 </span><input v-model="newInputValue.schoolName" v-on:input="addShoolName" type="text" placeholder="请输入学校名称"><span>{{newTextLeng.schoolName[0]}}/30</span>
           </label>
         </li>
-        <li>
+        <li class="clear">
           <span class="wrap-left">在校时间</span>
           <datepicker v-model="newInputValue.schoolTimeUp"></datepicker>
           <span>——</span>
           <datepicker v-model="newInputValue.schoolTimeDown"></datepicker>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <span class="wrap-left">专业名称</span> <input v-model="newInputValue.professionName" v-on:input="addProfession" type="text" placeholder="请输入专业名称"><span>{{newTextLeng.profession[0]}}/30</span>
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <span class="wrap-left">所获学历</span><input v-model="newInputValue.education" type="text" placeholder="请选择学校">
           </label>
         </li>
-        <li class="img-wrap">
+        <li class="img-wrap clear">
 					<span class="wrap-left">图片展示</span>
 					
 					<script type="text/template" id="qq-template-manual-trigger">
@@ -239,10 +239,10 @@
 			    </script>
 			    <div id="fine-uploader-manual-trigger"></div>
 				</li>
-				<li class="tip-wrap">
+				<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
-        <li class="btnBox">
+        <li class="btnBox clear">
           <button v-bind:class="{eduDisabled: buttonColor.add}" v-on:click="keepEditEduNew">保存</button>
           <button v-if="editEdu.add" v-on:click="cancellEditEdu">取消</button>
         </li>

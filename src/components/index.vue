@@ -1,13 +1,22 @@
 <template>
-  <div class="index">
-    <h1>{{msg}}</h1>
+  <div>
+		<header-nav></header-nav>
+		<div id="indexCont">
+			<h1>{{msg}}</h1>
+		</div>
+		<footer-nav></footer-nav>
   </div>
 </template>
 
 <script>
   import MyAjax from "../assets/js/MyAjax.js"
-	
+	import FooterNav from "./footer.vue";
+  import HeaderNav from "./header.vue";
   export default {
+		components:{
+			HeaderNav,
+			FooterNav
+		},
     name: 'Index',
     data:function(){
       return {
@@ -36,11 +45,12 @@
   }
 </script>
 <style scoped lang="scss">
-.index{
+#indexCont{
 	width: 1200px;
 	min-height: 600px;
 	color: #FFFFFF;
 	font-size: 20px;
+	margin: 150px auto;
 	 /*background-image: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,1));*/
 	background: -webkit-linear-gradient(top,rgba(109,125,155,0),rgba(109,125,155,0.5)); /* Safari 5.1 - 6 */
   background: -o-linear-gradient(top,rgba(109,125,155,0),rgba(109,125,155,0.5)); /* Opera 11.1 - 12*/

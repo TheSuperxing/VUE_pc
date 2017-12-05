@@ -11,12 +11,12 @@
     <!--公司名称搜索开始-->
     <div id="modal-overlay2">
       <div class="alert">
-        <div class="modal-title">
+        <div class="modal-title clear">
           <h6>搜索公司</h6>
           <button v-on:click="closeAlert2"></button>
         </div>
-        <ul class="modal-container" v-bind:class="{ modalContainerShow : reveal.modal,modalContainerEmpty: !reveal.modal}">
-          <li v-bind:class="{beforeSearch:!reveal.searchShow}">
+        <ul class="modal-container clear" v-bind:class="{ modalContainerShow : reveal.modal,modalContainerEmpty: !reveal.modal}">
+          <li v-bind:class="{beforeSearch:!reveal.searchShow}" class="clear">
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
              <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
@@ -25,7 +25,7 @@
               <p>搜索</p>
             </button>
           </li>
-          <li v-if="reveal.searchShow">
+          <li v-if="reveal.searchShow" class="clear">
             <h6>搜索结果</h6>
             <p v-if="!reveal.modal">抱歉，未找到该公司，请从新搜索</p>
             <div v-if="reveal.modal">
@@ -38,7 +38,7 @@
           <li v-if="reveal.searchShow" v-on:click="customCompanyName">
             自定义添加公司
           </li>
-          <li v-if="reveal.searchShow">
+          <li v-if="reveal.searchShow" class="clear">
             <button v-on:click="confirm">确认</button>
           </li>
         </ul>
@@ -46,7 +46,7 @@
     </div>
     <!--公司名称搜索结束-->
 
-    <div class="title">
+    <div class="title clear">
       <h2 v-cloak>{{title}}</h2>
       <p v-on:click="addInfo">添加</p>
     </div>
@@ -56,7 +56,7 @@
         <!--信息为空 时提示信息-->
       <div class="workExpInfo" v-if="reveal.addOrShow">
         <div v-for="(item,index) in workExperience" class="workExpInfoContainer">
-          <div v-if="reveal.editInfo[index]">
+          <div v-if="reveal.editInfo[index]" class="clear">
             <h4 v-cloak>{{item.companyName}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">{{reveal.openOrPrivacyText[index]}}</li>
@@ -65,7 +65,7 @@
             </ul>
           </div>
           <!--头部信息-->
-          <div v-if="reveal.editInfo[index]">
+          <div v-if="reveal.editInfo[index]" class="clear">
             <p>
             	Time : {{item.ocupationTimeUp}}——{{item.ocupationTimeDown}}
             </p>
@@ -76,31 +76,31 @@
           <!--显示存在信息-->
           <!--编辑工作经历-->
           <ul v-if="!reveal.editInfo[index]">
-            <li>
+            <li class="clear">
               <h5>*&nbsp;公司名称</h5>
               <p v-if="reveal.editDetailInfo[index]">{{localWorkExperience[index].companyName}}</p>
               <input v-if="!reveal.editDetailInfo[index]" type="text" v-model="localWorkExperience[index].companyName" placeholder="请输入公司名称">
             </li>
-            <li  v-if="!reveal.editDetailInfo[index]" class="companyAddress">
+            <li  v-if="!reveal.editDetailInfo[index]" class="companyAddress clear">
               <h5>公司地址</h5>
               <input type="text" v-model="localWorkExperience[index].companyAddress" placeholder="请输入公司地址">
             </li>
-            <li>
+            <li class="clear">
               <h5>任职职位</h5>
               <input type="text" v-model="localWorkExperience[index].ocupation" >
             </li>
-            <li>
+            <li class="clear">
               <h5>*&nbsp;任职时间</h5>
               <datepicker v-model="localWorkExperience[index].ocupationTimeUp"></datepicker>
               <span></span>
               <datepicker v-model="localWorkExperience[index].ocupationTimeDown"></datepicker>
             </li>
-            <li class="textArea">
+            <li class="textArea clear">
               <h5>职位描述</h5>
               <textarea v-model="localWorkExperience[index].jobDescription"  cols="66" rows="6" v-on:input="textLength(index)"></textarea>
               <i>{{reveal.textLength[index]}}/500</i>
             </li>
-            <li>
+            <li class="clear">
               <button v-on:click="keepEdit(index)">保存</button>
               <button v-on:click="cancelEdit(index)">取消</button>
             </li>
@@ -114,32 +114,32 @@
       <!--添加工作经历（默认情况）-->
 
       <ul class="addWorkExp" v-if="!reveal.addOrShow">
-        <li>
+        <li class="clear">
           <h5>*&nbsp;公司名称</h5>
           <p v-if="reveal.customCompanyName">{{newWorkExperience.companyName}}</p>
           <input v-if="!reveal.customCompanyName" type="text" placeholder="请输入公司名称" v-model="newWorkExperience.companyName">
 
         </li>
-        <li v-if="!reveal.customCompanyName">
+        <li v-if="!reveal.customCompanyName" class="clear">
           <h5>公司地址</h5>
           <input v-model="newWorkExperience.companyAddress" type="text" placeholder="请输入公司地址">
         </li>
-        <li>
+        <li class="clear">
           <h5>*&nbsp;任职职位</h5>
           <input v-model="newWorkExperience.ocupation" type="text" placeholder="请输入职位名称">
         </li>
-        <li>
+        <li class="clear">
           <h5>*&nbsp;任职时间</h5>
           <datepicker v-model="newWorkExperience.ocupationTimeUp"></datepicker>
           <span></span>
           <datepicker v-model="newWorkExperience.ocupationTimeDown"></datepicker>
         </li>
-        <li>
+        <li class="clear">
           <h5>职位描述</h5>
           <textarea v-model="newWorkExperience.jobDescription" cols="66" rows="6" v-on:input="newTextLength"></textarea>
           <i>{{reveal.newTextLength}}/500</i>
         </li>
-        <li>
+        <li class="clear">
           <button v-on:click="keepAdd" v-bind:class="{keepAdd:reveal.keepAdd}">保存</button>
           <button v-on:click="cancelAdd">取消</button>
         </li>

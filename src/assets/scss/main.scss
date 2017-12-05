@@ -58,7 +58,7 @@ body {
 :-ms-input-placeholder { color:#A9A9A9; }
 
 /*清除浮动*/
-.clear :after {
+.clear:after{
   clear: both;
   content: '.';
   display: block;
@@ -169,55 +169,5 @@ body {
 
   }
   /* 模态框样式 */
-
-  .topbar{
-
-  }
-
- #center-content{
-   width:1200px;
-   margin:150px auto;
-   margin-bottom: 150px;
- }
-  .footer{
-    width:100%;
-    min-width: 1200px;
-    height: 140px;
-    overflow: hidden;
-    background: #FFFFFF;
-//  position: absolute;
-//  bottom: 0;
-    .footerNav{
-      width:1200px;
-      height:110px;
-      padding-top:30px;
-      margin: 0 auto;
-      line-height: 32px;
-      color: #353535;
-      .contact{
-        text-align: center;
-        span:nth-child(1){
-          padding-right:20px;
-        }
-      }
-      .contactAds{
-        text-align: center;
-
-      }
-
-    }
-    .copyring{
-      height: 30px;
-      background: #353535;
-      p{
-        width: 1200px;
-        margin:0 auto;
-        text-align: center;
-        color: #FFF;
-        font-size: 14px;
-        line-height: 30px;
-      }
-    }
-  }
 
 }

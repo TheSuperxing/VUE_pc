@@ -42,7 +42,7 @@
             <p>138-6666-8888</p>
           </div>
 
-          <ul v-if="!empty.basicInfo">
+          <ul v-if="!empty.basicInfo" class="clear">
             <li>
               <h5>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
               <p>{{psnMsg.personalbasicinfo.nickName}}</p>
@@ -68,7 +68,7 @@
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.education">（此处暂无信息）</div>
 
-          <div v-for="(item,index) in this.psnMsg.psnEduBackGrounds">
+          <div v-for="(item,index) in this.psnMsg.psnEduBackGrounds" class="clear">
             <h4 v-cloak>{{item.schoolName}}</h4>
             <div>
               <p v-cloak>{{item.schoolTimeUp}}——{{item.schoolTimeDown}}</p>
@@ -83,7 +83,7 @@
         <h3 class="pi-title">工作经历</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.psnWorkExperiences">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.psnMsg.psnWorkExperiences">
+          <div v-for="(item,index) in this.psnMsg.psnWorkExperiences" class="clear">
             <h4 v-cloak>{{item.companyName}}</h4>
             <div>
               <p v-cloak>
@@ -102,7 +102,7 @@
         <h3 class="pi-title">项目经历</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.psnProjExpes">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.psnMsg.psnProjExpes">
+          <div v-for="(item,index) in this.psnMsg.psnProjExpes" class="clear">
             <h4 v-cloak>{{item.projectName}}</h4>
             <div>
               <p v-cloak>
@@ -123,7 +123,7 @@
         <h3 class="pi-title">团队经历</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.teamExperience">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.psnMsg.teamOrgaInfos">
+          <div v-for="(item,index) in this.psnMsg.teamOrgaInfos" class="clear">
             <h4 v-cloak>{{item.teamName}}</h4>
           </div>
         </div>
@@ -133,7 +133,7 @@
         <h3 class="pi-title">执业资格</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.psnQualifications">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.psnMsg.psnQualifications">
+          <div v-for="(item,index) in this.psnMsg.psnQualifications" class="clear">
             <h4 v-cloak>{{item.qualificationName}}</h4>
             <div>
               <p v-cloak>注册单位：{{item.registeredUnit}}</p>
@@ -147,7 +147,7 @@
         <h3 class="pi-title">职称信息</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.psnTitleMessages">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.psnMsg.psnTitleMessages">
+          <div v-for="(item,index) in this.psnMsg.psnTitleMessages" class="clear">
             <h4 v-cloak>{{item.professionalTitle}}</h4>
             <div>
               <p v-cloak>职称专业：&nbsp;&nbsp;{{item.titleName}}</p>
@@ -164,7 +164,7 @@
         <h3 class="pi-title">所获奖励</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.psnAwards">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.psnMsg.psnAwards">
+          <div v-for="(item,index) in this.psnMsg.psnAwards" class="clear">
             <h4 v-cloak>{{item.awardName}}</h4>
             <div>
               <p v-cloak>颁发机构：&nbsp;&nbsp;{{item.awardingBody}}</p>
@@ -178,14 +178,14 @@
         <h3 class="pi-title">论文专利</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.paperAndPatent">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.psnMsg.psnPapers">
+          <div v-for="(item,index) in this.psnMsg.psnPapers" class="clear">
             <h4 v-cloak>{{item.paperTitle}}</h4>
             <div>
               <p v-cloak>发表期刊：{{item.journal}}</p>
               <p v-cloak>发表时间：{{item.publicTime}}</p>
             </div>
           </div>
-          <div v-for="(item,index) in this.psnMsg.psnPatents">
+          <div v-for="(item,index) in this.psnMsg.psnPatents" class="clear">
             <h4 v-cloak>{{item.patentName}}</h4>
             <div>
               <p v-cloak>颁发机构：{{item.awardingBody}}</p>
@@ -199,13 +199,13 @@
         <h3 class="pi-title">语言软件</h3>
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.otherSkill">（此处暂无信息）</div>
-          <div v-for="(item,index) in this.psnMsg.psnlanguages">
+          <div v-for="(item,index) in this.psnMsg.psnlanguages" class="clear">
             <h4 v-cloak>{{item.language}}</h4>
             <div>
               <p v-cloak>熟练程度：{{item.proficiency}}</p>
             </div>
           </div>
-          <div v-for="(item,index) in this.psnMsg.psnsoftwares">
+          <div v-for="(item,index) in this.psnMsg.psnsoftwares" class="clear">
             <h4 v-cloak>{{item.software}}</h4>
             <div>
               <p v-cloak>熟练程度：{{item.proficiency}}</p>
@@ -222,6 +222,7 @@
 <script>
   import {mapState} from "vuex"
   import Vue from "vue"
+  import router from "../../router"
   import Modal from "../../assets/js/modal.js"
   import MyAjax from "../../assets/js/MyAjax.js"
   import "../../assets/js/units/corpbox/cropbox.js"
@@ -247,57 +248,31 @@
           // software:[true],
           otherSkill:true
         },
-        psnMsg:[],//用于存放服务器获取的数据
+        psnMsg:{
+          personalbasicinfo:{
+            nickName:"（暂无消息）",
+            psnName:"（暂无消息）",
+            sex:"（暂无消息）",
+            phoneNumber:"（暂无消息）"
+          }
+        },//用于存放服务器获取的数据
         validityTerm:[],//validityTermS+validityTermE
         personal:{
           personalPicture:"",
           fileName:"",
         	fd :"",
         },
+        status:200,
       }
     },
     created(){
-      var that=this;
-      var url = MyAjax.urlsy+"/psnHomePage/findByMySelf";
-    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-				
-			},function(data){
-        
-        that.psnMsg=data.msg;
-			},function(err){
-				console.log(err)
-      })
-      
+      this.getData();
     },
     mounted(){
+      var that=this;
+      //获取头像
+      this.getAvatar();
 
-      var that = this;
-    	//获取头像
-    	var url = MyAjax.urlsy+"/psnHomePage/getAvatar";
-    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-//				content-type: "text/plain;charset=UTF-8",
-				
-			},function(data){
-				console.log(data)
-				if(data.code==0){
-					that.personal.personalPicture = data.msg.pic
-				}else if(data.code==-1){
-					that.personal.personalPicture = require("../../assets/img/personal/personalIndex/picture.png");
-				}
-				
-			},function(err){
-				console.log(err)
-			})
-    	
-
-    
-//  	console.log(that.personal.personalPicture)
     	var options =
 			{
 				thumbBox: '.thumbBox',
@@ -359,8 +334,18 @@
 				
 			})
       //上传头像end
+
       
-      // 服务器获取首页所需的数据
+      if(this.status!="200"){
+        console.log("111")
+      }else{
+        // 为空的数据进行处理
+        this.dataProcess()
+      }
+    },
+    methods:{
+      dataProcess(){//处理是否为空的数据
+      
       function emptyText(text) {
         if(text==null||text.length==0){
           return "（暂无消息）";
@@ -368,153 +353,164 @@
           return text;
         }
       }
-      // 为空的数据进行处理
-      console.log(this.psnMsg.personalbasicinfo)
-      var personalbasicinfo=this.psnMsg.personalbasicinfo;
-      if(personalbasicinfo.sex==0){
-        return personalbasicinfo.sex="男"
-      }else{
-        return personalbasicinfo.sex="女"
-      }
-      if((personalbasicinfo.nickName==null||personalbasicinfo.nickName.length==0) && (personalbasicinfo.psnName==null||personalbasicinfo.psnName.length==0) && (personalbasicinfo.sex==null||personalbasicinfo.sex.length==0)){
-        Vue.set(this.empty,"basicInfo",true)
-      }
-      //基础信息部分数据空和非空切换
-      var psnEduBackGrounds=this.psnMsg.psnEduBackGrounds;
-      if(psnEduBackGrounds.length!=0){
-        Vue.set(this.empty,"education",false)
-        for (let item in psnEduBackGrounds){
-          psnEduBackGrounds[item].professionName=emptyText(psnEduBackGrounds[item].professionName);
-          psnEduBackGrounds[item].education=emptyText(psnEduBackGrounds[item].education);
-        }
-      }
-      //教育背景是否显示
 
-      var psnWorkExperiences=this.psnMsg.psnWorkExperiences;
-      if(psnWorkExperiences.length!=0){
-        Vue.set(this.empty,"psnWorkExperiences",false)
-        for (let item in psnWorkExperiences){
-          psnWorkExperiences[item].ocupation=emptyText(psnWorkExperiences[item].ocupation);
-          psnWorkExperiences[item].jobDescription=emptyText(psnWorkExperiences[item].jobDescription);
+        var personalbasicinfo=this.psnMsg.personalbasicinfo;
+        if(personalbasicinfo.sex==0){
+          personalbasicinfo.sex="男"
+        }else{
+          personalbasicinfo.sex="女"
         }
-      }
-      // 工作经历是否显示
-      var psnProjExpes=this.psnMsg.psnProjExpes;
-      if(psnProjExpes.length!=0){
-        Vue.set(this.empty,"psnProjExpes",false)
-        for (let item in psnProjExpes){
-          psnProjExpes[item].takeOffice=emptyText(psnProjExpes[item].takeOffice);
-          psnProjExpes[item].detailDes=emptyText(psnProjExpes[item].detailDes);
+        if((personalbasicinfo.nickName==null||personalbasicinfo.nickName.length==0) && (personalbasicinfo.psnName==null||personalbasicinfo.psnName.length==0) && (personalbasicinfo.sex==null||personalbasicinfo.sex.length==0)){
+          Vue.set(this.empty,"basicInfo",true)
         }
-      }
-      //项目经历是否显示
-      var teamOrgaInfos=this.psnMsg.teamOrgaInfos;
-      if(teamOrgaInfos.length!=0){
-        Vue.set(this.empty,"teamOrgaInfos",false)
-      }
-      //团队经历是否显示
-      var psnQualifications=this.psnMsg.psnQualifications;
-      if(psnQualifications.length!=0){
-        Vue.set(this.empty,"psnQualifications",false)
-        for (let item in psnQualifications){
-          psnQualifications[item].registeredUnit=emptyText(psnQualifications[item].registeredUnit);
-          psnQualifications[item].qualificationName=emptyText(psnQualifications[item].qualificationName);
+        //基础信息部分数据空和非空切换
+        var psnEduBackGrounds=this.psnMsg.psnEduBackGrounds;
+        
+        if(psnEduBackGrounds.length!=0){
+          Vue.set(this.empty,"education",false)
+          for (let item in psnEduBackGrounds){
+            psnEduBackGrounds[item].professionName=emptyText(psnEduBackGrounds[item].professionName);
+            psnEduBackGrounds[item].education=emptyText(psnEduBackGrounds[item].education);
+          }
         }
-      }
-      //执业资格是否显示
-      var psnTitleMessages=this.psnMsg.psnTitleMessages;
-      if(psnTitleMessages.length!=0){
-        Vue.set(this.empty,"psnTitleMessages",false)
-        for (let item in psnTitleMessages){
-          psnTitleMessages[item].titleName=emptyText(psnTitleMessages[item].titleName);
-          psnTitleMessages[item].titleLevel=emptyText(psnTitleMessages[item].titleLevel);
-          psnTitleMessages[item].certificateNumber=emptyText(psnTitleMessages[item].certificateNumber);
-          psnTitleMessages[item].assessmentTime=emptyText(psnTitleMessages[item].assessmentTime);
-          psnTitleMessages[item].certificateBody=emptyText(psnTitleMessages[item].certificateBody);
+        //教育背景是否显示
+        var psnWorkExperiences=this.psnMsg.psnWorkExperiences;
+        if(psnWorkExperiences.length!=0){
+          Vue.set(this.empty,"psnWorkExperiences",false)
+          for (let item in psnWorkExperiences){
+            psnWorkExperiences[item].ocupation=emptyText(psnWorkExperiences[item].ocupation);
+            psnWorkExperiences[item].jobDescription=emptyText(psnWorkExperiences[item].jobDescription);
+          }
         }
-      }
-      //职称信息是否显示
-      var psnAwards=this.psnMsg.psnAwards;
-      if(psnAwards.length!=0){
-        Vue.set(this.empty,"psnAwards",false)
-        for (let item in psnAwards){
-          psnAwards[item].awardName=emptyText(psnAwards[item].awardName);
-          psnAwards[item].awardingBody=emptyText(psnAwards[item].awardingBody);
-          psnAwards[item].awardingTime=emptyText(psnAwards[item].awardingTime);
+        // 工作经历是否显示
+        var psnProjExpes=this.psnMsg.psnProjExpes;
+        if(psnProjExpes.length!=0){
+          Vue.set(this.empty,"psnProjExpes",false)
+          for (let item in psnProjExpes){
+            psnProjExpes[item].takeOffice=emptyText(psnProjExpes[item].takeOffice);
+            psnProjExpes[item].detailDes=emptyText(psnProjExpes[item].detailDes);
+          }
         }
-      }
-      //所获奖励是否显示
-      var psnPapers=this.psnMsg.psnPapers;
-      if(psnPapers.length!=0){
-        for (let item in psnPapers){
-          psnPapers[item].journal=emptyText(psnPapers[item].journal);
-          psnPapers[item].publicTime=emptyText(psnPapers[item].publicTime);
+        //项目经历是否显示
+        var teamOrgaInfos=this.psnMsg.teamOrgaInfos;
+        if(teamOrgaInfos.length!=0){
+          Vue.set(this.empty,"teamOrgaInfos",false)
         }
-      }
-      var psnPatents=this.psnMsg.psnPatents;
-      
-      if(psnPatents.length!=0){
-        for (let item in psnPatents){
-          psnPatents[item].patentName=emptyText(psnPatents[item].patentName);
-          if((psnPatents[item].validityTermS!=null||psnPatents[item].validityTermS.length!=0)&&(psnPatents[item].validityTermE!=null||psnPatents[item].validityTermE.length!=0)){
-            this.validityTerm[item]= psnPatents[item].validityTermS+"-"+psnPatents[item].validityTermE
-          }else{
-            this.validityTerm[item]="（暂无消息）";
+        //团队经历是否显示
+        var psnQualifications=this.psnMsg.psnQualifications;
+        if(psnQualifications.length!=0){
+          Vue.set(this.empty,"psnQualifications",false)
+          for (let item in psnQualifications){
+            psnQualifications[item].registeredUnit=emptyText(psnQualifications[item].registeredUnit);
+            psnQualifications[item].qualificationName=emptyText(psnQualifications[item].qualificationName);
+          }
+        }
+        //执业资格是否显示
+        var psnTitleMessages=this.psnMsg.psnTitleMessages;
+        if(psnTitleMessages.length!=0){
+          Vue.set(this.empty,"psnTitleMessages",false)
+          for (let item in psnTitleMessages){
+            psnTitleMessages[item].titleName=emptyText(psnTitleMessages[item].titleName);
+            psnTitleMessages[item].titleLevel=emptyText(psnTitleMessages[item].titleLevel);
+            psnTitleMessages[item].certificateNumber=emptyText(psnTitleMessages[item].certificateNumber);
+            psnTitleMessages[item].assessmentTime=emptyText(psnTitleMessages[item].assessmentTime);
+            psnTitleMessages[item].certificateBody=emptyText(psnTitleMessages[item].certificateBody);
+          }
+        }
+        //职称信息是否显示
+        var psnAwards=this.psnMsg.psnAwards;
+        if(psnAwards.length!=0){
+          Vue.set(this.empty,"psnAwards",false)
+          for (let item in psnAwards){
+            psnAwards[item].awardName=emptyText(psnAwards[item].awardName);
+            psnAwards[item].awardingBody=emptyText(psnAwards[item].awardingBody);
+            psnAwards[item].awardingTime=emptyText(psnAwards[item].awardingTime);
+          }
+        }
+        //所获奖励是否显示
+        var psnPapers=this.psnMsg.psnPapers;
+        if(psnPapers.length!=0){
+          for (let item in psnPapers){
+            psnPapers[item].journal=emptyText(psnPapers[item].journal);
+            psnPapers[item].publicTime=emptyText(psnPapers[item].publicTime);
+          }
+        }
+        var psnPatents=this.psnMsg.psnPatents;
+        
+        if(psnPatents.length!=0){
+          for (let item in psnPatents){
+            psnPatents[item].patentName=emptyText(psnPatents[item].patentName);
+            if((psnPatents[item].validityTermS!=null||psnPatents[item].validityTermS.length!=0)&&(psnPatents[item].validityTermE!=null||psnPatents[item].validityTermE.length!=0)){
+              this.validityTerm[item]= psnPatents[item].validityTermS+"-"+psnPatents[item].validityTermE
+            }else{
+              this.validityTerm[item]="（暂无消息）";
+            }
+          }
+        }
+        if(psnPapers.length!=0||psnPatents.length!=0){
+          Vue.set(this.empty,"paperAndPatent",false)
+        }
+        //论文专利是否显示
+
+        var psnlanguages=this.psnMsg.psnlanguages;
+        if(psnlanguages.length!=0){
+          for (let item in psnlanguages){
+            psnlanguages[item].proficiency=emptyText(psnlanguages[item].proficiency);
+          }
+        }
+        var psnsoftwares=this.psnMsg.psnsoftwares;
+        if(psnsoftwares.length!=0){
+          for (let item in psnsoftwares){
+            psnsoftwares[item].proficiency=emptyText(psnsoftwares[item].proficiency);
+          }
+        }
+        if(psnlanguages.length!=0||psnsoftwares.length!=0){
+          Vue.set(this.empty,"otherSkill",false)
+        }
+        //语言软件是否显示
+      },
+      getAvatar(){//获取头像
+        var that = this;
+        var url = MyAjax.urlsy+"/psnHomePage/getAvatar";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:true,
+        },function(data){
+          if(data.code==0){
+            that.personal.personalPicture = data.msg.pic
+          }else if(data.code==-1){
+            that.personal.personalPicture = require("../../assets/img/personal/personalIndex/picture.png");
           }
           
-          //psnPatents[item].validityTermE=emptyText(psnPatents[item].validityTermE);
-        }
-      }
-      if(psnPapers.length!=0||psnPatents.length!=0){
-        Vue.set(this.empty,"paperAndPatent",false)
-      }
-      //论文专利是否显示
-
-      var psnlanguages=this.psnMsg.psnlanguages;
-      if(psnlanguages.length!=0){
-        for (let item in psnlanguages){
-          psnlanguages[item].proficiency=emptyText(psnlanguages[item].proficiency);
-        }
-      }
-      var psnsoftwares=this.psnMsg.psnsoftwares;
-      if(psnsoftwares.length!=0){
-        for (let item in psnsoftwares){
-          psnsoftwares[item].proficiency=emptyText(psnsoftwares[item].proficiency);
-        }
-      }
-      if(psnlanguages.length!=0||psnsoftwares.length!=0){
-        Vue.set(this.empty,"otherSkill",false)
-      }
-      //语言软件是否显示
-    },
-    methods:{
+        },function(err){
+          console.log(err)
+        })
+      },
+      getData(){
+        var that=this;
+        var url = MyAjax.urlsy+"/psnHomePage/findByMySelf";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+          if(data.code==0){
+            Vue.set(that,"psnMsg",data.msg);
+          }
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+      },
     	croperShow(){
     		Modal.makeText($('.corpbox'))
     	},
-//  	uploadAvatar(){
-//  		var that = this;
-//				var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
-//				console.log(that.personal.personalPicture)
-//				$.ajax({
-//						type: "POST",
-//						url:url,
-//						data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
-//						dataType: "json",
-//			//				content-type: "text/plain;charset=UTF-8",
-//						success:function(data){
-//						console.log(data)
-//			//					that.dataInfo = data
-//			//					console.log(that.dataInfo)
-//						},error:function(err){
-//							console.log(err)
-//						}
-//					})
-//				//上传头像
-//  	}
     },
-    destroyed(){
-    	
-    }
   }
 </script>
 <style scoped lang="scss">
@@ -562,7 +558,7 @@
 					border-radius: 50%;
 				}
     	}
-      padding-bottom:30px;
+      padding-bottom:145px;
       border-bottom: 1px solid $borderColor;
       .basicInfoImg{
       	width: 115px;
@@ -605,8 +601,10 @@
         margin-top:31px;
       }
     }
+
     .personalIndexList{
       li{
+        
         .infoContainer{
           color: rgb(53,53,53);
           padding:0 22px;
@@ -616,8 +614,10 @@
             font-size: 18px;
             color: $themeColor;
           }
+        }
+        .clear{
+          border-bottom:1px solid $borderColor;
           div{
-            border-bottom:1px solid $borderColor;
             p{
               float: left;
               padding-bottom:17px;
@@ -625,11 +625,10 @@
                 float: left;
               }
             }
+            
           }
-          div:last-child{
-            border-bottom: 0;
-          }
-        }
+          
+        } 
       }
       li:nth-child(1){
         .emptyBasicInfo{
@@ -648,16 +647,20 @@
         }
         .baseInfoContainer{
           padding-top: 30px;
+          .clear{
+            border:0;
+          }
           ul{
             color: rgb(114,114,114);
             padding-left:20px;
             li{
               padding-bottom:20px;
+              float: left;
+              width: 860px;
               h5{
                 float: left;
                 color: rgb(53,53,53);
                 padding-left:25px;
-                //width:95px;
               }
               p{
                 float: left;
@@ -686,10 +689,7 @@
               }
             }
           }
-          div:last-child{
-            padding-bottom: 15px;
-          }
-        }
+        }  
       }
       li:nth-child(2){
         div{

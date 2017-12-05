@@ -12,11 +12,7 @@
       </li>
       <li>
         <!-- <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus /> -->
-<<<<<<< HEAD
-        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入文字" @blur="msgConfirm($event)" @focus="divFocus()" @keyup.enter="keydownEnter"></div> 
-=======
         <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入短信验证码" @blur="msgConfirm($event)" @keydown="keydown($event)"></div> 
->>>>>>> a66714c5ab12d9c6d6152316164faca9a59087e5
         <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
       </li>
       
@@ -146,7 +142,7 @@
 	    	}
 	    },
 	    changePic(){
-	    	this.picSrc = "http://10.1.31.7:8080/captcha.jpg"
+	    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
 	    	$(".picConfirm").attr("src",this.picSrc)
 	    },
       picConfirm(){

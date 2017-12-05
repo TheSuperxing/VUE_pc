@@ -1,7 +1,7 @@
 <template>
   <div class="languageIndex">
 
-    <div class="title">
+    <div class="title clear">
       <h2 v-cloak>{{title}}</h2>
       <p v-on:click="addLanguage">添加</p>
     </div>
@@ -9,10 +9,10 @@
     <div class="languageContainer" v-show="reveal.addLanguage">
       <div class="personal-empty" v-if="reveal.empty">（您尚未添加语言信息）</div>
       <!--显示、编辑已存在的信息开始-->
-      <div class="languageInfo" v-for="(item,index) in language">
+      <div class="languageInfo clear" v-for="(item,index) in language">
         <!--显示信息列表开始-->
-        <div class="languageInfoList" v-if="!reveal.editInfo[index]">
-          <div class="languageInfoTitle">
+        <div class="languageInfoList clear" v-if="!reveal.editInfo[index]">
+          <div class="languageInfoTitle clear">
             <h4 v-cloak>{{item.language}}</h4>
             <ul class="toolsBox">
               <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
@@ -49,19 +49,19 @@
         <div class="languageInfoEdit" v-show="reveal.editInfo[index]">
           <ul>
             <li>带&nbsp;*&nbsp;号为必选项</li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>*&nbsp;语言种类</h5>
                 <input v-model="localLanguage[index].language" type="text" placeholder="请输入语言种类">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>熟练程度</h5>
                 <input v-model="localLanguage[index].proficiency" type="text" placeholder="请输入熟练程度">
               </label>
             </li>
-            <li class="img-wrap">
+            <li class="img-wrap clear">
 							<span class="wrap-left">上传附件</span>
               <div class="picListCont">
                 <div class="picList" v-for="(item,$index) in show.picList[index]">
@@ -134,10 +134,10 @@
 						    </script>
 						     <div :id="fineUploaderId[index]"></div>
 						</li>
-						<li class="tip-wrap">
+						<li class="tip-wrap clear">
 				      <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
 				    </li>
-            <li>
+            <li class="clear">
               <button v-on:click="languageEditKeep(index)">保存</button>
               <button v-on:click="languageEditCancel(index)">取消</button>
             </li>
@@ -150,19 +150,19 @@
     <div class="languageContainer" v-show="!reveal.addLanguage">
       <ul>
         <li>带&nbsp;*&nbsp;号为必选项</li>
-        <li>
+        <li class="clear">
           <label>
             <h5>*&nbsp;语言种类</h5>
             <input v-model="newLanguage.language" type="text" placeholder="请输入语言种类">
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>熟练程度</h5>
             <input v-model="newLanguage.proficiency" type="text" placeholder="请输入熟练程度">
           </label>
         </li>
-        <li class="img-wrap">
+        <li class="img-wrap clear">
 					<span class="wrap-left">图片展示</span>
 					<script type="text/template" id="qq-template-manual-trigger-language">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -231,10 +231,10 @@
 			    </script>
 			    <div id="fine-template-manual-trigger-language"></div>
 				</li>
-				<li class="tip-wrap">
+				<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
-        <li>
+        <li class="clear">
           <button v-bind:class="{keepAdd:reveal.keepAddLanguage}" v-on:click="keepNewLanguage">保存</button>
           <button v-on:click="cancelNewLanguage">取消</button>
         </li>
@@ -315,7 +315,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async: false,
 				},function(data){
 					data = data.msg;
 					that.language = data;
@@ -357,6 +357,7 @@
             type: "GET",
             url:url,
             dataType: "json",
+            async:  true,
           },function(data){
             Vue.set(that.show.picList,[index],data.msg)
           },function(err){

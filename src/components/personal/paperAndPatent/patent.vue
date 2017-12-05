@@ -1,7 +1,7 @@
 <template>
   <div class="patentIndex">
 
-    <div class="title">
+    <div class="title clear">
       <h2 v-cloak>{{title}}</h2>
       <p v-on:click="addPatent">添加</p>
     </div>
@@ -9,10 +9,10 @@
     <div class="patentContainer" v-show="reveal.addPatent">
       <div class="personal-empty" v-if="reveal.empty">（您尚未添加论文信息）</div>
       <!--显示、编辑已存在的信息开始-->
-      <div class="patentInfo" v-for="(item,index) in this.patent">
+      <div class="patentInfo clear" v-for="(item,index) in this.patent">
         <!--显示信息列表开始-->
-        <div class="patentInfoList" v-if="!reveal.editInfo[index]">
-          <div class="patentInfoTitle">
+        <div class="patentInfoList clear" v-if="!reveal.editInfo[index]">
+          <div class="patentInfoTitle clear">
             <h4 v-cloak>{{patent[index].patentName}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!patent[index].ifVisable}" v-on:click="openOrPrivacy(index)">
@@ -26,7 +26,7 @@
               </li>
             </ul>
           </div>
-          <div class="patentInfoBody">
+          <div class="patentInfoBody clear">
             <p v-cloak>{{patent[index].awardingBody}}</p>
             <div class="validityTime">
               <p v-cloak>{{patent[index].validityTermS}}</p>
@@ -53,19 +53,19 @@
         <div class="patentInfoEdit" v-show="reveal.editInfo[index]">
           <ul>
             <li>带&nbsp;*&nbsp;号为必选项</li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>*&nbsp;专利名称</h5>
                 <input v-model="localPatent[index].patentName" type="text" placeholder="请输入专利名称">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>颁发机构</h5>
                 <input v-model="localPatent[index].awardingBody" type="text" placeholder="请输入颁发机构">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
                 <!--<input v-model="localPatent.info.time[index]" type="month">-->
@@ -74,7 +74,7 @@
                 <datepicker v-model="localPatent[index].validityTermE"></datepicker>
               </label>
             </li>
-            <li class="img-wrap">
+            <li class="img-wrap clear">
 							<span class="wrap-left">图片展示</span>
 							
               <div class="picListCont">
@@ -148,10 +148,10 @@
 						    </script>
 						     <div :id="fineUploaderId[index]"></div>
 						</li>
-						<li class="tip-wrap">
+						<li class="tip-wrap clear">
 				      <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
 				    </li>
-            <li>
+            <li class="clear">
               <button v-on:click="paperEditKeep(index)">保存</button>
               <button v-on:click="paperEditCancel(index)">取消</button>
             </li>
@@ -164,19 +164,19 @@
     <div class="paperContainer" v-show="!reveal.addPatent">
       <ul>
         <li>带&nbsp;*&nbsp;号为必选项</li>
-        <li>
+        <li  class="clear">
           <label>
             <h5>*&nbsp;专利名称</h5>
             <input v-model="newPatent.patentName" type="text" placeholder="请输入论文">
           </label>
         </li>
-        <li>
+        <li  class="clear">
           <label>
             <h5>颁发机构</h5>
             <input v-model="newPatent.awardingBody" type="text" placeholder="请输入发表期刊">
           </label>
         </li>
-        <li>
+        <li  class="clear">
           <label>
             <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
             <!--<input v-model="newPatent.info.time" type="month" placeholder="请输入发表时间">-->
@@ -185,7 +185,7 @@
             <datepicker v-model="newPatent.validityTermE"></datepicker>
           </label>
         </li>
-        <li class="img-wrap">
+        <li class="img-wrap clear">
 					<span class="wrap-left">图片展示</span>
 					
 					<script type="text/template" id="qq-template-manual-trigger-patent">
@@ -255,10 +255,10 @@
 			    </script>
 			    <div id="fine-uploader-manual-trigger-patent"></div>
 				</li>
-				<li class="tip-wrap">
+				<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
-        <li>
+        <li class="clear">
           <button v-bind:class="{keepAdd:reveal.keepAddPatent}" v-on:click="keepNewPatent">保存</button>
           <button v-on:click="cancelNewPatent">取消</button>
         </li>
@@ -353,7 +353,7 @@
           type: "GET",
           url:url,
           dataType: "json",
-          
+          async: false,
         },function(data){
           if(data.code==0){
             that.patent=data.msg

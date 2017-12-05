@@ -114,7 +114,6 @@
 	    }),
 
 	  mounted(){
-				console.log(cookieTool.getCookie("token"))
 				
 				this.user.userState = sessionStorage.getItem("state");
 				
@@ -129,7 +128,6 @@
 			//				contentType:"application/json;charset=utf-8",
 					
 				},function(data){
-					console.log(data)
 					data = data.msg;
 					if(data == "100004"){
 						cookieTool.delCookie("token")
@@ -195,6 +193,7 @@
     top: 0;
     left:0;
     z-index: 100;
+    font-size: 14px;
     .headerTop{
       height: 39px;
       background: #323333;

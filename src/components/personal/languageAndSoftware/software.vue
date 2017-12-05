@@ -1,7 +1,7 @@
 <template>
   <div class="softwareIndex">
 
-    <div class="title">
+    <div class="title clear">
       <h2 v-cloak>{{title}}</h2>
       <p v-on:click="addSoftware" v-if="reveal.addSoftware">添加</p>
     </div>
@@ -9,10 +9,10 @@
     <div class="softwareContainer" v-show="reveal.addSoftware">
       <div class="personal-empty" v-if="reveal.empty">（您尚未添加软件信息）</div>
       <!--显示、编辑已存在的信息开始-->
-      <div class="softwareInfo" v-for="(item,index) in software">
+      <div class="softwareInfo clear" v-for="(item,index) in software">
         <!--显示信息列表开始-->
-        <div class="softwareInfoList" v-if="!reveal.editInfo[index]">
-          <div class="softwareInfoTitle">
+        <div class="softwareInfoList clear" v-if="!reveal.editInfo[index]">
+          <div class="softwareInfoTitle clear">
             <h4 v-cloak>{{item.software}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
@@ -48,19 +48,19 @@
         <div class="softwareInfoEdit" v-show="reveal.editInfo[index]">
           <ul>
             <li>带&nbsp;*&nbsp;号为必选项</li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>*&nbsp;语言种类</h5>
                 <input v-model="localSoftware[index].software" type="text" placeholder="请输入语言种类">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>熟练程度</h5>
                 <input v-model="localSoftware[index].proficiency" type="text" placeholder="请输入熟练程度">
               </label>
             </li>
-            <li class="img-wrap">
+            <li class="img-wrap clear">
 							<span class="wrap-left">图片展示</span>
 
               <div class="picListCont">
@@ -134,10 +134,10 @@
 						    </script>
 						     <div :id="fineUploaderId[index]"></div>
 						</li>
-						<li class="tip-wrap">
+						<li class="tip-wrap clear">
 				      <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
 				    </li>
-            <li>
+            <li class="clear">
               <button v-on:click="softwareEditKeep(index)">保存</button>
               <button v-on:click="softwareEditCancel(index)">取消</button>
             </li>
@@ -150,19 +150,19 @@
     <div class="softwareContainer" v-show="!reveal.addSoftware">
       <ul>
         <li>带&nbsp;*&nbsp;号为必选项</li>
-        <li>
+        <li class="clear">
           <label>
             <h5>*&nbsp;软件名称</h5>
             <input v-model="newSoftware.software" type="text" placeholder="请输入软件名称">
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>熟练程度</h5>
             <input v-model="newSoftware.proficiency" type="text" placeholder="请输入熟练程度">
           </label>
         </li>
-        <li class="img-wrap">
+        <li class="img-wrap clear">
 					<span class="wrap-left">图片展示</span>
 					<script type="text/template" id="qq-template-manual-trigger-software">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -231,10 +231,10 @@
 			    </script>
 			    <div id="fine-template-manual-trigger-software"></div>
 				</li>
-				<li class="tip-wrap">
+				<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
-        <li>
+        <li  class="clear">
           <button v-bind:class="{keepAdd:reveal.keepAddSoftware}" v-on:click="keepNewSoftware">保存</button>
           <button v-on:click="cancelNewSoftware">取消</button>
         </li>
@@ -319,7 +319,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				content-type: "text/plain;charset=UTF-8",
-					
+					async: false,
 				},function(data){
 					console.log(data)
 					data = data.msg;
@@ -354,6 +354,7 @@
             type: "GET",
             url:url,
             dataType: "json",
+            async: true,
           },function(data){
             Vue.set(that.show.picList,[index],data.msg)
           },function(err){
@@ -457,7 +458,7 @@
 					data: JSON.stringify(that.localSoftware[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async: false,
 				},function(data){
 					console.log(data)
 				},function(err){

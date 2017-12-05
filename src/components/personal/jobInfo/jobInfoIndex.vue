@@ -1,7 +1,7 @@
 <template>
   <div class="titleInfo">
 
-    <div class="title">
+    <div class="title clear">
       <h2 v-cloak>{{title.text}}</h2>
       <p v-on:click="addInfo">添加</p>
     </div>
@@ -11,8 +11,8 @@
       <!--显示、编辑已存在的信息开始-->
       <div class="jobInfoInfo" v-for="(item,index) in titleInfo">
         <!--显示信息列表开始-->
-        <div class="jobInfoInfoList" v-show="!reveal.editInfo[index]">
-          <div class="jobInfoInfoTitle">
+        <div class="jobInfoInfoList clear" v-show="!reveal.editInfo[index]">
+          <div class="jobInfoInfoTitle clear">
             <h4 v-cloak>{{item.titleName}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
@@ -52,44 +52,44 @@
         <div class="jobInfoInfoEdit" v-show="reveal.editInfo[index]">
           <ul>
             <li>带&nbsp;*&nbsp;号为必选项</li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>*&nbsp;资格名称</h5>
                 <input v-model="localTitleInfo[index].titleName" type="text" placeholder="请输入资格名称">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>职称专业</h5>
                 <input v-model="localTitleInfo[index].professionalTitle" type="text" placeholder="请输入注册单位">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>职称级别</h5>
                 <input v-model="localTitleInfo[index].titleLevel" type="text" placeholder="请输入职称级别">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>证书编号</h5>
                 <input v-model="localTitleInfo[index].certificateNumber" type="text" placeholder="请输入证件编号">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>评定日期</h5>
            			<datepicker class="datePicker" v-model="localTitleInfo[index].assessmentTime"></datepicker>
                 	
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>发证机构</h5>
                 <input v-model="localTitleInfo[index].certificateBody" type="text" placeholder="请输入发证机构">
               </label>
             </li>
-            <li class="img-wrap" >
+            <li class="img-wrap clear" >
 							<span class="wrap-left">图片展示</span>
 							<ul class="imgShow">
 								<li v-for="(item,$ind) in picArr[index]">
@@ -178,31 +178,31 @@
     <div class="addJobInfoContainer" v-show="!reveal.addJobInfo">
       <ul>
         <li>带&nbsp;*&nbsp;号为必选项</li>
-        <li>
+        <li class="clear">
           <label>
             <h5>*&nbsp;职称名称</h5>
             <input v-model="newTitleInfo.titleName" type="text" placeholder="请输入资格名称">
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>职称专业</h5>
             <input v-model="newTitleInfo.professionalTitle" type="text" placeholder="请输入资格名称">
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>职称级别</h5>
             <input v-model="newTitleInfo.titleLevel" type="text" placeholder="请输入资格名称">
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>证书编号</h5>
             <input v-model="newTitleInfo.certificateNumber" type="text" placeholder="请输入证件编号">
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>评定时间</h5>
            <!-- <input v-model="newTitleInfo.info.time" type="month" placeholder="请输入注册单位">-->
@@ -210,13 +210,13 @@
             <!--<datepicker v-model="newTitleInfo.assessmentTime"></datepicker>-->
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>注册单位</h5>
             <input v-model="newTitleInfo.certificateBody" type="text" placeholder="请输入注册单位">
           </label>
         </li>
-				<li class="img-wrap">
+				<li class="img-wrap clear">
 					<span class="wrap-left">图片展示</span>
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -285,10 +285,10 @@
 			    </script>
 			    <div id="fine-uploader-manual-trigger"></div>
 				</li>
-				<li class="tip-wrap">
+				<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
-        <li>
+        <li class="clear">
           <button v-bind:class="{keepAdd:reveal.keepAdd}" v-on:click="keepJobInfoAdd">保存</button>
           <button v-on:click="cancelJobInfoAdd">取消</button>
         </li>

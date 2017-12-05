@@ -1,7 +1,7 @@
 <template>
   <div class="certificate">
 
-    <div class="title">
+    <div class="title clear">
       <h2 v-cloak>{{title.text}}</h2>
       <p v-on:click="addInfo">添加</p>
     </div>
@@ -11,8 +11,8 @@
       <!--显示、编辑已存在的信息开始-->
       <div class="certificateInfo" v-for="(item,index) in certificate">
         <!--显示信息列表开始-->
-        <div class="certificateInfoList" v-show="!reveal.editInfo[index]">
-          <div class="certificateInfoTitle">
+        <div class="certificateInfoList clear" v-show="!reveal.editInfo[index]">
+          <div class="certificateInfoTitle clear">
             <h4 v-cloak>{{item.qualificationName}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">
@@ -47,25 +47,25 @@
         <div class="certificateInfoEdit" v-show="reveal.editInfo[index]">
           <ul class="edit-wrap">
             <li>带&nbsp;*&nbsp;号为必选项</li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>*&nbsp;资格名称</h5>
                 <input v-model="localCertificate[index].qualificationName" type="text" placeholder="请输入资格名称">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>注册单位</h5>
                 <input v-model="localCertificate[index].registeredUnit" type="text" placeholder="请输入注册单位">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>证件编号</h5>
                 <input v-model="localCertificate[index].certificateNumber" type="text" placeholder="请输入证件编号">
               </label>
             </li>
-            <li class="img-wrap" >
+            <li class="img-wrap clear" >
 							<span class="wrap-left">图片展示</span>
 							<ul class="imgShow">
 								<li v-for="(item,$ind) in picArr[index]">
@@ -158,25 +158,25 @@
     <div class="addCertificateContainer" v-show="!reveal.addCertificate">
       <ul>
         <li>带&nbsp;*&nbsp;号为必选项</li>
-        <li>
+        <li  class="clear">
           <label>
             <h5>*&nbsp;资格名称</h5>
             <input v-model="newCertificate.qualificationName" type="text" placeholder="请输入资格名称">
           </label>
         </li>
-        <li>
+        <li  class="clear">
           <label>
             <h5>注册单位</h5>
             <input v-model="newCertificate.registeredUnit" type="text" placeholder="请输入注册单位">
           </label>
         </li>
-        <li>
+        <li  class="clear">
           <label>
             <h5>证件编号</h5>
             <input v-model="newCertificate.certificateNumber" type="text" placeholder="请输入证件编号">
           </label>
         </li>
-        <li class="img-wrap">
+        <li class="img-wrap clear">
 					<span class="wrap-left">图片展示</span>
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -245,10 +245,10 @@
 			    </script>
 			    <div id="fine-uploader-manual-trigger"></div>
 				</li>
-				<li class="tip-wrap">
+				<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
-        <li>
+        <li class="clear">
           <button v-bind:class="{keepAdd:reveal.keepAdd}" v-on:click="keepCertificateInfoAdd">保存</button>
           <button v-on:click="cancelCertificateInfoAdd">取消</button>
         </li>

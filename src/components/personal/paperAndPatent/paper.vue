@@ -1,7 +1,7 @@
 <template>
   <div class="paperIndex">
 
-    <div class="title">
+    <div class="title clear">
       <h2 v-cloak>{{title}}</h2>
       <p v-on:click="addPaper">添加</p>
     </div>
@@ -11,8 +11,8 @@
       <!--显示、编辑已存在的信息开始-->
       <div class="paperInfo" v-for="(item,index) in this.paper">
         <!--显示信息列表开始-->
-        <div class="paperInfoList" v-if="!reveal.editInfo[index]">
-          <div class="paperInfoTitle">
+        <div class="paperInfoList clear" v-if="!reveal.editInfo[index]">
+          <div class="paperInfoTitle clear">
             <h4 v-cloak>{{paper[index].paperTitle}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!paper[index].ifVisable}" v-on:click="openOrPrivacy(index)">
@@ -26,7 +26,7 @@
               </li>
             </ul>
           </div>
-          <div class="paperInfoBody">
+          <div class="paperInfoBody clear">
             <p v-cloak>{{paper[index].journal}}</p>
             <p v-cloak>{{paper[index].publicTime}}</p>
 
@@ -49,26 +49,26 @@
         <div class="paperInfoEdit" v-show="reveal.editInfo[index]">
           <ul>
             <li>带&nbsp;*&nbsp;号为必选项</li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>*&nbsp;论文名称</h5>
                 <input v-model="localPaper[index].paperTitle" type="text" placeholder="请输入论文名称">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>发表期刊</h5>
                 <input v-model="localPaper[index].journal" type="text" placeholder="请输入熟练程度">
               </label>
             </li>
-            <li>
+            <li class="clear">
               <label>
                 <h5>发表时间</h5>
                 <!--<input v-model="localPaper.info.time[index]" type="month">-->
                 <datepicker v-model="localPaper[index].publicTime"></datepicker>
               </label>
             </li>
-            <li class="img-wrap">
+            <li class="img-wrap clear">
 							<span class="wrap-left">图片展示</span>
 
               <div class="picListCont">
@@ -158,26 +158,26 @@
     <div class="paperContainer" v-show="!reveal.addPaper">
       <ul>
         <li>带&nbsp;*&nbsp;号为必选项</li>
-        <li>
+        <li class="clear">
           <label>
             <h5>*&nbsp;论文名称</h5>
             <input v-model="newPaper.paperTitle" type="text" placeholder="请输入论文">
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>发表期刊</h5>
             <input v-model="newPaper.journal" type="text" placeholder="请输入发表期刊">
           </label>
         </li>
-        <li>
+        <li class="clear">
           <label>
             <h5>发表时间</h5>
             <!--<input v-model="newPaper.info.time" type="month" placeholder="请输入发表时间">-->
             <datepicker v-model="newPaper.publicTime"></datepicker>
           </label>
         </li>
-        <li class="img-wrap">
+        <li class="img-wrap clear">
 					<span class="wrap-left">图片展示</span>
 					<script type="text/template" id="qq-template-manual-trigger-paper">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -246,10 +246,10 @@
 			    </script>
 			    <div id="fine-uploader-manual-trigger-paper"></div>
 				</li>
-				<li class="tip-wrap">
+				<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
-        <li>
+        <li class="clear">
           <button v-bind:class="{keepAdd:reveal.keepAddPaper}" v-on:click="keepNewPaper">保存</button>
           <button v-on:click="cancelNewPaper">取消</button>
         </li>
@@ -345,7 +345,7 @@
           type: "GET",
           url:url,
           dataType: "json",
-          
+          async: false,
         },function(data){
           if(data.code==0){
             that.paper=data.msg

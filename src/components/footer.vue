@@ -34,10 +34,11 @@
     min-width: 1200px;
     height: 140px;
     overflow: hidden;
-    background: #F7F9FC;
+    background: #ffffff;
+    font-size: 14px;
     .footerNav{
       width:1200px;
-      height:80px;
+      height:110px;
       padding-top:30px;
       margin: 0 auto;
       line-height: 32px;
@@ -48,6 +49,10 @@
           padding-right:20px;
         }
       }
+      .contactAds{
+        text-align: center;
+      }
+      
     }
     .copyring{
       height: 30px;

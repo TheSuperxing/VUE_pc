@@ -21,11 +21,11 @@
       </ul>
     </div>
 
-    <div class="headerNavBg" v-if="user.userState==0">
+    <div class="headerNavBg" v-if="user.userState==1">
       <div class="headerNav" >
         <h1>LOGO</h1>
-        <ul class="navlist" v-bind:class="{'comStyle':user.userState==0}">
-          <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[0]" @click="getState">{{item.text}}</router-link></li>
+        <ul class="navlist" v-bind:class="{'comStyle':user.userState==1}">
+          <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[1]" @click="getState">{{item.text}}</router-link></li>
         	<li class="primary">
         		<div @click="redirect"><router-link to="/yhzx">用户中心</router-link></div>
         		<ul class="userNav">
@@ -39,11 +39,11 @@
       </div>
     </div>
 
-    <div class="headerNavBg" v-if="user.userState==1">
+    <div class="headerNavBg" v-if="user.userState==2">
       <div class="headerNav">
         <h1>LOGO</h1>
-        <ul class="navlist" v-bind:class="{'teamStyle':user.userState==1}">
-          <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[1]" @click="getState">{{item.text}}</router-link></li>
+        <ul class="navlist" v-bind:class="{'teamStyle':user.userState==2}">
+          <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[2]" @click="getState">{{item.text}}</router-link></li>
         	<li class="primary">
         		<div  @click="redirect"><router-link to="/yhzx">用户中心</router-link></div>
         		<ul class="userNav">
@@ -57,11 +57,11 @@
     </div>
 
     <!--个人状态的导航-->
-    <div class="headerNavBg"  v-if="user.userState==2">
+    <div class="headerNavBg"  v-if="user.userState==0">
       <div class="headerNav" >
         <h1>LOGO</h1>
-        <ul class="navlist" v-bind:class="{'personStyle':user.userState==2}">
-          <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[2]">{{item.text}}</router-link></li>
+        <ul class="navlist" v-bind:class="{'personStyle':user.userState==0}">
+          <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[0]">{{item.text}}</router-link></li>
         	<li class="primary" >
         		<div  @click="redirect"><router-link to="/yhzx">用户中心</router-link></div>
         		<ul class="userNav">

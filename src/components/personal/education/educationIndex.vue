@@ -199,7 +199,7 @@
 			            </ul>
 			            <div class="buttons">
 			                <div class="qq-upload-button-selector qq-upload-button">
-			                	
+			                		
 			                    <span>请上传图片</span>
 			                </div>
 			                <button type="button"  class="btn btn-primary" id="trigger-upload">
@@ -239,8 +239,13 @@
 			    </script>
 			    <div id="fine-uploader-manual-trigger"></div>
 				</li>
+<<<<<<< HEAD
 				<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
+=======
+				<li class="tip-wrap">
+          <p>( 可上传相关图片，支持JPG、PNG,不得超过8张 )</p>
+>>>>>>> f2989b8d87c786e7f8b501e75e72937acd4ca78b
         </li>
         <li class="btnBox clear">
           <button v-bind:class="{eduDisabled: buttonColor.add}" v-on:click="keepEditEduNew">保存</button>
@@ -296,6 +301,7 @@
 		      picId:[],
         },
         picArr:[],//图片展示的数组
+        picNum:[],//各条信息已经上传的图片数
         buttonColor:{exist:[],add:true},
         //按钮颜色
         //实例化上传图像的element根据信息条数添加className
@@ -394,34 +400,50 @@
     	getPicture(index){
     		var that = this;
     		var url = MyAjax.urlsy+"/psnEduBackGround/findPicsById/"+that.education[index].pkid;
-    		MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-					async: true, 
-				},function(data){
-					console.log(data)
-					Vue.set(that.picArr,[index],data.msg)
-//					that.picArr[index] = 
-					console.log(that.picArr)
-				},function(err){
-					console.log(err)
-				})
+    		//promise解决异步加载数据延迟
+    		return new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+			    },(data) => {
+			        resolve(data);
+			     },(err) => {
+			        reject(err);
+			     });
+			  });
+    		
+//  		MyAjax.ajax({
+//					type: "GET",
+//					url:url,
+//					dataType: "json",
+//					async: true, 
+//				},function(data){
+//					console.log(data)
+//					Vue.set(that.picArr,[index],data.msg)
+//					Vue.set(that.picNum,[index],that.picArr[index].length)
+//				},function(err){
+//					console.log(err)
+//				})
+//  		console.log(that.picArr)
+    		
     	},
     	upDown(index){
-				console.log(this.show.tag[index])
-				if(this.show.tag[index]==true){
-					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+    		var that = this;
+				if(that.show.tag[index]==true){
+					Vue.set(that.show.tag,[index],false)
+					that.updowntxt[index] = "收起图片"
 				}else{
-					Vue.set(this.show.tag,[index],true)
-					this.updowntxt[index] = "展开查看更多" 
+					Vue.set(that.show.tag,[index],true)
+					that.updowntxt[index] = "展开查看更多" 
 				}
-    		this.show.tag[index] == true? false:true;
-    		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-    		this.getPicture(index);
+    		that.show.tag[index] == true? false:true;
+    		that.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+    		that.getPicture(index).then(function(data){
+    			Vue.set(that.picArr,[index],data.msg)
+					Vue.set(that.picNum,[index],that.picArr[index].length)
+    		});
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
@@ -464,7 +486,7 @@
 					data: JSON.stringify(that.education[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					async: true,
+					async: false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -475,22 +497,28 @@
         /*显示隐藏文字切换*/
       },
       editEduExist(index){//编辑按钮事件，进入编辑模式
-        Vue.set(this.editEdu.edit[0],[index],true);
+      	var that = this;
+      	that.getPicture(index).then(function(data){
+    			Vue.set(that.picArr,[index],data.msg)
+					Vue.set(that.picNum,[index],that.picArr[index].length)
+    		});
+    		console.log(that.picNum)
+    		if(that.picNum[index]>=6){
+    			
+    		}
+        Vue.set(that.editEdu.edit[0],[index],true);
         //编辑和显示的切换
-        //console.log(this.buttonColor.exist)
-        if(this.localEdu[index].schoolName.length!=0){
-          Vue.set(this.buttonColor.exist,[index],false)
+        if(that.localEdu[index].schoolName.length!=0){
+          Vue.set(that.buttonColor.exist,[index],false)
         }
-        this.getPicture(index);
-
         //上传图片
-        var that = this;
 	      that.localEdu[index].picId = [];
-	     	moreManualUploader({
+	      moreManualUploader({
           nameList:'manualUploader'+index,
           element:that.fineUploaderId[index],
           template: that.qqTemplate[index],
           url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+          msgData:that.localEdu[index].pkid,
           picIdCont:that.localEdu[index].picId,
           btnPrimary:".btn-primary"
         })
@@ -508,8 +536,10 @@
 				},function(data){
 					console.log(data)
 					if(data.code==0){
-//						that.picArr[index].splice($ind,1)
-						that.getPicture(index);
+						that.getPicture(index).then(function(data){
+		    			Vue.set(that.picArr,[index],data.msg)
+							Vue.set(that.picNum,[index],that.picArr[index].length)
+		    		});
 					}
 				},function(err){
 					console.log(err)
@@ -532,18 +562,9 @@
         }
         var that = this;
         console.log(that.education[index].pkid)
-        var url = "http://10.1.31.16:8080/psnEduBackGround/del/"+that.education[index].pkid;
-        MyAjax.ajax({
-					type: "DELETE",
-					url:url,
-					dataType: "json",
-          contentType: "application/json;charset=UTF-8",
-          async: true,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
+        var url = MyAjax.urlsy+"/psnEduBackGround/del/"+that.education[index].pkid;
+        MyAjax.delete(url)
+
         that.updateData();
       },
       //以上是状态的改变
@@ -585,15 +606,20 @@
 					data: JSON.stringify(that.localEdu[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					async: true,
+					async: false,
 				},function(data){
 					console.log(data)
+					if(data.code === "200001"){
+						console.log(data.msg)
+					}else{
+						that.updateData();
+						Vue.set(this.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+					}
 				},function(err){
 					console.log(err)
 				})//更新到服务器
 				//保存之后再重新拉取数据
-				that.updateData();
-				Vue.set(this.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+				
         //提交编辑后的数据
         $("#"+this.fineUploaderId[index]).html("")
 

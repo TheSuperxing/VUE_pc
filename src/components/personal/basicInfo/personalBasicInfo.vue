@@ -2,12 +2,7 @@
 
   <div class="personalBasicInfo">
 
-    <!--<div class="basicInfoTitle">
-      <div class="basicInfoImg">
-        <img v-bind:src="header.imgsrc" alt="">
-      </div>
-      <p>{{header.titleName}}</p>
-    </div>-->
+ 
     <div class="basicInfoContainer">
       <div class="bic-title clear">
         <h2>基础信息</h2>
@@ -309,6 +304,7 @@
         console.log("ok");
 	        manualUploader.uploadStoredFiles();
 	    });
+	    
 
     },
     methods:{
@@ -321,7 +317,7 @@
 	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
 	//				contentType:"application/json;charset=utf-8",
-					async: false,
+					async:false,
 				},function(data){
 					console.log(data)
 					if(data.code==0){
@@ -510,7 +506,7 @@
 					data: JSON.stringify(that.localBaseInfo),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",//
-					
+					async:false,
 				}, function(data){
 					console.log(data)
 				},function(err){
@@ -535,7 +531,7 @@
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
         console.log(this.reveal.openOrPrivacy[index])
      		for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
-        	if(this.reveal.openOrPrivacy[i]==false){
+        	if(this.reveal.openOrPrivacy[i]===false){
         		this.reveal.openOrPrivacy[i] = 0;
         	}else{
         		this.reveal.openOrPrivacy[i] = 1;
@@ -557,7 +553,7 @@
 					data: JSON.stringify(that.baseInfo),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",//
-					
+					async:false,
 				}, function(data){
 					console.log(data)
 				},function(err){
@@ -647,12 +643,12 @@
           	line-height: 38px;
             float: left;
             padding-left:25px;
-            width:95px;
+            min-width:95px;
             text-align: right;
-            span{
+            /*span{
               color: $themeColor;
               float: left;
-            }
+            }*/
           }
           p{
           	height: 38px;
@@ -694,7 +690,7 @@
             span{
               float: left;
               height: 38px;
-          	line-height: 38px;
+          		line-height: 38px;
               overflow: hidden;
               line-height: 26px;
               margin-left:-8px;

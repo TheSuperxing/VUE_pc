@@ -1,29 +1,37 @@
 <template>
-  <div class="personalLogin">
+  <div class="personalLogin" @keydown="keyLogin()">
     <ul class="loginInput">
       <li>
-        <input v-model="personalLoginInput.tel" type="text" placeholder="手机号" @blur="personTelCfm" autofocus />
+        <input v-model="personalLoginInput.tel" type="text" placeholder="手机号" @blur="personTelCfm" class="tel" autofocus/>
       </li>
       <li>
-        <input v-model="personalLoginInput.picConfirm" @blur="picConfirm"  type="text" placeholder="图形验证码" autofocus />
+        <input v-model="personalLoginInput.picConfirm" @blur="picConfirm"  type="text" placeholder="图形验证码"  class="pic"/>
         <img class="picConfirm" :src="picSrc" alt="" @click="changePic"/>
         <!--<p v-cloak @click="random">{{makeRandom.num}}</p>-->
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
       <li>
+<<<<<<< HEAD
         <!-- <input v-model="personalLoginInput.messageConfirm" type="text" placeholder="短信验证码" name="message" @blur="msgConfirm" autofocus /> -->
         <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入短信验证码" @blur="msgConfirm($event)" @keydown="keydown($event)"></div> 
+=======
+        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入短信验证码" @blur="msgConfirm($event)" @keydown="keydown($event)"
+        	v-bind:html="personalLoginInput.messageConfirm"></div> 
+>>>>>>> f2989b8d87c786e7f8b501e75e72937acd4ca78b
         <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
       </li>
       
     </ul>
-		<alertTip v-if="showAlert" :showHide="showAlert" @closeTip="closeTip" :alertText="alertText"></alertTip>
-    
+		<alertTip v-if="showAlert" :showHide="showAlert" :alertText="alertText"></alertTip>
+    <div class="b_tips">
+    	<p><router-link to="/register">立即注册>></router-link></p>
+    </div>
     <ul class="loginSubmit">
       <li>
         <button @click="personalLogin"><router-link to="">登录</router-link></button>
       </li>
     </ul>
+    
   </div>
 </template>
 <script>
@@ -67,12 +75,12 @@
     mounted(){
     	
     	this.changePic();
-    	console.log(cookieTool.getCookie("token"));
+//  	console.log(cookieTool.getCookie("token"));
       do{
         Vue.set(this.makeRandom,"num",parseInt(Math.random()*10000))
       }while (this.makeRandom.num<1000);
 
-      Vue.set(this.user,'userState',2)
+      Vue.set(this.user,'userState',0)
       sessionStorage.setItem("state",this.user.userState)
       
       
@@ -80,34 +88,45 @@
     methods:{
       login(){
         var that = this;
+//      that.personTelCfm();
+//      that.picConfirm();
+//      that.msgConfirm(event);
       	var url = MyAjax.urlhw+"/accountmanainfo/login";
-        that.personalLoginInput.messageConfirm=event.currentTarget.innerText
+//      that.personalLoginInput.messageConfirm=event.currentTarget.innerText
       	if(that.personalLoginInput.tel.trim().length!=0&&that.personalLoginInput.messageConfirm.trim().length!=0
       	&&that.personalLoginInput.picConfirm.trim().length!=0){
+      		console.log(that.personalLoginInput.messageConfirm)
       		MyAjax.ajax({
 						type: "POST",
 						url:url,
 						data: {tel:that.personalLoginInput.tel,pwd:that.personalLoginInput.messageConfirm,verifyCode:that.personalLoginInput.picConfirm},
 						dataType: "json",
+						async:false,
 					}, function(data){
+						console.log(data)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
               console.log(data.code)
 							router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
-								case "100008":
-									console.log(222)
-									that.showAlert = true;
-									that.alertText = "手机号未注册";
-									break;
+//								case "100008":
+//									console.log(222)
+//									that.showAlert = true;
+//									that.alertText = "手机号未注册";
+//									break;
 								case "100005":
 									that.showAlert = true;
 									that.alertText = "图片验证码不一致";
+									that.personalLoginInput.picConfirm = "";
+									$('.pic').focus();
+									that.changePic();
 									break;
 								case "100006":
 									that.showAlert = true;
 									that.alertText = "短信验证码错误";
+									that.personalLoginInput.messageConfirm = "";
+									$('.input').focus()
 									break;
 								default:
 									break;
@@ -133,13 +152,16 @@
         }
       },
       personTelCfm(){/*验证个人登录的手机号*/
-	    	if(!/^1[34578]\d{9}$/gi.test(this.personalLoginInput.tel)){
-	    		console.log(11)
-	    		this.showAlert = true;
-	    		this.alertText = '您输入的手机号码格式不正确';
-	    	}else{
-	    		this.showAlert = false;
-	    	}
+     		if(this.personalLoginInput.tel.trim().length!=0){
+     			if(!/^1[34578]\d{9}$/gi.test(this.personalLoginInput.tel)){
+		    		this.showAlert = true;
+		    		this.alertText = '您输入的手机号码格式不正确';
+		    		this.personalLoginInput.tel = "";
+		    		$(".tel").focus();
+		    	}else{
+		    		this.showAlert = false;
+		    	}
+     		}
 	    },
 	    changePic(){
 	    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
@@ -147,9 +169,10 @@
 	    },
       picConfirm(){
       	//图片验证不能为空
+      	
       	if(this.personalLoginInput.picConfirm.trim().length==0){
       		this.showAlert = true;
-      		this.alertText  = "图形验证码不能为空";
+      		this.alertText  = "请输入图形验证码";
       	}else{
       		this.showAlert = false;
       	}
@@ -159,7 +182,7 @@
         this.personalLoginInput.messageConfirm=event.currentTarget.innerText
       	if(this.personalLoginInput.messageConfirm.trim().length==0){
       		this.showAlert = true;
-          this.alertText  = "短信验证码不能为空";
+          this.alertText  = "请输入短信验证码";
           Vue.set(this.reveal,"focus",false)
       	}else{
           this.showAlert = false;
@@ -208,30 +231,31 @@
         
         
       },
-      personalLogin(){
+    personalLogin(){
       	this.login()
      },
+		 keyLogin(){//enter键登录事件
+		 	var event = event || window.event;  
+		 	if(event.keyCode==13){ 
+		 		console.log("222")
+		     this.login()
+		     event.returnValue = false;    
+		     return false;
+		  }
+		 },
      keydown(event){
        this.personalLoginInput.messageConfirm=event.currentTarget.innerText
        Vue.set(this.reveal,"focus",true)
        var event = event || window.event;  
-       if(event.keyCode==13){ 
-         this.login()
-         event.returnValue = false;    
-         return false;
-       }
+       
        if(event.keyCode==8&&(this.personalLoginInput.messageConfirm.trim().length==1||this.personalLoginInput.messageConfirm.trim().length==0)){
          Vue.set(this.reveal,"focus",false)
        }
-       console.log(this.personalLoginInput.messageConfirm)
      },
-     closeTip(){  /*关闭提示框*/
-			    this.showAlert = false;
-			},
-
+   
     },
     destroyed(){
-    	Vue.set(this.user,'userState',2)
+    	Vue.set(this.user,'userState',0)
 
       sessionStorage.setItem("state",this.user.userState)
 
@@ -240,6 +264,9 @@
 </script>
 <style scoped lang="scss">
   $personalThemeColor:rgb(242,117,25);
+  .personalLogin{
+  	margin-bottom: 20px;
+  }
   .input{  
       width:200px;  
       height:24px;  
@@ -257,7 +284,7 @@
   }  
 
   .alet_container{
-  	bottom:200px !important;
+  	bottom:150px !important;
   	left: 100px;
   	font-size: 14px;
   	.tip_text_container{
@@ -328,12 +355,24 @@
       }
     }
   }
+  .b_tips{
+  	margin-top: 30px;
+  	
+  	p:nth-child(1){
+  		float: right;
+  		font-size: 14px;
+  		a{
+  			color: $personalThemeColor;
+  		}
+  	}
+  }
   .loginSubmit{
-    margin-top:40px;
+
     li{
       width: 314px;
-      margin:80px auto;
+      margin:18px auto;
       margin-bottom: 0;
+      cursor: pointer;
       button{
         width: 314px;
         height:50px;

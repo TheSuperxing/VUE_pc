@@ -47,9 +47,10 @@
 						style:"comStyle",text:"公司注册",
 					},{
 						style:"teamStyle",text:"团队注册",
-					},{
-						style:"personStyle",text:"个人注册",
-					}
+					},
+//					{
+//						style:"personStyle",text:"个人注册",
+//					}
 				],
 				indexActive:""
 			}
@@ -124,7 +125,7 @@
 
 					li{
 						float: left;
-						width: 132px;
+						width: 198px;
 						height: 46px;
 						border-bottom: 2px solid #cfcfcf;
 						a{

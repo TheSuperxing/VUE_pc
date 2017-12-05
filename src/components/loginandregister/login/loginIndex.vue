@@ -2,7 +2,7 @@
   <div class="loginIndex">
     <div id="modal-overlay">
       <div class="alert">
-        <div :class="{loginContainer:!reveal.titleColor[2],personalLoginContainer:reveal.titleColor[2]}">
+        <div :class="{loginContainer:reveal.titleColor[0],personalLoginContainer:!reveal.titleColor[0]}">
           <div class="loginLeft">
             <ul class="loginTitle" >
               <li v-for="(item,index) in titleText" @click="loginTog(index)">
@@ -10,16 +10,17 @@
               </li>
             </ul>
             <div class="loginTab">
-              <company-login v-if="reveal.titleColor[0]"></company-login>
-              <team-login v-if="reveal.titleColor[1]"></team-login>
-              <personal-login v-if="reveal.titleColor[2]"></personal-login>
+            	<personal-login v-if="reveal.titleColor[0]"></personal-login>
+              <company-login v-if="reveal.titleColor[1]"></company-login>
+              <team-login v-if="reveal.titleColor[2]"></team-login>
+              
             </div>
           </div>
 
-          <div class="loginRight">
+          <div class="loginRight" >
             <div>
               <p>没有账号</p>
-              <p><router-link to="/register">立即注册>></router-link></p>
+              <p><router-link to="/register" :class="{per:reveal.titleColor[0],com:reveal.titleColor[1],team:reveal.titleColor[2]}">立即注册>></router-link></p>
             </div>
           </div>
         </div>
@@ -42,7 +43,7 @@
     },
     data(){
       return {
-        titleText:["公司登录","团队登录","个人登录"],
+        titleText:["个人登录","公司登录","团队登录",],
         reveal:{
           titleColor:[null,null,null]
         }
@@ -90,19 +91,19 @@
         cursor: pointer;
       }
     }
-    li:nth-child(1){
+    li:nth-child(2){
       .title{
         color: $companyThemeColor;
         border-bottom: 2px solid $companyThemeColor;
       }
     }
-    li:nth-child(2){
+    li:nth-child(3){
       .title{
         color: $teamThemeColor;
         border-bottom: 2px solid $teamThemeColor;
       }
     }
-    li:nth-child(3){
+    li:nth-child(1){
       .title{
         color: $personalThemeColor;
         border-bottom: 2px solid $personalThemeColor;
@@ -128,7 +129,7 @@
       font-size: 16px;
       .loginContainer{
         width: 579px;
-        height:391px;
+        height:420px;
         overflow: hidden;
         margin:0 auto;
         .loginLeft{
@@ -143,7 +144,7 @@
       }
       .personalLoginContainer{
         width: 725px;
-        height:487px;
+        height:450px;
         .loginLeft{
           width:504px;
           height:100%;
@@ -161,7 +162,7 @@
           height:400px;
           border-left:1px dashed #9c9c9c;
           position: relative;
-          div{
+          >div{
             height:50px;
             position: absolute;
             margin:auto;
@@ -175,12 +176,18 @@
             }
             p:nth-child(2){
               font-size: 18px;
-
               cursor: pointer;
-              a{
-                color: $personalThemeColor;
-              }
             }
+          }
+          .com{
+          	color: $companyThemeColor;
+          }
+          .per{
+          	color: $personalThemeColor;
+          }
+          .team{
+	      			color: $teamThemeColor;
+          	
           }
         }
       }

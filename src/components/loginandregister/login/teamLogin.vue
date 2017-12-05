@@ -36,10 +36,9 @@
       user:state=>state.userState.user
     }),
     mounted(){
-    	Vue.set(this.user,'userState',1)
+    	Vue.set(this.user,'userState',2)
       sessionStorage.setItem("state",this.user.userState)
       
-      sessionStorage.setItem("account","{\"username\":\"123@qq.com\",\"password\":\"123\"}")
       
     },
     methods:{
@@ -55,7 +54,7 @@
       }
     },
     destroyed(){
-    	Vue.set(this.user,'userState',1)
+    	Vue.set(this.user,'userState',2)
 
       sessionStorage.setItem("state",this.user.userState)
 //    sessionStorage.setItem("state",1)

@@ -14,7 +14,7 @@
       </li>
       <li>
         <p>忘记密码？</p>
-        <p><router-link to="/register">立即注册>></router-link></p>
+        <!--<p><router-link to="/register">立即注册>></router-link></p>-->
       </li>
     </ul>
   </div>
@@ -42,7 +42,7 @@
       user:state=>state.userState.user
     }),
     mounted(){
-    	Vue.set(this.user,'userState',0)
+    	Vue.set(this.user,'userState',1)
       sessionStorage.setItem("state",this.user.userState)
       
       sessionStorage.setItem("account","{\"username\":\"123@qq.com\",\"password\":\"123\"}")
@@ -127,7 +127,7 @@
         cursor: pointer;
       }
       p:nth-child(1){
-        float: left;
+        float: right;
       }
       p:nth-child(2){
         float: right;

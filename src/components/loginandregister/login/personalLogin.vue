@@ -101,9 +101,15 @@
 						console.log(data)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
+<<<<<<< HEAD
 			              console.log(data.code)
 			              window.location.hash="/index"
 							//router.push("/index")
+=======
+              console.log(data.code)
+              //window.location.hash="/index"
+							router.push("/index")
+>>>>>>> d4f387c6f7f31f07fa3c3457c1ea3474443b277b
 						}else if(data.code==-1){
 							switch (data.msg){
 //								case "100008":
@@ -159,8 +165,11 @@
      		}
 	    },
 	    changePic(){
+<<<<<<< HEAD
 //	    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
 //      $(".picConfirm").attr("src",this.picSrc)
+=======
+>>>>>>> d4f387c6f7f31f07fa3c3457c1ea3474443b277b
 	    	this.picSrc = MyAjax.urlsy+"/captcha.jpg"
 	    	$(".picConfirm").attr("src",this.picSrc)
 	    },

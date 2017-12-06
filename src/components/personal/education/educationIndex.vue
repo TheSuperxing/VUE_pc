@@ -155,8 +155,7 @@
         </li>
         <li class="clear">
           <span class="wrap-left">在校时间</span>
-          <!-- <datepicker v-model="newInputValue.schoolTimeUp"></datepicker> -->
-          <year-month></year-month>
+          <datepicker v-model="newInputValue.schoolTimeUp"></datepicker>
           <span>——</span>
           <datepicker v-model="newInputValue.schoolTimeDown" v-bind:value="{type:['month']}"></datepicker>
         </li>
@@ -240,16 +239,11 @@
 			    </script>
 			    <div id="fine-uploader-manual-trigger"></div>
 				</li>
-<<<<<<< HEAD
-				<li class="tip-wrap clear">
-          <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
-=======
 				<!--<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>-->
 				<li class="tip-wrap">
           <p>( 可上传相关图片，支持JPG、PNG,不得超过8张 )</p>
->>>>>>> 955d02b80606b9ba95a66fe2441803882babc4f9
         </li>
         <li class="btnBox clear">
           <button v-bind:class="{eduDisabled: buttonColor.add}" v-on:click="keepEditEduNew">保存</button>
@@ -264,7 +258,6 @@
   import {mapState} from "vuex"
   import Vue  from "vue"
   import datepicker from "../units/Datepicker.vue"
-  import yearMonth from "../units/yearMonth.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
@@ -273,7 +266,6 @@
     name: 'educationIndex',
     components:{
       datepicker,
-      yearMonth
     },
     data:function() {
       return {

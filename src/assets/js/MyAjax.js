@@ -4,8 +4,8 @@
 import {cookieTool} from "./cookieTool.js"
 import fetchJsonp from "fetch-jsonp"
 var MyAjax = {
-	urlsy:"http://10.1.31.7:8080",
-	urlhw:"http://10.1.31.7:8080",
+	urlsy:"http://10.1.31.16:8080",
+	urlhw:"http://10.1.31.16:8080",
 	ajax(option,callback,errCallback) {
 		$.ajax({
 			type: option.type,
@@ -16,8 +16,8 @@ var MyAjax = {
 			},
 			data: option.data,
 			dataType: option.dataType,
-			contentType:"application/json;charset=utf-8",
-			//xhrFields: {withCredentials: true},
+			contentType: option.contentType, 
+			xhrFields: {withCredentials: true},
 			async: option.async, // 使用同步方式  
 			success: function(data) {		
 				callback(data);

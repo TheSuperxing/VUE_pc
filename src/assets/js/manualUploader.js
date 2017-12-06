@@ -174,13 +174,8 @@ function moreManualUploader(option){
         });
         window[option.nameList].uploadStoredFiles();
         btnPrimary.hide()
-<<<<<<< HEAD
-        eval(option.nameList)._currentItemLimit=3
-        console.log(eval(option.nameList))
-=======
         window[option.nameList]._currentItemLimit = option.canUploadNum;
         console.log(window[option.nameList])
->>>>>>> 955d02b80606b9ba95a66fe2441803882babc4f9
     });
 }
 export {singleManualUploader,moreManualUploader}

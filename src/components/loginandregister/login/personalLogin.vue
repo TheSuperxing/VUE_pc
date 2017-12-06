@@ -102,8 +102,8 @@
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
               console.log(data.code)
-              window.location.hash="/index"
-							//router.push("/index")
+              //window.location.hash="/index"
+							router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
 //								case "100008":
@@ -160,13 +160,8 @@
      		}
 	    },
 	    changePic(){
-<<<<<<< HEAD
-	    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
-        $(".picConfirm").attr("src",this.picSrc)
-=======
 	    	this.picSrc = MyAjax.urlsy+"/captcha.jpg"
 	    	$(".picConfirm").attr("src",this.picSrc)
->>>>>>> 955d02b80606b9ba95a66fe2441803882babc4f9
 	    },
       picConfirm(){
       	//图片验证不能为空

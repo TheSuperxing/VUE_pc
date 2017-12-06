@@ -19,10 +19,14 @@ manualUploader = new qq.FineUploader({
             confirmMessage: '确定要删除文件 {filename} 吗？ 不可恢复！！',  
             deletingFailedText: '删除失败！'  
         },  
+         messages: {                                                //自定义提示*********  
+            typeError: "文件类型错误",  
+            sizeError: "文件过大"  
+        }, 
         validation: {
             allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
             itemLimit: 5,
-            sizeLimit: 2400*2400*2400*2400*2400
+            sizeLimit: 1024* 1024* 1024 * 1024 * 1024
         },
         autoUpload: false,
         debug: true,
@@ -101,17 +105,30 @@ function moreManualUploader(option){
           },
           validation: {
             allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-            itemLimit: 5,
-            sizeLimit: 2000000
+            itemLimit: option.canUploadNum,
+            sizeLimit: 1024* 1024* 1024 * 1024 * 1024
           },
+          deleteFile: {  
+            enabled: true,  
+            endpoint: option.deleteUrl,  
+            method: 'POST',  
+            forceConfirm: true,  
+            confirmMessage: '确定要删除文件 {filename} 吗？ 不可恢复！！',  
+            deletingFailedText: '删除失败！'  
+        },  
+         messages: {                                                //自定义提示*********  
+            typeError: "文件类型错误！",  
+            sizeError: "文件过大！" ,
+            tooManyItemsError:"上传数量超限！"
+        }, 
           autoUpload: false,
           debug: true,
           callbacks:{
             onSubmit:  function(id,fileName){
-                console.log(eval(option.nameList)._netUploadedOrQueued+"  0")
-                console.log(eval(option.nameList)._netUploaded+"  0")
-                console.log(eval(option.nameList)._storedIds+"  0")
-                console.log(eval(option.nameList)._totalFilesInBatch+"  0")
+//              console.log(eval(option.nameList)._netUploadedOrQueued+"  0")
+//              console.log(eval(option.nameList)._netUploaded+"  0")
+//              console.log(eval(option.nameList)._storedIds+"  0")
+//              console.log(eval(option.nameList)._totalFilesInBatch+"  0")
               $("#"+option.element+" .qq-uploader-selector .buttons "+option.btnPrimary).show()
               var imgList=$("#"+option.element+" .qq-uploader-selector .qq-upload-list-selector .list")
 
@@ -123,8 +140,8 @@ function moreManualUploader(option){
                     }
                   });
                 }
-              	fielduploader.setParams({
-		           anotherParam: option.msgData/*在提交之前就把此条信息的pkid关联上*/
+              	window[option.nameList].setParams({
+		           anotherParam: option.anotherParam/*在提交之前就把此条信息的pkid关联上*/
 		        });
             },
             onCancel: function(){
@@ -132,19 +149,19 @@ function moreManualUploader(option){
                 if(imgList.length<=1){
                     $("#"+option.element+" .qq-uploader-selector .buttons "+option.btnPrimary).hide()
                 }
-                console.log(eval(option.nameList)._netUploadedOrQueued+"  1")
-                console.log(eval(option.nameList)._netUploaded+"  1")
-                console.log(eval(option.nameList)._storedIds+"  1")
-                console.log(eval(option.nameList)._totalFilesInBatch+"  1")
+//              console.log(eval(option.nameList)._netUploadedOrQueued+"  1")
+//              console.log(eval(option.nameList)._netUploaded+"  1")
+//              console.log(eval(option.nameList)._storedIds+"  1")
+//              console.log(eval(option.nameList)._totalFilesInBatch+"  1")
             },
             onComplete: function (id, fileName, responseJSON, maybeXhr) {
                 $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
 		        $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
                 option.picIdCont.push(responseJSON.msg)
-                console.log(eval(option.nameList)._netUploadedOrQueued+"  2")//页面等待上传的
-                console.log(eval(option.nameList)._netUploaded+"  2")//已经上传成功的
-                console.log(eval(option.nameList)._storedIds+"  2")
-                console.log(eval(option.nameList)._totalFilesInBatch+"  2")
+//              console.log(eval(option.nameList)._netUploadedOrQueued+"  2")//页面等待上传的
+//              console.log(eval(option.nameList)._netUploaded+"  2")//已经上传成功的
+//              console.log(eval(option.nameList)._storedIds+"  2")
+//              console.log(eval(option.nameList)._totalFilesInBatch+"  2")
             },
           }
         });
@@ -152,10 +169,13 @@ function moreManualUploader(option){
                   
     var btnPrimary= $("#"+option.element+" .qq-uploader-selector .buttons "+option.btnPrimary);
     qq(btnPrimary[0]).attach("click", function() {
-        eval(option.nameList).uploadStoredFiles();
+    	window[option.nameList].setParams({
+           anotherParam: option.anotherParam/*把此条信息的pkid关联上*/
+        });
+        window[option.nameList].uploadStoredFiles();
         btnPrimary.hide()
-        eval(option.nameList)._currentItemLimit=10
-        console.log(eval(option.nameList))
+        window[option.nameList]._currentItemLimit = option.canUploadNum;
+        console.log(window[option.nameList])
     });
 }
 export {singleManualUploader,moreManualUploader}

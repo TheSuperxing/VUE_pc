@@ -6,6 +6,8 @@ import App from './App'
 import router from './router'
 import $ from 'jquery'
 
+//import {Promise} from "es6-promise"
+import "es6-promise/auto" // 引入promise
 
 import store from "./store"
 import MyAjax from "./assets/js/MyAjax.js"

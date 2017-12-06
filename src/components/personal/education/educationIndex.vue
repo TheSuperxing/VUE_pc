@@ -191,9 +191,9 @@
 			                    <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
 			                    <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
 			                    <span class="qq-upload-size-selector qq-upload-size"></span>
-			                    <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel"></button>
-			                    <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">Retry</button>
-			                    <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">Delete</button>
+			                    <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel">放弃上传</button>
+			                    <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">重试</button>
+			                    <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">删除</button>
 			                    <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
 			                </li>
 			            </ul>
@@ -207,7 +207,7 @@
 			                </button>
 			            </div>
 			            <span class="qq-drop-processing-selector qq-drop-processing">
-			                <span>Processing dropped files...</span>
+			                <span>正在上传...</span>
 			                <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
 			            </span>
 			            
@@ -239,13 +239,11 @@
 			    </script>
 			    <div id="fine-uploader-manual-trigger"></div>
 				</li>
-<<<<<<< HEAD
-				<li class="tip-wrap clear">
+				<!--<li class="tip-wrap clear">
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
-=======
+        </li>-->
 				<li class="tip-wrap">
           <p>( 可上传相关图片，支持JPG、PNG,不得超过8张 )</p>
->>>>>>> f2989b8d87c786e7f8b501e75e72937acd4ca78b
         </li>
         <li class="btnBox clear">
           <button v-bind:class="{eduDisabled: buttonColor.add}" v-on:click="keepEditEduNew">保存</button>
@@ -498,54 +496,89 @@
       },
       editEduExist(index){//编辑按钮事件，进入编辑模式
       	var that = this;
+      	//promise 的then方法里面去读取已经上传的图片张数，然后实例化上传组件，以便控制可上传的图片张数
       	that.getPicture(index).then(function(data){
     			Vue.set(that.picArr,[index],data.msg)
 					Vue.set(that.picNum,[index],that.picArr[index].length)
+//					console.log(3-that.picArr[index].length)
+					that.localEdu[index].picId = [];
+		      moreManualUploader({
+		      	nameList:'manualUploader'+index,
+			      element:that.fineUploaderId[index],
+			      template: that.qqTemplate[index],
+			      url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+			      deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
+			      anotherParam:that.localEdu[index].pkid,
+			      picIdCont:that.localEdu[index].picId,
+			      btnPrimary:".btn-primary",
+			      canUploadNum:3-that.picArr[index].length,
+			    })
     		});
-    		console.log(that.picNum)
-    		if(that.picNum[index]>=6){
-    			
-    		}
+//  		console.log(that.picNum[index])
+    		
         Vue.set(that.editEdu.edit[0],[index],true);
         //编辑和显示的切换
         if(that.localEdu[index].schoolName.length!=0){
           Vue.set(that.buttonColor.exist,[index],false)
         }
         //上传图片
-	      that.localEdu[index].picId = [];
-	      moreManualUploader({
-          nameList:'manualUploader'+index,
-          element:that.fineUploaderId[index],
-          template: that.qqTemplate[index],
-          url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
-          msgData:that.localEdu[index].pkid,
-          picIdCont:that.localEdu[index].picId,
-          btnPrimary:".btn-primary"
-        })
+	      
       },
-      deleThisPic(id,index,$ind){//删除图片
+      deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
       	var that = this;
       	var url = MyAjax.urlsy + "/psnEduBackGround/delPic/"+ id
-      	MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-  //				content-type: "text/plain;charset=UTF-8",
-          async: true,
-				},function(data){
-					console.log(data)
-					if(data.code==0){
-						that.getPicture(index).then(function(data){
-		    			Vue.set(that.picArr,[index],data.msg)
-							Vue.set(that.picNum,[index],that.picArr[index].length)
-		    		});
-					}
-				},function(err){
-					console.log(err)
-				})
-      	
-      	
+      	var p = new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "POST",
+						url:url,
+						dataType: "json",
+						async: true, 
+			    },(data) => {
+			        resolve(data);
+			     },(err) => {
+			        reject(err);
+			     });
+			  });
+			  return p;
+      },
+      async deleThisPic(id,index,$ind){//删除图片
+      	var that = this;
+//    	(async () => {
+      		const dele = await that.deleThisPicPromise(id);
+      		
+      		if(dele.code===0){
+      			const getPic = await that.getPicture(index);
+      			console.log(getPic)
+//    			(async () =>{
+			  			if(getPic.code===0){
+			  					const data = await Promise.resolve(true).then(
+				      				function(){
+				      					Vue.set(that.picArr,[index],getPic.msg)
+							    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+							    	  	return that.picNum;
+				      				}
+				      				
+				      		)
+			  					console.log(data)
+			  			}
+//			  		})	
+      		}
+
+//				})();
+					that.localEdu[index].picId = [];
+					 $("#"+this.fineUploaderId[index]).html("")
+		      moreManualUploader({
+		      	nameList:'manualUploader'+index,
+			      element:that.fineUploaderId[index],
+			      template: that.qqTemplate[index],
+			      url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+			      deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
+			      anotherParam:that.localEdu[index].pkid,
+			      picIdCont:that.localEdu[index].picId,
+			      btnPrimary:".btn-primary",
+			      canUploadNum:3-that.picNum[index],
+			    })
+      	console.log(that.picNum[index])
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit[0],[index],false);
@@ -553,7 +586,6 @@
         //console.log("ok")
       },
       deleteEduExist(index){//删除按钮事件
-      	
 //      Vue.set(this.editEdu.delete[0],[index],false);
 //      this.education.splice(index,1)
 //      Vue.set(this.editEdu.delete[0],[index],true)//为了解决删除一项后一项不会显示问题
@@ -606,14 +638,14 @@
 					data: JSON.stringify(that.localEdu[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					async: false,
+					async: true,
 				},function(data){
 					console.log(data)
 					if(data.code === "200001"){
 						console.log(data.msg)
 					}else{
 						that.updateData();
-						Vue.set(this.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+						Vue.set(that.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
 					}
 				},function(err){
 					console.log(err)

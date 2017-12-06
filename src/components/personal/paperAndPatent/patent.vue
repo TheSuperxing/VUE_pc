@@ -70,8 +70,10 @@
                 <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
                 <!--<input v-model="localPatent.info.time[index]" type="month">-->
                 <datepicker v-model="localPatent[index].validityTermS"></datepicker>
+                <year-month v-model="localPatent[index].validityTermS"></year-month>
                 <span>—</span>
-                <datepicker v-model="localPatent[index].validityTermE"></datepicker>
+                <!-- <datepicker v-model="localPatent[index].validityTermE"></datepicker> -->
+                <year-month :value="[localPatent[index].validityTermE]" :min="localPatent[index].validityTermS" :today="true"></year-month>
               </label>
             </li>
             <li class="img-wrap clear">
@@ -270,6 +272,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import datepicker from "../../units/Datepicker.vue"
+  import YearMonth from "../units/yearMonth.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
@@ -278,7 +281,8 @@
   export default {
     name:"PatentIndex",
     components:{
-      datepicker
+      datepicker,
+      YearMonth
     },
     data(){
       return {

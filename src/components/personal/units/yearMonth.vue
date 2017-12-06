@@ -1,9 +1,9 @@
 <template>
   <div class="year-month">
-    <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false">
-      <div class="input" @click="togglePanel"></div>
+    <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false"  @click="togglePanel">
+      <div class="input" v-text="inputValue"></div>
       <transition name="fade">
-        <img class="cancel-btn" src="../../../assets/img/company/bottom.png"  v-show="showCancel"  @click="togglePanel">
+        <img class="cancel-btn" src="../../../assets/img/company/bottom.png"  v-show="showCancel">
       </transition>
     </div>
     <transition name="toggle">
@@ -12,7 +12,7 @@
           <div class="arrow-left" @click="prevYearPreview()">&lt;</div>
           <div class="year-month-box">
             <div class="year-box" @click="chType('year')" v-text="tmpYear"></div>
-            <div class="month-box" >至今</div>
+            <div class="month-box" @click="now" v-if="today">至今</div>
           </div>
           <div class="arrow-right" @click="nextYearPreview()">&gt;</div>
         </div>
@@ -60,10 +60,6 @@ export default {
         month: now.getMonth(),
         tmpYear: now.getFullYear(),
         tmpMonth: now.getMonth(),
-        tmpStartYear: now.getFullYear(),
-        tmpStartMonth: now.getMonth(),
-        tmpEndYear: now.getFullYear(),
-        tmpEndMonth: now.getMonth(),
         minYear: Number,
         minMonth: Number,
         maxYear: Number,
@@ -71,23 +67,51 @@ export default {
         yearList: Array.from({length: 12}, (value, index) => new Date().getFullYear() + index),
         monthList: [1, 2, 3 ,4 ,5, 6, 7 ,8, 9, 10, 11, 12],
         rangeStart: false,//标志位
+        inputValue:"",
       }
   },
   props: {
     language: {default: 'ch'},
-    min: {default: '1970-01-01'},
-    max: {default: '3016-01-01'},
+    min: {default: '1970-02'},
+    max: {default: '3016-01'},
     value: {
       type: [String, Array],
-      default: ''
+      default: ""
     },
     range: {
+      type: Boolean,
+      default: false
+    },
+    today:{
       type: Boolean,
       default: false
     }
   },
   mounted(){
-    console.log(this.year)
+    
+    this.$nextTick(() => {
+        if(this.$el.parentNode.offsetWidth + this.$el.parentNode.offsetLeft - this.$el.offsetLeft <= 300){
+          this.coordinates = {right: '0', top: `${window.getComputedStyle(this.$el.children[0]).offsetHeight + 4}px`}
+        }else{
+          this.coordinates = {left: '0', top: `${window.getComputedStyle(this.$el.children[0]).offsetHeight + 4}px`}
+        }
+        
+        let minArr = this.min.split('-')
+        this.minYear = Number(minArr[0])
+        this.minMonth = Number(minArr[1])
+        let maxArr = this.max.split('-')
+        this.maxYear = Number(maxArr[0])
+        this.maxMonth = Number(maxArr[1])
+        if(this.range){
+          if(Object.prototype.toString.call(this.value).slice(8, -1) !== 'Array'){
+            throw new Error('Binding value must be an array in range mode.')
+          }
+        }
+        if(!this.value){
+          this.inputValue=""
+        }
+        window.addEventListener('click', this.close)
+      })
   },
   methods:{
       togglePanel () {
@@ -100,16 +124,17 @@ export default {
       nextYearPreview(){
         this.tmpYear = this.tmpYear === 0 ? 0 : this.tmpYear + 1
       },
+      now(){
+        this.inputValue = "至今"
+        this.panelState = false
+        this.rangeStart = false
+      },
       isSelected (type, item) {
         switch (type){
           case 'year':
             if(!this.range) return item === this.tmpYear
-            return (new Date(item, 0).getTime() >= new Date(this.tmpStartYear, 0).getTime()
-              && new Date(item, 0).getTime() <= new Date(this.tmpEndYear, 0).getTime())
           case 'month':
             if(!this.range) return item === this.tmpMonth && this.year === this.tmpYear
-            return (new Date(this.tmpYear, item).getTime() >= new Date(this.tmpStartYear, this.tmpStartMonth).getTime()
-              && new Date(this.tmpYear, item).getTime() <= new Date(this.tmpEndYear, this.tmpEndMonth).getTime())
         }
       },
       chType (type) {
@@ -126,7 +151,6 @@ export default {
         return (year > this.maxYear || year < this.minYear) ? true : false
       },
       validateMonth (month) {
-        console.log(new Date(this.minYear, this.minMonth - 1).getTime())
         if(new Date(this.tmpYear, month).getTime() >= new Date(this.minYear, this.minMonth - 1).getTime()
           && new Date(this.tmpYear, month).getTime() <= new Date(this.maxYear, this.maxMonth - 1).getTime()){
           return false
@@ -140,7 +164,21 @@ export default {
       },
       selectMonth (month) {
         if(this.validateMonth(month)) return
-        this.tmpMonth = month
+          this.tmpMonth = month
+          if(!this.range){
+            this.year = this.tmpYear
+            this.month = this.tmpMonth
+            this.inputValue = `${this.tmpYear}-${('0' + (this.month + 1)).slice(-2)}`
+            //this.$emit('input', value)
+            this.panelState = false
+            //console.log(value)
+          }
+      },
+      close (e) {
+        if(!this.$el.contains(e.target)){
+          this.panelState = false
+          this.rangeStart = false
+        }
       },
   },
   watch: {
@@ -155,14 +193,14 @@ export default {
       this.maxMonth = Number(maxArr[1])
     },
     range (newVal, oldVal) {
-      if(newVal === oldVal) return
-      if(newVal && Object.prototype.toString.call(this.value).slice(8, -1) === 'String'){
-        this.$emit('input', ['', ''])
+        if(newVal === oldVal) return
+        if(newVal && Object.prototype.toString.call(this.value).slice(8, -1) === 'String'){
+          this.$emit('input', ['', ''])
+        }
+        if(!newVal && Object.prototype.toString.call(this.value).slice(8, -1) === 'Array'){
+          this.$emit('input', '')
+        }
       }
-      if(!newVal && Object.prototype.toString.call(this.value).slice(8, -1) === 'Array'){
-        this.$emit('input', '')
-      }
-    }
   },
   filters: {
       month: (item, lang) => {
@@ -181,6 +219,9 @@ export default {
         }
       }
     },
+    beforeDestroy () {
+      window.removeEventListener('click', this.close)
+    }
 }
 </script>
 <style scoped lang='scss'>
@@ -196,6 +237,7 @@ export default {
     width: 140px;
     position: relative;
     height: 35px;
+    color: #353535;
   }
   .input-wrapper{
     border:1px solid $borderColor;
@@ -205,17 +247,17 @@ export default {
     justify-content: space-between;
     flex-flow: row nowrap;
     align-items: center;
-    padding-left:15px;
+    padding-left:12px;
     height: 33px;
     line-height: 33px;
     box-sizing: border-box;
-    padding-right:15px;
+    padding-right:12px;
+    font-size: 14px;
   }
   .input{
     height: 100%;
     width: 100%;
     font-size: inherit;
-    padding-left: 8px;
     box-sizing: border-box;
     outline: none;
     text-align: left;

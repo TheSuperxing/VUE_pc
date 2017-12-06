@@ -322,6 +322,47 @@
 					console.log(data)
 					if(data.code==0){
 						that.baseInfo = data.msg;
+						//判断用户的全部信息为空值
+			    	if(that.baseInfo.sex=="0"){
+			    		that.baseInfo.sex = "男"
+			    	}else if(that.baseInfo.sex=="1"){
+			    		that.baseInfo.sex = "女"
+			    	}/*设置性别的初始勾选状态*/
+			    	
+			    	if(that.localBaseInfo.sex==null){
+					    Vue.set(that.reveal,'selectSex',true);
+					  }else if(that.localBaseInfo.sex.trim()=="女"){
+					    Vue.set(that.reveal,'selectSex',false);
+					  }else if(that.localBaseInfo.sex.trim()=="男"){
+					    Vue.set(that.reveal,'selectSex',true);
+					  }
+					  
+					  if(that.baseInfo.ifRNA){
+					    that.reveal.throughRealName=true;
+					  }
+					  that.baseInfo.nickName=emptyText(this.baseInfo.nickName);
+			      that.baseInfo.psnName=emptyText(this.baseInfo.psnName);
+			      that.baseInfo.sex=emptyText(this.baseInfo.sex);
+			      that.baseInfo.dateOfBirth=emptyText(this.baseInfo.dateOfBirth);
+			      that.baseInfo.psnMail=emptyText(this.baseInfo.psnMail);
+			      that.baseInfo.phoneNumber=emptyText(this.baseInfo.phoneNumber);
+			      //如果得到的数据为空，进行暂没有消息处理
+						that.reveal.openOrPrivacy = [];
+			      that.localBaseInfo=JSON.parse(JSON.stringify(that.baseInfo));
+			      that.reveal.openOrPrivacy.push(that.baseInfo.psnNameVisable)
+			      that.reveal.openOrPrivacy.push(that.baseInfo.sexVisable)
+			      that.reveal.openOrPrivacy.push(that.baseInfo.ageVisable)
+			      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
+			      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
+			      /*初始化openOrPrivacy*/
+						
+						for(var i=0;i<that.reveal.openOrPrivacy.length;i++){
+							if(that.reveal.openOrPrivacy[i] == 0){
+								that.reveal.openOrPrivacy[i] = false;
+							}else{
+								that.reveal.openOrPrivacy[i] = true;
+							}
+						}
 					}else if(data.code == -1){
 						if(data.msg == "null"){
 			    		that.noBaseInfo = true;
@@ -330,30 +371,10 @@
 			    	}
 			    	
 					}
-					
-					
-					
 				},function(err){
 					console.log(err)
 				})
-	    	//判断用户的全部信息为空值
-	    	if(that.baseInfo.sex=="0"){
-	    		that.baseInfo.sex = "男"
-	    	}else if(that.baseInfo.sex=="1"){
-	    		that.baseInfo.sex = "女"
-	    	}/*设置性别的初始勾选状态*/
 	    	
-	    	if(that.localBaseInfo.sex==null){
-			    Vue.set(that.reveal,'selectSex',true);
-			  }else if(that.localBaseInfo.sex.trim()=="女"){
-			    Vue.set(that.reveal,'selectSex',false);
-			  }else if(that.localBaseInfo.sex.trim()=="男"){
-			    Vue.set(that.reveal,'selectSex',true);
-			  }
-			  
-			  if(that.baseInfo.ifRNA){
-			    that.reveal.throughRealName=true;
-			  }
 			  
 	    	function emptyText(text) {
 			    if(text==null||text.length == 0){
@@ -363,29 +384,6 @@
 			    }
 			  }
 	    	
-	      that.baseInfo.nickName=emptyText(this.baseInfo.nickName);
-	      that.baseInfo.psnName=emptyText(this.baseInfo.psnName);
-	      that.baseInfo.sex=emptyText(this.baseInfo.sex);
-	      that.baseInfo.dateOfBirth=emptyText(this.baseInfo.dateOfBirth);
-	      that.baseInfo.psnMail=emptyText(this.baseInfo.psnMail);
-	      that.baseInfo.phoneNumber=emptyText(this.baseInfo.phoneNumber);
-	      //如果得到的数据为空，进行暂没有消息处理
-				that.reveal.openOrPrivacy = [];
-	      that.localBaseInfo=JSON.parse(JSON.stringify(that.baseInfo));
-	      that.reveal.openOrPrivacy.push(that.baseInfo.psnNameVisable)
-	      that.reveal.openOrPrivacy.push(that.baseInfo.sexVisable)
-	      that.reveal.openOrPrivacy.push(that.baseInfo.ageVisable)
-	      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
-	      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
-	      /*初始化openOrPrivacy*/
-				
-				for(var i=0;i<that.reveal.openOrPrivacy.length;i++){
-					if(that.reveal.openOrPrivacy[i] == 0){
-						that.reveal.openOrPrivacy[i] = false;
-					}else{
-						that.reveal.openOrPrivacy[i] = true;
-					}
-				}
 				console.log(that.reveal.openOrPrivacy)
     	},
       editBasicInfo(){//编辑进入编辑状态

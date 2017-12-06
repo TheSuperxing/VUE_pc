@@ -16,8 +16,8 @@ var MyAjax = {
 			},
 			data: option.data,
 			dataType: option.dataType,
-			contentType:"application/json;charset=utf-8",
-			//xhrFields: {withCredentials: true},
+			contentType: option.contentType, 
+			xhrFields: {withCredentials: true},
 			async: option.async, // 使用同步方式  
 			success: function(data) {		
 				callback(data);

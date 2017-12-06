@@ -18,7 +18,8 @@
 			注册
 		</div>
 		<p class="notice">
-			<span v-bind:class="{'selected':agree[0]}" @click="agreeDeal" class="agreeBtn"></span>您已阅读并同意
+			<span v-bind:class="{'selected':agree[0]}" @click="agreeDeal" class="agreeBtn"></span>
+			<span>您已阅读并同意</span>
 			<router-link to="">
 				[buildingshop用户协议]
 			</router-link>
@@ -42,7 +43,8 @@
 			注册
 		</div>
 		<p class="notice">
-			<span v-bind:class="{'selected':agree[1]}" @click="agreeDeal" class="agreeBtn"></span>您已阅读并同意
+			<span v-bind:class="{'selected':agree[1]}" @click="agreeDeal" class="agreeBtn"></span>
+			<span>您已阅读并同意</span>
 			<router-link to="">
 				[buildingshop用户协议]
 			</router-link>
@@ -399,12 +401,13 @@
 		.com-wrap{
 			li{
 				border-bottom: 1px solid #EAEAEA;
-				padding:15px 0px 15px 48px;
-				text-align: left;
+				padding-left:48px;
+				height: 35px;
 				input{
 					width: 300px;
-					height: 25px;
-					line-height: 25px;
+					height: 30px;
+					line-height: 30px;
+					text-align: left;
 				}
 				&:nth-child(1){
 					margin-top: 15px;
@@ -439,12 +442,13 @@
 		.team-wrap{
 			li{
 				border-bottom: 1px solid #EAEAEA;
-				padding:15px 0px 15px 48px;
-				text-align: left;
+				padding-left:48px;
+				height: 35px;
 				input{
 					width: 300px;
-					height: 25px;
-					line-height: 25px;
+					height: 30px;
+					line-height: 30px;
+					text-align: left;
 				}
 				&:nth-child(1){
 					margin-top: 15px;
@@ -479,12 +483,13 @@
 		.person-wrap{
 			li{
 				border-bottom: 1px solid #EAEAEA;
-				padding:15px 0px 15px 48px;
-				text-align: left;
+				padding-left:48px;
+				height: 35px;
 				input{
-					width: 250px;
-					height: 25px;
-					line-height: 25px;
+					width: 300px;
+					height: 30px;
+					line-height: 30px;
+					text-align: left;
 				}
 				&:nth-child(1){
 					margin-top: 15px;
@@ -573,7 +578,7 @@
 			line-height: 50px;
 			color: #FFFFFF;
 			font-size: 20px;
-			margin: 40px auto 0;
+			margin: 60px auto 0;
 			border-radius: 5px;
 			cursor: pointer;
 		}
@@ -584,8 +589,12 @@
 			margin: 20px auto 0;
 			margin-left: 50px;
 			text-align: left;
+			span,a{
+				float: left;
+			}
+			
 			.agreeBtn{
-				display: inline-block;
+				float: left;
 				width: 17px;
 				height: 17px;
 				margin-right: 14px;

@@ -310,7 +310,7 @@
     methods:{
     	updateData(){
         var that = this;
-	    	var url = MyAjax.urlhw+"/personalbasicinfo/findByMySelf";
+	    	var url = MyAjax.urlsy+"/personalbasicinfo/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -498,7 +498,7 @@
 	    		this.localBaseInfo.sex = "1";
 	    	}
 	    	var that = this;
-	    	var url = MyAjax.urlhw+"/personalbasicinfo/update";
+	    	var url = MyAjax.urlsy+"/personalbasicinfo/update";
 	    	$.ajaxSetup({ contentType : 'application/json' });
 	    	MyAjax.ajax({
 					type: "POST",
@@ -545,7 +545,7 @@
 	    	this.baseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
 	    	console.log(this.baseInfo)
 	    	var that = this;
-	    	var url = MyAjax.urlhw+"/personalbasicinfo/update";
+	    	var url = MyAjax.urlsy+"/personalbasicinfo/update";
 	    	$.ajaxSetup({ contentType : 'application/json' });
 	    	MyAjax.ajax({
 					type: "POST",

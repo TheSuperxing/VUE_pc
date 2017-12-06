@@ -18,9 +18,9 @@
       
     </ul>
 		<alertTip v-if="showAlert" :showHide="showAlert" :alertText="alertText"></alertTip>
-    <!-- <div class="b_tips">
+     <div class="b_tips">
     	<p><router-link to="/register">立即注册>></router-link></p>
-    </div> -->
+    </div> 
     <ul class="loginSubmit">
       <li>
         <button @click="personalLogin"><router-link to="">登录</router-link></button>
@@ -86,7 +86,7 @@
 //      that.personTelCfm();
 //      that.picConfirm();
 //      that.msgConfirm(event);
-      	var url = MyAjax.urlhw+"/accountmanainfo/login";
+      	var url = MyAjax.urlsy+"/accountmanainfo/login";
 //      that.personalLoginInput.messageConfirm=event.currentTarget.innerText
       	if(that.personalLoginInput.tel.trim().length!=0&&that.personalLoginInput.messageConfirm.trim().length!=0
       	&&that.personalLoginInput.picConfirm.trim().length!=0){
@@ -160,8 +160,13 @@
      		}
 	    },
 	    changePic(){
+<<<<<<< HEAD
 	    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
         $(".picConfirm").attr("src",this.picSrc)
+=======
+	    	this.picSrc = MyAjax.urlsy+"/captcha.jpg"
+	    	$(".picConfirm").attr("src",this.picSrc)
+>>>>>>> 955d02b80606b9ba95a66fe2441803882babc4f9
 	    },
       picConfirm(){
       	//图片验证不能为空
@@ -367,8 +372,9 @@
     }
   }
   .b_tips{
-  	margin-top: 30px;
-  	
+  	margin-top: 15px;
+  	margin-bottom: 20px;
+  	float: right;
   	p:nth-child(1){
   		float: right;
   		font-size: 14px;

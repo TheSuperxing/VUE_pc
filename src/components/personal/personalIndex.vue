@@ -254,7 +254,18 @@
             psnName:"（暂无消息）",
             sex:"（暂无消息）",
             phoneNumber:"（暂无消息）"
-          }
+          },
+          psnEduBackGrounds:[],
+          psnWorkExperiences:[],
+          psnProjExpes:[],
+          teamOrgaInfos:[],
+          psnQualifications:[],
+          psnTitleMessages:[],
+          psnAwards:[],
+          psnPapers:[],
+          psnPatents:[],
+          psnlanguages:[],
+          psnsoftwares:[]
         },//用于存放服务器获取的数据
         validityTerm:[],//validityTermS+validityTermE
         personal:{

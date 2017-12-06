@@ -102,7 +102,8 @@
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
               console.log(data.code)
-							router.push("/index")
+              window.location.hash="/index"
+							//router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
 //								case "100008":
@@ -160,7 +161,7 @@
 	    },
 	    changePic(){
 	    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
-	    	$(".picConfirm").attr("src",this.picSrc)
+        $(".picConfirm").attr("src",this.picSrc)
 	    },
       picConfirm(){
       	//图片验证不能为空
@@ -227,7 +228,22 @@
         
       },
     personalLogin(){
-      	this.login()
+         this.login()
+        // $.ajax({
+        //   type: "POST",
+        //   url: "http://10.1.31.7:8080/hello1",
+        //   dataType: "json",
+        //   contentType:"application/json;charset=utf-8",
+        //   data: {id:"1"},
+        //   //xhrFields: {withCredentials: true},
+        //   //crossDomain: true,
+        //   async:false,//使用同步方式
+        //   success: function(data){
+        //     console.log(data)
+        //   },error:function(error){
+        //     console.log(error)
+        //   }
+        // });
      },
 		 keyLogin(){//enter键登录事件
 		 	var event = event || window.event;  

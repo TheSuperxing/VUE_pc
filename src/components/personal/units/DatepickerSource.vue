@@ -224,7 +224,6 @@
         return (year > this.maxYear || year < this.minYear) ? true : false
       },
       validateMonth (month) {
-        console.log(this.minYear)
         if(new Date(this.tmpYear, month).getTime() >= new Date(this.minYear, this.minMonth - 1).getTime()
           && new Date(this.tmpYear, month).getTime() <= new Date(this.maxYear, this.maxMonth - 1).getTime()){
           return false

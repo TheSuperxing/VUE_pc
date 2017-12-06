@@ -154,7 +154,7 @@ function moreManualUploader(option){
     qq(btnPrimary[0]).attach("click", function() {
         eval(option.nameList).uploadStoredFiles();
         btnPrimary.hide()
-        eval(option.nameList)._currentItemLimit=10
+        eval(option.nameList)._currentItemLimit=3
         console.log(eval(option.nameList))
     });
 }

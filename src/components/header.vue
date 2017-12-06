@@ -119,7 +119,7 @@
 				
 				//首页请求信息
 				var that = this;
-				var url = MyAjax.urlhw +"/accountmanainfo/home";
+				var url = MyAjax.urlhw+"/accountmanainfo/home";
 				MyAjax.ajax({
 					type: "GET",
 					url:url,

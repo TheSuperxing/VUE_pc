@@ -3,6 +3,7 @@
 		<header-nav></header-nav>
 		<div id="indexCont">
 			<h1>{{msg}}</h1>
+			<year-month :min="'1970-02'"></year-month>
 		</div>
 		<footer-nav></footer-nav>
   </div>
@@ -11,11 +12,13 @@
 <script>
   import MyAjax from "../assets/js/MyAjax.js"
 	import FooterNav from "./footer.vue";
-  import HeaderNav from "./header.vue";
+	import HeaderNav from "./header.vue";
+	import YearMonth from "./personal/units/yearMonth.vue"
   export default {
 		components:{
 			HeaderNav,
-			FooterNav
+			FooterNav,
+			YearMonth
 		},
     name: 'Index',
     data:function(){
@@ -48,7 +51,7 @@
 #indexCont{
 	width: 1200px;
 	min-height: 600px;
-	color: #FFFFFF;
+	color: red;
 	font-size: 20px;
 	margin: 150px auto;
 	 /*background-image: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,1));*/

@@ -358,7 +358,7 @@
             that.show.tag=[];
 	    	    that.updowntxt=[];
             for(let i=0;i<that.award.length;i++){//拼接fineUploader的ID
-              that.fineUploaderId.push("fine-uploader-man ual-trigger"+that.localAward[i].pkid);
+              that.fineUploaderId.push("fine-uploader-manual-trigger"+that.localAward[i].pkid);
               that.qqTemplate.push("qq-template-manual-trigger"+that.localAward[i].pkid);
          	    that.show.tag[i]=true;
 	    				that.updowntxt.push("展开查看更多");
@@ -433,7 +433,6 @@
       },
       async awardEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
-        this.getPicture(index);
         var that = this;
         const getPic = await that.getPicture(index);
         if(getPic.code === 0){

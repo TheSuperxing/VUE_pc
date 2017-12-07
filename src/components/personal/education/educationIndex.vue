@@ -191,7 +191,7 @@
 			                    <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
 			                    <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
 			                    <span class="qq-upload-size-selector qq-upload-size"></span>
-			                    <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel">放弃上传</button>
+			                    <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel"></button>
 			                    <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">重试</button>
 			                    <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">删除</button>
 			                    <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
@@ -312,40 +312,9 @@
 
     mounted(){
 			
-			this.updateData();
-			//上传图片
-			var that = this;
-
-      if(this.education.length!==0){
-        Vue.set(this.empty,"promote",false)
-        //if 有信息 信息为空的提升隐藏
-        for(let i = 0 ; i < this.education.length ; i++){
-          this.editEdu.edit[0].push(false);
-          this.editEdu.delete[0].push(true);
-          this.textLeng.schoolName.push(0);
-          this.textLeng.profession.push(0);
-          this.buttonColor.exist.push(true);
-          this.show.tag[i]=true;
-	    		this.updowntxt.push("展开查看更多");
-          /*初始化本地数据开始*/
-//        
-          /*初始化本地数据结束*/
-          Vue.set(this.textLeng.schoolName,[i],this.localEdu[i].schoolName.length)
-          Vue.set(this.textLeng.profession,[i],this.localEdu[i].professionName.length)
-          /*初始化记录输入字符长度的值*/
-          //信息是否对外显示赋初始值
-          //信息是否对外显示文字切换赋初始值
-          
-          /*是否显示隐藏文本的初始化*/
-        }
-        //为每一个对象添加一个独有的状态
-      }
-      
-      
-
+		this.updateData();
+		//上传图片
     },
-    
-
     methods:{
     	updateData(){//更新本地数据
     		var that = this;
@@ -372,27 +341,43 @@
 			    }
 			  }
 	    	
-	      that.localEdu=JSON.parse(JSON.stringify(that.education));
+	        that.localEdu=JSON.parse(JSON.stringify(that.education));
 	    	that.openOrPrivacy = [];
-	      that.openOrPrivacyText = [];
-	      that.fineUploaderId = [];
-	      that.qqTemplate = [];
-	      that.show.tag=[];
+	        that.openOrPrivacyText = [];
+	        that.fineUploaderId = [];
+	        that.qqTemplate = [];
+	        that.editEdu.edit[0]=[];
+	        that.editEdu.delete[0] = [];
+	        that.textLeng.schoolName = [];
+	        that.textLeng.profession = [];
+	        that.buttonColor.exist = [];
+	        that.show.tag=[];
 	    	that.updowntxt=[];
-	    	for(var i=0;i<that.education.length;i++){
+	    	if(this.education.length!==0){
+			    Vue.set(this.empty,"promote",false)
+			    //if 有信息 信息为空的提升隐藏
+			}
+	    	for(let i=0;i<that.education.length;i++){
 	    		that.education[i].professionName = emptyText(that.education[i].professionName);//空值判断
 	    		that.education[i].education = emptyText(that.education[i].education);
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
+	    		that.editEdu.edit[0].push(false);
+	            that.editEdu.delete[0].push(true);
+	            that.textLeng.schoolName.push(0);
+	            that.textLeng.profession.push(0);
+	            that.buttonColor.exist.push(true);
+	            Vue.set(that.textLeng.schoolName,[i],that.localEdu[i].schoolName.length)
+          		Vue.set(that.textLeng.profession,[i],that.localEdu[i].professionName.length)
 	    		that.show.tag[i]=true;
 	    		that.updowntxt.push("展开查看更多");
 	    		if(that.education[i].ifVisable==1){
 	    			that.openOrPrivacy.push(true);
 	    			that.openOrPrivacyText.push("显示")
-		      }else{
-		        that.openOrPrivacy.push(false);
+		        }else{
+		            that.openOrPrivacy.push(false);
 	    			that.openOrPrivacyText.push("隐藏")
-		      }
+		        }
 	    	}
     	},
     	getPicture(index){
@@ -402,46 +387,32 @@
     		return new Promise((resolve, reject) => {
 			    MyAjax.ajax({
 			      type: "GET",
-						url:url,
-						dataType: "json",
-						async: true, 
+					url:url,
+					dataType: "json",
+					async: true, 
 			    },(data) => {
 			        resolve(data);
-			     },(err) => {
+			    },(err) => {
 			        reject(err);
-			     });
-			  });
-    		
-//  		MyAjax.ajax({
-//					type: "GET",
-//					url:url,
-//					dataType: "json",
-//					async: true, 
-//				},function(data){
-//					console.log(data)
-//					Vue.set(that.picArr,[index],data.msg)
-//					Vue.set(that.picNum,[index],that.picArr[index].length)
-//				},function(err){
-//					console.log(err)
-//				})
-//  		console.log(that.picArr)
-    		
+			    });
+			});
     	},
     	upDown(index){
     		var that = this;
 				if(that.show.tag[index]==true){
 					Vue.set(that.show.tag,[index],false)
-					that.updowntxt[index] = "收起图片"
+					that.updowntxt[index] = "收起"
 				}else{
 					Vue.set(that.show.tag,[index],true)
 					that.updowntxt[index] = "展开查看更多" 
 				}
     		that.show.tag[index] == true? false:true;
-    		that.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+    		that.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
     		that.getPicture(index).then(function(data){
     			Vue.set(that.picArr,[index],data.msg)
-					Vue.set(that.picNum,[index],that.picArr[index].length)
+				Vue.set(that.picNum,[index],that.picArr[index].length)
     		});
+    		    		console.log(that.picNum[index])
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
@@ -454,10 +425,11 @@
         var that=this;
         singleManualUploader({
 	        element:"fine-uploader-manual-trigger",
-					template: "qq-template-manual-trigger",
+			template: "qq-template-manual-trigger",
 	        url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
 	        picIdCont:that.newInputValue.picId,
-	        btnPrimary:".btn-primary"
+	        btnPrimary:".btn-primary",
+			canUploadNum:3,
 	      })
         
       },
@@ -494,34 +466,44 @@
 				that.updateData();
         /*显示隐藏文字切换*/
       },
-      editEduExist(index){//编辑按钮事件，进入编辑模式
+      async editEduExist(index){//编辑按钮事件，进入编辑模式
       	var that = this;
       	//promise 的then方法里面去读取已经上传的图片张数，然后实例化上传组件，以便控制可上传的图片张数
-      	that.getPicture(index).then(function(data){
-    			Vue.set(that.picArr,[index],data.msg)
-					Vue.set(that.picNum,[index],that.picArr[index].length)
-//					console.log(3-that.picArr[index].length)
-					that.localEdu[index].picId = [];
-		      moreManualUploader({
+      	const getPic = await that.getPicture(index);
+      	if(getPic.code === 0){
+      		const data = await Promise.resolve(true).then(
+  				function(){
+  					Vue.set(that.picArr,[index],getPic.msg)
+		    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+		    	  	return that.picNum;
+  				}
+  			)
+      		console.log(that.picNum[index])
+      		
+      	}
+      	//实例化上传控件
+      	if(Math.floor(3-that.picNum[index])>0){
+      		that.localEdu[index].picId = [];
+      		$("#"+this.fineUploaderId[index]).html("")
+		    moreManualUploader({
 		      	nameList:'manualUploader'+index,
-			      element:that.fineUploaderId[index],
-			      template: that.qqTemplate[index],
-			      url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
-			      deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
-			      anotherParam:that.localEdu[index].pkid,
-			      picIdCont:that.localEdu[index].picId,
-			      btnPrimary:".btn-primary",
-			      canUploadNum:3-that.picArr[index].length,
-			    })
-    		});
-//  		console.log(that.picNum[index])
-    		
+			    element:that.fineUploaderId[index],
+			    template: that.qqTemplate[index],
+			    url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+			    anotherParam:that.localEdu[index].pkid,
+			    picIdCont:that.localEdu[index].picId,
+			    btnPrimary:".btn-primary",
+			    canUploadNum : Math.floor(3-that.picNum[index]),
+		    })
+      	}
+      	
+    	console.log(that.picNum[index])
         Vue.set(that.editEdu.edit[0],[index],true);
         //编辑和显示的切换
         if(that.localEdu[index].schoolName.length!=0){
           Vue.set(that.buttonColor.exist,[index],false)
         }
-        //上传图片
+       
 	      
       },
       deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
@@ -530,9 +512,9 @@
       	var p = new Promise((resolve, reject) => {
 			    MyAjax.ajax({
 			      type: "POST",
-						url:url,
-						dataType: "json",
-						async: true, 
+					url:url,
+					dataType: "json",
+					async: true, 
 			    },(data) => {
 			        resolve(data);
 			     },(err) => {
@@ -543,42 +525,35 @@
       },
       async deleThisPic(id,index,$ind){//删除图片
       	var that = this;
-//    	(async () => {
-      		const dele = await that.deleThisPicPromise(id);
-      		
-      		if(dele.code===0){
-      			const getPic = await that.getPicture(index);
-      			console.log(getPic)
-//    			(async () =>{
-			  			if(getPic.code===0){
-			  					const data = await Promise.resolve(true).then(
-				      				function(){
-				      					Vue.set(that.picArr,[index],getPic.msg)
-							    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
-							    	  	return that.picNum;
-				      				}
-				      				
-				      		)
-			  					console.log(data)
-			  			}
-//			  		})	
-      		}
+  		const dele = await that.deleThisPicPromise(id);
+  		
+  		if(dele.code===0){
+  			const getPic = await that.getPicture(index);
+  			if(getPic.code===0){
+  					const data = await Promise.resolve(true).then(
+	      				function(){
+	      					Vue.set(that.picArr,[index],getPic.msg)
+				    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+				    	  	return that.picNum;
+	      				}
+	      			)
+  					console.log(data)
+  			}
+  		}
 
-//				})();
-					that.localEdu[index].picId = [];
-					 $("#"+this.fineUploaderId[index]).html("")
-		      moreManualUploader({
-		      	nameList:'manualUploader'+index,
-			      element:that.fineUploaderId[index],
-			      template: that.qqTemplate[index],
-			      url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
-			      deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
-			      anotherParam:that.localEdu[index].pkid,
-			      picIdCont:that.localEdu[index].picId,
-			      btnPrimary:".btn-primary",
-			      canUploadNum:3-that.picNum[index],
-			    })
-      	console.log(that.picNum[index])
+		that.localEdu[index].picId = [];
+		$("#"+this.fineUploaderId[index]).html("")
+     	moreManualUploader({
+      		nameList:'manualUploader'+index,
+	      element:that.fineUploaderId[index],
+	      template: that.qqTemplate[index],
+	      url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+	      deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
+	      anotherParam:that.localEdu[index].pkid,
+	      picIdCont:that.localEdu[index].picId,
+	      btnPrimary:".btn-primary",
+	      canUploadNum:Math.floor(3-that.picNum[index]),
+	    })
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit[0],[index],false);
@@ -633,24 +608,24 @@
         var url = "http://10.1.31.16:8080/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: JSON.stringify(that.localEdu[index]),
-					dataType: "json",
-					contentType:"application/json;charset=utf-8",
-					async: true,
-				},function(data){
-					console.log(data)
-					if(data.code === "200001"){
-						console.log(data.msg)
-					}else{
-						that.updateData();
-						Vue.set(that.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
-					}
-				},function(err){
-					console.log(err)
-				})//更新到服务器
-				//保存之后再重新拉取数据
+			type: "POST",
+			url:url,
+			data: JSON.stringify(that.localEdu[index]),
+			dataType: "json",
+			contentType:"application/json;charset=utf-8",
+			async: true,
+		},function(data){
+			console.log(data)
+			if(data.code === "200001"){
+				console.log(data.msg)
+			}else{
+				that.updateData();
+				Vue.set(that.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+			}
+		},function(err){
+			console.log(err)
+		})//更新到服务器
+		//保存之后再重新拉取数据
 				
         //提交编辑后的数据
         $("#"+this.fineUploaderId[index]).html("")

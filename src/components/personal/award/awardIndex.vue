@@ -91,8 +91,8 @@
 				                    <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
 				                    <span class="qq-upload-size-selector qq-upload-size"></span>
 				                    <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel"></button>
-				                    <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">Retry</button>
-				                    <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">Delete</button>
+				                    <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">重试</button>
+				                    <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">删除</button>
 				                    <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
 					                </li>
 						            </ul>
@@ -292,6 +292,7 @@
           picId:[],
         },
         picArr:[],//图片展示的数组
+        picNum:[],//各条信息已经上传的图片数
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
@@ -309,17 +310,7 @@
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
       }
       /*以上是初始化*/
-      if(this.award.length!=0){
-        for(let i=0;i<this.award.length;i++){
-          if(this.award[i].ifVisable==0){
-            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
-            //this.reveal.openOrPrivacyText.push("显示")
-          }else{
-            Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
-            //this.reveal.openOrPrivacyText.push("隐藏")
-          }
-        }
-      }
+      
       /*以上是是否对外显示文本信息初始化*/
 
     },
@@ -366,45 +357,55 @@
             that.qqTemplate = [];
             that.show.tag=[];
 	    	    that.updowntxt=[];
-            for(let i=0;i<that.localAward.length;i++){//拼接fineUploader的ID
-              that.fineUploaderId.push("fine-uploader-manual-trigger"+i);
-              that.qqTemplate.push("qq-template-manual-trigger"+i);
+            for(let i=0;i<that.award.length;i++){//拼接fineUploader的ID
+              that.fineUploaderId.push("fine-uploader-man ual-trigger"+that.localAward[i].pkid);
+              that.qqTemplate.push("qq-template-manual-trigger"+that.localAward[i].pkid);
          	    that.show.tag[i]=true;
 	    				that.updowntxt.push("展开查看更多");
+	    				if(this.award[i].ifVisable===0){
+		            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
+		            //this.reveal.openOrPrivacyText.push("显示")
+		          }else{
+		            Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
+		            //this.reveal.openOrPrivacyText.push("隐藏")
+		          }
             }
       },
       getPicture(index){
     		var that = this;
     		var url = MyAjax.urlsy+"/psnAwards/findPicsById/"+that.award[index].pkid;
-    		MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-					
-				},function(data){
-					console.log(data)
-					Vue.set(that.picArr,[index],data.msg)
-//					that.picArr[index] = 
-					console.log(that.picArr)
-				},function(err){
-					console.log(err)
-				})
+    		//promise解决异步加载数据延迟
+    		return new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				        resolve(data);
+				    },(err) => {
+				        reject(err);
+				  });
+				});
+    		
     	},
       upDown(index){
 				console.log(this.show.tag[index])
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片";
+					this.updowntxt[index] = "收起";
 					this.getPicture(index);
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
-    		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-    		
+    		this.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
+    		var that = this;
+    		that.getPicture(index).then(function(data){
+    			Vue.set(that.picArr,[index],data.msg)
+					Vue.set(that.picNum,[index],that.picArr[index].length)
+    		});
     	},
       openOrPrivacy(index){//信息是否对外公开控制按钮\
         
@@ -428,28 +429,39 @@
             console.log(err)
           })
           that.getData();
-          
-          if(this.award[index].ifVisable==0){
-            Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
-          }else{
-            Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
-          }
           console.log(this.award)
       },
-      awardEdit(index){//编辑状态进入按钮
+      async awardEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         this.getPicture(index);
         var that = this;
-
-				that.localAward[index].picId = [];
-	     	moreManualUploader({
-          nameList:'manualUploader'+index,
-          element:that.fineUploaderId[index],
-          template: that.qqTemplate[index],
-          url:MyAjax.urlsy+"/psnAwards/batchUpload",
-          picIdCont:that.localAward[index].picId,
-          btnPrimary:".btn-primary"
-        })
+        const getPic = await that.getPicture(index);
+        if(getPic.code === 0){
+      		const data = await Promise.resolve(true).then(
+  				function(){
+  					Vue.set(that.picArr,[index],getPic.msg)
+	    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+	    	  	return that.picNum;
+  				}
+  			)
+      		console.log(that.picNum[index])
+      		
+      	}
+				if(Math.floor(3-that.picNum[index])>0){
+					that.localAward[index].picId = [];
+					$("#"+this.fineUploaderId[index]).html("")
+		     	moreManualUploader({
+	          nameList:'manualUploader'+index,
+	          element:that.fineUploaderId[index],
+	          template: that.qqTemplate[index],
+	          url:MyAjax.urlsy+"/psnAwards/batchUpload",
+	          anotherParam:that.localAward[index].pkid,
+	          picIdCont:that.localAward[index].picId,
+	          btnPrimary:".btn-primary",
+	          canUploadNum : Math.floor(3-that.picNum[index]),
+	        })
+				}
+				
 
       },
       keepAwardEdit(index){//编辑状态，保存按钮
@@ -474,24 +486,52 @@
          	$("#"+this.fineUploaderId[index]).html("")
         }
       },
-      deleThisPic(id,index,$ind){//删除图片
+      deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
       	var that = this;
-      	var url = MyAjax.urlsy + "/psnAwards/delPic/"+ id
-      	MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-				},function(data){
-					console.log(data)
-					if(data.code==0){
-//						that.picArr[index].splice($ind,1)
-						that.getPicture(index);
-					}
-				},function(err){
-					console.log(err)
-				})
+      	var url = MyAjax.urlsy + "/psnAwards/delPic/"+ id;
+      	var p = new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "POST",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				        resolve(data);
+				     },(err) => {
+				        reject(err);
+				     });
+			  });
+			  return p;
+      },
+      async deleThisPic(id,index,$ind){//删除图片
+      	var that = this;
+      	const dele = await that.deleThisPicPromise(id);
+  		
+	  		if(dele.code===0){
+	  			const getPic = await that.getPicture(index);
+	  			if(getPic.code===0){
+	  					const data = await Promise.resolve(true).then(
+		      				function(){
+		      					Vue.set(that.picArr,[index],getPic.msg)
+					    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+					    	  	return that.picNum;
+		      				}
+		      			)
+	  					console.log(data)
+	  			}
+	  		}
+      	that.localAward[index].picId = [];
+      	$("#"+this.fineUploaderId[index]).html("")
+	     	moreManualUploader({
+          nameList:'manualUploader'+index,
+          element:that.fineUploaderId[index],
+          template: that.qqTemplate[index],
+          url:MyAjax.urlsy+"/psnAwards/batchUpload",
+          anotherParam:that.localAward[index].pkid,
+          picIdCont:that.localAward[index].picId,
+          btnPrimary:".btn-primary",
+          canUploadNum : Math.floor(3-that.picNum[index]),
+        })
       	
       },
       cancelAwardEdit(index){//编辑状态，取消按钮
@@ -506,14 +546,8 @@
         var that=this;
         var url = MyAjax.urlsy+"/psnAwards/del/"+this.award[index].pkid;
         MyAjax.delete(url);
-        
         that.getData();
         
-        // 从新获取数据
-        for(let i=0;i<this.localAward.length;i++){//拼接fineUploader的ID
-          this.fineUploaderId.push("fine-uploader-manual-trigger"+i);
-          this.qqTemplate.push("qq-template-manual-trigger"+i);
-        }
       },
       addInfo(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addAward",false);
@@ -524,7 +558,8 @@
 					template: "qq-template-manual-trigger",
 	        url:MyAjax.urlsy+"/psnAwards/batchUpload",
 	        picIdCont:this.newAward.picId,
-	        btnPrimary:".btn-primary"
+	        btnPrimary:".btn-primary",
+					canUploadNum:3,
 	      })
       },
       keepAwardAdd(){//添加模式下的保存
@@ -556,10 +591,7 @@
             })
             this.getData();
             // 从新获取数据
-            for(let i=0;i<this.localAward.length;i++){//拼接fineUploader的ID
-              this.fineUploaderId.push("fine-uploader-manual-trigger"+i);
-              this.qqTemplate.push("qq-template-manual-trigger"+i);
-            }
+            
           }
         }
 
@@ -577,7 +609,7 @@
         Vue.set(this.newAward,"time","");
         Vue.set(this.newAward,"organ","");
         /*清除数据，保证下次输入时输入框为空*/
-       	$("#fine-uploader-manual-trigger").html("")
+       	$("#fine-uploader-manual-trigger").html("");
       }
     }
   }

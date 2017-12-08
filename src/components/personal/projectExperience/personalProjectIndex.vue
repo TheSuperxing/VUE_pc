@@ -9,9 +9,9 @@
 				<div class="content-wrap">
 						<div class="search-wrap">
 							<span class="wrap-left">项目名称</span>
-							<p class="wrap-right">
+							<p class="wrap-right" @keydown="keySearch">
 								<input type="text" placeholder="请输入项目名称" v-model="searchText" class="searchInput"/>
-								<span class="sBtn" @click="getData"><img src="../../../assets/img/company/seacer.png" />搜索</span>
+								<span class="sBtn" @click="search" ><img src="../../../assets/img/company/seacer.png" />搜索</span>
 							</p>
 						</div>
 						<div class="result-wrap">
@@ -128,9 +128,7 @@
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
 					if(data.code==0){
@@ -180,7 +178,7 @@
 				dataType: "json",
 				async:true,
 			},function(data){
-				console.log(data.msg)
+				console.log(data)
 				Vue.set(that.show.picList,[index],data.msg)
 			},function(err){
 				console.log(err)
@@ -193,18 +191,16 @@
 			},
     	
     	upDown(index){
-//  		Vue.set(this.show,"tag[index]",false)
-				console.log(this.show.tag[index])
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+					this.updowntxt[index] = "收起"
 					this.getPic(this.proInfo[index].psnProExpeID,index)
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
-				this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+				this.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
 			
 				console.log(this.show.picList)
     	},
@@ -250,15 +246,13 @@
 				$('.search-wrap').css({marginTop:"120px",marginBottom:"170px"})
 				$('.result-wrap').css({display:"none"})
 			},
-			getData(){
+			search(){
 				var that = this;
 	    	var url = MyAjax.urlsy+"/psnProjExpe/findProjByName/"+that.searchText;
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
 					console.log(data)
@@ -276,7 +270,15 @@
 					console.log(err)
 				})
 					
-					
+			},
+			keySearch(){//enter键登录事件
+			 	var event = event || window.event;  
+			 	if(event.keyCode==13){ 
+			 		console.log("222")
+			     this.search()
+			     event.returnValue = false;    
+			     return false;
+			  }
 			},
 			choseThis(e,index){
 				

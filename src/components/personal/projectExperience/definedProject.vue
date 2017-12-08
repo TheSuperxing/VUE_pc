@@ -94,8 +94,8 @@
 			                    <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
 			                    <span class="qq-upload-size-selector qq-upload-size"></span>
 			                    <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel"></button>
-			                    <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">Retry</button>
-			                    <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">Delete</button>
+			                    <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">重试</button>
+			                    <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">删除</button>
 			                    <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
 			                </li>
 			            </ul>
@@ -114,7 +114,7 @@
 			            <dialog class="qq-alert-dialog-selector">
 			                <div class="qq-dialog-message-selector"></div>
 			                <div class="qq-dialog-buttons">
-			                    <button type="button" class="qq-cancel-button-selector">Close</button>
+			                    <button type="button" class="qq-cancel-button-selector">关闭</button>
 			                </div>
 			            </dialog>
 			
@@ -130,7 +130,7 @@
 			                <div class="qq-dialog-message-selector"></div>
 			                <input type="text">
 			                <div class="qq-dialog-buttons">
-			                    <button type="button" class="qq-cancel-button-selector">Cancel</button>
+			                    <button type="button" class="qq-cancel-button-selector">取消</button>
 			                    <button type="button" class="qq-ok-button-selector">Ok</button>
 			                </div>
 			            </dialog>
@@ -204,7 +204,8 @@
 				detailDes:"",//职责详细描述
 				"ifVisable": 1,
 				picId:[],//上传图片返回的ID
-	        }
+	        },
+	        picNum:"",
 	      }
 	    },
 	    mounted(){
@@ -230,7 +231,8 @@
         		template: "qq-template-manual-trigger",
 				url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
 				picIdCont:that.projectInfo.picId,
-				btnPrimary:".btn-primary"
+				btnPrimary:".btn-primary",
+				canUploadNum:Math.floor(3-that.picNum),
 			})
 		},
 		methods: {

@@ -3,7 +3,7 @@
 
     <div class="title clear">
       <h2 v-cloak>{{title.text}}</h2>
-      <p v-on:click="addInfo">添加</p>
+      <p v-on:click="addInfo" v-if="reveal.addCertificate">添加</p>
     </div>
     <!--personaltitle结束-->
     <div class="certificateContainer" v-show="reveal.addCertificate">
@@ -295,6 +295,7 @@
 				  picId:[],
         },
         picArr:[],//图片展示的数组
+        picNum:[],//各条信息已经上传的图片数
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
@@ -315,12 +316,7 @@
       }
       /*以上是初始化*/
       
-      /*以上是是否对外显示文本信息初始化*/
-      for(var i=0;i<this.certificate.length;i++){
-    		this.fineUploaderId.push("fine-uploader-manual-trigger"+this.certificate[i].pkid);
-    		this.qqTemplate.push("qq-template-manual-trigger"+this.certificate[i].pkid);
-    		//this.qqTriggerUpload.push("trigger-upload"+this.education[i].pkid);
-    	}
+     
     },
     updated(){
       if(this.certificate.length==0){
@@ -347,9 +343,7 @@
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
           if(data.code==0){
@@ -386,20 +380,19 @@
     	getPicture(index){
     		var that = this;
     		var url = MyAjax.urlsy+"/psnQualification/findPicsById/"+that.certificate[index].pkid;
-    		MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-					async:true,
-				},function(data){
-					console.log(data)
-					Vue.set(that.picArr,[index],data.msg)
-					console.log(that.picArr)
-				},function(err){
-					console.log(err)
-				})
+    		return new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				        resolve(data);
+				    },(err) => {
+				        reject(err);
+				  });
+				});
+    	
     	},
     	upDown(index){
 //  		Vue.set(this.show,"tag[index]",false)
@@ -414,7 +407,11 @@
 				}
     		this.show.tag[index] == true? false:true;
     		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-    		
+    		var that = this;
+    		that.getPicture(index).then(function(data){
+    			Vue.set(that.picArr,[index],data.msg)
+					Vue.set(that.picNum,[index],that.picArr[index].length)
+    		});
     	},
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
@@ -450,41 +447,81 @@
 				},function(err){
 					console.log(err)
 				})
+        that.updateData();
       },
-      certificateInfoEdit(index){//编辑状态进入按钮
+      async certificateInfoEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
-
-        //上传图片
-        
-       
-          moreManualUploader({
+        const getPic = await that.getPicture(index);
+        if(getPic.code === 0){
+      		const data = await Promise.resolve(true).then(
+  				function(){
+  					Vue.set(that.picArr,[index],getPic.msg)
+	    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+	    	  	return that.picNum;
+  				})
+  			}
+				if(Math.floor(3-that.picNum[index])>0){
+					that.localCertificate[index].picId = [];
+					$("#"+that.fineUploaderId[index]).html("")
+					 moreManualUploader({
 	          nameList:'manualUploader'+index,
 	          element:that.fineUploaderId[index],
 	          template: that.qqTemplate[index],
 	          url:MyAjax.urlsy+"/psnQualification/batchUpload",
 	          picIdCont:that.localCertificate[index].picId,
-	          btnPrimary:".btn-primary"
+	          btnPrimary:".btn-primary",
+	          canUploadNum : Math.floor(3-that.picNum[index]),
 	        })
-          this.getPicture(index);
+				}
+        //上传图片
       },
-      deleThisPic(id,index,$ind){//删除图片
+      deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
       	var that = this;
-      	var url = MyAjax.urlsy + "/psnEduBackGround/delPic/"+ id
-      	MyAjax.ajax({
-					type: "GET",
-					url:url,
-					dataType: "json",
-					async:false,
-				},function(data){
-					console.log(data)
-					if(data.code==0){
-						that.getPicture(index);
-					}
-				},function(err){
-					console.log(err)
-				})
-      	
+      	var url = MyAjax.urlsy + "/psnQualification/delPic/"+ id;
+      	var p = new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "POST",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				        resolve(data);
+				     },(err) => {
+				        reject(err);
+				     });
+			  });
+			  return p;
+      },
+      async deleThisPic(id,index,$ind){//删除图片
+      	var that = this;
+      	const dele = await that.deleThisPicPromise(id);
+	  		if(dele.code===0){
+	  			const getPic = await that.getPicture(index);
+	  			if(getPic.code===0){
+	  					const data = await Promise.resolve(true).then(
+		      				function(){
+		      					Vue.set(that.picArr,[index],getPic.msg)
+					    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+					    	  	return that.picNum;
+		      				}
+		      			)
+	  					console.log(data)
+	  			}
+	  		}
+      	if(Math.floor(3-that.picNum[index])>0){
+					that.localCertificate[index].picId = [];
+					$("#"+this.fineUploaderId[index]).html("")
+						moreManualUploader({
+	          nameList:'manualUploader'+index,
+	          element:that.fineUploaderId[index],
+	          template: that.qqTemplate[index],
+	          url:MyAjax.urlsy+"/psnQualification/batchUpload",
+	          picIdCont:that.localCertificate[index].picId,
+	          btnPrimary:".btn-primary",
+	          canUploadNum : Math.floor(3-that.picNum[index]),
+	        })
+				}
       	
       },
       keepCertificateInfoEdit(index){//编辑状态，保存按钮
@@ -515,7 +552,6 @@
       cancelCertificateInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
         this.localCertificate[index]=JSON.parse(JSON.stringify(this.certificate[index]));
-        $('.qq-upload-success').hide();
       },
       certificateInfoDel(index){//编辑状态，删除按钮
         var that = this;
@@ -536,7 +572,8 @@
 					template: "qq-template-manual-trigger",
 	        url:MyAjax.urlsy+"/psnQualification/batchUpload",
 	        picIdCont:this.newCertificate.picId,
-	        btnPrimary:".btn-primary"
+	        btnPrimary:".btn-primary",
+					canUploadNum:3,
 	      })
       },
       keepCertificateInfoAdd(){
@@ -589,7 +626,7 @@
     padding: 0 40px;
     background: $bfColor;
     min-height: 671px;
-
+		padding-bottom: 30px;
     .title{
       padding:35px 0 0 0;
       font-size: 18px;
@@ -785,7 +822,11 @@
 		        		float: left;
 		        		>li{
 		        			float: left;
-		        			height: 100px;
+		        			width: 200px;
+				          height: 200px;
+				          padding: 10px;
+				          background: rgba(210,210,210,.3);
+				          border-radius: 10px;
 									position: relative;
 									margin-right: 15px;
 										margin-bottom: 15px;
@@ -796,8 +837,8 @@
 										}
 									}
 									img{
-										width: 160px;
-										height: 100px;
+										width: 180px;
+										max-height: 180px;
 										
 										
 									}
@@ -805,7 +846,7 @@
 										width: 21px;
 										height: 21px;
 										position: absolute;
-										right: 5px; top: 5px;
+										right: 10px; top: 10px;
 										background: url(../../../assets/img/personal/education/delePic.png) no-repeat;
 										display: none;
 										cursor: pointer;

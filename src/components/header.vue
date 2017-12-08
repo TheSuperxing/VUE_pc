@@ -123,10 +123,8 @@
 				MyAjax.ajax({
 					type: "GET",
 					url:url,
-			//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-			//				contentType:"application/json;charset=utf-8",
-					
+					async:false,					
 				},function(data){
 					data = data.msg;
 					if(data == "100004"){

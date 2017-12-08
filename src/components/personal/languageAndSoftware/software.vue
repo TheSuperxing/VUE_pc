@@ -66,7 +66,7 @@
               <div class="picListCont">
                 <div class="picList" v-for="(item,$index) in show.picList[index]">
                   <img :src="item.pic" alt="">
-                  <button @click="deletePic(index,$index)"></button>
+                  <button @click="deletePic(item.id,index,$index)"></button>
                 </div>
               </div>
 
@@ -267,6 +267,7 @@
         show:{
           tag:[],
           picList:[],
+          picNum:[],
         },
 
         picInfo:[require("../../../assets/img/images/captainmiao1.jpg"),require("../../../assets/img/images/captainmiao2.jpg")],
@@ -347,21 +348,22 @@
 	    		}
 	    	}
       },
-      getPic(pkid,index){
+      getPic(index){
         var that=this;
-        var url=MyAjax.urlsy+"/psnsoftware/findPicsById/"+pkid;
-        MyAjax.ajax({
-            type: "GET",
-            url:url,
-            dataType: "json",
-            async: true,
-          },function(data){
-            Vue.set(that.show.picList,[index],data.msg)
-          },function(err){
-            console.log(err)
-          })
+        var url=MyAjax.urlsy+"/psnsoftware/findPicsById/"+that.software[index].pkid;
+        return new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				        resolve(data);
+				    },(err) => {
+				        reject(err);
+				    });
+				});
       },
-
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
         if(this.reveal.openOrPrivacyText[index]=="显示"){//显示隐藏文字切换
@@ -386,70 +388,115 @@
 					data: JSON.stringify(that.software[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
 					console.log(err)
 				})
-        
+        that.updateData();
       },
       upDown(index){
 //  		Vue.set(this.show,"tag[index]",false)
-				if(this.show.tag[index]==true){
-					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+				var that = this;
+				if(that.show.tag[index]==true){
+					Vue.set(that.show.tag,[index],false)
+					that.updowntxt[index] = "收起";
+					that.getPic(index).then(function(data){
+						Vue.set(that.show.picList,[index],data.msg)
+						Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+		    		});
 				}else{
-					Vue.set(this.show.tag,[index],true)
-					this.updowntxt[index] = "展开查看更多" 
+					Vue.set(that.show.tag,[index],true)
+					that.updowntxt[index] = "展开查看更多" 
 				}
-    		this.show.tag[index] == true? false:true;
-        this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-        this.getPic(this.software[index].pkid,index)
-			  console.log(this.show.picList)
+    		that.show.tag[index] == true? false:true;
+        that.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
       },
       
-      softwareEdit(index){//编辑状态进入按钮
+      async softwareEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         //上传图片
         var that = this
-        this.getPic(this.software[index].pkid,index)
+        const getPic = await that.getPic(index);
+				if(getPic.code === 0){
+      		const data = await Promise.resolve(true).then(
+	  				function(){
+	  					Vue.set(that.show.picList,[index],getPic.msg)
+							Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+			    	  	return that.show.picNum;
+	  				}
+	  			)
+      		console.log(that.show.picNum[index])
+      		
+      	}
+				if(Math.floor(3-that.show.picNum[index])>0){
+					that.localSoftware[index].picId=[];
+					$("#"+that.fineUploaderId[index]).html("");
+					
+	        moreManualUploader({
+	          nameList:'manualUploader_software_'+index,
+	          element:that.fineUploaderId[index],
+	          template: that.qqTemplate[index],
+	          url:MyAjax.urlsy+'/psnsoftware/batchUpload',
+	          picIdCont:that.localSoftware[index].picId,
+	          btnPrimary:".btn-primary-software",
+	          canUploadNum : Math.floor(3-that.show.picNum[index]),
+	        })
+				}
 
-        that.software[index].picId=[];
+        
+        
+      },
+			deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
+      	var that = this;
+      	var url = MyAjax.urlsy+"/psnlanguage/delPic/"+id
+      	var p = new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "POST",
+						url:url,
+						dataType: "json",
+						async: true, 
+			    },(data) => {
+			        resolve(data);
+			     },(err) => {
+			        reject(err);
+			     });
+			  });
+			  return p;
+      },
+      async deletePic(id,index,$index){
+        var that =this;
+        const dele = await that.deleThisPicPromise(id);
+        if(dele.code===0){
+	  			const getPic = await that.getPic(index);
+	  			if(getPic.code===0){
+	  					const data = await Promise.resolve(true).then(
+		      				function(){
+		      					Vue.set(that.show.picList,[index],getPic.msg)
+										Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+					    	  	return that.show.picNum;
+		      				}
+		      			)
+	  					console.log(data)
+	  			}
+	  		}
+        that.localSoftware[index].picId=[];
+				$("#"+that.fineUploaderId[index]).html("");
         moreManualUploader({
           nameList:'manualUploader_software_'+index,
           element:that.fineUploaderId[index],
           template: that.qqTemplate[index],
           url:MyAjax.urlsy+'/psnsoftware/batchUpload',
-          picIdCont:that.software[index].picId,
-          btnPrimary:".btn-primary-software"
+          picIdCont:that.localSoftware[index].picId,
+          btnPrimary:".btn-primary-software",
+          canUploadNum : Math.floor(3-that.show.picNum[index]),
         })
-        
-      },
-
-      deletePic(index,$index){
-        var that =this;
-        var url = MyAjax.urlsy+"/psnsoftware/delPic/"+this.show.picList[index][$index].id
-        MyAjax.ajax({
-          type: "GET",
-          url:url,
-          dataType: "json",
-        },function(data){
-          // if(data.msg=="success"){
-          //   that.show.picList[index][$index]="";
-          // }
-          //console.log(data)
-        },function(err){
-          console.log(err)
-        })
-        this.getPic(this.software[index].pkid,index)
 
       },
       softwareEditKeep(index){//编辑状态，保存按钮
         
         var that = this;
-        console.log()
-        that.localSoftware[index]=that.software[index];
         var url = MyAjax.urlsy+"/psnsoftware/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
@@ -504,7 +551,8 @@
           template: "qq-template-manual-trigger-software",
           url:MyAjax.urlsy+'/psnsoftware/batchUpload',
           picIdCont:that.newSoftware.picId,
-          btnPrimary:".btn-primary-software"
+          btnPrimary:".btn-primary-software",
+          canUploadNum:3,
         })
 
       },
@@ -532,7 +580,7 @@
 					url:url,
 					data:JSON.stringify(that.newSoftware),
 					dataType: "json",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -632,7 +680,7 @@
               li.img-wrap{
 					    	/*padding-left: 30px;*/
 					    	>div{
-					    		width: 680px;
+					    		width: 730px;
 					    		float: left;
 					    	}
 					    }
@@ -691,7 +739,7 @@
 				      	text-align: right;
 				      	float: left;
 				      	color:$themeColor;
-				      	margin-right: 35px;
+				      	margin-right: 25px;
 				      }
               h5{
                 float: left;
@@ -731,7 +779,7 @@
             li.img-wrap{
 				    	/*padding-left: 30px;*/
 				    	>div{
-				    		width: 720px;
+				    		width: 730px;
 				    		float: right;
 				    	}
 				    }
@@ -783,7 +831,7 @@
 		      	text-align: right;
 		      	float: left;
 		      	color:$themeColor;
-		      	margin-right: 35px;
+		      	margin-right: 25px;
 		      }
           h5{
             float: left;
@@ -909,8 +957,8 @@
 			}
       // 显示图片样式
       .picListCont{
-        width: 720px;
-        float: left;
+        width: 730px;
+        float: left !important;
         .picList{
           float: left;
           width: 200px;
@@ -918,7 +966,7 @@
           padding: 8px;
           background: rgba(210,210,210,.3);
           border-radius: 10px;
-          margin-left: 10px;
+          margin-right: 10px;
           margin-bottom: 10px;
           position: relative;
           img{

@@ -20,14 +20,14 @@
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
              <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
-            <button  v-on:click="search">
+            <button  v-on:click="search" @keydown="keySearch">
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
             </button>
           </li>
           <li v-if="reveal.searchShow" class="clear">
             <h6>搜索结果</h6>
-            <p v-if="!reveal.modal">抱歉，未找到该公司，请从新搜索</p>
+            <p v-if="!reveal.modal" style="color: #e0e0e0;">抱歉，未找到该公司，请重新搜索</p>
             <div v-if="reveal.modal">
               <p v-for="(item,index) in searchResult" v-on:click="selectCompanyName(index)">
                 <span>{{item.companyName}}</span>
@@ -79,14 +79,14 @@
             <li class="clear">
               <h5>*&nbsp;公司名称</h5>
               <p v-if="reveal.editDetailInfo[index]">{{localWorkExperience[index].companyName}}</p>
-              <input v-if="!reveal.editDetailInfo[index]" type="text" v-model="localWorkExperience[index].companyName" placeholder="请输入公司名称">
+              <p v-if="!reveal.editDetailInfo[index]">{{localWorkExperience[index].companyName}}</p>
             </li>
             <li  v-if="!reveal.editDetailInfo[index]" class="companyAddress clear">
               <h5>公司地址</h5>
               <input type="text" v-model="localWorkExperience[index].companyAddress" placeholder="请输入公司地址">
             </li>
             <li class="clear">
-              <h5>任职职位</h5>
+              <h5>*&nbsp;任职职位</h5>
               <input type="text" v-model="localWorkExperience[index].ocupation" >
             </li>
             <li class="clear">
@@ -321,7 +321,7 @@
 					data: JSON.stringify(that.workExperience[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -356,7 +356,7 @@
 					data: JSON.stringify(that.localWorkExperience[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -364,8 +364,7 @@
 				})//更新到服务器
 				//保存之后再重新拉取数据
 				that.updateData();
-//      if(this.localEdu[index].schoolName.length!=0){
-        Vue.set(this.reveal.editInfo,[index],true);
+        Vue.set(that.reveal.editInfo,[index],true);
         /*视图的切换*/
       },
       deleteInfo(index){//删除显示信息
@@ -396,19 +395,19 @@
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
-					data = data.msg;
-					that.searchResult = data;
-					if(that.searchResult.length!=0){
-            Vue.set(that.reveal,"modal",true)
-          }else {
-            Vue.set(that.reveal,"modal",false)
-          }
+					if(data.code===0){
+						that.searchResult = data.msg;
+						if(that.searchResult.length!=0){
+	            Vue.set(that.reveal,"modal",true)
+	          }else {
+	            Vue.set(that.reveal,"modal",false)
+	          }
+					}
+					
 				},function(err){
 					console.log(err)
 				})
@@ -421,6 +420,15 @@
         }
         
       },
+      keySearch(){//enter键登录事件
+			 	var event = event || window.event;  
+			 	if(event.keyCode==13){ 
+			 		console.log("222")
+			     this.search()
+			     event.returnValue = false;    
+			     return false;
+			  }
+			},
       customCompanyName(){//自定义公司
         Vue.set(this.reveal,"customCompanyName",false);//切换到能自定义公司数据
         console.log(this.reveal.customCompanyName)
@@ -461,31 +469,32 @@
         }
       },
       keepAdd(){//添加模式下，确认添加按钮
-        if(this.newWorkExperience.companyName.length!=0){//保证公司信息不为空才能进行操作
+      	var that = this;
+        if(that.newWorkExperience.companyName.length!=0&&that.newWorkExperience.jobDescription.length!=0){//保证公司信息不为空才能进行操作
+        	
      
-          this.reveal.editInfo.push(true);//在是否编辑的状态里添加一条新的状态
-          this.reveal.openOrPrivacy.push(true);//在是否让他人查看添加一条新的信息
-          this.reveal.openOrPrivacyText.push("显示");//在是否让他人查看添加一条新的信息
-          Vue.set(this.reveal,"addOrShow",true)//切换到显示信息页
+          that.reveal.editInfo.push(true);//在是否编辑的状态里添加一条新的状态
+          that.reveal.openOrPrivacy.push(true);//在是否让他人查看添加一条新的信息
+          that.reveal.openOrPrivacyText.push("显示");//在是否让他人查看添加一条新的信息
+          Vue.set(that.reveal,"addOrShow",true)//切换到显示信息页
+          
+          var url = MyAjax.urlsy+"/psnWorkExperience/insert";
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.newWorkExperience),
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})
+	        
           /*确定添加后信息的清除*/
         }
-        var that = this;
-        console.log(JSON.stringify(that.newWorkExperience))
-        var url = MyAjax.urlsy+"/psnWorkExperience/insert";
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data:JSON.stringify(that.newWorkExperience),
-					dataType: "json",
-					
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
         that.updateData();
-				$('.qq-upload-success').hide();
       },
       cancelAdd(){
         Vue.set(this.reveal,"addOrShow",true)//切换到显示信息页
@@ -495,7 +504,6 @@
           Vue.set(this.reveal,"empty",false)
         }
         Vue.set(this.reveal,"addOrShow",true)//切换到显示信息页
-        $('.qq-upload-success').hide();
         /*取消添加后信息的清除*/
       }
     }
@@ -647,6 +655,7 @@
             }
           }
           li:nth-child(3){
+          	width: 140px;
             cursor: pointer;
             text-align: left;
             margin-left:92px;

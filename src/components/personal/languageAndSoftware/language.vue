@@ -3,7 +3,7 @@
 
     <div class="title clear">
       <h2 v-cloak>{{title}}</h2>
-      <p v-on:click="addLanguage">添加</p>
+      <p v-on:click="addLanguage" v-if="reveal.addLanguage">添加</p>
     </div>
     <!--personaltitle结束-->
     <div class="languageContainer" v-show="reveal.addLanguage">
@@ -66,7 +66,7 @@
               <div class="picListCont">
                 <div class="picList" v-for="(item,$index) in show.picList[index]">
                   <img :src="item.pic" alt="">
-                  <button @click="deletePic(index,$index)"></button>
+                  <button @click="deletePic(item.id,index,$index)"></button>
                 </div>
               </div>
 
@@ -267,6 +267,7 @@
         show:{
           tag:[],
           picList:[],
+          picNum:[],
         },
 
         language:[],
@@ -350,19 +351,22 @@
 
         
       },
-      getPic(pkid,index){
+      getPic(index){
         var that=this;
-        var url=MyAjax.urlsy+"/psnlanguage/findPicsById/"+pkid;
-        MyAjax.ajax({
-            type: "GET",
-            url:url,
-            dataType: "json",
-            async:  true,
-          },function(data){
-            Vue.set(that.show.picList,[index],data.msg)
-          },function(err){
-            console.log(err)
-          })
+        var url=MyAjax.urlsy+"/psnlanguage/findPicsById/"+that.language[index].pkid;
+        return new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				        resolve(data);
+				    },(err) => {
+				        reject(err);
+				    });
+				});
+        
       },
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//信息是否对外公开的切换（颜色，和图片切换）
@@ -391,62 +395,109 @@
 					data: JSON.stringify(that.language[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
 					console.log(err)
 				})
+        that.updateData();
       },
       upDown(index){
 //  		Vue.set(this.show,"tag[index]",false)
-				if(this.show.tag[index]==true){
-					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+				var that = this;
+				if(that.show.tag[index]==true){
+					Vue.set(that.show.tag,[index],false)
+					that.updowntxt[index] = "收起",
+					that.getPic(index).then(function(data){
+						Vue.set(that.show.picList,[index],data.msg)
+						Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+		    		});
 				}else{
-					Vue.set(this.show.tag,[index],true)
-					this.updowntxt[index] = "展开查看更多" 
+					Vue.set(that.show.tag,[index],true)
+					that.updowntxt[index] = "展开查看更多" 
 				}
-    		this.show.tag[index] == true? false:true;
-        this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-        this.getPic(this.language[index].pkid,index)
-			  console.log(this.show.picList)
+    		that.show.tag[index] == true? false:true;
+        that.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
+      
     	},
-      languageEdit(index){//编辑状态进入按钮
+      async languageEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
         //上传图片
-        this.getPic(this.language[index].pkid,index)
-
-        that.language[index].picId=[];
+         const getPic = await that.getPic(index);
+				if(getPic.code === 0){
+      		const data = await Promise.resolve(true).then(
+	  				function(){
+	  					Vue.set(that.show.picList,[index],getPic.msg)
+							Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+			    	  	return that.show.picNum;
+	  				}
+	  			)
+      		console.log(that.show.picNum[index])
+      		
+      	}
+				$("#"+that.fineUploaderId[index]).html("");
+				if(Math.floor(3-that.show.picNum[index])>0){
+					that.localLanguage[index].picId=[];
+					$("#"+that.fineUploaderId[index]).html("");
+					console.log($("#"+that.fineUploaderId[index]))
+	        moreManualUploader({
+	          nameList:'manualUploader_language_'+index,
+	          element:that.fineUploaderId[index],
+	          template: that.qqTemplate[index],
+	          url:MyAjax.urlsy+'/psnlanguage/batchUpload',
+	          picIdCont:that.localLanguage[index].picId,
+	          btnPrimary:".btn-primary-language",
+	          canUploadNum : Math.floor(3-that.show.picNum[index]),
+	        })
+				}
+      },
+      deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
+      	var that = this;
+      	var url = MyAjax.urlsy+"/psnlanguage/delPic/"+id
+      	var p = new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "POST",
+						url:url,
+						dataType: "json",
+						async: true, 
+			    },(data) => {
+			        resolve(data);
+			     },(err) => {
+			        reject(err);
+			     });
+			  });
+			  return p;
+      },
+      async deletePic(id,index,$index){
+        var that =this;
+        const dele = await that.deleThisPicPromise(id);
+        if(dele.code===0){
+	  			const getPic = await that.getPic(index);
+	  			if(getPic.code===0){
+	  					const data = await Promise.resolve(true).then(
+		      				function(){
+		      					Vue.set(that.show.picList,[index],getPic.msg)
+										Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+					    	  	return that.show.picNum;
+		      				}
+		      			)
+	  					console.log(data)
+	  			}
+	  		}
+        that.localLanguage[index].picId=[];
+				$("#"+that.fineUploaderId[index]).html("");
         moreManualUploader({
           nameList:'manualUploader_language_'+index,
           element:that.fineUploaderId[index],
           template: that.qqTemplate[index],
           url:MyAjax.urlsy+'/psnlanguage/batchUpload',
-          picIdCont:that.language[index].picId,
-          btnPrimary:".btn-primary-language"
+          picIdCont:that.localLanguage[index].picId,
+          btnPrimary:".btn-primary-language",
+          canUploadNum : Math.floor(3-that.show.picNum[index]),
         })
         
-      },
-      deletePic(index,$index){
-        var that =this;
-        var url = MyAjax.urlsy+"/psnlanguage/delPic/"+this.show.picList[index][$index].id
-        MyAjax.ajax({
-          type: "GET",
-          url:url,
-          dataType: "json",
-        },function(data){
-          // if(data.msg=="success"){
-          //   that.show.picList[index][$index]="";
-          // }
-          //console.log(data)
-        },function(err){
-          console.log(err)
-        })
-        console.log(this.show.picList[index]);
-        this.getPic(this.language[index].pkid,index)
-        console.log(this.show.picList[index]);
 
       },
       languageEditKeep(index){//编辑状态，保存按钮
@@ -456,10 +507,10 @@
         MyAjax.ajax({
 					type: "POST",
 					url:url,
-					data: JSON.stringify(that.language[index]),
+					data: JSON.stringify(that.localLanguage[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
-					
+					async:false,
 				},function(data){
 					//console.log(data)
 				},function(err){
@@ -467,10 +518,10 @@
 				})//更新到服务器
 				//保存之后再重新拉取数据
 				that.updateData();
-				if(this.localLanguage[index].length!=0){
-          Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
+				if(that.localLanguage[index].length!=0){
+          Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
         }
-        $("#"+this.fineUploaderId[index]).html("")
+        $("#"+that.fineUploaderId[index]).html("");
       },
       languageEditCancel(index){//编辑状态，取消按钮
        Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -501,7 +552,8 @@
           template: "qq-template-manual-trigger-language",
           url:MyAjax.urlsy+'/psnlanguage/batchUpload',
           picIdCont:that.newLanguage.picId,
-          btnPrimary:".btn-primary-language"
+          btnPrimary:".btn-primary-language",
+          canUploadNum:3,
         })
       },
       keepNewLanguage(){//添加模式下的保存
@@ -685,7 +737,7 @@
 				      	text-align: right;
 				      	float: left;
 				      	color:$themeColor;
-				      	margin-right: 35px;
+				      	margin-right: 25px;
 				      }
               h5{
                 float: left;
@@ -725,7 +777,7 @@
             li.img-wrap{
 		        	/*padding-left: 30px;*/
 		        	>div{
-		        		width: 720px;
+		        		width: 735px;
 		        		float: right;
 		        	}
 		        }
@@ -776,7 +828,7 @@
 		      	text-align: right;
 		      	float: left;
 		      	color:$themeColor;
-		      	margin-right: 35px;
+		      	margin-right: 25px;
 		      }
           h5{
             float: left;
@@ -816,8 +868,8 @@
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{
-        		width: 680px;
-        		float: left;
+        		width: 730px;
+        		float: right;
         	}
         }
         li.tip-wrap{
@@ -901,8 +953,8 @@
 			}
       // 显示图片样式
       .picListCont{
-        width: 720px;
-        float: left;
+        width: 730px;
+        float: left !important;
         .picList{
           float: left;
           width: 200px;
@@ -910,7 +962,7 @@
           padding: 8px;
           background: rgba(210,210,210,.3);
           border-radius: 10px;
-          margin-left: 10px;
+          margin-right: 10px;
           margin-bottom: 10px;
           position: relative;
           img{

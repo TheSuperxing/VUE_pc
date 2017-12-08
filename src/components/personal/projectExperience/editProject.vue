@@ -66,7 +66,7 @@
 				<year-month v-model="project.partakeTimeDown" :min="project.partakeTimeUp" :today="true"></year-month>
 			</li>
 			<li class="duty-wrap">
-				<span class="table-wrap-left">* 公司职责</span>
+				<span class="table-wrap-left">* 项目职责</span>
 				<input type="text" placeholder="请输入公司在项目中所属职位" maxlength="30"  v-model="project.takeOffice"/>
 				<p class="limit-words">{{dutycont}}/30</p>
 			</li>
@@ -80,7 +80,7 @@
 			<li class="img-wrap">
 				<span class="table-wrap-left">图片展示</span>
 				<div class="picListCont">
-					<div class="picList" v-for="(item,$index) in picList[0]">
+					<div class="picList" v-for="(item,$index) in picList">
 						<img :src="item.pic" alt="">
 						<button @click="deletePic(index,$index)"></button>
 					</div>
@@ -198,7 +198,8 @@
 	        index:"",
 	        compalteTime:[],
 			parTakeTime:[],
-			picList:[]
+			picList:[],
+			picNum:"",
 	      }
 	    },
 	   	created(){
@@ -220,7 +221,6 @@
 				async:false,
 			},function(data){
 				data = data.msg;
-//				that.project = data;
 				Vue.set(that,"project",data)
 				that.project.picId=[];
 				console.log(that.project)
@@ -228,12 +228,13 @@
 				console.log(err)
 			})
 			// 获取数据信息
-			this.getPic(that.psnProExpeID)
-			//获取图片
-			if(this.project.ifPublish==false){
-				this.isMine = true;
+			
+		
+			
+			if(that.project.ifPublish==false){
+				that.isMine = true;
 			}else{
-				this.isMine = false;
+				that.isMine = false;
 			}
 	    	function emptyText(text) {
 			    if(text == null||text.length == 0){
@@ -259,56 +260,82 @@
 	    	that.project.takeOffice = emptyText2(that.project.takeOffice);
 	    	that.project.detailDes = emptyText2(that.project.detailDes);
 	    	if(that.project.architectFunctions[0]==""){
-//	    		that.project.architectFunctions = [];
 	    		that.project.architectFunctions[0] = "（暂无信息）"
 	    	}
 	    	//空值的处理
 	    	
-			
 	   	},
-		mounted(){
+		async mounted(){
 			
 			$(document.body).css("overflow-y","scroll");
 			var that = this;
 			//上传图片
-			singleManualUploader({
-				element:"fine-uploader-manual-trigger",
-        		template: "qq-template-manual-trigger",
-				url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
-				picIdCont:that.project.picId,
-				btnPrimary:".btn-primary"
-			})
+			const data = await that.getPic(that.psnProExpeID)
+			if(data.code===0){
+				Vue.set(that,"picList",data.msg)
+			    Vue.set(that,"picNum",data.msg.length)
+			}
+			console.log(that.picList)
+			console.log(that.picNum)
+			console.log(Math.floor(3-that.picNum))
+			if(Math.floor(3-that.picNum)>0){
+				singleManualUploader({
+					element:"fine-uploader-manual-trigger",
+	        		template: "qq-template-manual-trigger",
+					url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+					picIdCont:that.project.picId,
+					btnPrimary:".btn-primary",
+					canUploadNum:Math.floor(3-that.picNum),
+				})
+			}
 	    },
 	    methods:{
 	    	getPic(psnProExpeID){
 				var that=this;
 				var url=MyAjax.urlsy+"/psnProjExpe/findById/"+psnProExpeID;
-				MyAjax.ajax({
-						type: "GET",
+				return new Promise((resolve, reject) => {
+					MyAjax.ajax({
+				        type: "GET",
 						url:url,
 						dataType: "json",
-						async:true,
+						async: true, 
+				    },(data) => {
+				    	resolve(data)
+				    },(err) => {
+				        reject(err);
+					});
+				})
+			},
+			
+			async deletePic(index,$index){
+				var that =this;
+				var url = MyAjax.urlsy+"/psnProjExpe/delPic/"+this.picList[$index].id
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					dataType: "json",
+					async:false,
 					},function(data){
-						Vue.set(that.picList,[0],data.msg)
+						console.log(data)
 					},function(err){
 						console.log(err)
-					})
-			},
-			deletePic(index,$index){
-				var that =this;
-				var url = MyAjax.urlsy+"/psnProjExpe/delPic/"+this.picList[0][$index].id
-				MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-				async:false,
-				},function(data){
-				
-				},function(err){
-				console.log(err)
 				})
-				that.psnProExpeID = that.$route.query.psnId;
-				this.getPic(that.psnProExpeID)
+				const data = await that.getPic(that.psnProExpeID) 
+				if(data.code===0){
+					Vue.set(that,"picList",data.msg)
+				    Vue.set(that,"picNum",data.msg.length)
+				}
+				$("#fine-uploader-manual-trigger").html("")
+				if(Math.floor(3-that.picNum)>0){
+					singleManualUploader({
+						element:"fine-uploader-manual-trigger",
+		        		template: "qq-template-manual-trigger",
+						url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+						picIdCont:that.project.picId,
+						btnPrimary:".btn-primary",
+						canUploadNum:Math.floor(3-that.picNum),
+					})
+				}
 			},
 	    	overlayA(){
 	    		var modal = $('.modal-a')
@@ -334,7 +361,7 @@
 		    	}
 				var that = this;
 			    console.log(JSON.stringify(that.project))
-			    var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe";
+			    var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe/";
 			    $.ajaxSetup({ contentType : 'application/json' });
 			    MyAjax.ajax({
 					type: "POST",

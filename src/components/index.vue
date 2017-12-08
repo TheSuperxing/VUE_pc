@@ -47,7 +47,7 @@
 #indexCont{
 	width: 1200px;
 	min-height: 600px;
-	color: red;
+	color: #FFFFFF;
 	font-size: 20px;
 	margin: 150px auto;
 	 /*background-image: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,1));*/

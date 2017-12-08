@@ -19,7 +19,7 @@
             </ul>
           </div>
           <div v-show="!editEdu.edit[index]">
-            <p v-cloak >{{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
+            <p v-cloak >{{item.schoolTimeUp}} — {{item.schoolTimeDown}}</p>
             <p v-cloak >专业：{{item.professionName}}</p>
             <p v-cloak >学历：{{item.education}}</p>
           </div>
@@ -156,7 +156,7 @@
           </label>
         </li>
         <li class="clear">
-          <span class="wrap-left">在校时间</span>
+          <span class="wrap-left">*在校时间</span>
           <!-- <datepicker v-model="newInputValue.schoolTimeUp"></datepicker> -->
 					<year-month v-model="newInputValue.schoolTimeUp"></year-month> 
           <span>——</span>
@@ -336,6 +336,7 @@
 					dataType: "json",
 					async: false,
 				},function(data){
+					console.log(data.msg)
 					if(data.code==0){
 						that.education = data.msg;
 					}else{
@@ -368,6 +369,12 @@
 						Vue.set(this.empty,"promote",false)
 						//if 有信息 信息为空的提升隐藏
 						for(let i=0;i<that.education.length;i++){
+							if(that.education[i].schoolTimeDown=="0002.12"){
+							 	that.education[i].schoolTimeDown = "至今";
+							}
+							if(that.localEdu[i].schoolTimeDown=="0002.12"){
+							 	that.localEdu[i].schoolTimeDown = "至今";
+							}
 							that.education[i].professionName = emptyText(that.education[i].professionName);//空值判断
 							that.education[i].education = emptyText(that.education[i].education);
 							that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
@@ -384,14 +391,16 @@
 							if(that.education[i].ifVisable==1){
 								that.openOrPrivacy.push(true);
 								that.openOrPrivacyText.push("显示")
-								}else{
-										that.openOrPrivacy.push(false);
-										that.openOrPrivacyText.push("隐藏")
-								}
+							}else{
+									that.openOrPrivacy.push(false);
+									that.openOrPrivacyText.push("隐藏")
+							}
+							
 						}
 					}else{
 						Vue.set(this.empty,"promote",true)
 					}
+					
 	    	
     	},
     	getPicture(index){
@@ -617,6 +626,15 @@
 			keepEditEduExist(index){//编辑状态，提交保存
 				var that = this;
 				console.log(that.localEdu[index])
+				 var date = new Date;
+//				 date.setFullYear(1992,02,05); 
+//				 var month=date.setMonth("00");
+//				 month =(month<10 ? "0"+month:month); 
+//				 var mydate = (year.toString()+'.'+month.toString());
+				 console.log(date)
+				 if(that.localEdu[index].schoolTimeDown=="至今"){
+				 	that.localEdu[index].schoolTimeDown = "0000.00.00";
+				 }
 //      var judgUpDate=this.education[index].schoolName==this.inputValue.schoolText[index]&&this.education[index].info.profession==this.inputValue.professionText[index]&&this.education[index].info.schoolTimeStart==this.inputValue.schoolTimeStart[index]&&this.education[index].info.schoolTimeEnd==this.inputValue.schoolTimeEnd[index]&&this.education[index].info.introduce == this.inputValue.introduce[index];/*数据是否更改的判断条件*/
 				
         var url = "http://10.1.31.16:8080/psnEduBackGround/update"
@@ -689,13 +707,16 @@
           /*添加的数据追加到vuex中*/
           
           /*保存添加后，清除之前添加的数据*/
-          this.editEdu.delete[0].push(true)//解决添加数据后视图部更新
+          this.editEdu.delete.push(true)//解决添加数据后视图部更新
           Vue.set(this.editEdu,"add",false);//如果学校名称为空不能提交，视图不会切换
           this.openOrPrivacy.push(true);//是否显示样式
           this.openOrPrivacyText.push("显示");//是否显示文本信息
         }
         
         var that = this;
+        if(that.newInputValue.schoolTimeDown=="至今"){
+		 	that.newInputValue.schoolTimeDown = "0000.00.00";
+		 }
         console.log(JSON.stringify(that.newInputValue))
         var url = "http://10.1.31.16:8080/psnEduBackGround/insert";
         $.ajaxSetup({ contentType : 'application/json' });

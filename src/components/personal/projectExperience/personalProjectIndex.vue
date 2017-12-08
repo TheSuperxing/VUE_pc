@@ -61,7 +61,7 @@
     		<!--确认删除该项目模态框-->
     	</div>
     	<div class="pr-wrap-a">
-    		<span class="completeTime">Time : {{item.partakeTimeUp}} 至 {{item.partakeTimeDown}}</span>
+    		<span class="completeTime">{{item.partakeTimeUp}} — {{item.partakeTimeDown}}</span>
   			<span class="takeOfficeBar">项目责任：<em class="takeOffice">{{item.takeOffice}}</em></span>
     	</div>
     	<div class="pr-wrap-b">责任描述：{{item.detailDes}}
@@ -159,6 +159,12 @@
 			that.show.tag.length = that.proInfo.length;
 	//  	console.log(this.show.tag.length)
 	    	for(var i=0;i<this.proInfo.length;i++){
+	    		if(that.proInfo[i].partakeTimeDown=="0002.12"){
+					 	that.proInfo[i].partakeTimeDown = "至今";
+					}
+	    		if(that.localProInfo[i].partakeTimeDown=="0002.12"){
+					 	that.localProInfo[i].partakeTimeDown = "至今";
+					}
 	    		that.proInfo[i].takeOffice = emptyText(that.proInfo[i].takeOffice);
 	    	  that.proInfo[i].detailDes = emptyText(that.proInfo[i].detailDes);
 	    		that.show.tag[i]=true;

@@ -262,6 +262,9 @@
 	    	if(that.project.architectFunctions[0]==""){
 	    		that.project.architectFunctions[0] = "（暂无信息）"
 	    	}
+	    	if(that.project.partakeTimeDown=="0002.12"){
+			 	that.project.partakeTimeDown = "至今";
+			}
 	    	//空值的处理
 	    	
 	   	},
@@ -360,6 +363,9 @@
 		    		this.project.architectFunctions = [];
 		    	}
 				var that = this;
+				if(that.project.partakeTimeDown=="至今"){
+				 	that.project.partakeTimeDown = "0000.00";
+				}
 			    console.log(JSON.stringify(that.project))
 			    var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe/";
 			    $.ajaxSetup({ contentType : 'application/json' });

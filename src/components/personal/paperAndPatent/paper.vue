@@ -65,7 +65,8 @@
               <label>
                 <h5>发表时间</h5>
                 <!--<input v-model="localPaper.info.time[index]" type="month">-->
-                <datepicker v-model="localPaper[index].publicTime"></datepicker>
+                <!-- <datepicker v-model="localPaper[index].publicTime"></datepicker> -->
+                <year-month v-model="localPaper[index].publicTime"></year-month>
               </label>
             </li>
             <li class="img-wrap clear">
@@ -174,7 +175,8 @@
           <label>
             <h5>发表时间</h5>
             <!--<input v-model="newPaper.info.time" type="month" placeholder="请输入发表时间">-->
-            <datepicker v-model="newPaper.publicTime"></datepicker>
+            <!-- <datepicker v-model="newPaper.publicTime"></datepicker> -->
+            <year-month v-model="newPaper.publicTime"></year-month> 
           </label>
         </li>
         <li class="img-wrap clear">
@@ -261,6 +263,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import datepicker from "../../units/Datepicker.vue"
+  import YearMonth from "../units/yearMonth.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
@@ -268,7 +271,8 @@
   export default {
     name:"PaperIndex",
     components:{
-      datepicker
+      datepicker,
+      YearMonth
     },
     data(){
       return {
@@ -377,6 +381,7 @@
             type: "GET",
             url:url,
             dataType: "json",
+            async: true,
           },function(data){
             Vue.set(that.show.picList,[index],data.msg)
           },function(err){
@@ -582,7 +587,7 @@
   $themeColor:rgb(242,117,25);
   .paperIndex {
   	padding-bottom: 40px;
-    .date-picker{
+    .year-month{
       width:140px;
       float: left;
       margin-left:22px;

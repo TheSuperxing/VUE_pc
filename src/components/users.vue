@@ -12,7 +12,7 @@
 	import {cookieTool} from "../assets/js/cookieTool.js"
 	import router from "../router"
 	import FooterNav from "./footer.vue";
-  import HeaderNav from "./header.vue";
+  	import HeaderNav from "./header.vue";
 	export default{
 		components:{
 			HeaderNav,

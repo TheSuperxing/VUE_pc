@@ -50,7 +50,6 @@
       }
     },
     mounted(){
-    	console.log(sessionStorage.getItem("state"))
     	if(sessionStorage.getItem("state")==null){
     		sessionStorage.setItem("state",0)
     	}

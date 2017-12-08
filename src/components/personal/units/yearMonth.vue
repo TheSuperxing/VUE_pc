@@ -1,7 +1,7 @@
 <template>
   <div class="year-month">
     <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false"  @click="togglePanel">
-      <div class="input" v-text="inputValue"></div>
+      <div class="input" v-text="value"></div>
       <transition name="fade">
         <img class="cancel-btn" src="../../../assets/img/company/bottom.png"  v-show="showCancel">
       </transition>
@@ -72,10 +72,10 @@ export default {
   },
   props: {
     language: {default: 'ch'},
-    min: {default: '1970-02'},
-    max: {default: '3016-01'},
+    min: {default: '1970.02'},
+    max: {default: '3016.01'},
     value: {
-      type: [String, Array],
+      type: String,
       default: ""
     },
     range: {
@@ -96,10 +96,10 @@ export default {
           this.coordinates = {left: '0', top: `${window.getComputedStyle(this.$el.children[0]).offsetHeight + 4}px`}
         }
         
-        let minArr = this.min.split('-')
+        let minArr = this.min.split('.')
         this.minYear = Number(minArr[0])
         this.minMonth = Number(minArr[1])
-        let maxArr = this.max.split('-')
+        let maxArr = this.max.split('.')
         this.maxYear = Number(maxArr[0])
         this.maxMonth = Number(maxArr[1])
         if(this.range){
@@ -108,8 +108,11 @@ export default {
           }
         }
         if(!this.value){
-          this.inputValue=""
+          this.inputValue=this.value;
+        }else{
+          this.inputValue=this.value;
         }
+
         window.addEventListener('click', this.close)
       })
   },
@@ -125,7 +128,8 @@ export default {
         this.tmpYear = this.tmpYear === 0 ? 0 : this.tmpYear + 1
       },
       now(){
-        this.inputValue = "至今"
+        let value = "至今"
+        this.$emit('input', value)
         this.panelState = false
         this.rangeStart = false
       },
@@ -168,8 +172,8 @@ export default {
           if(!this.range){
             this.year = this.tmpYear
             this.month = this.tmpMonth
-            this.inputValue = `${this.tmpYear}-${('0' + (this.month + 1)).slice(-2)}`
-            //this.$emit('input', value)
+            let value = `${this.tmpYear}.${('0' + (this.month + 1)).slice(-2)}`
+            this.$emit('input', value)
             this.panelState = false
             //console.log(value)
           }
@@ -183,12 +187,12 @@ export default {
   },
   watch: {
     min (v) {
-      let minArr = v.split('-')
+      let minArr = v.split('.')
       this.minYear = Number(minArr[0])
       this.minMonth = Number(minArr[1])
     },
     max (v) {
-      let maxArr = v.split('-')
+      let maxArr = v.split('.')
       this.maxYear = Number(maxArr[0])
       this.maxMonth = Number(maxArr[1])
     },

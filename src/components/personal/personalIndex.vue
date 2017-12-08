@@ -356,7 +356,7 @@
     },
     methods:{
       dataProcess(){//处理是否为空的数据
-      
+
       function emptyText(text) {
         if(text==null||text.length==0){
           return "（暂无消息）";
@@ -376,14 +376,17 @@
         }
         //基础信息部分数据空和非空切换
         var psnEduBackGrounds=this.psnMsg.psnEduBackGrounds;
-        
+       
         if(psnEduBackGrounds.length!=0){
           Vue.set(this.empty,"education",false)
           for (let item in psnEduBackGrounds){
             psnEduBackGrounds[item].professionName=emptyText(psnEduBackGrounds[item].professionName);
             psnEduBackGrounds[item].education=emptyText(psnEduBackGrounds[item].education);
           }
+        }else{
+          //console.log(this.empty.education)
         }
+        
         //教育背景是否显示
         var psnWorkExperiences=this.psnMsg.psnWorkExperiences;
         if(psnWorkExperiences.length!=0){
@@ -452,7 +455,7 @@
           for (let item in psnPatents){
             psnPatents[item].patentName=emptyText(psnPatents[item].patentName);
             if((psnPatents[item].validityTermS!=null||psnPatents[item].validityTermS.length!=0)&&(psnPatents[item].validityTermE!=null||psnPatents[item].validityTermE.length!=0)){
-              this.validityTerm[item]= psnPatents[item].validityTermS+"-"+psnPatents[item].validityTermE
+              this.validityTerm[item]= psnPatents[item].validityTermS+"——"+psnPatents[item].validityTermE
             }else{
               this.validityTerm[item]="（暂无消息）";
             }
@@ -509,7 +512,8 @@
           async:false,
         },function(data){
           if(data.code==0){
-            Vue.set(that,"psnMsg",data.msg);
+            that.psnMsg=data.msg;
+            //Vue.set(that,"psnMsg",data.msg);
           }
         },function(err){
           if(err.status!=200){

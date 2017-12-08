@@ -1,5 +1,5 @@
 <template>
-  <div class="personalLogin" @keydown="keyLogin()">
+  <div class="personalLogin" @keydown="keyLogin($event)">
     <ul class="loginInput">
       <li>
         <input v-model="personalLoginInput.tel" type="text" placeholder="手机号" @blur="personTelCfm" class="tel" autofocus/>
@@ -90,7 +90,6 @@
 //      that.personalLoginInput.messageConfirm=event.currentTarget.innerText
       	if(that.personalLoginInput.tel.trim().length!=0&&that.personalLoginInput.messageConfirm.trim().length!=0
       	&&that.personalLoginInput.picConfirm.trim().length!=0){
-      		console.log(that.personalLoginInput.messageConfirm)
       		MyAjax.ajax({
 						type: "POST",
 						url:url,
@@ -98,12 +97,12 @@
 						dataType: "json",
 						async:false,
 					}, function(data){
-						console.log(data)
+						//console.log(data)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
-              console.log(data.code)
-              //window.location.hash="/index"
-							router.push("/index")
+              console.log("success")
+              window.location.hash="/index"
+							//router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
 //								case "100008":
@@ -129,10 +128,12 @@
 							}
 						}
 					},function(err){
+            console.log("error")
 						console.log(err)
 					})
       	}
-      	
+        
+        
         
       },
       random(){
@@ -244,14 +245,17 @@
         //   }
         // });
      },
-		 keyLogin(){//enter键登录事件
-		 	var event = event || window.event;  
+     keyLogin($event){//enter键登录事件
+      var event = $event || window.event;  
 		 	if(event.keyCode==13){ 
-		 		console.log("222")
 		     this.login()
-		     event.returnValue = false;    
-		     return false;
-		  }
+         event.returnValue = false;    
+         event.cancelBubble=true;
+         event.preventDefault();
+         //event.stopProgagation();
+         return false;
+      } 
+
 		 },
      keydown(event){
        this.personalLoginInput.messageConfirm=event.currentTarget.innerText

@@ -124,7 +124,7 @@
     methods:{
     	updateData(){
     		var that = this;
-				var url = MyAjax.urlsy+"/psnProjExpe/findProjExpe";//暂时先写成这样
+			var url = MyAjax.urlsy+"/psnProjExpe/findProjExpe";//暂时先写成这样
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -133,9 +133,11 @@
 	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
-					console.log(data)
-					data = data.msg;
-					that.proInfo = data;
+					if(data.code==0){
+						that.proInfo = data.msg;
+					}else{
+						console.log("错误返回");
+					}
 				},function(err){
 					console.log(err)
 				})

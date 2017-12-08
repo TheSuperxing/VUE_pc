@@ -69,11 +69,11 @@
               <label>
                 <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
                 <!--<input v-model="localPatent.info.time[index]" type="month">-->
-                <datepicker v-model="localPatent[index].validityTermS"></datepicker>
+                <!-- <datepicker v-model="localPatent[index].validityTermS"></datepicker> -->
                 <year-month v-model="localPatent[index].validityTermS"></year-month>
                 <span>—</span>
                 <!-- <datepicker v-model="localPatent[index].validityTermE"></datepicker> -->
-                <year-month :value="[localPatent[index].validityTermE]" :min="localPatent[index].validityTermS" :today="true"></year-month>
+                <year-month v-model="localPatent[index].validityTermE" :min="localPatent[index].validityTermS" :today="true"></year-month>
               </label>
             </li>
             <li class="img-wrap clear">
@@ -182,9 +182,11 @@
           <label>
             <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
             <!--<input v-model="newPatent.info.time" type="month" placeholder="请输入发表时间">-->
-            <datepicker v-model="newPatent.validityTermS"></datepicker>
+            <!-- <datepicker v-model="newPatent.validityTermS"></datepicker> -->
+            <year-month v-model="newPatent.validityTermS"></year-month> 
             <span>—</span>
-            <datepicker v-model="newPatent.validityTermE"></datepicker>
+            <!-- <datepicker v-model="newPatent.validityTermE"></datepicker> -->
+            <year-month v-model="newPatent.validityTermE" :min="newPatent.validityTermS" :today="true"></year-month>
           </label>
         </li>
         <li class="img-wrap clear">
@@ -386,6 +388,7 @@
             type: "GET",
             url:url,
             dataType: "json",
+            async: true,
           },function(data){
             Vue.set(that.show.picList,[index],data.msg)
           },function(err){
@@ -589,7 +592,7 @@
   $themeColor:rgb(242,117,25);
   .patentIndex {
   	padding-bottom: 40px;
-    .date-picker{
+    .year-month{
       width:140px;
       float: left;
       margin-left:22px;
@@ -749,8 +752,9 @@
                 height: 31px;
                 line-height: 31px;
               }
-              .date-picker{
+              .year-month{
                 float: left;
+                margin-left: 22px;
                 margin-right: 22px;
               }
             }
@@ -850,7 +854,7 @@
             height: 31px;
             line-height: 31px;
           }
-          .date-picker{
+          .year-month{
             float: left;
             margin-right: 22px;
           }

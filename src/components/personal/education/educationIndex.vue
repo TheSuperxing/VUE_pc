@@ -10,7 +10,7 @@
       <div class="eduInfo" v-for="(item,index) in education" v-show="!editEdu.add">
 
         <div class="eduInfoContainer clear" v-show="editEdu.delete[0][index]">
-          <div v-show="!editEdu.edit[0][index]" class="clear">
+          <div v-show="!editEdu.edit[index]" class="clear">
             <h4 v-cloak>{{item.schoolName}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!openOrPrivacy[index]}" v-on:click="openOrPrivacyInfo(index)">{{openOrPrivacyText[index]}}</li>
@@ -18,33 +18,35 @@
               <li v-on:click="deleteEduExist(index)">删除</li>
             </ul>
           </div>
-          <div v-show="!editEdu.edit[0][index]">
-            <p v-cloak >Time :  {{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
+          <div v-show="!editEdu.edit[index]">
+            <p v-cloak >{{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
             <p v-cloak >专业：{{item.professionName}}</p>
             <p v-cloak >学历：{{item.education}}</p>
           </div>
-          <ul class="morePics" v-if="!show.tag[index]" v-show="!editEdu.edit[0][index]">
+          <ul class="morePics" v-if="!show.tag[index]" v-show="!editEdu.edit[index]">
 						<li v-for="item in picArr[index]">
 							<img :src="item.pic"/>
 						</li>
 								
 		    	</ul>
-					<div class="viewMore" v-show="!editEdu.edit[0][index]">
+					<div class="viewMore" v-show="!editEdu.edit[index]">
 						<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
 							
 								<span>{{updowntxt[index]}}</span>
 						</p>
 					</div>
 
-          <ul class="editEduInfo" v-show="editEdu.edit[0][index]">
+          <ul class="editEduInfo" v-show="editEdu.edit[index]">
             <li class="clear">
               <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)"><span>{{textLeng.schoolName[index]}}/30</span>
             </li>
             <li class="clear">
               <span class="wrap-left">*在校时间</span>
-              <datepicker v-model="localEdu[index].schoolTimeUp"></datepicker>
+              <!-- <datepicker v-model="localEdu[index].schoolTimeUp"></datepicker> -->
+							<year-month v-model="localEdu[index].schoolTimeUp"></year-month> 
               <span>——</span>
-              <datepicker v-model="localEdu[index].schoolTimeDown"></datepicker>
+              <!-- <datepicker v-model="localEdu[index].schoolTimeDown"></datepicker> -->
+							<year-month v-model="localEdu[index].schoolTimeDown" :min="localEdu[index].schoolTimeUp" :today="true"></year-month>
             </li>
             <li class="clear">
               <label>
@@ -155,10 +157,12 @@
         </li>
         <li class="clear">
           <span class="wrap-left">在校时间</span>
-          <datepicker v-model="newInputValue.schoolTimeUp"></datepicker>
+          <!-- <datepicker v-model="newInputValue.schoolTimeUp"></datepicker> -->
+					<year-month v-model="newInputValue.schoolTimeUp"></year-month> 
           <span>——</span>
-          <datepicker v-model="newInputValue.schoolTimeDown" v-bind:value="{type:['month']}"></datepicker>
-        </li>
+          <!-- <datepicker v-model="newInputValue.schoolTimeDown" v-bind:value="{type:['month']}"></datepicker> -->
+					<year-month v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
+				</li>
         <li class="clear">
           <label>
             <span class="wrap-left">专业名称</span> <input v-model="newInputValue.professionName" v-on:input="addProfession" type="text" placeholder="请输入专业名称"><span>{{newTextLeng.profession[0]}}/30</span>
@@ -261,11 +265,13 @@
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
+	import YearMonth from "../units/yearMonth.vue"
 
   export default {
     name: 'educationIndex',
     components:{
-      datepicker,
+			datepicker,
+			YearMonth
     },
     data:function() {
       return {
@@ -275,7 +281,7 @@
         show:{
         	tag:[],
         },
-        editEdu:{add:false,edit:[[]],delete:[[]]},
+        editEdu:{add:false,edit:[],delete:[]},
         //状态部分
         textLeng:{schoolName:[],profession:[]},
         newTextLeng:{schoolName:[0],profession:[0]},
@@ -313,6 +319,11 @@
     mounted(){
 			
 		this.updateData();
+		if(this.education.length==0){
+			Vue.set(this.empty,"promote",true)//是否显示教育背景信息尚未添加
+		}else {
+			Vue.set(this.empty,"promote",false)//是否显示教育背景信息尚未添加
+		}
 		//上传图片
     },
     methods:{
@@ -327,9 +338,11 @@
 	//				content-type: "text/plain;charset=UTF-8",
 					async: false,
 				},function(data){
-					console.log(data)
-					data = data.msg;
-					that.education = data;
+					if(data.code==0){
+						that.education = data.msg;
+					}else{
+						console.log("错误返回");
+					}
 				},function(err){
 					console.log(err)
 				})
@@ -342,43 +355,45 @@
 			  }
 	    	
 	        that.localEdu=JSON.parse(JSON.stringify(that.education));
-	    	that.openOrPrivacy = [];
+	    		that.openOrPrivacy = [];
 	        that.openOrPrivacyText = [];
 	        that.fineUploaderId = [];
 	        that.qqTemplate = [];
-	        that.editEdu.edit[0]=[];
 	        that.editEdu.delete[0] = [];
 	        that.textLeng.schoolName = [];
 	        that.textLeng.profession = [];
 	        that.buttonColor.exist = [];
 	        that.show.tag=[];
-	    	that.updowntxt=[];
-	    	if(this.education.length!==0){
-			    Vue.set(this.empty,"promote",false)
-			    //if 有信息 信息为空的提升隐藏
-			}
-	    	for(let i=0;i<that.education.length;i++){
-	    		that.education[i].professionName = emptyText(that.education[i].professionName);//空值判断
-	    		that.education[i].education = emptyText(that.education[i].education);
-	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
-	    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
-	    		that.editEdu.edit[0].push(false);
-	            that.editEdu.delete[0].push(true);
-	            that.textLeng.schoolName.push(0);
-	            that.textLeng.profession.push(0);
-	            that.buttonColor.exist.push(true);
-	            Vue.set(that.textLeng.schoolName,[i],that.localEdu[i].schoolName.length)
-          		Vue.set(that.textLeng.profession,[i],that.localEdu[i].professionName.length)
-	    		that.show.tag[i]=true;
-	    		that.updowntxt.push("展开查看更多");
-	    		if(that.education[i].ifVisable==1){
-	    			that.openOrPrivacy.push(true);
-	    			that.openOrPrivacyText.push("显示")
-		        }else{
-		            that.openOrPrivacy.push(false);
-	    			that.openOrPrivacyText.push("隐藏")
-		        }
-	    	}
+	    		that.updowntxt=[];
+					if(this.education.length!=0){
+						Vue.set(this.empty,"promote",false)
+						//if 有信息 信息为空的提升隐藏
+						for(let i=0;i<that.education.length;i++){
+							that.education[i].professionName = emptyText(that.education[i].professionName);//空值判断
+							that.education[i].education = emptyText(that.education[i].education);
+							that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
+							that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
+							that.editEdu.edit.push(false);
+							that.editEdu.delete[0].push(true);
+							that.textLeng.schoolName.push(0);
+							that.textLeng.profession.push(0);
+							that.buttonColor.exist.push(true);
+							Vue.set(that.textLeng.schoolName,[i],that.localEdu[i].schoolName.length)
+							Vue.set(that.textLeng.profession,[i],that.localEdu[i].professionName.length)
+							that.show.tag[i]=true;
+							that.updowntxt.push("展开查看更多");
+							if(that.education[i].ifVisable==1){
+								that.openOrPrivacy.push(true);
+								that.openOrPrivacyText.push("显示")
+								}else{
+										that.openOrPrivacy.push(false);
+										that.openOrPrivacyText.push("隐藏")
+								}
+						}
+					}else{
+						Vue.set(this.empty,"promote",true)
+					}
+	    	
     	},
     	getPicture(index){
     		var that = this;
@@ -387,15 +402,15 @@
     		return new Promise((resolve, reject) => {
 			    MyAjax.ajax({
 			      type: "GET",
-					url:url,
-					dataType: "json",
-					async: true, 
-			    },(data) => {
-			        resolve(data);
-			    },(err) => {
-			        reject(err);
-			    });
-			});
+						url:url,
+						dataType: "json",
+						async: true, 
+						},(data) => {
+								resolve(data);
+						},(err) => {
+								reject(err);
+						});
+					});
     	},
     	upDown(index){
     		var that = this;
@@ -412,7 +427,6 @@
     			Vue.set(that.picArr,[index],data.msg)
 				Vue.set(that.picNum,[index],that.picArr[index].length)
     		});
-    		    		console.log(that.picNum[index])
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
@@ -425,11 +439,11 @@
         var that=this;
         singleManualUploader({
 	        element:"fine-uploader-manual-trigger",
-			template: "qq-template-manual-trigger",
+					template: "qq-template-manual-trigger",
 	        url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
 	        picIdCont:that.newInputValue.picId,
 	        btnPrimary:".btn-primary",
-			canUploadNum:3,
+					canUploadNum:3,
 	      })
         
       },
@@ -498,7 +512,7 @@
       	}
       	
     	console.log(that.picNum[index])
-        Vue.set(that.editEdu.edit[0],[index],true);
+        Vue.set(that.editEdu.edit,[index],true);
         //编辑和显示的切换
         if(that.localEdu[index].schoolName.length!=0){
           Vue.set(that.buttonColor.exist,[index],false)
@@ -556,9 +570,8 @@
 	    })
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
-        Vue.set(this.editEdu.edit[0],[index],false);
-        $("#"+this.fineUploaderId[index]).html("")
-        //console.log("ok")
+        Vue.set(this.editEdu.edit,[index],false);
+				$("#"+this.fineUploaderId[index]).html("");
       },
       deleteEduExist(index){//删除按钮事件
 //      Vue.set(this.editEdu.delete[0],[index],false);
@@ -601,35 +614,37 @@
         }
       },
       //以上是改变数据
-      keepEditEduExist(index){//编辑状态，提交保存
-				
-//      var judgUpDate=this.education[index].schoolName==this.inputValue.schoolText[index]&&this.education[index].info.profession==this.inputValue.professionText[index]&&this.education[index].info.schoolTimeStart==this.inputValue.schoolTimeStart[index]&&this.education[index].info.schoolTimeEnd==this.inputValue.schoolTimeEnd[index]&&this.education[index].info.introduce == this.inputValue.introduce[index];/*数据是否更改的判断条件*/
+			keepEditEduExist(index){//编辑状态，提交保存
 				var that = this;
+				console.log(that.localEdu[index])
+//      var judgUpDate=this.education[index].schoolName==this.inputValue.schoolText[index]&&this.education[index].info.profession==this.inputValue.professionText[index]&&this.education[index].info.schoolTimeStart==this.inputValue.schoolTimeStart[index]&&this.education[index].info.schoolTimeEnd==this.inputValue.schoolTimeEnd[index]&&this.education[index].info.introduce == this.inputValue.introduce[index];/*数据是否更改的判断条件*/
+				
         var url = "http://10.1.31.16:8080/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
-			type: "POST",
-			url:url,
-			data: JSON.stringify(that.localEdu[index]),
-			dataType: "json",
-			contentType:"application/json;charset=utf-8",
-			async: true,
-		},function(data){
-			console.log(data)
-			if(data.code === "200001"){
-				console.log(data.msg)
-			}else{
-				that.updateData();
-				Vue.set(that.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
-			}
-		},function(err){
-			console.log(err)
-		})//更新到服务器
-		//保存之后再重新拉取数据
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.localEdu[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: true,
+				},function(data){
+					console.log(data)
+					if(data.code === "200001"){
+						console.log(data.msg)
+					}else{
+						that.updateData();
+						Vue.set(that.editEdu.edit,[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+				//保存之后再重新拉取数据
 				
         //提交编辑后的数据
-        $("#"+this.fineUploaderId[index]).html("")
-
+				$("#"+this.fineUploaderId[index]).html("")
+				
+				console.log(that.localEdu[index])
       },
       //提交数据
       cancellEditEdu(){//添加模式下，取消编辑
@@ -917,7 +932,7 @@
             float: left;
             line-height: 35px;
           }
-          .date-picker{
+          .year-month{
             width:140px;
             float: left;
           }

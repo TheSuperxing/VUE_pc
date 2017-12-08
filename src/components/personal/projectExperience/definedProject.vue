@@ -27,7 +27,8 @@
 			</li>
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 建成时间</span>
-				<datepicker class="datePicker" v-model="projectInfo.completeTime"></datepicker>
+				<!-- <datepicker class="datePicker" v-model="projectInfo.completeTime"></datepicker> -->
+				<year-month v-model="projectInfo.completeTime"></year-month> 
 				<alertTip v-if="showAlert.completeTime" :showHide="showAlert.completeTime" @closeTip="closeTip" :alertText="alertText.completeTime"></alertTip>
 				<div class="timeGray" v-if="complated">
 					<span class="table-wrap-left">* 建成时间</span>
@@ -52,9 +53,11 @@
 			</li>
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 参与时间</span>
-				<datepicker class="datePicker" v-model="projectInfo.partakeTimeUp"></datepicker>
+				<!-- <datepicker class="datePicker" v-model="projectInfo.partakeTimeUp"></datepicker> -->
+				<year-month v-model="projectInfo.partakeTimeUp"></year-month> 
 				<span class="heng"></span>
-				<datepicker class="datePicker" v-model="projectInfo.partakeTimeDown"></datepicker>
+				<!-- <datepicker class="datePicker" v-model="projectInfo.partakeTimeDown"></datepicker> -->
+				<year-month v-model="projectInfo.partakeTimeDown" :min="projectInfo.partakeTimeUp" :today="true"></year-month>
 				<alertTip v-if="showAlert.parTakeTime" :showHide="showAlert.parTakeTime" @closeTip="closeTip" :alertText="alertText.parTakeTime"></alertTip>
 			</li>
 			<li class="duty-wrap">
@@ -158,6 +161,7 @@
 	import router from "../../../router"
 	import ProvincesCity from "../units/province-city-county.vue"
 	import Datepicker from "../units/Datepicker.vue"
+	import YearMonth from "../units/yearMonth.vue"
 	import alertTip from "../units/alertTip.vue"
 	import qq from "fine-uploader"
     import MyAjax from "../../../assets/js/MyAjax.js"
@@ -168,7 +172,8 @@
 	    components:{
 	      ProvincesCity,
 	      Datepicker,
-	      alertTip
+		  alertTip,
+		  YearMonth
 	    },
 	    data:function(){
 	      return {
@@ -400,6 +405,12 @@ $activeColor: rgb(242,117,25);
 	width: 710px;
 	float: right;
 }
+.year-month{
+	height: 35px;
+	float: left;
+	width: 140px;
+	margin-right: 20px;
+}
 .editProject{
 	width:940px; 
 	padding: 40px;
@@ -609,12 +620,6 @@ $activeColor: rgb(242,117,25);
 					height: 35px;
 					line-height: 35px;
 					position: relative;
-					.datePicker{
-						height: 35px;
-						float: left;
-						width: 140px;
-						margin-right: 20px;
-					}
 					.heng{
 						display: inline-block;
 						vertical-align: middle;

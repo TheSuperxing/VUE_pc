@@ -1,9 +1,9 @@
 <template>
   <div class="date-picker">
-    <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false">
+    <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false" @click="togglePanel">
       <div class="input" v-text="range ? value[0] + ' -- ' + value[1] : value"></div>
       <transition name="fade">
-        <img class="cancel-btn" src="../../../assets/img/company/bottom.png"  v-show="showCancel"  @click="togglePanel">
+        <img class="cancel-btn" src="../../../assets/img/company/bottom.png"  v-show="showCancel">
       </transition>
     </div>
     <transition name="toggle">

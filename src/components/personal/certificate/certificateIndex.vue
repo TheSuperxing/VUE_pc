@@ -305,6 +305,7 @@
     mounted(){
     	this.updateData();
     	//上传图片
+      console.log(this.certificate)
 			
       if(this.certificate.length==0){
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
@@ -351,9 +352,11 @@
 	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
-					console.log(data)
-					data = data.msg;
-					that.certificate = data;
+          if(data.code==0){
+					  that.certificate = data.msg;
+					}else{
+						console.log("错误返回");
+					}
 				},function(err){
 					console.log(err)
 				})

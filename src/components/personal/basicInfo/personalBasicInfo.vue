@@ -92,8 +92,8 @@
           <p><input type="text" v-model="localBaseInfo.psnMail" ></p>
         </li>
         <li class="cancelSubmit clear">
-          <button v-on:click="cancelEdit">取消</button>
           <button v-on:click="submitEdit" v-bind:class="{submitBgColor:reveal.submitBgColor}">提交</button>
+          <button v-on:click="cancelEdit">取消</button>
         </li>
       </ul>
       <div class="realName">
@@ -223,9 +223,7 @@
         },
         noBaseInfo:false,
         haveUploaded:false,//实名认证图片已经上传，false代表还没上传
-        baseInfo:{
-        	
-        },
+        baseInfo:[],
         localBaseInfo:{
           nickName:"",
           psnName:"",
@@ -319,9 +317,8 @@
 	//				contentType:"application/json;charset=utf-8",
 					async:false,
 				},function(data){
-					console.log(data)
 					if(data.code==0){
-						that.baseInfo = data.msg;
+            that.baseInfo = data.msg;
 						//判断用户的全部信息为空值
 			    	if(that.baseInfo.sex=="0"){
 			    		that.baseInfo.sex = "男"
@@ -339,13 +336,13 @@
 					  
 					  if(that.baseInfo.ifRNA){
 					    that.reveal.throughRealName=true;
-					  }
-					  that.baseInfo.nickName=emptyText(this.baseInfo.nickName);
-			      that.baseInfo.psnName=emptyText(this.baseInfo.psnName);
-			      that.baseInfo.sex=emptyText(this.baseInfo.sex);
-			      that.baseInfo.dateOfBirth=emptyText(this.baseInfo.dateOfBirth);
-			      that.baseInfo.psnMail=emptyText(this.baseInfo.psnMail);
-			      that.baseInfo.phoneNumber=emptyText(this.baseInfo.phoneNumber);
+            }
+					  that.baseInfo.nickName=emptyText(that.baseInfo.nickName);
+			      that.baseInfo.psnName=emptyText(that.baseInfo.psnName);
+			      that.baseInfo.sex=emptyText(that.baseInfo.sex);
+			      that.baseInfo.dateOfBirth=emptyText(that.baseInfo.dateOfBirth);
+			      that.baseInfo.psnMail=emptyText(that.baseInfo.psnMail);
+			      that.baseInfo.phoneNumber=emptyText(that.baseInfo.phoneNumber);
 			      //如果得到的数据为空，进行暂没有消息处理
 						that.reveal.openOrPrivacy = [];
 			      that.localBaseInfo=JSON.parse(JSON.stringify(that.baseInfo));
@@ -491,7 +488,7 @@
 	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
 	    	if(this.localBaseInfo.sex=='男'){
-	    		this.localBaseInfo.sex = "2";
+	    		this.localBaseInfo.sex = "0";
 	    	}else if(this.localBaseInfo.sex=='女'){
 	    		this.localBaseInfo.sex = "1";
 	    	}
@@ -643,10 +640,10 @@
             padding-left:25px;
             min-width:95px;
             text-align: right;
-            /*span{
+            span{
               color: $themeColor;
               float: left;
-            }*/
+            }
           }
           p{
           	height: 38px;

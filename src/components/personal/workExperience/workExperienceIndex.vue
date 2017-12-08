@@ -91,9 +91,11 @@
             </li>
             <li class="clear">
               <h5>*&nbsp;任职时间</h5>
-              <datepicker v-model="localWorkExperience[index].ocupationTimeUp"></datepicker>
+              <!-- <datepicker v-model="localWorkExperience[index].ocupationTimeUp"></datepicker> -->
+              <year-month v-model="localWorkExperience[index].ocupationTimeUp"></year-month> 
               <span></span>
-              <datepicker v-model="localWorkExperience[index].ocupationTimeDown"></datepicker>
+              <!-- <datepicker v-model="localWorkExperience[index].ocupationTimeDown"></datepicker> -->
+              <year-month v-model="localWorkExperience[index].ocupationTimeDown" :min="localWorkExperience[index].ocupationTimeUp" :today="true"></year-month>
             </li>
             <li class="textArea clear">
               <h5>职位描述</h5>
@@ -130,9 +132,11 @@
         </li>
         <li class="clear">
           <h5>*&nbsp;任职时间</h5>
-          <datepicker v-model="newWorkExperience.ocupationTimeUp"></datepicker>
+          <!-- <datepicker v-model="newWorkExperience.ocupationTimeUp"></datepicker> -->
+          <year-month v-model="newWorkExperience.ocupationTimeUp"></year-month> 
           <span></span>
-          <datepicker v-model="newWorkExperience.ocupationTimeDown"></datepicker>
+          <!-- <datepicker v-model="newWorkExperience.ocupationTimeDown"></datepicker> -->
+          <year-month v-model="newWorkExperience.ocupationTimeDown" :min="newWorkExperience.ocupationTimeUp" :today="true"></year-month>
         </li>
         <li class="clear">
           <h5>职位描述</h5>
@@ -153,12 +157,14 @@
   import ModalOpp from "../../../assets/js/modalOpp"
   import {mapState} from "vuex"
   import Datepicker from "../units/Datepicker.vue"
+  import YearMonth from "../units/yearMonth.vue"
   import MyAjax from "../../../assets/js/MyAjax.js"
   
   export default {
     name:"workExperienceIndex",
     components:{
-      Datepicker
+      Datepicker,
+      YearMonth
     },
     data(){
       return {
@@ -243,12 +249,14 @@
 					dataType: "json",
 					async:false,
 				},function(data){
-					console.log(data)
-					data = data.msg;
-					that.workExperience = data;
-					if(that.workExperience.length==0){
-	          Vue.set(that.reveal,"empty",true)
-	        }
+          if(data.code==0){
+            that.workExperience = data.msg;
+            if(that.workExperience.length==0){
+              Vue.set(that.reveal,"empty",true)
+            }
+					}else{
+						console.log("错误返回");
+					}
 				},function(err){
 					console.log(err)
 				})

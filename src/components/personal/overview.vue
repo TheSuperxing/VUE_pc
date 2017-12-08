@@ -122,7 +122,7 @@
 //			if(this.personalMessage.teamExperience.length==0){
 //				this.stateNone.projectExperience=true;
 //			}
-			console.log(this.stateNone)
+			//console.log(this.stateNone)
 		}
 		
 	}

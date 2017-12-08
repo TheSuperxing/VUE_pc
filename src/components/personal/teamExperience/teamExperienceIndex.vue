@@ -74,11 +74,9 @@
           }else{
             console.log("错误返回");
           }
-          
         },function(err){
           console.log(err)
         })
-        console.log(that.teamExperience[0].ifCer)
       },
       openOrPrivacy(index){
         Vue.set(this.reveal.abs,[index],!this.reveal.abs[index]);

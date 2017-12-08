@@ -7,7 +7,7 @@
     </div>
     <!--personaltitle结束-->
     <div class="jobInfoContainer" v-show="reveal.addJobInfo">
-      <div class="personal-empty" v-if="reveal.empty">（您尚未添加执业资格信息）</div>
+      <div class="personal-empty" v-if="reveal.empty">（您尚未添加职称信息）</div>
       <!--显示、编辑已存在的信息开始-->
       <div class="jobInfoInfo" v-for="(item,index) in titleInfo">
         <!--显示信息列表开始-->
@@ -79,8 +79,8 @@
             <li class="clear">
               <label>
                 <h5>评定日期</h5>
-           			<datepicker class="datePicker" v-model="localTitleInfo[index].assessmentTime"></datepicker>
-                	
+           			<!-- <datepicker class="datePicker" v-model="localTitleInfo[index].assessmentTime"></datepicker> -->
+                <year-month v-model="localTitleInfo[index].assessmentTime"></year-month> 	
               </label>
             </li>
             <li class="clear">
@@ -300,6 +300,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import Datepicker from "../units/Datepicker.vue"
+  import YearMonth from "../units/yearMonth.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
@@ -308,7 +309,8 @@
   export default {
     name:"titleInfo",
     components:{
-      Datepicker
+      Datepicker,
+      YearMonth
     },
     data(){
       return {
@@ -357,7 +359,6 @@
       }else {
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
         for(let i=0;i<this.titleInfo.length;i++){
-          
           this.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
         }
       }
@@ -409,9 +410,11 @@
 	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
-					console.log(data)
-					data = data.msg;
-					that.titleInfo = data;
+          if(data.code==0){
+						that.titleInfo = data.msg;
+					}else{
+						console.log("错误返回");
+					}
 				},function(err){
 					console.log(err)
 				})
@@ -430,7 +433,8 @@
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	that.show.tag=[];
-	    	that.updowntxt=[];
+        that.updowntxt=[];
+        
 	    	for(var i=0;i<that.titleInfo.length;i++){
 	    		that.titleInfo[i].titleLevel = emptyText(that.titleInfo[i].titleLevel);
 	    		that.titleInfo[i].assessmentTime = emptyText(that.titleInfo[i].assessmentTime);
@@ -668,7 +672,7 @@
     padding: 0 40px;
     background: $bfColor;
     min-height: 671px;
-    .date-picker{
+    .year-month{
       width:140px;
       float: left;
       margin-left:22px;

@@ -63,7 +63,8 @@
             <li class="clear">
               <label>
                 <h5>评定日期</h5>
-                <datepicker v-model="localAward[index].awardingTime"></datepicker>
+                <!-- <datepicker v-model="localAward[index].awardingTime"></datepicker> -->
+                <year-month v-model="localAward[index].awardingTime"></year-month>
               </label>
             <li class="img-wrap clear">
 							<span class="wrap-left">图片展示</span>
@@ -171,7 +172,8 @@
           <label>
             <h5>获奖时间</h5>
             <!--<input v-model="newAward.info.time" type="month" placeholder="请输入注册单位">-->
-            <datepicker v-model="newAward.time"></datepicker>
+            <!-- <datepicker v-model="newAward.time"></datepicker> -->
+            <year-month v-model="newAward.time"></year-month>
           </label>
         </li>
         <li class="img-wrap clear">
@@ -258,6 +260,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import datepicker from "../../units/Datepicker.vue"
+  import YearMonth from "../units/yearMonth.vue"
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
@@ -266,7 +269,8 @@
   export default {
     name:"awardIndex",
     components:{
-      datepicker
+      datepicker,
+      YearMonth
     },
     data(){
       return {
@@ -626,7 +630,7 @@
     background: $bfColor;
     min-height: 671px;
     padding-bottom: 40px;
-    .date-picker{
+    .year-month{
       width:140px;
       float: left;
       margin-left:22px;

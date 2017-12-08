@@ -59,9 +59,11 @@
 		<ul class="modify-table-wrap">
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 参与时间</span>
-				<datepicker class="datePicker" v-model="project.partakeTimeUp"></datepicker>
+				<!-- <datepicker class="datePicker" v-model="project.partakeTimeUp"></datepicker> -->
+				<year-month v-model="project.partakeTimeUp"></year-month> 
 				<span class="heng"></span>
-				<datepicker class="datePicker" v-model="project.partakeTimeDown"></datepicker>
+				<!-- <datepicker class="datePicker" v-model="project.partakeTimeDown"></datepicker> -->
+				<year-month v-model="project.partakeTimeDown" :min="project.partakeTimeUp" :today="true"></year-month>
 			</li>
 			<li class="duty-wrap">
 				<span class="table-wrap-left">* 公司职责</span>
@@ -169,6 +171,7 @@
 	import {mapState} from "vuex"
 	import 	Modal from "../../../assets/js/modal.js"
 	import Datepicker from "../units/Datepicker.vue"
+	import YearMonth from "../units/yearMonth.vue"
 	import router from "../../../router"
 	import qq from "fine-uploader"
     import MyAjax from "../../../assets/js/MyAjax.js"
@@ -177,7 +180,8 @@
 	export default {
 	    name:"editProject",
 	    components:{
-	      Datepicker
+		  Datepicker,
+		  YearMonth
 	    },
 	    data:function(){
 	      return {
@@ -380,19 +384,17 @@ $activeColor: rgb(242,117,25);
 	width: 720px;
 	float: right;
 }
-
-
-
 #fine-uploader-manual-trigger .qq-upload-button {
     margin-right: 15px;
 }
-
-
-
 #fine-uploader-manual-trigger .qq-uploader .qq-total-progress-bar-container {
     width: 60%;
 }
-
+.year-month{
+	float: left;
+	width: 140px;
+	margin-right: 20px;
+}
 .editProject{
 	width:940px; 
 	padding: 40px;
@@ -621,11 +623,6 @@ $activeColor: rgb(242,117,25);
 				&.time-wrap{
 					height: 35px;
 					line-height: 35px;
-					.datePicker{
-						float: left;
-						width: 140px;
-						margin-right: 20px;
-					}
 					.heng{
 						display: inline-block;
 						vertical-align: middle;

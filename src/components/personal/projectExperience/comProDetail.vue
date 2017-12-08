@@ -61,9 +61,11 @@
 			<ul class="modify-table-wrap" v-if="editShow">
 				<li class="time-wrap">
 					<span class="table-wrap-left">* 参与时间</span>
-					<datepicker class="datePicker" v-model="project.parTakeTime_S"></datepicker>
+					<!-- <datepicker class="datePicker" v-model="project.parTakeTime_S"></datepicker> -->
+					<year-month v-model="project.parTakeTime_S"></year-month> 
 					<span class="heng"></span>
-					<datepicker class="datePicker" v-model="project.parTakeTime_E"></datepicker>
+					<!-- <datepicker class="datePicker" v-model="project.parTakeTime_E"></datepicker> -->
+					<year-month v-model="project.parTakeTime_E" :min="project.parTakeTime_S" :today="true"></year-month>
 				</li>
 				<li class="duty-wrap">
 					<span class="table-wrap-left">* 公司职责</span>
@@ -135,11 +137,13 @@
 	import {mapState} from "vuex"
 	import 	Modal from "../../../assets/js/modal.js"
 	import Datepicker from "../units/Datepicker.vue"
+	import YearMonth from "../units/yearMonth.vue"
 	import router from "../../../router"
 	export default {
 	    name:"comProDetail",
 	    components:{
-	      Datepicker
+		  Datepicker,
+		  YearMonth
 	    },
 	    data:function(){
 	      return {

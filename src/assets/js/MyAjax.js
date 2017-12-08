@@ -18,6 +18,7 @@ var MyAjax = {
 			dataType: option.dataType,
 			contentType: option.contentType, 
 			xhrFields: {withCredentials: true},
+			crossDomain: true == !(document.all),//IE9不能发起请求
 			async: option.async, // 使用同步方式  
 			success: function(data) {		
 				callback(data);

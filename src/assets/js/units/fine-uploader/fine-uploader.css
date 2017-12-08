@@ -194,8 +194,8 @@
 	border-style: none;
 	width: 21px; height: 21px;
 	position: absolute;
-	top: 10px; right: 10px;
-	background: url(../../../img/company/trash.gif) no-repeat center;
+	top: 10px; right: 12px;
+	background: url(../../../img/personal/common/picDelete.png) no-repeat center;
 	cursor: pointer;
 	
 }

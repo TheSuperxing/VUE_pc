@@ -9,7 +9,7 @@
     <div class="patentContainer" v-show="reveal.addPatent">
       <div class="personal-empty" v-if="reveal.empty">（您尚未添加论文信息）</div>
       <!--显示、编辑已存在的信息开始-->
-      <div class="patentInfo clear" v-for="(item,index) in this.patent">
+      <div class="patentInfo clear" v-for="(item,index) in patent">
         <!--显示信息列表开始-->
         <div class="patentInfoList clear" v-if="!reveal.editInfo[index]">
           <div class="patentInfoTitle clear">
@@ -82,7 +82,7 @@
               <div class="picListCont">
                 <div class="picList" v-for="(item,$index) in show.picList[index]">
                   <img :src="item.pic" alt="">
-                  <button @click="deletePic(index,$index)"></button>
+                  <button @click="deletePic(item.id,index,$index)"></button>
                 </div>
               </div>
 
@@ -299,6 +299,7 @@
         show:{
           tag:[],
           picList:[],
+          picNum:[],
         },
 
         patent:[],
@@ -371,26 +372,40 @@
         })
         // 从服务器获取数据
         this.localPatent=JSON.parse(JSON.stringify(this.patent));
+        that.fineUploaderId = [];
+				that.qqTemplate = [];
+				that.qqTriggerUpload = [];
+				that.updowntxt = [];
         //数据库的数据放本地一份
-        for(var i=0;i<this.patent.length;i++){
-          this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
-          this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
+        for(var i=0;i<that.patent.length;i++){
+          that.fineUploaderId.push("fine-uploader-manual-trigger-paper"+that.patent[i].pkid);
+          that.qqTemplate.push("qq-template-manual-trigger-paper"+that.patent[i].pkid);
           that.show.tag[i]=true;
           that.updowntxt.push("展开查看更多");
+          if(that.patent[i].ifVisable==0){
+		        Vue.set(that.reveal.openOrPrivacyText,[i],"隐藏")
+		      }else{
+		        Vue.set(that.reveal.openOrPrivacyText,[i],"显示")
+		      }
         }
       },
-      getPic(pkid,index){
+      getPic(index){
         var that=this;
-        var url=MyAjax.urlsy+"/psnPaperPatent/findPicsById/"+pkid;
-        MyAjax.ajax({
-            type: "GET",
-            url:url,
-            dataType: "json",
-          },function(data){
-            Vue.set(that.show.picList,[index],data.msg)
-          },function(err){
-            console.log(err)
-          })
+        console.log(that.patent[index])
+        var url=MyAjax.urlsy+"/psnPaperPatent/findPicsById/"+that.patent[index].pkid;
+        return new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				        resolve(data);
+				    },(err) => {
+				        reject(err);
+				    });
+				});
+        
       },
       openOrPrivacy(index){//信息是否对外公开控制按钮
         var that=this;
@@ -407,7 +422,7 @@
             data: JSON.stringify(that.patent[index]),
             dataType: "json",
             contentType: "application/json;charset=UTF-8",
-            
+            async:false,
           },function(data){
             //console.log(data)
           },function(err){
@@ -415,66 +430,105 @@
           })
           that.getData();
           
-          if(this.patent[index].ifVisable==0){
-            Vue.set(this.reveal.openOrPrivacyText,[index],"隐藏")
-          }else{
-            Vue.set(this.reveal.openOrPrivacyText,[index],"显示")
-          }
-
       },
       upDown(index){
 //  		Vue.set(this.show,"tag[index]",false)
-				if(this.show.tag[index]==true){
-					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+				var that = this;
+				if(that.show.tag[index]==true){
+					Vue.set(that.show.tag,[index],false)
+					that.updowntxt[index] = "收起";
+					that.getPic(index).then(function(data){
+						Vue.set(that.show.picList,[index],data.msg)
+						Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+		    		});
 				}else{
-					Vue.set(this.show.tag,[index],true)
-					this.updowntxt[index] = "展开查看更多" 
+					Vue.set(that.show.tag,[index],true)
+					that.updowntxt[index] = "展开查看更多" 
 				}
-    		this.show.tag[index] == true? false:true;
-        this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-        this.getPic(this.patent[index].pkid,index)
-			  console.log(this.show.picList)
+    		that.show.tag[index] == true? false:true;
+        that.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
+        
     	},
-      paperEdit(index){//编辑状态进入按钮
-        var index=index;
+      async  paperEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         var that = this;
-
+        const getPic = await that.getPic(index);
+				if(getPic.code === 0){
+      		const data = await Promise.resolve(true).then(
+	  				function(){
+	  					Vue.set(that.show.picList,[index],getPic.msg)
+							Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+			    	  	return that.show.picNum;
+	  				}
+	  			)
+      		console.log(that.show.picNum[index])
+      		
+      	}
         //上传图片
+				if(Math.floor(3-that.show.picNum[index])>0){
+					that.localPatent[index].picId=[];
+					$("#"+that.fineUploaderId[index]).html("");
+	        moreManualUploader({
+	          nameList:'manualUploader_patent_'+index,
+	          element:that.fineUploaderId[index],
+	          template: that.qqTemplate[index],
+	          url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
+	          picIdCont:that.localPatent[index].picId,
+	          btnPrimary:".btn-primary-patent",
+	          canUploadNum : Math.floor(3-that.show.picNum[index]),
+	        })
+				}
 
-        this.getPic(this.patent[index].pkid,index)
-
-        that.patent[index].picId=[];
+        
+      },
+      deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
+      	var that = this;
+      	var url = MyAjax.urlsy+"/psnPaperPatent/delPic/"+id
+      	var p = new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "POST",
+					url:url,
+					dataType: "json",
+					async: true, 
+			    },(data) => {
+			        resolve(data);
+			     },(err) => {
+			        reject(err);
+			     });
+			  });
+			  return p;
+      },
+      async deletePic(id,index,$index){
+        var that =this;
+         const dele = await that.deleThisPicPromise(id);
+        if(dele.code===0){
+	  			const getPic = await that.getPic(index);
+	  			if(getPic.code===0){
+	  					const data = await Promise.resolve(true).then(
+		      				function(){
+		      					Vue.set(that.show.picList,[index],getPic.msg)
+										Vue.set(that.show.picNum,[index],that.show.picList[index].length)
+					    	  	return that.show.picNum;
+		      				}
+		      			)
+	  					console.log(data)
+	  			}
+	  		}
+        console.log(that.localPatent[index])
+        that.localPatent[index].picId=[];
+				$("#"+that.fineUploaderId[index]).html("");
         moreManualUploader({
           nameList:'manualUploader_patent_'+index,
           element:that.fineUploaderId[index],
           template: that.qqTemplate[index],
           url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
-          picIdCont:that.patent[index].picId,
-          btnPrimary:".btn-primary-patent"
+          picIdCont:that.localPatent[index].picId,
+          btnPrimary:".btn-primary-patent",
+          canUploadNum : Math.floor(3-that.show.picNum[index]),
         })
-      },
-      deletePic(index,$index){
-        var that =this;
-        var url = MyAjax.urlsy+"/psnPaperPatent/delPic/"+this.show.picList[index][$index].id
-        MyAjax.ajax({
-          type: "GET",
-          url:url,
-          dataType: "json",
-        },function(data){
-          // if(data.msg=="success"){
-          //   that.show.picList[index][$index]="";
-          // }
-          //console.log(data)
-        },function(err){
-          console.log(err)
-        })
-        this.getPic(this.patent[index].pkid,index)
       },
       paperEditKeep(index){//编辑状态，保存按钮
         var that=this;
-        that.localPatent[index].picId=this.patent[index].picId;
         if(this.localPatent[index].patentName.trim().length!=0){
           var url = MyAjax.urlsy+"/psnPaperPatent/updatePatent";
           MyAjax.ajax({
@@ -510,12 +564,6 @@
         var url = MyAjax.urlsy+"/psnPaperPatent/delPatent/"+this.patent[index].pkid;
         MyAjax.delete(url);
         that.getData();
-
-        for(var i=0;i<this.patent.length;i++){
-          this.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.patent[i].pkid);
-    		  this.qqTemplate.push("qq-template-manual-trigger-paper"+this.patent[i].pkid);
-        }
-       
       },
       addPatent(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addPatent",false);
@@ -529,7 +577,8 @@
           template: "qq-template-manual-trigger-patent",
           url:MyAjax.urlsy+'/psnPaperPatent/batchUpload',
           picIdCont:that.newPatent.picId,
-          btnPrimary:".btn-primary-patent"
+          btnPrimary:".btn-primary-patent",
+          canUploadNum:3,
         })
       },
       keepNewPatent(){//添加模式下的保存
@@ -551,10 +600,7 @@
             })
             this.getData();
             // 从新获取数据
-            for(var i=0;i<this.patent.length;i++){
-              this.fineUploaderId.push("fine-uploader-manual-trigger-patent"+this.patent[i].pkid);
-    		      this.qqTemplate.push("qq-template-manual-trigger-patent"+this.patent[i].pkid);
-            }
+            
             
             Vue.set(this.reveal,"addPatent",true);
             //视图切换到执业资格的首页
@@ -682,6 +728,7 @@
 
           }
           .patentInfoBody{
+          	overflow: hidden;
             p{
               height: 14px;
               line-height: 14px;
@@ -694,9 +741,9 @@
             .validityTime{
               margin-bottom:17px;
               margin-top: 15px;
-              
+              overflow: hidden;
               P{
-                float: left;
+              	float: left;
                 color: rgb(117, 117, 117);
               }
               span{
@@ -811,7 +858,7 @@
     }
     /*添加信息开始*/
     .paperContainer{
-      ul{
+      >ul{
         li{
           margin:20px 0;
           .wrap-left{

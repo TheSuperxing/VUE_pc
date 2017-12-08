@@ -429,7 +429,6 @@
             console.log(err)
           })
           that.getData();
-          console.log(this.award)
       },
       async awardEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
@@ -448,7 +447,7 @@
       	}
 				if(Math.floor(3-that.picNum[index])>0){
 					that.localAward[index].picId = [];
-					$("#"+this.fineUploaderId[index]).html("")
+					$("#"+that.fineUploaderId[index]).html("")
 		     	moreManualUploader({
 	          nameList:'manualUploader'+index,
 	          element:that.fineUploaderId[index],
@@ -538,7 +537,6 @@
         this.localAward[index].awardName=this.award[index].awardName;
         this.localAward[index].awardingBody=this.award[index].awardingBody;
         this.localAward[index].awardingTime=this.award[index].awardingTime;
-				$('.qq-upload-success').hide();
         /*如果是取消编辑，从新从Vuex中得到数据*/
       },
       awardDel(index){//编辑状态，删除按钮
@@ -567,7 +565,6 @@
           if(this.newAward.awardName.trim().length!=0){
             Vue.set(this.reveal,"addAward",true);
             //视图切换到执业资格的首页
-            
             this.reveal.openOrPrivacyText.push("隐藏")//设置是否对外显示文本
             var that=this;
             var url = MyAjax.urlsy+"/psnAwards/insert";
@@ -840,7 +837,11 @@
 		        		float: left;
 		        		li{
 		        			float: left;
-		        			height: 100px;
+		        			width: 200px;
+		         			height: 200px;
+			          	padding: 10px;
+			          	background: rgba(210,210,210,.3);
+			          	border-radius: 10px;
 									position: relative;
 									margin-right: 15px;
 										margin-bottom: 15px;
@@ -851,14 +852,14 @@
 										}
 									}
 									img{
-										width: 160px;
-										height: 100px;
+										width: 180px;
+										max-height: 180px;
 									}
 									.delePic{
 										width: 21px;
 										height: 21px;
 										position: absolute;
-										right: 5px; top: 5px;
+										right: 10px; top: 10px;
 										background: url(../../../assets/img/personal/education/delePic.png) no-repeat;
 										display: none;
 										cursor: pointer;

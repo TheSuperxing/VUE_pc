@@ -101,7 +101,7 @@
 						console.log(data)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
-              console.log(data.code)
+              			console.log(data.code)
               //window.location.hash="/index"
 							router.push("/index")
 						}else if(data.code==-1){
@@ -208,7 +208,7 @@
 				// 				break;
 				// 		}
 				// 	}else{
-						var timer=setInterval(
+					var timer=setInterval(
 				      function () {
 				        if(parseInt(self.messageConfirm.confirmText)>1){
 				          self.messageConfirm.confirmText=parseInt(self.messageConfirm.confirmText)-1+"s";

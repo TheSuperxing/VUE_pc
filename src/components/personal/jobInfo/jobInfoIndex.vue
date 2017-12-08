@@ -90,7 +90,7 @@
               </label>
             </li>
             <li class="img-wrap clear" >
-							<span class="wrap-left">图片展示</span>
+							<span class="wrap-left">证书文件</span>
 							<ul class="imgShow">
 								<li v-for="(item,$ind) in picArr[index]">
 									<img :src="item.pic"/>
@@ -217,7 +217,7 @@
           </label>
         </li>
 				<li class="img-wrap clear">
-					<span class="wrap-left">图片展示</span>
+					<span class="wrap-left">证书文件</span>
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -342,6 +342,7 @@
 				  picId:[],
         },
         picArr:[],//图片展示的数组
+        picNum:[],//各条信息已经上传的图片数
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
@@ -404,9 +405,7 @@
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
 					console.log(data)
@@ -453,34 +452,36 @@
     	getPicture(index){
     		var that = this;
     		var url = MyAjax.urlsy+"/psnTitleMessage/findPicsById/"+that.titleInfo[index].pkid;
-    		MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-					async:true,
-				},function(data){
-					console.log(data)
-					Vue.set(that.picArr,[index],data.msg)
-//					that.picArr[index] = 
-					console.log(that.picArr)
-				},function(err){
-					console.log(err)
-				})
+    		return new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				        resolve(data);
+				    },(err) => {
+				        reject(err);
+				    });
+				});
+    		
     	},
     	upDown(index){
-				console.log(this.show.tag[index])
-				if(this.show.tag[index]==true){
-					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+    		var that = this;
+				if(that.show.tag[index]==true){
+					Vue.set(that.show.tag,[index],false)
+					that.updowntxt[index] = "收起"
+					that.getPicture(index).then(function(data){
+	    			Vue.set(that.picArr,[index],data.msg)
+						Vue.set(that.picNum,[index],that.picArr[index].length)
+	    		});
 				}else{
-					Vue.set(this.show.tag,[index],true)
-					this.updowntxt[index] = "展开查看更多" 
+					Vue.set(that.show.tag,[index],true)
+					that.updowntxt[index] = "展开查看更多" 
 				}
-    		this.show.tag[index] == true? false:true;
-    		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
-    		this.getPicture(index);
+    		that.show.tag[index] == true? false:true;
+    		that.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
+    		
     	},
       openOrPrivacy(index){//信息是否对外公开控制按钮
         Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);
@@ -516,44 +517,86 @@
 				//保存之后再重新拉取数据
 				that.updateData();
       },
-      jobInfoEdit(index){//编辑状态进入按钮
+      async jobInfoEdit(index){//编辑状态进入按钮
       	
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
         this.getPicture(index);
         
         var that = this;
-
+        const getPic = await that.getPicture(index);
+      	if(getPic.code === 0){
+      		const data = await Promise.resolve(true).then(
+  				function(){
+  					Vue.set(that.picArr,[index],getPic.msg)
+		    	  Vue.set(that.picNum,[index],that.picArr[index].length)
+		    	  	return that.picNum;
+  				}
+  			)
+      		console.log(that.picNum[index])
+      		
+      	}
         //上传图片
-//      
+        if(Math.floor(3-that.picNum[index])>0){
+        	that.localTitleInfo[index].picId = [];
+        	$("#"+this.fineUploaderId[index]).html("")
+		     	moreManualUploader({
+	          nameList:'manualUploader'+index,
+	          element:that.fineUploaderId[index],
+	          template: that.qqTemplate[index],
+	          url:MyAjax.urlsy+"/psnTitleMessage/batchUpload",
+	          picIdCont:that.localTitleInfo[index].picId,
+	          btnPrimary:".btn-primary",
+	          canUploadNum : Math.floor(3-that.picNum[index]),
+	        })
+        }
           
-        that.localTitleInfo[index].picId = [];
+        
+      },
+      deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
+      	var that = this;
+      	var url = MyAjax.urlsy + "/psnTitleMessage/delPic/"+ id
+      	var p = new Promise((resolve, reject) => {
+			    MyAjax.ajax({
+			      type: "POST",
+					url:url,
+					dataType: "json",
+					async: true, 
+			    },(data) => {
+			        resolve(data);
+			     },(err) => {
+			        reject(err);
+			     });
+			  });
+			  return p;
+      },
+      async deleThisPic(id,index,$ind){//删除图片
+      	var that = this;
+      	const dele = await that.deleThisPicPromise(id);
+  		
+	  		if(dele.code===0){
+	  			const getPic = await that.getPicture(index);
+	  			if(getPic.code===0){
+	  					const data = await Promise.resolve(true).then(
+		      				function(){
+		      					Vue.set(that.picArr,[index],getPic.msg)
+					    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+					    	  	return that.picNum;
+		      				}
+		      			)
+	  					console.log(data)
+	  			}
+	  		}
+      	that.localTitleInfo[index].picId = [];
+	    	$("#"+this.fineUploaderId[index]).html("")
 	     	moreManualUploader({
           nameList:'manualUploader'+index,
           element:that.fineUploaderId[index],
           template: that.qqTemplate[index],
           url:MyAjax.urlsy+"/psnTitleMessage/batchUpload",
           picIdCont:that.localTitleInfo[index].picId,
-          btnPrimary:".btn-primary"
+          btnPrimary:".btn-primary",
+          canUploadNum : Math.floor(3-that.picNum[index]),
         })
-      },
-      deleThisPic(id,index,$ind){//删除图片
-      	var that = this;
-      	var url = MyAjax.urlsy + "/psnTitleMessage/delPic/"+ id
-      	MyAjax.ajax({
-					type: "GET",
-					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
-					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
-					
-				},function(data){
-					console.log(data)
-					if(data.code==0){
-						that.getPicture(index);
-					}
-				},function(err){
-					console.log(err)
-				})
       	
       	
       },
@@ -612,7 +655,8 @@
 					template: "qq-template-manual-trigger",
 	        url:MyAjax.urlsy+"/psnTitleMessage/batchUpload",
 	        picIdCont:this.newTitleInfo.picId,
-	        btnPrimary:".btn-primary"
+	        btnPrimary:".btn-primary",
+					canUploadNum:3,		
 	      })
       },
       keepJobInfoAdd(){//添加模式下的保存
@@ -668,10 +712,12 @@
     padding: 0 40px;
     background: $bfColor;
     min-height: 671px;
+    padding-bottom: 30px;
+    border-radius: 5px;
     .date-picker{
       width:140px;
       float: left;
-      margin-left:22px;
+      margin-left:25px;
     }
     /*时间插件样式*/
     .title{
@@ -837,7 +883,7 @@
 				      	text-align: right;
 				      	float: left;
 				      	color:$themeColor;
-				      	margin-right: 35px;
+				      	margin-right: 25px;
 				      }
               h5{
                 float: left;
@@ -848,7 +894,7 @@
               input{
                 float: left;
                 height:35px;
-                margin-left:22px;
+                margin-left:25px;
                 padding-left:15px;
                 border-radius: 5px;
                 border:1px solid $borderColor;
@@ -878,11 +924,15 @@
 				    	/*padding-left: 30px;*/
 				    	.imgShow{
 		        		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
-		        		width: 700px;
+		        		width: 730px;
 		        		float: left;
 		        		li{
 		        			float: left;
-		        			height: 100px;
+		        			width: 200px;
+		        			height: 200px;
+				          padding: 10px;
+				          background: rgba(210,210,210,.3);
+				          border-radius: 10px;
 									position: relative;
 									margin-right: 15px;
 									margin-bottom: 15px;
@@ -893,14 +943,14 @@
 										}
 									}
 									img{
-										width: 160px;
-										height: 100px;
+										width: 180px;
+										max-height: 180px;
 									}
 									.delePic{
 										width: 21px;
 										height: 21px;
 										position: absolute;
-										right: 5px; top: 5px;
+										right: 10px; top: 10px;
 										background: url(../../../assets/img/personal/education/delePic.png) no-repeat;
 										display: none;
 										cursor: pointer;
@@ -909,7 +959,7 @@
 		        		
 		        	}
 				    	>div{
-				    		width: 700px;
+				    		width: 730px;
 				    		float: right;
 				    	}
 				    }
@@ -967,7 +1017,7 @@
           input{
             float: left;
             height:35px;
-            margin-left:22px;
+            margin-left:25px;
             padding-left:15px;
             border-radius: 5px;
             border:1px solid $borderColor;
@@ -996,7 +1046,7 @@
         li.img-wrap{
 		    	/*padding-left: 30px;*/
 		    	>div{
-		    		width: 700px;
+		    		width: 730px;
 		    		float: left;
 		    	}
 		    }

@@ -128,9 +128,7 @@
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
 					console.log(data)
@@ -178,7 +176,7 @@
 				dataType: "json",
 				async:true,
 			},function(data){
-				console.log(data.msg)
+				console.log(data)
 				Vue.set(that.show.picList,[index],data.msg)
 			},function(err){
 				console.log(err)
@@ -191,18 +189,16 @@
 			},
     	
     	upDown(index){
-//  		Vue.set(this.show,"tag[index]",false)
-				console.log(this.show.tag[index])
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+					this.updowntxt[index] = "收起"
 					this.getPic(this.proInfo[index].psnProExpeID,index)
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
-				this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+				this.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
 			
 				console.log(this.show.picList)
     	},

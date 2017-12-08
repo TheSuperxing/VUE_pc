@@ -9,8 +9,8 @@
 
       <div class="eduInfo" v-for="(item,index) in education" v-show="!editEdu.add">
 
-        <div class="eduInfoContainer clear" v-show="editEdu.delete[0][index]">
-          <div v-show="!editEdu.edit[0][index]" class="clear">
+        <div class="eduInfoContainer clear" v-show="editEdu.delete[index]">
+          <div v-show="!editEdu.edit[index]" class="clear">
             <h4 v-cloak>{{item.schoolName}}</h4>
             <ul>
               <li v-bind:class="{openOrPrivacy:!openOrPrivacy[index]}" v-on:click="openOrPrivacyInfo(index)">{{openOrPrivacyText[index]}}</li>
@@ -18,25 +18,25 @@
               <li v-on:click="deleteEduExist(index)">删除</li>
             </ul>
           </div>
-          <div v-show="!editEdu.edit[0][index]">
+          <div v-show="!editEdu.edit[index]">
             <p v-cloak >Time :  {{item.schoolTimeUp}} 至 {{item.schoolTimeDown}}</p>
             <p v-cloak >专业：{{item.professionName}}</p>
             <p v-cloak >学历：{{item.education}}</p>
           </div>
-          <ul class="morePics" v-if="!show.tag[index]" v-show="!editEdu.edit[0][index]">
-						<li v-for="item in picArr[index]">
-							<img :src="item.pic"/>
-						</li>
-								
-		    	</ul>
-					<div class="viewMore" v-show="!editEdu.edit[0][index]">
-						<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
-							
-								<span>{{updowntxt[index]}}</span>
-						</p>
-					</div>
+          <ul class="morePics" v-if="!show.tag[index]" v-show="!editEdu.edit[index]">
+			<li v-for="item in picArr[index]">
+				<img :src="item.pic"/>
+			</li>
+						
+    	</ul>
+			<div class="viewMore" v-show="!editEdu.edit[index]">
+				<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
+					
+						<span>{{updowntxt[index]}}</span>
+				</p>
+			</div>
 
-          <ul class="editEduInfo" v-show="editEdu.edit[0][index]">
+          <ul class="editEduInfo" v-show="editEdu.edit[index]">
             <li class="clear">
               <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)"><span>{{textLeng.schoolName[index]}}/30</span>
             </li>
@@ -57,7 +57,7 @@
               </label>
             </li>
             <li class="img-wrap clear" >
-							<span class="wrap-left">图片展示</span>
+							<span class="wrap-left">学历证书</span>
 							<ul class="imgShow">
 								<li v-for="(item,$ind) in picArr[index]">
 									<img :src="item.pic"/>
@@ -170,7 +170,7 @@
           </label>
         </li>
         <li class="img-wrap clear">
-					<span class="wrap-left">图片展示</span>
+					<span class="wrap-left">学历证书</span>
 					
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -275,7 +275,7 @@
         show:{
         	tag:[],
         },
-        editEdu:{add:false,edit:[[]],delete:[[]]},
+        editEdu:{add:false,edit:[],delete:[]},
         //状态部分
         textLeng:{schoolName:[],profession:[]},
         newTextLeng:{schoolName:[0],profession:[0]},
@@ -322,9 +322,7 @@
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
 					async: false,
 				},function(data){
 					console.log(data)
@@ -339,15 +337,15 @@
 			    }else {
 			      return text;
 			    }
-			  }
+			}
 	    	
 	        that.localEdu=JSON.parse(JSON.stringify(that.education));
 	    	that.openOrPrivacy = [];
 	        that.openOrPrivacyText = [];
 	        that.fineUploaderId = [];
 	        that.qqTemplate = [];
-	        that.editEdu.edit[0]=[];
-	        that.editEdu.delete[0] = [];
+	        that.editEdu.edit=[];
+	        that.editEdu.delete = [];
 	        that.textLeng.schoolName = [];
 	        that.textLeng.profession = [];
 	        that.buttonColor.exist = [];
@@ -362,8 +360,8 @@
 	    		that.education[i].education = emptyText(that.education[i].education);
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.education[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.education[i].pkid);
-	    		that.editEdu.edit[0].push(false);
-	            that.editEdu.delete[0].push(true);
+	    		that.editEdu.edit.push(false);
+	            that.editEdu.delete.push(true);
 	            that.textLeng.schoolName.push(0);
 	            that.textLeng.profession.push(0);
 	            that.buttonColor.exist.push(true);
@@ -379,6 +377,7 @@
 	    			that.openOrPrivacyText.push("隐藏")
 		        }
 	    	}
+	    	console.log(that.editEdu.edit)
     	},
     	getPicture(index){
     		var that = this;
@@ -402,17 +401,17 @@
 				if(that.show.tag[index]==true){
 					Vue.set(that.show.tag,[index],false)
 					that.updowntxt[index] = "收起"
+					that.getPicture(index).then(function(data){
+		    			Vue.set(that.picArr,[index],data.msg)
+						Vue.set(that.picNum,[index],that.picArr[index].length)
+		    		});
 				}else{
 					Vue.set(that.show.tag,[index],true)
 					that.updowntxt[index] = "展开查看更多" 
 				}
     		that.show.tag[index] == true? false:true;
     		that.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
-    		that.getPicture(index).then(function(data){
-    			Vue.set(that.picArr,[index],data.msg)
-				Vue.set(that.picNum,[index],that.picArr[index].length)
-    		});
-    		    		console.log(that.picNum[index])
+    		
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
@@ -430,7 +429,7 @@
 	        picIdCont:that.newInputValue.picId,
 	        btnPrimary:".btn-primary",
 			canUploadNum:3,
-	      })
+	    })
         
       },
       openOrPrivacyInfo(index){//是否显示隐藏按钮的事件
@@ -498,7 +497,7 @@
       	}
       	
     	console.log(that.picNum[index])
-        Vue.set(that.editEdu.edit[0],[index],true);
+        Vue.set(that.editEdu.edit,[index],true);
         //编辑和显示的切换
         if(that.localEdu[index].schoolName.length!=0){
           Vue.set(that.buttonColor.exist,[index],false)
@@ -556,14 +555,14 @@
 	    })
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
-        Vue.set(this.editEdu.edit[0],[index],false);
+        Vue.set(this.editEdu.edit,[index],false);
         $("#"+this.fineUploaderId[index]).html("")
         //console.log("ok")
       },
       deleteEduExist(index){//删除按钮事件
 //      Vue.set(this.editEdu.delete[0],[index],false);
 //      this.education.splice(index,1)
-//      Vue.set(this.editEdu.delete[0],[index],true)//为了解决删除一项后一项不会显示问题
+//      Vue.set(this.editEdu.delete[0],[index],true)//为	了解决删除一项后一项不会显示问题
         if(this.education.length==0){//数据完全删除后显示无数据提示
           Vue.set(this.empty,"promote",true);
         }
@@ -620,7 +619,7 @@
 				console.log(data.msg)
 			}else{
 				that.updateData();
-				Vue.set(that.editEdu.edit[0],[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+				Vue.set(that.editEdu.edit,[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
 			}
 		},function(err){
 			console.log(err)
@@ -948,30 +947,36 @@
         		float: right;
         		li{
         			float: left;
-        			height: 120px;
-							position: relative;
-							&:hover{
-								.delePic{
-									display: block;
-									
-								}
-							}
-							img{
-								width: 160px;
-								height: 100px;
-								margin-right: 15px;
-								margin-bottom: 15px;
-								
-							}
-							.delePic{
-								width: 21px;
-								height: 21px;
-								position: absolute;
-								right: 20px; top: 15px;
-								background: url(../../../assets/img/personal/education/delePic.png) no-repeat;
-								display: none;
-								cursor: pointer;
-							}
+        			width: 200px;
+		         	height: 200px;
+		          	padding: 8px;
+		          	background: rgba(210,210,210,.3);
+		          	border-radius: 10px;
+		          	margin-right: 10px;
+		          	margin-bottom: 10px;
+					position: relative;
+					&:hover{
+						.delePic{
+							display: block;
+							
+						}
+					}
+					img{
+						width: 180px;
+						max-height: 180px;
+						margin-right: 15px;
+						margin-bottom: 15px;
+						
+					}
+					.delePic{
+						width: 21px;
+						height: 21px;
+						position: absolute;
+						right: 20px; top: 15px;
+						background: url(../../../assets/img/personal/education/delePic.png) no-repeat;
+						display: none;
+						cursor: pointer;
+					}
         		}
         		
         	}

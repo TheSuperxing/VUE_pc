@@ -93,7 +93,7 @@
         </li>
         <li class="cancelSubmit clear">
           <button v-on:click="cancelEdit">取消</button>
-          <button v-on:click="submitEdit" v-bind:class="{submitBgColor:reveal.submitBgColor}">提交</button>
+          <button v-on:click="submitEdit" v-bind:class="{submitBgColor:reveal.submitBgColor}">保存</button>
         </li>
       </ul>
       <div class="realName">
@@ -340,12 +340,12 @@
 					  if(that.baseInfo.ifRNA){
 					    that.reveal.throughRealName=true;
 					  }
-					  that.baseInfo.nickName=emptyText(this.baseInfo.nickName);
-			      that.baseInfo.psnName=emptyText(this.baseInfo.psnName);
-			      that.baseInfo.sex=emptyText(this.baseInfo.sex);
-			      that.baseInfo.dateOfBirth=emptyText(this.baseInfo.dateOfBirth);
-			      that.baseInfo.psnMail=emptyText(this.baseInfo.psnMail);
-			      that.baseInfo.phoneNumber=emptyText(this.baseInfo.phoneNumber);
+					  that.baseInfo.nickName=emptyText(that.baseInfo.nickName);
+			      that.baseInfo.psnName=emptyText(that.baseInfo.psnName);
+			      that.baseInfo.sex=emptyText(that.baseInfo.sex);
+			      that.baseInfo.dateOfBirth=emptyText(that.baseInfo.dateOfBirth);
+			      that.baseInfo.psnMail=emptyText(that.baseInfo.psnMail);
+			      that.baseInfo.phoneNumber=emptyText(that.baseInfo.phoneNumber);
 			      //如果得到的数据为空，进行暂没有消息处理
 						that.reveal.openOrPrivacy = [];
 			      that.localBaseInfo=JSON.parse(JSON.stringify(that.baseInfo));
@@ -491,7 +491,7 @@
 	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
 	    	if(this.localBaseInfo.sex=='男'){
-	    		this.localBaseInfo.sex = "2";
+	    		this.localBaseInfo.sex = "0";
 	    	}else if(this.localBaseInfo.sex=='女'){
 	    		this.localBaseInfo.sex = "1";
 	    	}

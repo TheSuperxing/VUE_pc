@@ -3,7 +3,7 @@
 
     <div class="title clear">
       <h2 v-cloak>{{title}}</h2>
-      <p v-on:click="addLanguage">添加</p>
+      <p v-on:click="addLanguage" v-if="reveal.addLanguage">添加</p>
     </div>
     <!--personaltitle结束-->
     <div class="languageContainer" v-show="reveal.addLanguage">

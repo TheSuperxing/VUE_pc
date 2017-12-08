@@ -2,7 +2,7 @@
   <div class="educationIndex">
     <div  class="title clear">
       <h2 v-cloak>{{title}}</h2>
-      <p v-on:click="addEdu">添加</p>
+      <p v-on:click="addEdu" v-if="!editEdu.add">添加</p>
     </div>
     <div class="educationContainer">
       <div class="personal-empty" v-if="empty.promote">（您尚未添加教育背景信息）</div>

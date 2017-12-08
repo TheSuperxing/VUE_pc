@@ -102,7 +102,6 @@
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
               			console.log(data.code)
-              //window.location.hash="/index"
 							router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
@@ -244,15 +243,15 @@
         //   }
         // });
      },
-		 keyLogin(){//enter键登录事件
-		 	var event = event || window.event;  
-		 	if(event.keyCode==13){ 
-		 		console.log("222")
-		     this.login()
-		     event.returnValue = false;    
-		     return false;
-		  }
-		 },
+	 keyLogin(){//enter键登录事件
+	 	var event = event || window.event;  
+	 	if(event.keyCode==13){ 
+	 		console.log("222")
+	     this.login()
+	     event.returnValue = false;    
+	     return false;
+	  }
+	 },
      keydown(event){
        this.personalLoginInput.messageConfirm=event.currentTarget.innerText
        Vue.set(this.reveal,"focus",true)

@@ -9,9 +9,9 @@
 				<div class="content-wrap">
 						<div class="search-wrap">
 							<span class="wrap-left">项目名称</span>
-							<p class="wrap-right">
+							<p class="wrap-right" @keydown="keySearch">
 								<input type="text" placeholder="请输入项目名称" v-model="searchText" class="searchInput"/>
-								<span class="sBtn" @click="getData"><img src="../../../assets/img/company/seacer.png" />搜索</span>
+								<span class="sBtn" @click="search" ><img src="../../../assets/img/company/seacer.png" />搜索</span>
 							</p>
 						</div>
 						<div class="result-wrap">
@@ -244,15 +244,13 @@
 				$('.search-wrap').css({marginTop:"120px",marginBottom:"170px"})
 				$('.result-wrap').css({display:"none"})
 			},
-			getData(){
+			search(){
 				var that = this;
 	    	var url = MyAjax.urlsy+"/psnProjExpe/findProjByName/"+that.searchText;
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
-	//				data: {accountID:"3b15132cdb994b76bd0d9ee0de0dc0b8"},
 					dataType: "json",
-	//				content-type: "text/plain;charset=UTF-8",
 					async:false,
 				},function(data){
 					console.log(data)
@@ -270,7 +268,15 @@
 					console.log(err)
 				})
 					
-					
+			},
+			keySearch(){//enter键登录事件
+			 	var event = event || window.event;  
+			 	if(event.keyCode==13){ 
+			 		console.log("222")
+			     this.search()
+			     event.returnValue = false;    
+			     return false;
+			  }
 			},
 			choseThis(e,index){
 				

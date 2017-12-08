@@ -99,7 +99,7 @@
       <div class="realName">
         <div class="realNameTop clear">
           <h5>实名认证：</h5>
-          <p v-if="!localBaseInfo.haveUploaded" v-bind:class="{throughRealName:reveal.throughRealName}">（暂未上传认证文件）</p>
+          <p v-if="localBaseInfo.rnastatus===0" v-bind:class="{throughRealName:reveal.throughRealName}">（暂未上传认证文件）</p>
         </div>
         <p v-show="haveUploaded" style="line-height: 40px;color: rgb(242,117,25);">上传认证证件成功，已进入审核阶段。可继续上传。</p>
         <div class="realNameMain">
@@ -288,8 +288,9 @@
 	          
 	            console.log(responseJSON)
 	            if(responseJSON.success==true){
-	            	$(".qq-upload-list").hide()
+	            	$(".qq-upload-list .qq-upload-success").hide()
 	            	that.haveUploaded = true;
+	            	that.updateData();
 	            }
 	            
 
@@ -329,7 +330,7 @@
 			    		that.baseInfo.sex = "女"
 			    	}/*设置性别的初始勾选状态*/
 			    	
-			    	if(that.localBaseInfo.sex==null){
+			    	if(that.localBaseInfo.sex==null){	
 					    Vue.set(that.reveal,'selectSex',true);
 					  }else if(that.localBaseInfo.sex.trim()=="女"){
 					    Vue.set(that.reveal,'selectSex',false);

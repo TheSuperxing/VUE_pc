@@ -3,7 +3,7 @@
 
     <div class="title clear">
       <h2 v-cloak>{{title}}</h2>
-      <p v-on:click="addPatent">添加</p>
+      <p v-on:click="addPatent" v-if="reveal.addPatent">添加</p>
     </div>
     <!--personaltitle结束-->
     <div class="patentContainer" v-show="reveal.addPatent">

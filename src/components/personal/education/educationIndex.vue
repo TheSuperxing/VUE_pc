@@ -46,13 +46,19 @@
 		    	</ul>
 					<div class="viewMore" v-show="!editEdu.edit[index]">
 						<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
+<<<<<<< HEAD
+
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 								<span>{{updowntxt[index]}}</span>
 						</p>
 					</div>
 
           <ul class="editEduInfo" v-show="editEdu.edit[index]">
             <li class="clear">
-              <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)" maxlength="30"><span>{{textLeng.schoolName[index]}}/30</span>
+              <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)"><span>{{textLeng.schoolName[index]}}/30</span>
+						  <alertTip v-if="showAlert.schoolName" :showHide="showAlert.schoolName"  :alertText="alertText.schoolName"></alertTip>
+            	
             </li>
             <li class="clear">
               <span class="wrap-left">*在校时间</span>
@@ -61,23 +67,17 @@
               <span>——</span>
               <!-- <datepicker v-model="localEdu[index].schoolTimeDown"></datepicker> -->
 							<year-month v-model="localEdu[index].schoolTimeDown" :min="localEdu[index].schoolTimeUp" :today="true"></year-month>
+						  <alertTip v-if="showAlert.schoolTime" :showHide="showAlert.schoolTime"  :alertText="alertText.schoolTime"></alertTip>
+            	
             </li>
             <li class="clear">
               <label>
-                <span class="wrap-left">专业名称</span><input v-model="localEdu[index].professionName" v-on:input="changeProfession(index)" type="text" placeholder="请输入专业名称" maxlength="30"><span>{{textLeng.profession[index]}}/30</span>
+                <span class="wrap-left">专业名称</span><input v-model="localEdu[index].professionName" v-on:input="changeProfession(index)" type="text" placeholder="请输入专业名称"><span>{{textLeng.profession[index]}}/30</span>
               </label>
             </li>
             <li class="clear">
               <label>
-                <span class="wrap-left">所获学历 </span>
-								<select v-model="localEdu[index].education">
-									<option value="大专">大专</option>
-									<option value="本科">本科</option>
-									<option value="硕士">硕士</option>
-									<option value="博士">博士</option>
-									<option value="其他">其他</option>
-								</select>
-								<!-- <input v-model="localEdu[index].education" type="text" placeholder="请选择学校"> -->
+                <span class="wrap-left">所获学历 </span><input v-model="localEdu[index].education" type="text" placeholder="请选择学校">
               </label>
             </li>
             <li class="img-wrap clear" >
@@ -173,33 +173,33 @@
       <ul class="editEduInfo" v-show="editEdu.add">
         <li class="clear">
           <label>
-           <span class="wrap-left">*学校名称 </span><input v-model="newInputValue.schoolName" v-on:input="addShoolName" type="text" placeholder="请输入学校名称" maxlength="30"><span>{{newTextLeng.schoolName[0]}}/30</span>
+           <span class="wrap-left">*学校名称 </span><input v-model="newInputValue.schoolName" v-on:input="addShoolName" type="text" placeholder="请输入学校名称"><span>{{newTextLeng.schoolName[0]}}/30</span>
           </label>
         </li>
         <li class="clear">
           <span class="wrap-left">*在校时间</span>
+<<<<<<< HEAD
+
+					<year-month v-model="newInputValue.schoolTimeUp"></year-month>
+          <span>——</span>
+
+					<year-month v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
+=======
           <!-- <datepicker v-model="newInputValue.schoolTimeUp"></datepicker> -->
 					<year-month v-on:input="addShoolTime" v-model="newInputValue.schoolTimeUp"></year-month> 
           <span>——</span>
           <!-- <datepicker v-model="newInputValue.schoolTimeDown" v-bind:value="{type:['month']}"></datepicker> -->
 					<year-month v-on:input="addShoolTime" v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 				</li>
         <li class="clear">
           <label>
-            <span class="wrap-left">专业名称</span> <input v-model="newInputValue.professionName" v-on:input="addProfession" type="text" placeholder="请输入专业名称" maxlength="30"><span>{{newTextLeng.profession[0]}}/30</span>
+            <span class="wrap-left">专业名称</span> <input v-model="newInputValue.professionName" v-on:input="addProfession" type="text" placeholder="请输入专业名称"><span>{{newTextLeng.profession[0]}}/30</span>
           </label>
         </li>
         <li class="clear">
           <label>
-            <span class="wrap-left">所获学历</span>
-						<select v-model="newInputValue.education">
-							<option value="大专">大专</option>
-							<option value="本科">本科</option>
-							<option value="硕士">硕士</option>
-							<option value="博士">博士</option>
-							<option value="其他">其他</option>
-						</select>
-						<!-- <input v-model="newInputValue.education" type="text" placeholder="请选择学校"> -->
+            <span class="wrap-left">所获学历</span><input v-model="newInputValue.education" type="text" placeholder="请选择学校">
           </label>
         </li>
         <li class="img-wrap clear">
@@ -296,12 +296,14 @@
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 	import YearMonth from "../units/yearMonth.vue"
 	import Modal from "../../../assets/js/modal.js"
+	import alertTip from "../units/alertTip.vue"
 	
   export default {
     name: 'educationIndex',
     components:{
 			datepicker,
-			YearMonth
+			YearMonth,
+			alertTip
     },
     data:function() {
       return {
@@ -316,6 +318,8 @@
         //状态部分
         textLeng:{schoolName:[],profession:[]},
         newTextLeng:{schoolName:[0],profession:[0]},
+        showAlert:{schoolName:false,schoolName:false},//提示框显隐
+	      alertText:{schoolName:null,schoolName:null},
         //字符段长度
         openOrPrivacy:[false,true,false,true],//信息是否公开显示,通过服务器获取的数据
         openOrPrivacyText:[],//信息是否公开显示,文本信息
@@ -366,6 +370,7 @@
 					dataType: "json",
 					async: false,
 				},function(data){
+					console.log(data.msg)
 					if(data.code==0){
 						that.education = data.msg;
 					}else{
@@ -450,7 +455,7 @@
 								reject(err);
 						});
 					});
-			},
+    	},
     	upDown(index){
     		var that = this;
 				if(that.show.tag[index]==true){
@@ -489,18 +494,20 @@
       },
       openOrPrivacyInfo(index){//是否显示隐藏按钮的事件
         Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index]);//通过类名控制图片和文字颜色
-				if(!this.openOrPrivacy[index]){
-					Vue.set(this.openOrPrivacyText,[index],"隐藏");
-					this.education[index].ifVisable = 0
-				}else{
-					Vue.set(this.openOrPrivacyText,[index],"显示");
-					this.education[index].ifVisable = 1
-				}
-				var that = this;
-				if(that.education[index].schoolTimeDown=="至今"){
-				 	that.education[index].schoolTimeDown = "0000.00.00";
-				 }
-				var url = MyAjax.urlsy +"/psnEduBackGround/update"
+        if(!this.openOrPrivacy[index]){
+          Vue.set(this.openOrPrivacyText,[index],"隐藏")
+        }else{
+          Vue.set(this.openOrPrivacyText,[index],"显示")
+        }
+        for(let i=0;i<this.openOrPrivacy.length;i++){
+        	if(this.openOrPrivacy[i]==false){
+        		this.education[i].ifVisable = 0;
+        	}else{
+        		this.education[i].ifVisable = 1;
+        	}
+        }
+        var that = this;
+        var url = MyAjax.urlsy +"/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -518,13 +525,8 @@
 				that.updateData();
         /*显示隐藏文字切换*/
       },
-			async editEduExist(index){//编辑按钮事件，进入编辑模式
-				let professionName=this.localEdu[index].professionName;
-				let education=this.localEdu[index].education; 
-        professionName=="（暂无信息）" ? this.localEdu[index].professionName="":professionName=professionName;
-				education=="（暂无信息）"?this.localEdu[index].education="":education=education;
-				//如果将要编辑的数据为（暂无信息），则重置位空
-				var that = this;
+      async editEduExist(index){//编辑按钮事件，进入编辑模式
+      	var that = this;
       	//promise 的then方法里面去读取已经上传的图片张数，然后实例化上传组件，以便控制可上传的图片张数
       	const getPic = await that.getPicture(index);
       	if(getPic.code === 0){
@@ -535,27 +537,42 @@
 		    	  	return that.picNum;
   				}
   			)
+<<<<<<< HEAD
+      		console.log(that.picNum[index])
+
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
       	}
       	//实例化上传控件
       	if(Math.floor(3-that.picNum[index])>0){
       		that.localEdu[index].picId = [];
       		$("#"+this.fineUploaderId[index]).html("")
-					moreManualUploader({
-						nameList:'manualUploader'+index,
-						element:that.fineUploaderId[index],
-						template: that.qqTemplate[index],
-						url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
-						anotherParam:that.localEdu[index].pkid,
-						picIdCont:that.localEdu[index].picId,
-						btnPrimary:".btn-primary",
-						canUploadNum : Math.floor(3-that.picNum[index]),
-					})
+		    moreManualUploader({
+		      	nameList:'manualUploader'+index,
+			    element:that.fineUploaderId[index],
+			    template: that.qqTemplate[index],
+			    url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+			    anotherParam:that.localEdu[index].pkid,
+			    picIdCont:that.localEdu[index].picId,
+			    btnPrimary:".btn-primary",
+			    canUploadNum : Math.floor(3-that.picNum[index]),
+		    })
       	}
+<<<<<<< HEAD
+
+    	console.log(that.picNum[index])
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
         Vue.set(that.editEdu.edit,[index],true);
         //编辑和显示的切换
         if(that.localEdu[index].schoolName.length!=0){
           Vue.set(that.buttonColor.exist,[index],false)
         }
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
       },
       deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
       	var that = this;
@@ -563,19 +580,50 @@
       	var p = new Promise((resolve, reject) => {
 			    MyAjax.ajax({
 			      type: "POST",
-						url:url,
-						dataType: "json",
-						async: true, 
-						},(data) => {
-								resolve(data);
-						},(err) => {
-								reject(err);
+					url:url,
+					dataType: "json",
+					async: true, 
+			    },(data) => {
+			        resolve(data);
+			     },(err) => {
+			        reject(err);
 			     });
 			  });
 			  return p;
       },
       async deleThisPic(id,index,$ind){//删除图片
       	var that = this;
+<<<<<<< HEAD
+  		const dele = await that.deleThisPicPromise(id);
+
+  		if(dele.code===0){
+  			const getPic = await that.getPicture(index);
+  			if(getPic.code===0){
+  					const data = await Promise.resolve(true).then(
+	      				function(){
+	      					Vue.set(that.picArr,[index],getPic.msg)
+				    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
+				    	  	return that.picNum;
+	      				}
+	      			)
+  					console.log(data)
+  			}
+  		}
+
+			that.localEdu[index].picId = [];
+			$("#"+this.fineUploaderId[index]).html("")
+     	moreManualUploader({
+      		nameList:'manualUploader'+index,
+	      element:that.fineUploaderId[index],
+	      template: that.qqTemplate[index],
+	      url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+	      deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
+	      anotherParam:that.localEdu[index].pkid,
+	      picIdCont:that.localEdu[index].picId,
+	      btnPrimary:".btn-primary",
+	      canUploadNum:Math.floor(3-that.picNum[index]),
+	    })
+=======
 				const dele = await that.deleThisPicPromise(id);
 				
 				if(dele.code===0){
@@ -604,15 +652,11 @@
 						btnPrimary:".btn-primary",
 						canUploadNum:Math.floor(3-that.picNum[index]),
 					})
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit,[index],false);
-				setTimeout(() => {
-					$("#"+this.fineUploaderId[index]).html("");
-				}, 1);
-				this.localEdu[index]=JSON.parse(JSON.stringify(this.education[index]));
-				
-        //返回到更改之前,如果是暂无消息，重置为空
+				$("#"+this.fineUploaderId[index]).html("");
       },
       
       deleteEduExist(index){//删除按钮事件
@@ -629,6 +673,7 @@
           Vue.set(this.empty,"promote",true);
         }
         var that = this;
+        console.log(that.education[index].pkid)
         var url = MyAjax.urlsy+"/psnEduBackGround/del/"+that.education[index].pkid;
         MyAjax.delete(url)
 
@@ -646,29 +691,54 @@
         //当input的值改变时后面会相应改变的数字
 
         if(this.localEdu[index].schoolName.length>=30){
-					//this.localEdu[index].schoolName=this.localEdu[index].schoolName.slice(0,29);
-					console.log(this.localEdu[index].schoolName)
+          this.localEdu[index].schoolName=this.localEdu[index].schoolName.slice(0,29);
         }
-        if(this.localEdu[index].schoolName.length!=0&&this.localEdu[index].schoolTimeUp.length!=0&&this.localEdu[index].schoolTimeDown.length!=0){
-					//必填项是否为空判断
+        if(this.localEdu[index].schoolName.length!=0){
           Vue.set(this.buttonColor.exist,[index],false)
         }else {
           Vue.set(this.buttonColor.exist,[index],true)
         }
         //通过学校名字的长度，设置提交按钮的不同样式
-			},
+      },
       changeProfession(index){//编辑状态，改变专业名称
         //console.log(this.inputValue.text[index].length)
         Vue.set(this.textLeng.profession,[index],this.localEdu[index].professionName.length)
         //当input的值改变时改变相应的数字
         if(this.localEdu[index].professionName.length>=30){
 
-          //this.localEdu[index].professionName=this.localEdu[index].professionName.slice(0,29);
+          this.localEdu[index].professionName=this.localEdu[index].professionName.slice(0,29);
 
         }
       },
       //以上是改变数据
 			keepEditEduExist(index){//编辑状态，提交保存
+<<<<<<< HEAD
+				var that = this;
+				console.log(that.localEdu[index])
+				 var date = new Date;
+//				 date.setFullYear(1992,02,05);
+//				 var month=date.setMonth("00");
+//				 month =(month<10 ? "0"+month:month);
+//				 var mydate = (year.toString()+'.'+month.toString());
+				 console.log(date)
+				 if(that.localEdu[index].schoolTimeDown=="至今"){
+				 	that.localEdu[index].schoolTimeDown = "0000.00.00";
+				 }
+//      var judgUpDate=this.education[index].schoolName==this.inputValue.schoolText[index]&&this.education[index].info.profession==this.inputValue.professionText[index]&&this.education[index].info.schoolTimeStart==this.inputValue.schoolTimeStart[index]&&this.education[index].info.schoolTimeEnd==this.inputValue.schoolTimeEnd[index]&&this.education[index].info.introduce == this.inputValue.introduce[index];/*数据是否更改的判断条件*/
+				if(that.localEdu[index].schoolName.trim().length===0){
+					that.showAlert.schoolName = true;
+					that.alertText.schoolName = "请填写学校名称"
+				}else if(that.localEdu[index].schoolTimeUp.trim().length===0||that.localEdu[index].schoolTimeDown.trim().length===0){
+					that.showAlert.schoolTime = true;
+					that.alertText.schoolTime = "请填写在校时间"
+				}else if(that.localEdu[index].schoolName.trim().length!=0&&
+				（that.localEdu[index].schoolTimeUp.trim().length!=0||that.localEdu[index].schoolTimeDown.trim().length!=0)){
+					that.showAlert.schoolName = false;
+					that.showAlert.schoolTime = false;
+					var url = "http://10.1.31.16:8080/psnEduBackGround/update"
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+=======
 				if(this.localEdu[index].schoolName.length!=0&&this.localEdu[index].schoolTimeUp.length!=0&&this.localEdu[index].schoolTimeDown.length!=0){
 					//必填项是否为空判断
 					var that = this;
@@ -678,6 +748,7 @@
 					var url = MyAjax.urlsy+"/psnEduBackGround/update"
 					$.ajaxSetup({ contentType : 'application/json' });
 					MyAjax.ajax({//更新到服务器
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 						type: "POST",
 						url:url,
 						data: JSON.stringify(that.localEdu[index]),
@@ -685,19 +756,27 @@
 						contentType:"application/json;charset=utf-8",
 						async: true,
 					},function(data){
+						console.log(data)
 						if(data.code === "200001"){
 							console.log(data.msg)
 						}else{
-							that.updateData();//保存之后再重新拉取数据
-							setTimeout(function(){//数据更新成功，移除图片上传的文档元素，便于下次实例化
-								$("#"+that.fineUploaderId[index]).html("")
-							},1)
+							that.updateData();
 							Vue.set(that.editEdu.edit,[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
 						}
 					},function(err){
 						console.log(err)
-					})
+					})//更新到服务器
+					//保存之后再重新拉取数据
 				}
+<<<<<<< HEAD
+        
+
+        //提交编辑后的数据
+				$("#"+this.fineUploaderId[index]).html("")
+
+				console.log(that.localEdu[index])
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
       },
       //提交数据
       cancellEditEdu(){//添加模式下，取消编辑
@@ -717,10 +796,9 @@
         Vue.set(this.newTextLeng.schoolName,[0],this.newInputValue.schoolName.length)
         //当input的值改变时改变相应的数字
         if(this.newInputValue.schoolName.length>=30){
-          //this.newInputValue.schoolName=this.newInputValue.schoolName.slice(0,29);
-				}
-        if(this.newInputValue.schoolName.length!=0&&this.newInputValue.schoolTimeUp.length!=0&&this.newInputValue.schoolTimeDown.length!=0){
-					//必填项是否为空判断
+          this.newInputValue.schoolName=this.newInputValue.schoolName.slice(0,29);
+        }
+        if(this.newInputValue.schoolName.length!=0){
           Vue.set(this.buttonColor,"add",false)
         }else {
           Vue.set(this.buttonColor,"add",true)
@@ -732,23 +810,46 @@
         //当input的值改变时改变相应的数字
 
         if(this.newInputValue.professionName.length>=30){
-          //this.newInputValue.professionName=this.newInputValue.professionName.slice(0,29);
+          this.newInputValue.professionName=this.newInputValue.professionName.slice(0,29);
         }
-			},
-			addShoolTime(index){
-				if(this.newInputValue.schoolName.length!=0&&this.newInputValue.schoolTimeUp.length!=0&&this.newInputValue.schoolTimeDown.length!=0){
-					//必填项是否为空判断
-          Vue.set(this.buttonColor,"add",false)
-        }else {
-          Vue.set(this.buttonColor,"add",true)
-        }
-        //通过学校名字的长度，设置提交按钮的不同样式
-			},
+      },
       keepEditEduNew(){//添加模式下保存
-				if(this.newInputValue.schoolName.length!=0&&this.newInputValue.schoolTimeUp.length!=0&&this.newInputValue.schoolTimeDown.length!=0){
-					//必填项是否为空判断
+				if(this.newInputValue.schoolName.length!=0){
           this.localEdu.push(JSON.parse(JSON.stringify(this.newInputValue)))
           /*添加的数据，追加到本地数据里一份*/
+<<<<<<< HEAD
+//        this.education.push({schoolName:this.newInputValue.schoolText,info:{schoolTimeStart:this.newInputValue.schoolTimeStart,schoolTimeEnd:this.newInputValue.schoolTimeEnd,profession:this.newInputValue.professionText,introduce:this.newInputValue.introduce}})//向store中追加添加的数据
+          /*添加的数据追加到vuex中*/
+
+          /*保存添加后，清除之前添加的数据*/
+          this.editEdu.delete.push(true)//解决添加数据后视图部更新
+          Vue.set(this.editEdu,"add",false);//如果学校名称为空不能提交，视图不会切换
+          this.openOrPrivacy.push(true);//是否显示样式
+          this.openOrPrivacyText.push("显示");//是否显示文本信息
+        }
+
+        var that = this;
+        if(that.newInputValue.schoolTimeDown=="至今"){
+				 	that.newInputValue.schoolTimeDown = "0000.00.00";
+				}
+        console.log(JSON.stringify(that.newInputValue))
+        var url = "http://10.1.31.16:8080/psnEduBackGround/insert";
+        $.ajaxSetup({ contentType : 'application/json' });
+        MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.newInputValue),
+					dataType: "json",
+					async: false,
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})
+        that.updateData();
+
+	      $("#fine-uploader-manual-trigger").html("")
+=======
           this.editEdu.delete.push(true)//解决添加数据后视图部更新
           Vue.set(this.editEdu,"add",false);//如果学校名称为空不能提交，视图不会切换
           this.openOrPrivacy.push(true);//是否显示样式
@@ -776,10 +877,11 @@
 						$("#fine-uploader-manual-trigger").html("")
 					},1)
         } 
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 	    }
 
       //新建部分
-		},
+    }
   }
 </script>
 <style scoped lang="scss">
@@ -841,7 +943,7 @@
             color: $themeColor;
             padding-bottom:12px;
             h4{
-              font-size: 14px;
+              font-size: 18px;
               float: left;
             }
             ul{
@@ -963,15 +1065,12 @@
               float: left;
               font-size:14px;
             }
-            p:nth-child(1){//显示列表，时间
-              width: 154px;
+            p:nth-child(1){
+              width:292px;
               height: 21px;
             }
-            p:nth-child(2){//显示列表，专业
-              width:500px;
-              height: 21px;
-						}
-						p:nth-child(3){//显示列表，学历
+            p:nth-child(2){
+              width:214px;
               height: 21px;
             }
           }
@@ -1069,14 +1168,14 @@
           }*/
 
         }
-        li:nth-child(1){//学校名称
+        li:nth-child(1){
         	 height: 55px;
           input{
             width:480px;
             /*margin-left:26px;*/
           }
         }
-        li:nth-child(2){//在校时间按
+        li:nth-child(2){
           color: #000;
           span{
             float: left;
@@ -1094,20 +1193,15 @@
             margin:0 20px;
           }
         }
-        li:nth-child(3){//专业名词
+        li:nth-child(3){
         	height: 55px;
           input{
             width:480px;
           }
         }
-        li:nth-child(4){//学历下拉
-          select{
-						width:100px;
-						height: 35px;
-						border-radius: 5px;
-						color: #363636;
-						border: 1px solid #ebebeb;
-						padding-left: 12px;
+        li:nth-child(4){
+          input{
+            width:480px;
           }
         }
         li.img-wrap{

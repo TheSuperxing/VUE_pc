@@ -102,7 +102,7 @@
             </li>
             <li class="clear">
               <h5>*&nbsp;任职职位</h5>
-              <input type="text" v-model="localWorkExperience[index].ocupation" >
+              <input @input="changeWEXP(index)" type="text" v-model="localWorkExperience[index].ocupation" >
             </li>
             <li class="clear">
               <h5>*&nbsp;任职时间</h5>
@@ -367,6 +367,17 @@
         ocupation=="（暂无信息）"?this.localWorkExperience[index].ocupation="":ocupation=ocupation;
         jobDescription=="（暂无信息）"?this.localWorkExperience[index].jobDescription="":jobDescription=jobDescription;
         //如果将要编辑的数据为（暂无信息），则重置位空
+      },
+      changeWEXP(index){//编辑状态下，工作经历的变化的input事件
+        console.log(this.localWorkExperience[index])
+        let condition=this.localWorkExperience[index].ocupation.length!=0
+        &&this.localWorkExperience[index].ocupationTimeUp.length!=0
+        &&this.localWorkExperience[index].ocupationTimeDown.length!=0;//按钮的颜色是否可用颜色的判断条件
+        if(condition){
+          Vue.set(this.buttonColor.exist,[index],false)
+        }else{
+          Vue.set(this.buttonColor.exist,[index],true)
+        }
       },
       cancelEdit(index){//编辑状态取消按钮的单击事件，取消编辑状态，回到显示状态
         Vue.set(this.reveal.editInfo,[index],true);//取消编辑的视图切换

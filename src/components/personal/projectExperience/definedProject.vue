@@ -485,7 +485,7 @@ $activeColor: rgb(242,117,25);
 			
 			li{
 				&:after{display:block; content:'clear'; clear:both; line-height:0; visibility:hidden;} 
-				
+				position:relative;
 				.table-wrap-left{
 					color: $activeColor;
 					margin-right: 30px;
@@ -493,6 +493,11 @@ $activeColor: rgb(242,117,25);
 					width: 80px;
 					text-align: right;
 				}
+				.alet_container{
+			      	right: 10px;
+			      	top: 8px;
+			      	bottom: 0;
+			      }
 				&.name-wrap{	
 					height: 35px;
 					line-height: 35px;

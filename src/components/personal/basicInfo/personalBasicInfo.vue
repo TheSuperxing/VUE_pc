@@ -48,7 +48,13 @@
         </li>
         <li class="clear">
         	<h5>支付宝账号:</h5>
-        	<p>{{baseInfo.phoneNumber}}</p>
+        	<p>{{baseInfo.alipayAccount}}</p>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[5]}" v-on:click="openOrPrivacy(5)"></strong>
+          <p v-if="noBaseInfo">（暂无信息）</p>
+        </li>
+        <li class="clear">
+        	<h5>微信账号:</h5>
+        	<p>{{baseInfo.wechatAccount}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[5]}" v-on:click="openOrPrivacy(5)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
@@ -68,7 +74,7 @@
           <p>{{baseInfo.psnName}}</p>
           <i>{{textLeng.psnName}}/30</i>
           <span>（进入实名认证流程后，姓名将不可以自行修改，需联系管理员）</span>
-				  <alertTip v-if="showAlert.psnName" :showHide="showAlert.psnName"  :alertText="alertText.psnName"></alertTip>
+				  
 					
         </li>
         
@@ -76,6 +82,7 @@
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p><input type="text" v-model="localBaseInfo.psnName"  v-on:input="changeName"></p>
           <i>{{textLeng.psnName}}/30</i>
+          <alertTip v-if="showAlert.psnName" :showHide="showAlert.psnName"  :alertText="alertText.psnName"></alertTip>
         </li>
         
         <li class="clear">
@@ -99,10 +106,18 @@
           <h5>联系邮箱：</h5>
           <p><input type="text" v-model="localBaseInfo.psnMail" ></p>
         </li>
+       
         <li class="clear">
+        	
         	<h5><span>*</span> 支付宝账号：</h5>
-        	<p><input type="text" v-model="localBaseInfo.phoneNumber"/></p>
+        	<p><input type="text" v-model="localBaseInfo.alipayAccount"/></p>
+        	<p class="tip">该账号将在协议支付时提供给付款方，为保证交易的顺利进行，请准确填写</p>
 				  <alertTip v-if="showAlert.alipay" :showHide="showAlert.alipay"  :alertText="alertText.alipay"></alertTip>
+        	
+        </li>
+        <li class="clear">
+        	<h5>微信账号：</h5>
+        	<p><input type="text" v-model="localBaseInfo.wechatAccount"/></p>
         	
         </li>
         <li class="cancelSubmit clear">
@@ -360,6 +375,11 @@
 			      that.baseInfo.dateOfBirth=emptyText(that.baseInfo.dateOfBirth);
 			      that.baseInfo.psnMail=emptyText(that.baseInfo.psnMail);
 			      that.baseInfo.phoneNumber=emptyText(that.baseInfo.phoneNumber);
+			      that.baseInfo.alipayAccount=emptyText(that.baseInfo.alipayAccount);
+			      that.baseInfo.wechatAccount=emptyText(that.baseInfo.wechatAccount);
+			      
+			      
+			      
 			      //如果得到的数据为空，进行暂没有消息处理
 						that.reveal.openOrPrivacy = [];
 			      that.localBaseInfo=JSON.parse(JSON.stringify(that.baseInfo));
@@ -368,7 +388,10 @@
 			      that.reveal.openOrPrivacy.push(that.baseInfo.ageVisable)
 			      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
 			      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
-			      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
+			      that.reveal.openOrPrivacy.push(that.baseInfo.alipayAccountVisable)
+			      that.reveal.openOrPrivacy.push(that.baseInfo.wechatAccountVisable)
+			      
+			      
 			      /*初始化openOrPrivacy*/
 						
 						for(var i=0;i<that.reveal.openOrPrivacy.length;i++){
@@ -415,6 +438,8 @@
 	      this.localBaseInfo.sex=emptyText(this.localBaseInfo.sex);
 	      this.localBaseInfo.psnMail=emptyText(this.localBaseInfo.psnMail);
 	      this.localBaseInfo.phoneNumber=emptyText(this.localBaseInfo.phoneNumber);
+	      this.localBaseInfo.alipayAccount=emptyText(this.localBaseInfo.alipayAccount);
+	      this.localBaseInfo.wechatAccount=emptyText(this.localBaseInfo.wechatAccount);
 				var d = new Date();
 //				console.log(d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate())
 				if(this.localBaseInfo.dateOfBirth == "（暂无信息）"){
@@ -500,7 +525,9 @@
 	    	this.localBaseInfo.ageVisable = this.reveal.openOrPrivacy[2];
 	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
-	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[5];//支付宝账号
+	    	this.localBaseInfo.alipayAccountVisable = this.reveal.openOrPrivacy[5];//支付宝账号
+	    	this.localBaseInfo.wechatAccountVisable = this.reveal.openOrPrivacy[5];//支付宝账号
+	    	
 	    	if(this.localBaseInfo.sex=='男'){
 	    		this.localBaseInfo.sex = "0";
 	    	}else if(this.localBaseInfo.sex=='女'){
@@ -508,10 +535,29 @@
 	    	}
 	    	
 	    	var that = this;
-	    	if(that.localBaseInfo.phoneNumber.trim().length===0){
+	    	if(that.localBaseInfo.nickName.trim().length===0){
+	    		that.showAlert.nickName = true;
+	    		that.alertText.nickName = "请填写昵称"
+	    	}else{
+	    		that.showAlert.nickName = false;
+	    		that.alertText.nickName = ""
+	    	}
+	    	if(that.localBaseInfo.psnName.trim().length===0){
+	    		that.showAlert.psnName = true;
+	    		that.alertText.psnName = "请填写姓名"
+	    	}else{
+	    		that.showAlert.psnName = false;
+	    		that.alertText.psnName = ""
+	    	}
+	    	if(that.localBaseInfo.alipayAccount.trim().length===0){
 	    		that.showAlert.alipay = true;
 	    		that.alertText.alipay = "请填写支付宝账号"
-	    	}else if(that.localBaseInfo.phoneNumber.trim().length!=0){
+	    	}else{
+	    		that.showAlert.alipay = false;
+	    		that.alertText.alipay = ""
+	    	}
+	    	if(that.localBaseInfo.nickName.trim().length!=0&&that.localBaseInfo.psnName.trim().length!=0&&
+	    	that.localBaseInfo.alipayAccount.trim().length!=0){
 	    		var url = MyAjax.urlsy+"/personalbasicinfo/update";
 		    	$.ajaxSetup({ contentType : 'application/json' });
 		    	MyAjax.ajax({
@@ -708,6 +754,7 @@
 
         }
         li:nth-child(1){
+        	position: relative;
           h5{
           	
             background: url("../../../assets/img/personal/basicInfo/pet_name.png") left center no-repeat;
@@ -728,9 +775,15 @@
             margin-left:10px;
             margin-top: 5px;
           }
+          .alet_container{
+          	right: 120px;
+          	top: 10px;
+          	bottom: 0;
+          }
 
         }
         li:nth-child(2){
+        	position: relative;
           h5{
             background: url("../../../assets/img/personal/basicInfo/name.png") left center no-repeat;
             span{
@@ -752,6 +805,11 @@
           }
           input{
             width:384px;
+          }
+          .alet_container{
+          	right: 120px;
+          	top: 10px;
+          	bottom: 0;
           }
         }
         li:nth-child(3){
@@ -819,11 +877,26 @@
            input{
           	width: 365px;
           }
+          .tip{
+          	color: $activeColor;
+          	margin-left: 130px;
+          	display: block;
+          }
           .alet_container{
           	right: 120px;
           	top: 10px;
           	bottom: 0;
           }
+        }
+        li:nth-child(8){
+        	position: relative;
+          h5{
+            background: url("../../../assets/img/personal/basicInfo/icon_mail.png") left center no-repeat;
+          }
+           input{
+          	width: 385px;
+          }
+         
         }
         .cancelSubmit{
           margin:30px 0 15px 277px;

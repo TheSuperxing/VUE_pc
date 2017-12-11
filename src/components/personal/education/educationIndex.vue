@@ -31,14 +31,13 @@
 		    	</ul>
 					<div class="viewMore" v-show="!editEdu.edit[index]">
 						<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
-							
 								<span>{{updowntxt[index]}}</span>
 						</p>
 					</div>
 
           <ul class="editEduInfo" v-show="editEdu.edit[index]">
             <li class="clear">
-              <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)"><span>{{textLeng.schoolName[index]}}/30</span>
+              <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)" maxlength="30"><span>{{textLeng.schoolName[index]}}/30</span>
             </li>
             <li class="clear">
               <span class="wrap-left">*在校时间</span>
@@ -50,7 +49,7 @@
             </li>
             <li class="clear">
               <label>
-                <span class="wrap-left">专业名称</span><input v-model="localEdu[index].professionName" v-on:input="changeProfession(index)" type="text" placeholder="请输入专业名称"><span>{{textLeng.profession[index]}}/30</span>
+                <span class="wrap-left">专业名称</span><input v-model="localEdu[index].professionName" v-on:input="changeProfession(index)" type="text" placeholder="请输入专业名称" maxlength="30"><span>{{textLeng.profession[index]}}/30</span>
               </label>
             </li>
             <li class="clear">
@@ -152,20 +151,20 @@
       <ul class="editEduInfo" v-show="editEdu.add">
         <li class="clear">
           <label>
-           <span class="wrap-left">*学校名称 </span><input v-model="newInputValue.schoolName" v-on:input="addShoolName" type="text" placeholder="请输入学校名称"><span>{{newTextLeng.schoolName[0]}}/30</span>
+           <span class="wrap-left">*学校名称 </span><input v-model="newInputValue.schoolName" v-on:input="addShoolName" type="text" placeholder="请输入学校名称" maxlength="30"><span>{{newTextLeng.schoolName[0]}}/30</span>
           </label>
         </li>
         <li class="clear">
           <span class="wrap-left">*在校时间</span>
           <!-- <datepicker v-model="newInputValue.schoolTimeUp"></datepicker> -->
-					<year-month v-model="newInputValue.schoolTimeUp"></year-month> 
+					<year-month v-on:input="addShoolTime" v-model="newInputValue.schoolTimeUp"></year-month> 
           <span>——</span>
           <!-- <datepicker v-model="newInputValue.schoolTimeDown" v-bind:value="{type:['month']}"></datepicker> -->
-					<year-month v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
+					<year-month v-on:input="addShoolTime" v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
 				</li>
         <li class="clear">
           <label>
-            <span class="wrap-left">专业名称</span> <input v-model="newInputValue.professionName" v-on:input="addProfession" type="text" placeholder="请输入专业名称"><span>{{newTextLeng.profession[0]}}/30</span>
+            <span class="wrap-left">专业名称</span> <input v-model="newInputValue.professionName" v-on:input="addProfession" type="text" placeholder="请输入专业名称" maxlength="30"><span>{{newTextLeng.profession[0]}}/30</span>
           </label>
         </li>
         <li class="clear">
@@ -336,7 +335,6 @@
 					dataType: "json",
 					async: false,
 				},function(data){
-					console.log(data.msg)
 					if(data.code==0){
 						that.education = data.msg;
 					}else{
@@ -419,7 +417,7 @@
 								reject(err);
 						});
 					});
-    	},
+			},
     	upDown(index){
     		var that = this;
 				if(that.show.tag[index]==true){
@@ -458,20 +456,18 @@
       },
       openOrPrivacyInfo(index){//是否显示隐藏按钮的事件
         Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index]);//通过类名控制图片和文字颜色
-        if(!this.openOrPrivacy[index]){
-          Vue.set(this.openOrPrivacyText,[index],"隐藏")
-        }else{
-          Vue.set(this.openOrPrivacyText,[index],"显示")
-        }
-        for(let i=0;i<this.openOrPrivacy.length;i++){
-        	if(this.openOrPrivacy[i]==false){
-        		this.education[i].ifVisable = 0;
-        	}else{
-        		this.education[i].ifVisable = 1;
-        	}
-        }
-        var that = this;
-        var url = MyAjax.urlsy +"/psnEduBackGround/update"
+				if(!this.openOrPrivacy[index]){
+					Vue.set(this.openOrPrivacyText,[index],"隐藏");
+					this.education[index].ifVisable = 0
+				}else{
+					Vue.set(this.openOrPrivacyText,[index],"显示");
+					this.education[index].ifVisable = 1
+				}
+				var that = this;
+				if(that.education[index].schoolTimeDown=="至今"){
+				 	that.education[index].schoolTimeDown = "0000.00.00";
+				 }
+				var url = MyAjax.urlsy +"/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
 					type: "POST",
@@ -501,26 +497,22 @@
 		    	  	return that.picNum;
   				}
   			)
-      		console.log(that.picNum[index])
-      		
       	}
       	//实例化上传控件
       	if(Math.floor(3-that.picNum[index])>0){
       		that.localEdu[index].picId = [];
       		$("#"+this.fineUploaderId[index]).html("")
-		    moreManualUploader({
-		      	nameList:'manualUploader'+index,
-			    element:that.fineUploaderId[index],
-			    template: that.qqTemplate[index],
-			    url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
-			    anotherParam:that.localEdu[index].pkid,
-			    picIdCont:that.localEdu[index].picId,
-			    btnPrimary:".btn-primary",
-			    canUploadNum : Math.floor(3-that.picNum[index]),
-		    })
+					moreManualUploader({
+						nameList:'manualUploader'+index,
+						element:that.fineUploaderId[index],
+						template: that.qqTemplate[index],
+						url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+						anotherParam:that.localEdu[index].pkid,
+						picIdCont:that.localEdu[index].picId,
+						btnPrimary:".btn-primary",
+						canUploadNum : Math.floor(3-that.picNum[index]),
+					})
       	}
-      	
-    	console.log(that.picNum[index])
         Vue.set(that.editEdu.edit,[index],true);
         //编辑和显示的切换
         if(that.localEdu[index].schoolName.length!=0){
@@ -535,62 +527,57 @@
       	var p = new Promise((resolve, reject) => {
 			    MyAjax.ajax({
 			      type: "POST",
-					url:url,
-					dataType: "json",
-					async: true, 
-			    },(data) => {
-			        resolve(data);
-			     },(err) => {
-			        reject(err);
+						url:url,
+						dataType: "json",
+						async: true, 
+						},(data) => {
+								resolve(data);
+						},(err) => {
+								reject(err);
 			     });
 			  });
 			  return p;
       },
       async deleThisPic(id,index,$ind){//删除图片
       	var that = this;
-  		const dele = await that.deleThisPicPromise(id);
-  		
-  		if(dele.code===0){
-  			const getPic = await that.getPicture(index);
-  			if(getPic.code===0){
-  					const data = await Promise.resolve(true).then(
-	      				function(){
-	      					Vue.set(that.picArr,[index],getPic.msg)
-				    	  	Vue.set(that.picNum,[index],that.picArr[index].length)
-				    	  	return that.picNum;
-	      				}
-	      			)
-  					console.log(data)
-  			}
-  		}
+				const dele = await that.deleThisPicPromise(id);
+				
+				if(dele.code===0){
+					const getPic = await that.getPicture(index);
+					if(getPic.code===0){
+							const data = await Promise.resolve(true).then(
+									function(){
+										Vue.set(that.picArr,[index],getPic.msg)
+										Vue.set(that.picNum,[index],that.picArr[index].length)
+										return that.picNum;
+									}
+								)
+					}
+				}
 
-		that.localEdu[index].picId = [];
-		$("#"+this.fineUploaderId[index]).html("")
-     	moreManualUploader({
-      		nameList:'manualUploader'+index,
-	      element:that.fineUploaderId[index],
-	      template: that.qqTemplate[index],
-	      url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
-	      deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
-	      anotherParam:that.localEdu[index].pkid,
-	      picIdCont:that.localEdu[index].picId,
-	      btnPrimary:".btn-primary",
-	      canUploadNum:Math.floor(3-that.picNum[index]),
-	    })
+				that.localEdu[index].picId = [];
+				$("#"+this.fineUploaderId[index]).html("")
+					moreManualUploader({
+							nameList:'manualUploader'+index,
+						element:that.fineUploaderId[index],
+						template: that.qqTemplate[index],
+						url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+						deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
+						anotherParam:that.localEdu[index].pkid,
+						picIdCont:that.localEdu[index].picId,
+						btnPrimary:".btn-primary",
+						canUploadNum:Math.floor(3-that.picNum[index]),
+					})
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit,[index],false);
 				$("#"+this.fineUploaderId[index]).html("");
       },
       deleteEduExist(index){//删除按钮事件
-//      Vue.set(this.editEdu.delete[0],[index],false);
-//      this.education.splice(index,1)
-//      Vue.set(this.editEdu.delete[0],[index],true)//为	了解决删除一项后一项不会显示问题
         if(this.education.length==0){//数据完全删除后显示无数据提示
           Vue.set(this.empty,"promote",true);
         }
         var that = this;
-        console.log(that.education[index].pkid)
         var url = MyAjax.urlsy+"/psnEduBackGround/del/"+that.education[index].pkid;
         MyAjax.delete(url)
 
@@ -603,15 +590,17 @@
         //当input的值改变时后面会相应改变的数字
 
         if(this.localEdu[index].schoolName.length>=30){
-          this.localEdu[index].schoolName=this.localEdu[index].schoolName.slice(0,29);
+					//this.localEdu[index].schoolName=this.localEdu[index].schoolName.slice(0,29);
+					console.log(this.localEdu[index].schoolName)
         }
-        if(this.localEdu[index].schoolName.length!=0){
+        if(this.localEdu[index].schoolName.length!=0&&this.localEdu[index].schoolTimeUp.length!=0&&this.localEdu[index].schoolTimeDown.length!=0){
+					//必填项是否为空判断
           Vue.set(this.buttonColor.exist,[index],false)
         }else {
           Vue.set(this.buttonColor.exist,[index],true)
         }
         //通过学校名字的长度，设置提交按钮的不同样式
-      },
+			},
       changeProfession(index){//编辑状态，改变专业名称
         //console.log(this.inputValue.text[index].length)
         Vue.set(this.textLeng.profession,[index],this.localEdu[index].professionName.length)
@@ -624,45 +613,35 @@
       },
       //以上是改变数据
 			keepEditEduExist(index){//编辑状态，提交保存
-				var that = this;
-				console.log(that.localEdu[index])
-				 var date = new Date;
-//				 date.setFullYear(1992,02,05); 
-//				 var month=date.setMonth("00");
-//				 month =(month<10 ? "0"+month:month); 
-//				 var mydate = (year.toString()+'.'+month.toString());
-				 console.log(date)
-				 if(that.localEdu[index].schoolTimeDown=="至今"){
-				 	that.localEdu[index].schoolTimeDown = "0000.00.00";
-				 }
-//      var judgUpDate=this.education[index].schoolName==this.inputValue.schoolText[index]&&this.education[index].info.profession==this.inputValue.professionText[index]&&this.education[index].info.schoolTimeStart==this.inputValue.schoolTimeStart[index]&&this.education[index].info.schoolTimeEnd==this.inputValue.schoolTimeEnd[index]&&this.education[index].info.introduce == this.inputValue.introduce[index];/*数据是否更改的判断条件*/
-				
-        var url = "http://10.1.31.16:8080/psnEduBackGround/update"
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: JSON.stringify(that.localEdu[index]),
-					dataType: "json",
-					contentType:"application/json;charset=utf-8",
-					async: true,
-				},function(data){
-					console.log(data)
-					if(data.code === "200001"){
-						console.log(data.msg)
-					}else{
-						that.updateData();
-						Vue.set(that.editEdu.edit,[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+				if(this.localEdu[index].schoolName.length!=0&&this.localEdu[index].schoolTimeUp.length!=0&&this.localEdu[index].schoolTimeDown.length!=0){
+					//必填项是否为空判断
+					var that = this;
+					if(that.localEdu[index].schoolTimeDown=="至今"){
+						that.localEdu[index].schoolTimeDown = "0000.00.00";
 					}
-				},function(err){
-					console.log(err)
-				})//更新到服务器
-				//保存之后再重新拉取数据
-				
-        //提交编辑后的数据
-				$("#"+this.fineUploaderId[index]).html("")
-				
-				console.log(that.localEdu[index])
+					var url = MyAjax.urlsy+"/psnEduBackGround/update"
+					$.ajaxSetup({ contentType : 'application/json' });
+					MyAjax.ajax({//更新到服务器
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localEdu[index]),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+						async: true,
+					},function(data){
+						if(data.code === "200001"){
+							console.log(data.msg)
+						}else{
+							that.updateData();//保存之后再重新拉取数据
+							setTimeout(function(){//数据更新成功，移除图片上传的文档元素，便于下次实例化
+								$("#"+that.fineUploaderId[index]).html("")
+							},1)
+							Vue.set(that.editEdu.edit,[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
+						}
+					},function(err){
+						console.log(err)
+					})
+				}
       },
       //提交数据
       cancellEditEdu(){//添加模式下，取消编辑
@@ -682,9 +661,10 @@
         Vue.set(this.newTextLeng.schoolName,[0],this.newInputValue.schoolName.length)
         //当input的值改变时改变相应的数字
         if(this.newInputValue.schoolName.length>=30){
-          this.newInputValue.schoolName=this.newInputValue.schoolName.slice(0,29);
-        }
-        if(this.newInputValue.schoolName.length!=0){
+          //this.newInputValue.schoolName=this.newInputValue.schoolName.slice(0,29);
+				}
+        if(this.newInputValue.schoolName.length!=0&&this.newInputValue.schoolTimeUp.length!=0&&this.newInputValue.schoolTimeDown.length!=0){
+					//必填项是否为空判断
           Vue.set(this.buttonColor,"add",false)
         }else {
           Vue.set(this.buttonColor,"add",true)
@@ -698,46 +678,52 @@
         if(this.newInputValue.professionName.length>=30){
           this.newInputValue.professionName=this.newInputValue.professionName.slice(0,29);
         }
-      },
+			},
+			addShoolTime(index){
+				if(this.newInputValue.schoolName.length!=0&&this.newInputValue.schoolTimeUp.length!=0&&this.newInputValue.schoolTimeDown.length!=0){
+					//必填项是否为空判断
+          Vue.set(this.buttonColor,"add",false)
+        }else {
+          Vue.set(this.buttonColor,"add",true)
+        }
+        //通过学校名字的长度，设置提交按钮的不同样式
+			},
       keepEditEduNew(){//添加模式下保存
-				if(this.newInputValue.schoolName.length!=0){
+				if(this.newInputValue.schoolName.length!=0&&this.newInputValue.schoolTimeUp.length!=0&&this.newInputValue.schoolTimeDown.length!=0){
+					//必填项是否为空判断
           this.localEdu.push(JSON.parse(JSON.stringify(this.newInputValue)))
           /*添加的数据，追加到本地数据里一份*/
-//        this.education.push({schoolName:this.newInputValue.schoolText,info:{schoolTimeStart:this.newInputValue.schoolTimeStart,schoolTimeEnd:this.newInputValue.schoolTimeEnd,profession:this.newInputValue.professionText,introduce:this.newInputValue.introduce}})//向store中追加添加的数据
-          /*添加的数据追加到vuex中*/
-          
-          /*保存添加后，清除之前添加的数据*/
           this.editEdu.delete.push(true)//解决添加数据后视图部更新
           Vue.set(this.editEdu,"add",false);//如果学校名称为空不能提交，视图不会切换
           this.openOrPrivacy.push(true);//是否显示样式
-          this.openOrPrivacyText.push("显示");//是否显示文本信息
-        }
-        
-        var that = this;
-        if(that.newInputValue.schoolTimeDown=="至今"){
-		 	that.newInputValue.schoolTimeDown = "0000.00.00";
-		 }
-        console.log(JSON.stringify(that.newInputValue))
-        var url = "http://10.1.31.16:8080/psnEduBackGround/insert";
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data:JSON.stringify(that.newInputValue),
-					dataType: "json",
-					async: false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
-        that.updateData();
-        
-	      $("#fine-uploader-manual-trigger").html("")  
+					this.openOrPrivacyText.push("显示");//是否显示文本信息
+					//以上是一些状态的控制
+					var that = this;
+					if(that.newInputValue.schoolTimeDown=="至今"){
+						that.newInputValue.schoolTimeDown = "0000.00.00";
+					}
+					var url = MyAjax.urlsy+"/psnEduBackGround/insert";
+					$.ajaxSetup({ contentType : 'application/json' });
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.newInputValue),
+						dataType: "json",
+						async: false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})
+					that.updateData();
+					setTimeout(function(){
+						$("#fine-uploader-manual-trigger").html("")
+					},1)
+        } 
 	    }
 	      
       //新建部分
-    }
+		},
   }
 </script>
 <style scoped lang="scss">

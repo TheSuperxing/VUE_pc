@@ -19,7 +19,7 @@
           <li v-bind:class="{beforeSearch:!reveal.searchShow}" class="clear">
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
-             <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
+            <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
             <button  v-on:click="search" @keydown="keySearch">
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>

@@ -12,11 +12,11 @@
             <p><em>退出登录</em></p>
           </div> -->
         </li>
-        <li>
-          <p>
+        <li class="notice">
+          <router-link to="/notice">
             <span>消息</span>
             <span v-cloak>（{{msgNum}}）</span>
-          </p>
+          </router-link>
         </li>
       </ul>
     </div>
@@ -209,9 +209,10 @@
           float: left;
           line-height: 40px;
           height: 40px;
-          p{
+          a{
             display: inline-block;
             padding-left:37px;
+            color: #ffffff;
             span:nth-child(2){
               color: #2eb3df;
             }
@@ -263,8 +264,8 @@
             }
           }
         }
-        li:nth-child(2){
-          p{
+        .notice{
+          a{
             background: url("../assets/img/top/xiaoxi.png") left center no-repeat;
           }
         }

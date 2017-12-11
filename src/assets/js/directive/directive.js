@@ -8,5 +8,4 @@ const title=Vue.directive('title',{
     },2000)
   }
 })
-
 export {title}

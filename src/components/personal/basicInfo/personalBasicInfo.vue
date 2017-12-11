@@ -92,8 +92,8 @@
           <p><input type="text" v-model="localBaseInfo.psnMail" ></p>
         </li>
         <li class="cancelSubmit clear">
-          <button v-on:click="cancelEdit">取消</button>
-          <button v-on:click="submitEdit" v-bind:class="{submitBgColor:reveal.submitBgColor}">保存</button>
+          <button class="submitEdit" v-on:click="submitEdit" v-bind:class="{submitBgColor:reveal.submitBgColor}">保存</button>
+          <button class="cancelEdit" v-on:click="cancelEdit">取消</button>
         </li>
       </ul>
       <div class="realName">
@@ -797,10 +797,10 @@
             margin-right:30px;
             background: url("../../../assets/img/personal/education/btn_save_disabled.png.png");
           }
-          button:nth-child(1){
+          .cancelEdit{
             background: #ffffff;
           }
-          button:nth-child(2){
+          .submitEdit{
             border:0;
             color: #FFF;
           }

@@ -67,7 +67,7 @@
           <!--头部信息-->
           <div v-if="reveal.editInfo[index]" class="clear">
             <p>
-            	Time : {{item.ocupationTimeUp}}——{{item.ocupationTimeDown}}
+            	{{item.ocupationTimeUp}} — {{item.ocupationTimeDown}}
             </p>
             <!--时间部分-->
             <p>任职职位：{{item.ocupation}}</p>
@@ -271,6 +271,10 @@
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	for(var i=0;i<that.workExperience.length;i++){
+	    		if(that.workExperience[i].ocupationTimeDown=="0002.12"){
+					 	that.workExperience[i].ocupationTimeDown = "至今";
+					}
+					
 	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
 	    		if(that.workExperience[i].ifVisable==1){
@@ -348,6 +352,9 @@
       },
       keepEdit(index){//编辑状态下的保存按钮
        	var that = this;
+       	if(that.localWorkExperience[index].ocupationTimeDown=="至今"){
+				 	that.localWorkExperience[index].ocupationTimeDown = "0000.00.00";
+				 }
         var url = MyAjax.urlsy+"/psnWorkExperience/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({

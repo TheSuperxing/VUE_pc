@@ -46,7 +46,10 @@
 		    	</ul>
 					<div class="viewMore" v-show="!editEdu.edit[index]">
 						<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
+<<<<<<< HEAD
 
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 								<span>{{updowntxt[index]}}</span>
 						</p>
 					</div>
@@ -175,11 +178,19 @@
         </li>
         <li class="clear">
           <span class="wrap-left">*在校时间</span>
+<<<<<<< HEAD
 
 					<year-month v-model="newInputValue.schoolTimeUp"></year-month>
           <span>——</span>
 
 					<year-month v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
+=======
+          <!-- <datepicker v-model="newInputValue.schoolTimeUp"></datepicker> -->
+					<year-month v-on:input="addShoolTime" v-model="newInputValue.schoolTimeUp"></year-month> 
+          <span>——</span>
+          <!-- <datepicker v-model="newInputValue.schoolTimeDown" v-bind:value="{type:['month']}"></datepicker> -->
+					<year-month v-on:input="addShoolTime" v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 				</li>
         <li class="clear">
           <label>
@@ -330,8 +341,7 @@
         },
         picArr:[],//图片展示的数组
         picNum:[],//各条信息已经上传的图片数
-        buttonColor:{exist:[],add:true},
-        //按钮颜色
+        buttonColor:{exist:[],add:true},//按钮颜色
         //实例化上传图像的element根据信息条数添加className
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
@@ -408,7 +418,7 @@
 							that.editEdu.delete.push(true);
 							that.textLeng.schoolName.push(0);
 							that.textLeng.profession.push(0);
-							that.buttonColor.exist.push(true);
+							that.buttonColor.exist.push(true);//控制每一个保存按钮颜色
 							Vue.set(that.textLeng.schoolName,[i],that.localEdu[i].schoolName.length)
 							Vue.set(that.textLeng.profession,[i],that.localEdu[i].professionName.length)
 							that.show.tag[i]=true;
@@ -527,8 +537,11 @@
 		    	  	return that.picNum;
   				}
   			)
+<<<<<<< HEAD
       		console.log(that.picNum[index])
 
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
       	}
       	//实例化上传控件
       	if(Math.floor(3-that.picNum[index])>0){
@@ -545,15 +558,21 @@
 			    canUploadNum : Math.floor(3-that.picNum[index]),
 		    })
       	}
+<<<<<<< HEAD
 
     	console.log(that.picNum[index])
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
         Vue.set(that.editEdu.edit,[index],true);
         //编辑和显示的切换
         if(that.localEdu[index].schoolName.length!=0){
           Vue.set(that.buttonColor.exist,[index],false)
         }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
       },
       deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
       	var that = this;
@@ -574,6 +593,7 @@
       },
       async deleThisPic(id,index,$ind){//删除图片
       	var that = this;
+<<<<<<< HEAD
   		const dele = await that.deleThisPicPromise(id);
 
   		if(dele.code===0){
@@ -603,6 +623,36 @@
 	      btnPrimary:".btn-primary",
 	      canUploadNum:Math.floor(3-that.picNum[index]),
 	    })
+=======
+				const dele = await that.deleThisPicPromise(id);
+				
+				if(dele.code===0){
+					const getPic = await that.getPicture(index);
+					if(getPic.code===0){
+							const data = await Promise.resolve(true).then(
+									function(){
+										Vue.set(that.picArr,[index],getPic.msg)
+										Vue.set(that.picNum,[index],that.picArr[index].length)
+										return that.picNum;
+									}
+								)
+					}
+				}
+
+				that.localEdu[index].picId = [];
+				$("#"+this.fineUploaderId[index]).html("")
+					moreManualUploader({
+							nameList:'manualUploader'+index,
+						element:that.fineUploaderId[index],
+						template: that.qqTemplate[index],
+						url:MyAjax.urlsy+'/psnEduBackGround/batchUpload',
+						deleteUrl:MyAjax.urlsy + "/psnEduBackGround/delPic/",
+						anotherParam:that.localEdu[index].pkid,
+						picIdCont:that.localEdu[index].picId,
+						btnPrimary:".btn-primary",
+						canUploadNum:Math.floor(3-that.picNum[index]),
+					})
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit,[index],false);
@@ -662,6 +712,7 @@
       },
       //以上是改变数据
 			keepEditEduExist(index){//编辑状态，提交保存
+<<<<<<< HEAD
 				var that = this;
 				console.log(that.localEdu[index])
 				 var date = new Date;
@@ -687,6 +738,17 @@
 					var url = "http://10.1.31.16:8080/psnEduBackGround/update"
 	        $.ajaxSetup({ contentType : 'application/json' });
 	        MyAjax.ajax({
+=======
+				if(this.localEdu[index].schoolName.length!=0&&this.localEdu[index].schoolTimeUp.length!=0&&this.localEdu[index].schoolTimeDown.length!=0){
+					//必填项是否为空判断
+					var that = this;
+					if(that.localEdu[index].schoolTimeDown=="至今"){
+						that.localEdu[index].schoolTimeDown = "0000.00.00";
+					}
+					var url = MyAjax.urlsy+"/psnEduBackGround/update"
+					$.ajaxSetup({ contentType : 'application/json' });
+					MyAjax.ajax({//更新到服务器
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 						type: "POST",
 						url:url,
 						data: JSON.stringify(that.localEdu[index]),
@@ -706,12 +768,15 @@
 					})//更新到服务器
 					//保存之后再重新拉取数据
 				}
+<<<<<<< HEAD
         
 
         //提交编辑后的数据
 				$("#"+this.fineUploaderId[index]).html("")
 
 				console.log(that.localEdu[index])
+=======
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
       },
       //提交数据
       cancellEditEdu(){//添加模式下，取消编辑
@@ -752,6 +817,7 @@
 				if(this.newInputValue.schoolName.length!=0){
           this.localEdu.push(JSON.parse(JSON.stringify(this.newInputValue)))
           /*添加的数据，追加到本地数据里一份*/
+<<<<<<< HEAD
 //        this.education.push({schoolName:this.newInputValue.schoolText,info:{schoolTimeStart:this.newInputValue.schoolTimeStart,schoolTimeEnd:this.newInputValue.schoolTimeEnd,profession:this.newInputValue.professionText,introduce:this.newInputValue.introduce}})//向store中追加添加的数据
           /*添加的数据追加到vuex中*/
 
@@ -783,6 +849,35 @@
         that.updateData();
 
 	      $("#fine-uploader-manual-trigger").html("")
+=======
+          this.editEdu.delete.push(true)//解决添加数据后视图部更新
+          Vue.set(this.editEdu,"add",false);//如果学校名称为空不能提交，视图不会切换
+          this.openOrPrivacy.push(true);//是否显示样式
+					this.openOrPrivacyText.push("显示");//是否显示文本信息
+					//以上是一些状态的控制
+					var that = this;
+					if(that.newInputValue.schoolTimeDown=="至今"){
+						that.newInputValue.schoolTimeDown = "0000.00.00";
+					}
+					var url = MyAjax.urlsy+"/psnEduBackGround/insert";
+					$.ajaxSetup({ contentType : 'application/json' });
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.newInputValue),
+						dataType: "json",
+						async: false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})
+					that.updateData();
+					setTimeout(function(){
+						$("#fine-uploader-manual-trigger").html("")
+					},1)
+        } 
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 	    }
 
       //新建部分

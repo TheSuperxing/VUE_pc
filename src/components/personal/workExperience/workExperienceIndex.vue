@@ -20,7 +20,11 @@
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
              <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
+<<<<<<< HEAD
             <button  v-on:click="search" @keydown="keySearch($event)"></button>
+=======
+            <button  v-on:click="search" @keydown="keySearch($event)">
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
             </button>
@@ -118,7 +122,7 @@
               <i>{{reveal.textLength[index]}}/500</i>
             </li>
             <li class="clear">
-              <button :class="disabled" v-on:click="keepEdit(index)">保存</button>
+              <button :class="{disabled: buttonColor.exist[index]}" v-on:click="keepEdit(index)">保存</button>
               <button v-on:click="cancelEdit(index)">取消</button>
             </li>
           </ul>
@@ -188,6 +192,7 @@
         searchResult:[],
         input:{value:""},//搜索公司时，自己输入的公司名称
         companyName:{name:''},//用来存放选择公司的索引
+        buttonColor:{exist:[],add:true},//按钮颜色
         deleteModalClass:[],
         reveal:{
           empty:true,//信息为空时，为空信息提示
@@ -298,6 +303,10 @@
 					that.reveal.textLength.push(0)//字数统计初始化为
 	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
+<<<<<<< HEAD
+=======
+          that.buttonColor.exist.push(true);//控制每一个保存按钮颜色
+>>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 	    	  that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
 	    		if(that.workExperience[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
@@ -1028,12 +1037,15 @@
                 color: $themeColor;
                 margin-top:14px;
                 border-radius: 5px ;
+                background: url("../../../assets/img/personal/education/btn_save_normal.png.png")left center no-repeat;
               }
               button:nth-child(1){
                 margin-left:86px;
                 border:0;
-                background: url("../../../assets/img/personal/education/btn_save_normal.png.png")left center no-repeat;
                 color: #ffffff;
+              }
+              button:nth-child(2){
+                background: #ffffff;
               }
               .disabled{
                 border:0px;

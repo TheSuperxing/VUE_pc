@@ -54,7 +54,15 @@
             </li>
             <li class="clear">
               <label>
-                <span class="wrap-left">所获学历 </span><input v-model="localEdu[index].education" type="text" placeholder="请选择学校">
+                <span class="wrap-left">所获学历 </span>
+								<select v-model="localEdu[index].education">
+									<option value="大专">大专</option>
+									<option value="本科">本科</option>
+									<option value="硕士">硕士</option>
+									<option value="博士">博士</option>
+									<option value="其他">其他</option>
+								</select>
+								<!-- <input v-model="localEdu[index].education" type="text" placeholder="请选择学校"> -->
               </label>
             </li>
             <li class="img-wrap clear" >
@@ -169,7 +177,15 @@
         </li>
         <li class="clear">
           <label>
-            <span class="wrap-left">所获学历</span><input v-model="newInputValue.education" type="text" placeholder="请选择学校">
+            <span class="wrap-left">所获学历</span>
+						<select v-model="newInputValue.education">
+							<option value="大专">大专</option>
+							<option value="本科">本科</option>
+							<option value="硕士">硕士</option>
+							<option value="博士">博士</option>
+							<option value="其他">其他</option>
+						</select>
+						<!-- <input v-model="newInputValue.education" type="text" placeholder="请选择学校"> -->
           </label>
         </li>
         <li class="img-wrap clear">
@@ -485,8 +501,13 @@
 				that.updateData();
         /*显示隐藏文字切换*/
       },
-      async editEduExist(index){//编辑按钮事件，进入编辑模式
-      	var that = this;
+			async editEduExist(index){//编辑按钮事件，进入编辑模式
+				let professionName=this.localEdu[index].professionName;
+				let education=this.localEdu[index].education; 
+        professionName=="（暂无信息）" ? this.localEdu[index].professionName="":professionName=professionName;
+				education=="（暂无信息）"?this.localEdu[index].education="":education=education;
+				//如果将要编辑的数据为（暂无信息），则重置位空
+				var that = this;
       	//promise 的then方法里面去读取已经上传的图片张数，然后实例化上传组件，以便控制可上传的图片张数
       	const getPic = await that.getPicture(index);
       	if(getPic.code === 0){
@@ -518,8 +539,6 @@
         if(that.localEdu[index].schoolName.length!=0){
           Vue.set(that.buttonColor.exist,[index],false)
         }
-       
-	      
       },
       deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
       	var that = this;
@@ -571,7 +590,12 @@
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit,[index],false);
-				$("#"+this.fineUploaderId[index]).html("");
+				setTimeout(() => {
+					$("#"+this.fineUploaderId[index]).html("");
+				}, 1);
+				this.localEdu[index]=JSON.parse(JSON.stringify(this.education[index]));
+				
+        //返回到更改之前,如果是暂无消息，重置为空
       },
       deleteEduExist(index){//删除按钮事件
         if(this.education.length==0){//数据完全删除后显示无数据提示
@@ -607,7 +631,7 @@
         //当input的值改变时改变相应的数字
         if(this.localEdu[index].professionName.length>=30){
 
-          this.localEdu[index].professionName=this.localEdu[index].professionName.slice(0,29);
+          //this.localEdu[index].professionName=this.localEdu[index].professionName.slice(0,29);
 
         }
       },
@@ -676,7 +700,7 @@
         //当input的值改变时改变相应的数字
 
         if(this.newInputValue.professionName.length>=30){
-          this.newInputValue.professionName=this.newInputValue.professionName.slice(0,29);
+          //this.newInputValue.professionName=this.newInputValue.professionName.slice(0,29);
         }
 			},
 			addShoolTime(index){
@@ -785,7 +809,7 @@
             color: $themeColor;
             padding-bottom:12px;
             h4{
-              font-size: 18px;
+              font-size: 14px;
               float: left;
             }
             ul{
@@ -823,12 +847,15 @@
               float: left;
               font-size:14px;
             }
-            p:nth-child(1){
-              width:292px;
+            p:nth-child(1){//显示列表，时间
+              width: 154px;
               height: 21px;
             }
-            p:nth-child(2){
-              width:214px;
+            p:nth-child(2){//显示列表，专业
+              width:500px;
+              height: 21px;
+						}
+						p:nth-child(3){//显示列表，学历
               height: 21px;
             }
           }
@@ -926,14 +953,14 @@
           }*/
 
         }
-        li:nth-child(1){
+        li:nth-child(1){//学校名称
         	 height: 55px;
           input{
             width:480px;
             /*margin-left:26px;*/
           }
         }
-        li:nth-child(2){
+        li:nth-child(2){//在校时间按
           color: #000;
           span{
             float: left;
@@ -951,15 +978,20 @@
             margin:0 20px;
           }
         }
-        li:nth-child(3){
+        li:nth-child(3){//专业名词
         	height: 55px;
           input{
             width:480px;
           }
         }
-        li:nth-child(4){
-          input{
-            width:480px;
+        li:nth-child(4){//学历下拉
+          select{
+						width:100px;
+						height: 35px;
+						border-radius: 5px;
+						color: #363636;
+						border: 1px solid #ebebeb;
+						padding-left: 12px;
           }
         }
         li.img-wrap{
@@ -977,7 +1009,7 @@
 		          	border-radius: 10px;
 		          	margin-right: 10px;
 		          	margin-bottom: 10px;
-					position: relative;
+								position: relative;
 					&:hover{
 						.delePic{
 							display: block;

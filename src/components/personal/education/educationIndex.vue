@@ -321,8 +321,7 @@
         },
         picArr:[],//图片展示的数组
         picNum:[],//各条信息已经上传的图片数
-        buttonColor:{exist:[],add:true},
-        //按钮颜色
+        buttonColor:{exist:[],add:true},//按钮颜色
         //实例化上传图像的element根据信息条数添加className
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
@@ -397,7 +396,7 @@
 							that.editEdu.delete.push(true);
 							that.textLeng.schoolName.push(0);
 							that.textLeng.profession.push(0);
-							that.buttonColor.exist.push(true);
+							that.buttonColor.exist.push(true);//控制每一个保存按钮颜色
 							Vue.set(that.textLeng.schoolName,[i],that.localEdu[i].schoolName.length)
 							Vue.set(that.textLeng.profession,[i],that.localEdu[i].professionName.length)
 							that.show.tag[i]=true;

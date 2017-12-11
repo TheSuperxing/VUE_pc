@@ -103,7 +103,7 @@
               <i>{{reveal.textLength[index]}}/500</i>
             </li>
             <li class="clear">
-              <button :class="disabled" v-on:click="keepEdit(index)">保存</button>
+              <button :class="{disabled: buttonColor.exist[index]}" v-on:click="keepEdit(index)">保存</button>
               <button v-on:click="cancelEdit(index)">取消</button>
             </li>
           </ul>
@@ -172,6 +172,7 @@
         searchResult:[],
         input:{value:""},//搜索公司时，自己输入的公司名称
         companyName:{name:''},//用来存放选择公司的索引
+        buttonColor:{exist:[],add:true},//按钮颜色
         reveal:{
           empty:true,//信息为空时，为空信息提示
           editInfo:[],//编辑信息的状态切换
@@ -280,7 +281,7 @@
 					that.reveal.textLength.push(0)//字数统计初始化为
 	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
-          
+          that.buttonColor.exist.push(true);//控制每一个保存按钮颜色
           if(that.workExperience[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
@@ -911,12 +912,15 @@
                 color: $themeColor;
                 margin-top:14px;
                 border-radius: 5px ;
+                background: url("../../../assets/img/personal/education/btn_save_normal.png.png")left center no-repeat;
               }
               button:nth-child(1){
                 margin-left:86px;
                 border:0;
-                background: url("../../../assets/img/personal/education/btn_save_normal.png.png")left center no-repeat;
                 color: #ffffff;
+              }
+              button:nth-child(2){
+                background: #ffffff;
               }
               .disabled{
                 border:0px;

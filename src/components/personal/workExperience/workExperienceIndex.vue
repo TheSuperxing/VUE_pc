@@ -20,11 +20,7 @@
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
              <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
-<<<<<<< HEAD
             <button  v-on:click="search" @keydown="keySearch($event)"></button>
-=======
-            <button  v-on:click="search" @keydown="keySearch($event)">
->>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
             </button>
@@ -303,10 +299,7 @@
 					that.reveal.textLength.push(0)//字数统计初始化为
 	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
-<<<<<<< HEAD
-=======
           that.buttonColor.exist.push(true);//控制每一个保存按钮颜色
->>>>>>> 35195b10c287e6334261f7f9e501d92998b7f1ba
 	    	  that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
 	    		if(that.workExperience[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值

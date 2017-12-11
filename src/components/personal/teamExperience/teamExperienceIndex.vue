@@ -68,6 +68,7 @@
           dataType: "json",
           async: false,
         },function(data){
+        	console.log(data)
           if(data.code==0){
             that.teamExperience=data.msg
             //Vue.set(that,"teamExperience",data.msg)//ifCer标识是否认证，0未认证，1已经认证
@@ -88,7 +89,7 @@
 
       },
       togConfirm(index){
-        //console.log(this.teamExperience[index])
+          console.log("renzheng")
         if(this.teamExperience[index].ifCer==0){
           Vue.set(this.teamExperience[index],"ifCer",1)
           Vue.set(this.reveal.confirmText,[index],"取消认证");
@@ -111,7 +112,7 @@
           contentType: "application/json;charset=UTF-8",
           async: false,
         },function(data){
-          //console.log(data)
+            console.log(data)
         },function(err){
           console.log(err)
         })

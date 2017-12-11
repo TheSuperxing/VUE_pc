@@ -20,8 +20,11 @@ var MyAjax = {
 			xhrFields: {withCredentials: true},
 			crossDomain: true == !(document.all),//IE9不能发起请求
 			async: option.async, // 使用同步方式  
-			success: function(data) {		
+			success: function(data){		
 				callback(data);
+				if(data.msg==="100004"){
+					window.location.hash ="/login"
+				}
 			},error:function(error){
 				errCallback(error)
 			}

@@ -24,6 +24,21 @@
               <li v-on:click="languageEditDel(index)">
                 <p>删除</p>
               </li>
+              <!--确认删除该项目模态框-->
+		    			<div id="modal-overlay" v-bind:class="deleteModalClass[index]">
+								<div class="deleteLanguage">
+									<h5>删除</h5>
+									<span class="modalChaBtn" @click="closeModal(index)"></span>
+									<div class="content-wrap">
+									<p class="deleteOrNo">确定删除此条信息吗？</p>
+									<div class="btnBox">
+										<span class="cancelBtn" @click="cancleDele(index)">取消</span>
+										<span class="confirmBtn" @click="confirmDelete(index)">确认</span>
+									</div>
+									</div>
+								</div>
+							</div>
+		    			<!--确认删除该项目模态框-->
             </ul>
           </div>
           <div class="languageInfoBody">
@@ -248,7 +263,8 @@
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
-
+	import Modal from "../../../assets/js/modal.js"  
+	
   export default {
     name:"LanguageIndex",
     data(){
@@ -269,7 +285,7 @@
           picList:[],
           picNum:[],
         },
-
+        deleteModalClass:[],
         language:[],
         localLanguage:[],
         picInfo:[require("../../../assets/img/images/captainmiao1.jpg"),require("../../../assets/img/images/captainmiao2.jpg")],
@@ -329,6 +345,8 @@
 	    	that.qqTemplate = [];
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
+	    	that.deleteModalClass = [];
+	    	
         if(this.language.length!=0){
           Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
           for(var i=0;i<that.language.length;i++){
@@ -336,6 +354,7 @@
             that.qqTemplate.push("qq-template-manual-trigger-language"+that.language[i].pkid);
             that.show.tag[i]=true;
             that.updowntxt.push("展开查看更多");
+						that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
             that.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
             if(that.language[i].ifVisable==1){
               that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
@@ -532,13 +551,25 @@
         $("#"+this.fineUploaderId[index]).html("")
       },
       languageEditDel(index){//编辑状态，删除按钮
-        var that = this;
+        var aa = "deleteModalClass"+index;
+    		Modal.makeText($('.'+aa))
+
+      },
+      closeModal(index){
+				var aa = "deleteModalClass"+index;
+    		Modal.closeModal($('.'+aa))
+			},
+      confirmDelete(index){
+      	var that = this;
         var url = MyAjax.urlsy+"/psnlanguage/del/"+that.language[index].pkid;
         MyAjax.delete(url)
 				that.updateData();
-				
-
+        that.closeModal(index);
       },
+      cancleDele(index){
+    		//取消删除该项目
+    		this.closeModal(index);
+    	},
       addLanguage(){//添加信息按钮，添加信息的视图切换
         /*先清除数据，保证下次输入时输入框为空*/
         Vue.set(this.newLanguage,"language","");
@@ -573,7 +604,7 @@
 					url:url,
 					data:JSON.stringify(that.newLanguage),
 					dataType: "json",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 				},function(err){
@@ -688,7 +719,88 @@
 	                }
 	              }
               }
-              
+              .deleteLanguage{
+              	width: 549px;
+								overflow: hidden;
+						    position:absolute;top:50%;left:50%; 
+								transform:translate(-50%,-50%);
+								-webkit-transform:translate(-50%,-50%);
+								-moz-transform:translate(-50%,-50%);
+								-ms-transform:translate(-50%,-50%);
+								-o-transform:translate(-50%,-50%);
+						    background: #FFFFFF;
+						    border-radius: 10px;
+						    text-align: center;
+						    h5{
+							    color:$activeColor;
+							    font-size: 18px;
+							    height: 50px;
+							    line-height: 50px;
+							    text-align: left;
+							    background: rgb(247,249,252);
+							    padding: 0 40px;
+							    
+								}
+								.modalChaBtn{
+							     width: 20px;
+							     height: 20px;
+							     background: url(../../../assets/img/personal/workexperience/icon_close.png) no-repeat center;
+							     position: absolute;
+							     top: 16px;
+							     right: 40px;
+							     cursor: pointer;
+						    }
+						    .content-wrap{
+						    	width: 100%;
+						    	overflow: hidden;
+						    		.deleteOrNo{
+						    			margin: 30px auto;
+						    			color: $activeColor;
+						    			font-size: 20px;
+						    		}
+						    		.btnBox{
+								    	height: 40px;
+								    	width: 330px;
+								    	margin:40px auto;
+								    	display: flex;
+								    	justify-content: space-between;
+								    	overflow: hidden;
+								    	margin-left: 110px;
+								    	span{
+								    		float: left;
+								    		/*margin-right: 50px;*/
+								    		width: 140px;
+								    		height: 40px;
+								    		line-height: 40px;
+								    		text-align: center;
+								    		vertical-align: middle;
+								    		font-size: 16px;
+								    		border-radius: 5px;
+								    		cursor: pointer;
+												padding-left: 0 !important;
+								    		&.cancelBtn{
+								    			border: 1px solid #e0e0e0;
+							
+								    			&:hover{
+								    				border: 1px solid $activeColor;
+								    				color: $activeColor;
+								    			}
+								    		}
+								    		&.confirmBtn{
+								    			background: url(../../../assets/img/personal/education/btn_save_normal.png.png) no-repeat center;
+								    			background-size: 100%;
+								    			color: #FFFFFF;
+								    			&:hover{
+								    				filter:alpha(opacity=80);       /* IE */
+												  -moz-opacity:0.8;              /* 老版Mozilla */
+												  -khtml-opacity:0.8;              /* 老版Safari */
+												   opacity: 0.8;           /* 支持opacity的浏览器*/
+								    			}
+								    		}
+						    			}
+						    		}		
+						   	  }
+              	}
               .openOrPrivacy{
                 p{
                   background: url("../../../assets/img/personal/education/hidden.png") left center no-repeat!important;

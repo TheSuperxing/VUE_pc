@@ -16,6 +16,21 @@
               <li v-bind:class="{openOrPrivacy:!openOrPrivacy[index]}" v-on:click="openOrPrivacyInfo(index)">{{openOrPrivacyText[index]}}</li>
               <li v-on:click="editEduExist(index)">编辑</li>
               <li v-on:click="deleteEduExist(index)">删除</li>
+              <!--确认删除该项目模态框-->
+			    			<div id="modal-overlay" v-bind:class="deleteModalClass[index]">
+									<div class="deleteEdu">
+										<h5>删除</h5>
+										<span class="modalChaBtn" @click="closeModal(index)"></span>
+										<div class="content-wrap">
+										<p class="deleteOrNo">确定删除此条信息吗？</p>
+										<div class="btnBox">
+											<span class="cancelBtn" @click="cancleDele(index)">取消</span>
+											<span class="confirmBtn" @click="confirmDelete(index)">确认</span>
+										</div>
+										</div>
+									</div>
+								</div>
+			    		<!--确认删除该项目模态框-->
             </ul>
           </div>
           <div v-show="!editEdu.edit[index]">
@@ -27,11 +42,11 @@
 						<li v-for="item in picArr[index]">
 							<img :src="item.pic"/>
 						</li>
-								
+
 		    	</ul>
 					<div class="viewMore" v-show="!editEdu.edit[index]">
 						<p v-bind:class="{viewDown:show.tag[index],viewUp:!show.tag[index]}" @click="upDown(index)">
-							
+
 								<span>{{updowntxt[index]}}</span>
 						</p>
 					</div>
@@ -43,7 +58,7 @@
             <li class="clear">
               <span class="wrap-left">*在校时间</span>
               <!-- <datepicker v-model="localEdu[index].schoolTimeUp"></datepicker> -->
-							<year-month v-model="localEdu[index].schoolTimeUp"></year-month> 
+							<year-month v-model="localEdu[index].schoolTimeUp"></year-month>
               <span>——</span>
               <!-- <datepicker v-model="localEdu[index].schoolTimeDown"></datepicker> -->
 							<year-month v-model="localEdu[index].schoolTimeDown" :min="localEdu[index].schoolTimeUp" :today="true"></year-month>
@@ -65,9 +80,9 @@
 									<img :src="item.pic"/>
 									<span class="delePic" @click="deleThisPic(item.id,index,$ind)"></span>
 								</li>
-								
+
 							</ul>
-							
+
 							<script type="text/template" :id="qqTemplate[index]">
 						        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 						            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -133,7 +148,6 @@
 						            </dialog>
 						        </div>
 						    </script>
-						     <!--<div id="fine-uploader-manual-trigger1"></div>-->
 						     <div :id="fineUploaderId[index]"></div>
 						</li>
 						<li class="tip-wrap">
@@ -157,10 +171,10 @@
         </li>
         <li class="clear">
           <span class="wrap-left">*在校时间</span>
-          <!-- <datepicker v-model="newInputValue.schoolTimeUp"></datepicker> -->
-					<year-month v-model="newInputValue.schoolTimeUp"></year-month> 
+
+					<year-month v-model="newInputValue.schoolTimeUp"></year-month>
           <span>——</span>
-          <!-- <datepicker v-model="newInputValue.schoolTimeDown" v-bind:value="{type:['month']}"></datepicker> -->
+
 					<year-month v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
 				</li>
         <li class="clear">
@@ -175,7 +189,7 @@
         </li>
         <li class="img-wrap clear">
 					<span class="wrap-left">学历证书</span>
-					
+
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -203,7 +217,7 @@
 			            </ul>
 			            <div class="buttons">
 			                <div class="qq-upload-button-selector qq-upload-button">
-			                		
+
 			                    <span>请上传图片</span>
 			                </div>
 			                <button type="button"  class="btn btn-primary" id="trigger-upload">
@@ -214,15 +228,15 @@
 			                <span>正在上传...</span>
 			                <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
 			            </span>
-			            
-			
+
+
 			            <dialog class="qq-alert-dialog-selector">
 			                <div class="qq-dialog-message-selector"></div>
 			                <div class="qq-dialog-buttons">
 			                    <button type="button" class="qq-cancel-button-selector">关闭</button>
 			                </div>
 			            </dialog>
-			
+
 			            <dialog class="qq-confirm-dialog-selector">
 			                <div class="qq-dialog-message-selector"></div>
 			                <div class="qq-dialog-buttons">
@@ -230,7 +244,7 @@
 			                    <button type="button" class="qq-ok-button-selector">Yes</button>
 			                </div>
 			            </dialog>
-			
+
 			            <dialog class="qq-prompt-dialog-selector">
 			                <div class="qq-dialog-message-selector"></div>
 			                <input type="text">
@@ -266,7 +280,8 @@
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 	import YearMonth from "../units/yearMonth.vue"
-
+	import Modal from "../../../assets/js/modal.js"
+	
   export default {
     name: 'educationIndex',
     components:{
@@ -281,6 +296,7 @@
         show:{
         	tag:[],
         },
+        deleteModalClass:[],
         editEdu:{add:false,edit:[],delete:[]},
         //状态部分
         textLeng:{schoolName:[],profession:[]},
@@ -312,12 +328,12 @@
         fineUploaderId:[],//存放实例化div的id名数组
         qqTemplate:[],//存放script标签的id数组
         qqFineloader:[],//实例化的上传组件数组  一旦点击一个就全部实例化
-       
+
       }
     },
 
     mounted(){
-			
+
 		this.updateData();
 		if(this.education.length==0){
 			Vue.set(this.empty,"promote",true)//是否显示教育背景信息尚未添加
@@ -352,7 +368,7 @@
 			      return text;
 			    }
 			}
-	    	
+
 	        that.localEdu=JSON.parse(JSON.stringify(that.education));
 	    		that.openOrPrivacy = [];
 	        that.openOrPrivacyText = [];
@@ -365,6 +381,7 @@
 	        that.buttonColor.exist = [];
 	        that.show.tag=[];
 	    		that.updowntxt=[];
+	    		that.deleteModalClass = [];
 					if(this.education.length!=0){
 						Vue.set(this.empty,"promote",false)
 						//if 有信息 信息为空的提升隐藏
@@ -388,6 +405,7 @@
 							Vue.set(that.textLeng.profession,[i],that.localEdu[i].professionName.length)
 							that.show.tag[i]=true;
 							that.updowntxt.push("展开查看更多");
+							that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
 							if(that.education[i].ifVisable==1){
 								that.openOrPrivacy.push(true);
 								that.openOrPrivacyText.push("显示")
@@ -395,13 +413,13 @@
 									that.openOrPrivacy.push(false);
 									that.openOrPrivacyText.push("隐藏")
 							}
-							
+
 						}
 					}else{
 						Vue.set(this.empty,"promote",true)
 					}
-					
-	    	
+
+
     	},
     	getPicture(index){
     		var that = this;
@@ -431,11 +449,11 @@
 		    		});
 				}else{
 					Vue.set(that.show.tag,[index],true)
-					that.updowntxt[index] = "展开查看更多" 
+					that.updowntxt[index] = "展开查看更多"
 				}
     		that.show.tag[index] == true? false:true;
     		that.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
-    		
+
     	},
       addEdu(){//添加按钮事件
         Vue.set(this.editEdu,"add",true);//添加界面显示
@@ -454,7 +472,7 @@
 	        btnPrimary:".btn-primary",
 					canUploadNum:3,
 	    })
-        
+
       },
       openOrPrivacyInfo(index){//是否显示隐藏按钮的事件
         Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index]);//通过类名控制图片和文字颜色
@@ -502,7 +520,7 @@
   				}
   			)
       		console.log(that.picNum[index])
-      		
+
       	}
       	//实例化上传控件
       	if(Math.floor(3-that.picNum[index])>0){
@@ -519,15 +537,15 @@
 			    canUploadNum : Math.floor(3-that.picNum[index]),
 		    })
       	}
-      	
+
     	console.log(that.picNum[index])
         Vue.set(that.editEdu.edit,[index],true);
         //编辑和显示的切换
         if(that.localEdu[index].schoolName.length!=0){
           Vue.set(that.buttonColor.exist,[index],false)
         }
-       
-	      
+
+
       },
       deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
       	var that = this;
@@ -549,7 +567,7 @@
       async deleThisPic(id,index,$ind){//删除图片
       	var that = this;
   		const dele = await that.deleThisPicPromise(id);
-  		
+
   		if(dele.code===0){
   			const getPic = await that.getPicture(index);
   			if(getPic.code===0){
@@ -564,8 +582,8 @@
   			}
   		}
 
-		that.localEdu[index].picId = [];
-		$("#"+this.fineUploaderId[index]).html("")
+			that.localEdu[index].picId = [];
+			$("#"+this.fineUploaderId[index]).html("")
      	moreManualUploader({
       		nameList:'manualUploader'+index,
 	      element:that.fineUploaderId[index],
@@ -582,11 +600,18 @@
         Vue.set(this.editEdu.edit,[index],false);
 				$("#"+this.fineUploaderId[index]).html("");
       },
+      
       deleteEduExist(index){//删除按钮事件
-//      Vue.set(this.editEdu.delete[0],[index],false);
-//      this.education.splice(index,1)
-//      Vue.set(this.editEdu.delete[0],[index],true)//为	了解决删除一项后一项不会显示问题
-        if(this.education.length==0){//数据完全删除后显示无数据提示
+				var aa = "deleteModalClass"+index;
+    		Modal.makeText($('.'+aa))
+        
+      },
+      closeModal(index){
+				var aa = "deleteModalClass"+index;
+    		Modal.closeModal($('.'+aa))
+			},
+      confirmDelete(index){
+      	if(this.education.length==0){//数据完全删除后显示无数据提示
           Vue.set(this.empty,"promote",true);
         }
         var that = this;
@@ -595,7 +620,12 @@
         MyAjax.delete(url)
 
         that.updateData();
+        that.closeModal(index);
       },
+      cancleDele(index){
+    		//取消删除该项目
+    		this.closeModal(index);
+    	},
       //以上是状态的改变
       changeShoolName(index){//编辑状态，改变学校名称
         //console.log(this.inputValue.text[index].length)
@@ -627,16 +657,16 @@
 				var that = this;
 				console.log(that.localEdu[index])
 				 var date = new Date;
-//				 date.setFullYear(1992,02,05); 
+//				 date.setFullYear(1992,02,05);
 //				 var month=date.setMonth("00");
-//				 month =(month<10 ? "0"+month:month); 
+//				 month =(month<10 ? "0"+month:month);
 //				 var mydate = (year.toString()+'.'+month.toString());
 				 console.log(date)
 				 if(that.localEdu[index].schoolTimeDown=="至今"){
 				 	that.localEdu[index].schoolTimeDown = "0000.00.00";
 				 }
 //      var judgUpDate=this.education[index].schoolName==this.inputValue.schoolText[index]&&this.education[index].info.profession==this.inputValue.professionText[index]&&this.education[index].info.schoolTimeStart==this.inputValue.schoolTimeStart[index]&&this.education[index].info.schoolTimeEnd==this.inputValue.schoolTimeEnd[index]&&this.education[index].info.introduce == this.inputValue.introduce[index];/*数据是否更改的判断条件*/
-				
+
         var url = "http://10.1.31.16:8080/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
@@ -658,10 +688,10 @@
 					console.log(err)
 				})//更新到服务器
 				//保存之后再重新拉取数据
-				
+
         //提交编辑后的数据
 				$("#"+this.fineUploaderId[index]).html("")
-				
+
 				console.log(that.localEdu[index])
       },
       //提交数据
@@ -705,14 +735,14 @@
           /*添加的数据，追加到本地数据里一份*/
 //        this.education.push({schoolName:this.newInputValue.schoolText,info:{schoolTimeStart:this.newInputValue.schoolTimeStart,schoolTimeEnd:this.newInputValue.schoolTimeEnd,profession:this.newInputValue.professionText,introduce:this.newInputValue.introduce}})//向store中追加添加的数据
           /*添加的数据追加到vuex中*/
-          
+
           /*保存添加后，清除之前添加的数据*/
           this.editEdu.delete.push(true)//解决添加数据后视图部更新
           Vue.set(this.editEdu,"add",false);//如果学校名称为空不能提交，视图不会切换
           this.openOrPrivacy.push(true);//是否显示样式
           this.openOrPrivacyText.push("显示");//是否显示文本信息
         }
-        
+
         var that = this;
         if(that.newInputValue.schoolTimeDown=="至今"){
 		 	that.newInputValue.schoolTimeDown = "0000.00.00";
@@ -732,10 +762,10 @@
 					console.log(err)
 				})
         that.updateData();
-        
-	      $("#fine-uploader-manual-trigger").html("")  
+
+	      $("#fine-uploader-manual-trigger").html("")
 	    }
-	      
+
       //新建部分
     }
   }
@@ -787,7 +817,7 @@
     }
     /*信息为空提示*/
     .educationContainer{
-    	
+
       padding:0 20px;
       .eduInfo{
         padding-top:25px;
@@ -822,7 +852,91 @@
                 padding:0 20px 0 26px;
                 background: url("../../../assets/img/personal/education/delete.png") left center no-repeat;
               }
-              
+              .deleteEdu{
+              	width: 549px;
+								overflow: hidden;
+						    position:absolute;top:50%;left:50%; 
+								transform:translate(-50%,-50%);
+								-webkit-transform:translate(-50%,-50%);
+								-moz-transform:translate(-50%,-50%);
+								-ms-transform:translate(-50%,-50%);
+								-o-transform:translate(-50%,-50%);
+						    background: #FFFFFF;
+						    border-radius: 10px;
+						    text-align: center;
+						    h5{
+							    color:$activeColor;
+							    font-size: 18px;
+							    height: 50px;
+							    line-height: 50px;
+							    text-align: left;
+							    background: #f7f7f7;
+							    padding: 0 40px;
+							     
+								}
+								.modalChaBtn{
+							     width: 20px;
+							     height: 20px;
+							     background: url(../../../assets/img/personal/teamexperience/icon_cannel_large.png) no-repeat center;
+							     position: absolute;
+							     top: 16px;
+							     right: 40px;
+							     cursor: pointer;
+						    }
+						    .content-wrap{
+						    	width: 100%;
+						    	overflow: hidden;
+						    		.deleteOrNo{
+						    			margin: 30px auto;
+						    			color: $activeColor;
+						    			font-size: 20px;
+						    		}
+						    		.btnBox{
+								    	height: 40px;
+								    	width: 330px;
+								    	margin:40px auto;
+								    	display: flex;
+								    	justify-content: space-between;
+								    	overflow: hidden;
+								    	margin-left: 110px;
+								    	span{
+								    		float: left;
+								    		/*margin-right: 50px;*/
+								    		width: 140px;
+								    		height: 40px;
+								    		line-height: 40px;
+								    		text-align: center;
+								    		vertical-align: middle;
+								    		font-size: 16px;
+								    		border-radius: 5px;
+								    		cursor: pointer;
+												padding-left: 0 !important;
+								    		&.cancelBtn{
+								    			border: 1px solid #e0e0e0;
+							
+								    			&:hover{
+								    				border: 1px solid $activeColor;
+								    				color: $activeColor;
+								    			}
+								    		}
+								    		&.confirmBtn{
+								    			background: url(../../../assets/img/personal/education/btn_save_normal.png.png) no-repeat center;
+								    			background-size: 100%;
+								    			color: #FFFFFF;
+								    			&:hover{
+								    				filter:alpha(opacity=80);       /* IE */
+												  -moz-opacity:0.8;              /* 老版Mozilla */
+												  -khtml-opacity:0.8;              /* 老版Safari */
+												   opacity: 0.8;           /* 支持opacity的浏览器*/
+								    			}
+								    		}
+						    			}
+						    		}		
+						    		
+						    		
+						    }
+              }
+
               .openOrPrivacy{
                   background: url("../../../assets/img/personal/education/hidden.png") left center no-repeat!important;
                   color: #353535;
@@ -857,7 +971,7 @@
 							&:hover{
 								.delePic{
 									display: block;
-									
+
 								}
 							}
 							img{
@@ -866,11 +980,11 @@
 								height: 100px;
 								margin-right: 15px;
 								margin-bottom: 15px;
-								
+
 							}
-							
+
 						}
-						
+
 					}
 					.viewMore{
 						float: left;
@@ -986,44 +1100,44 @@
         			float: left;
         			width: 200px;
 		         	height: 200px;
-		          	padding: 8px;
-		          	background: rgba(210,210,210,.3);
-		          	border-radius: 10px;
-		          	margin-right: 10px;
-		          	margin-bottom: 10px;
-					position: relative;
-					&:hover{
-						.delePic{
-							display: block;
-							
-						}
-					}
+	          	padding: 10px;
+	          	background: rgba(210,210,210,.3);
+	          	border-radius: 10px;
+	          	margin-right: 10px;
+	          	margin-bottom: 10px;
+							position: relative;
+							&:hover{
+								.delePic{
+									display: block;
+			
+								}
+							}
 					img{
 						width: 180px;
 						max-height: 180px;
 						margin-right: 15px;
 						margin-bottom: 15px;
-						
+
 					}
 					.delePic{
 						width: 21px;
 						height: 21px;
 						position: absolute;
-						right: 20px; top: 15px;
+						right: 10px; top: 10px;
 						background: url(../../../assets/img/personal/education/delePic.png) no-repeat;
 						display: none;
 						cursor: pointer;
 					}
         		}
-        		
+
         	}
-        	
+
         	>div{
         		width: 700px;
         		float: right;
-        		
+
         	}
-        	
+
         }
         li.tip-wrap{
         	padding-left: 110px;

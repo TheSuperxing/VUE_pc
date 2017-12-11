@@ -19,13 +19,8 @@
           <li v-bind:class="{beforeSearch:!reveal.searchShow}" class="clear">
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
-<<<<<<< HEAD
              <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
-            <button  v-on:click="search" @keydown="keySearch($event)">
-=======
-            <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
-            <button  v-on:click="search" @keydown="keySearch">
->>>>>>> de601695282afffa97a9518526d4516ef0ce6bc1
+            <button  v-on:click="search" @keydown="keySearch($event)"></button>
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
             </button>
@@ -303,13 +298,8 @@
 					that.reveal.textLength.push(0)//字数统计初始化为
 	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
-<<<<<<< HEAD
 	    	  that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
 	    		if(that.workExperience[i].ifVisable==1){
-=======
-          
-          if(that.workExperience[i].ifVisable==1){
->>>>>>> de601695282afffa97a9518526d4516ef0ce6bc1
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
 	    		}else{

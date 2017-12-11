@@ -1,21 +1,21 @@
 <template>
   <div class="deal">
-    <div class="title">
-        <div class="text">
+    <div class="title clear">
+        <div class="text clear">
             <h2 v-cloak>通知</h2>
             <span>（5）</span>
         </div>
     </div>
     <ul class="notContain">
-        <li>
+        <li class="clear">
             <span></span>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
         </li>
-        <li>
+        <li class="clear">
             <span></span>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aliquam in odit totam itaque dolorem dolore modi nisi, veniam repellendus iusto ad, ullam perspiciatis necessitatibus temporibus voluptatibus? Aspernatur, molestias maiores?</p>
         </li>
-        <li>
+        <li class="clear">
             <span></span>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aliquam in odit totam itaque dolorem dolore modi nisi, veniam repellendus iusto ad, ullam perspiciatis necessitatibus temporibus voluptatibus? Aspernatur, molestias maiores?Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aliquam in odit totam itaque dolorem dolore modi nisi, veniam repellendus iusto ad, ullam perspiciatis necessitatibus temporibus voluptatibus? Aspernatur, molestias maiores?</p>
         </li>

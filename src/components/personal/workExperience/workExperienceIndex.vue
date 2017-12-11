@@ -19,8 +19,13 @@
           <li v-bind:class="{beforeSearch:!reveal.searchShow}" class="clear">
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
+<<<<<<< HEAD
              <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
             <button  v-on:click="search" @keydown="keySearch($event)">
+=======
+            <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
+            <button  v-on:click="search" @keydown="keySearch">
+>>>>>>> de601695282afffa97a9518526d4516ef0ce6bc1
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
             </button>
@@ -114,11 +119,11 @@
             </li>
             <li class="textArea clear">
               <h5>职位描述</h5>
-              <textarea v-model="localWorkExperience[index].jobDescription"  cols="66" rows="6" v-on:input="textLength(index)"></textarea>
+              <textarea v-model="localWorkExperience[index].jobDescription"  cols="66" rows="6" v-on:input="textLength(index)" maxlength="500"></textarea>
               <i>{{reveal.textLength[index]}}/500</i>
             </li>
             <li class="clear">
-              <button v-on:click="keepEdit(index)">保存</button>
+              <button :class="disabled" v-on:click="keepEdit(index)">保存</button>
               <button v-on:click="cancelEdit(index)">取消</button>
             </li>
           </ul>
@@ -224,9 +229,8 @@
     },
  
     computed:mapState({
-//    workExperience:state=>state.personal.personalMessage.workExperience,
-      /*从Vuex中获取workExperience信息*/
       baseInfoName:state=>state.personal.personalMessage.baseInfo.psnName
+      /*从Vuex中获取workExperience信息,用到了baseInfoName的数据*/
     }),
     /*获取基础信息中的姓名信息*/
     mounted(){
@@ -241,9 +245,7 @@
         /*通过判断是否显示信息为空提示*/
         for(var i=0;i<this.workExperience.length;i++){
           this.reveal.editInfo.push(true);
-//
         }
-
       }else {
         Vue.set(this.reveal,"empty",true)
         /*判断是否显示信息为空提示*/
@@ -268,6 +270,7 @@
 				},function(data){
           if(data.code==0){
             that.workExperience = data.msg;
+            console.log(data.msg)
             if(that.workExperience.length==0){
               Vue.set(that.reveal,"empty",true)
             }
@@ -284,19 +287,29 @@
 			    }else {
 			      return text;
 			    }
-			  }
+        }
+        that.localWorkExperience=JSON.parse(JSON.stringify(that.workExperience));
+        
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	that.deleteModalClass = [];
 	    	for(var i=0;i<that.workExperience.length;i++){
 	    		if(that.workExperience[i].ocupationTimeDown=="0002.12"){
 					 	that.workExperience[i].ocupationTimeDown = "至今";
-					}
-					
+          }
+          if(that.localWorkExperience[i].ocupationTimeDown=="0002.12"){
+					 	that.localWorkExperience[i].ocupationTimeDown = "至今";
+          }
+					that.reveal.textLength.push(0)//字数统计初始化为
 	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
+<<<<<<< HEAD
 	    	  that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
 	    		if(that.workExperience[i].ifVisable==1){
+=======
+          
+          if(that.workExperience[i].ifVisable==1){
+>>>>>>> de601695282afffa97a9518526d4516ef0ce6bc1
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
 	    		}else{
@@ -304,8 +317,7 @@
 	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值		
 	    		}
         }
-	    	that.localWorkExperience=JSON.parse(JSON.stringify(that.workExperience));
-
+	    	
         
       },
       closeAlert(){
@@ -336,6 +348,9 @@
         	}
         }
         var that = this;
+        if(that.workExperience[index].ocupationTimeDown=="至今"){
+				 	that.workExperience[index].ocupationTimeDown = "0000.00.00";
+				 }
         var url = MyAjax.urlsy+"/psnWorkExperience/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
@@ -355,43 +370,50 @@
       },
       editInfo(index){//编辑按钮单击事件，进入编辑状态
         Vue.set(this.reveal.editInfo,[index],false);
+        let ocupation=this.localWorkExperience[index].ocupation;
+        let jobDescription=this.localWorkExperience[index].jobDescription;
+        ocupation=="（暂无信息）"?this.localWorkExperience[index].ocupation="":ocupation=ocupation;
+        jobDescription=="（暂无信息）"?this.localWorkExperience[index].jobDescription="":jobDescription=jobDescription;
+        //如果将要编辑的数据为（暂无信息），则重置位空
       },
       cancelEdit(index){//编辑状态取消按钮的单击事件，取消编辑状态，回到显示状态
         Vue.set(this.reveal.editInfo,[index],true);//取消编辑的视图切换
-        this.localWorkExperience[index]= JSON.parse(JSON.stringify(this.workExperience[index]));
-        //返回到更改之前
+        this.localWorkExperience[index]=JSON.parse(JSON.stringify(this.workExperience[index]));
+        //返回到更改之前,如果是暂无消息，重置为空
       },
       textLength(index){//编辑状态下记录输入多行文本的字数
         if(this.localWorkExperience[index].jobDescription.trim().length<=500){
           Vue.set(this.reveal.textLength,[index],this.localWorkExperience[index].jobDescription.trim().length)
         }else{
-          this.localWorkExperience[index].jobDescription=this.localWorkExperience[index].jobDescription.trim().slice(0,499);
+          //this.localWorkExperience[index].jobDescription=this.localWorkExperience[index].jobDescription.trim().slice(0,499);
           Vue.set(this.reveal.textLength,[index],500)
         }
       },
       keepEdit(index){//编辑状态下的保存按钮
-       	var that = this;
-       	if(that.localWorkExperience[index].ocupationTimeDown=="至今"){
-				 	that.localWorkExperience[index].ocupationTimeDown = "0000.00.00";
-				 }
-        var url = MyAjax.urlsy+"/psnWorkExperience/update"
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: JSON.stringify(that.localWorkExperience[index]),
-					dataType: "json",
-					contentType:"application/json;charset=utf-8",
-					async:false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})//更新到服务器
-				//保存之后再重新拉取数据
-				that.updateData();
-        Vue.set(that.reveal.editInfo,[index],true);
-        /*视图的切换*/
+        if(this.localWorkExperience[index].ocupation.length!=0&&this.localWorkExperience[index].ocupationTimeUp.length!=0&&this.localWorkExperience[index].ocupationTimeDown.length!=0){
+          var that = this;
+          if(that.localWorkExperience[index].ocupationTimeDown=="至今"){
+            that.localWorkExperience[index].ocupationTimeDown = "0000.00.00";
+          }
+          var url = MyAjax.urlsy+"/psnWorkExperience/update"
+          $.ajaxSetup({ contentType : 'application/json' });
+          MyAjax.ajax({
+            type: "POST",
+            url:url,
+            data: JSON.stringify(that.localWorkExperience[index]),
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+            async:false,
+          },function(data){
+            console.log(data)
+          },function(err){
+            console.log(err)
+          })//更新到服务器
+          //保存之后再重新拉取数据
+          that.updateData();
+          Vue.set(that.reveal.editInfo,[index],true);
+          /*视图的切换*/
+        }
       },
       deleteInfo(index){//删除显示信息
       	var aa = "deleteModalClass"+index;
@@ -508,14 +530,12 @@
       newTextLength(){//添加模式下，计算多行文本框的字符个数
         Vue.set(this.reveal,"newTextLength",this.newWorkExperience.jobDescription.length);
         if(this.newWorkExperience.jobDescription.trim().length>500){
-          this.newWorkExperience.jobDescription=this.newWorkExperience.jobDescription.trim().slice(0,499);
+          //this.newWorkExperience.jobDescription=this.newWorkExperience.jobDescription.trim().slice(0,499);
         }
       },
       keepAdd(){//添加模式下，确认添加按钮
       	var that = this;
         if(that.newWorkExperience.companyName.length!=0&&that.newWorkExperience.jobDescription.length!=0){//保证公司信息不为空才能进行操作
-        	
-     
           that.reveal.editInfo.push(true);//在是否编辑的状态里添加一条新的状态
           that.reveal.openOrPrivacy.push(true);//在是否让他人查看添加一条新的信息
           that.reveal.openOrPrivacyText.push("显示");//在是否让他人查看添加一条新的信息
@@ -1024,6 +1044,11 @@
                 border:0;
                 background: url("../../../assets/img/personal/education/btn_save_normal.png.png")left center no-repeat;
                 color: #ffffff;
+              }
+              .disabled{
+                border:0px;
+                color: #fff;
+                background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat;
               }
             }
             .companyAddress{

@@ -46,6 +46,12 @@
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[4]}" v-on:click="openOrPrivacy(4)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
+        <li class="clear">
+        	<h5>支付宝账号:</h5>
+        	<p>{{baseInfo.phoneNumber}}</p>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[5]}" v-on:click="openOrPrivacy(5)"></strong>
+          <p v-if="noBaseInfo">（暂无信息）</p>
+        </li>
       </ul>
 
 
@@ -54,7 +60,7 @@
           <h5><span>*</span>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</h5>
           <p><input type="text" v-model="localBaseInfo.nickName"  v-on:input="changeNickName"></p>
           <i>{{textLeng.nickName}}/30</i>
-				  <alertTip v-if="showAlert.nickName" :showHide="showAlert.nickName" @closeTip="closeTip" :alertText="alertText.nickName"></alertTip>
+				  <alertTip v-if="showAlert.nickName" :showHide="showAlert.nickName"  :alertText="alertText.nickName"></alertTip>
           
         </li>
         <li v-if="baseInfo.ifRNA" class="clear">
@@ -62,14 +68,16 @@
           <p>{{baseInfo.psnName}}</p>
           <i>{{textLeng.psnName}}/30</i>
           <span>（进入实名认证流程后，姓名将不可以自行修改，需联系管理员）</span>
-				  <alertTip v-if="showAlert.psnName" :showHide="showAlert.psnName" @closeTip="closeTip" :alertText="alertText.psnName"></alertTip>
+				  <alertTip v-if="showAlert.psnName" :showHide="showAlert.psnName"  :alertText="alertText.psnName"></alertTip>
 					
         </li>
+        
         <li v-if="!baseInfo.ifRNA" class="clear">
           <h5><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</h5>
           <p><input type="text" v-model="localBaseInfo.psnName"  v-on:input="changeName"></p>
           <i>{{textLeng.psnName}}/30</i>
         </li>
+        
         <li class="clear">
           <h5>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</h5>
           <p>
@@ -91,17 +99,24 @@
           <h5>联系邮箱：</h5>
           <p><input type="text" v-model="localBaseInfo.psnMail" ></p>
         </li>
+        <li class="clear">
+        	<h5><span>*</span> 支付宝账号：</h5>
+        	<p><input type="text" v-model="localBaseInfo.phoneNumber"/></p>
+				  <alertTip v-if="showAlert.alipay" :showHide="showAlert.alipay"  :alertText="alertText.alipay"></alertTip>
+        	
+        </li>
         <li class="cancelSubmit clear">
           <button class="submitEdit" v-on:click="submitEdit" v-bind:class="{submitBgColor:reveal.submitBgColor}">保存</button>
           <button class="cancelEdit" v-on:click="cancelEdit">取消</button>
         </li>
+        
       </ul>
       <div class="realName">
         <div class="realNameTop clear">
           <h5>实名认证：</h5>
           <p v-if="localBaseInfo.rnastatus===0" v-bind:class="{throughRealName:reveal.throughRealName}">（暂未上传认证文件）</p>
         </div>
-        <p v-show="haveUploaded" style="line-height: 40px;color: rgb(242,117,25);">上传认证证件成功，已进入审核阶段。可继续上传。</p>
+        <p v-if="localBaseInfo.rnastatus===0" v-show="haveUploaded" style="line-height: 40px;color: rgb(242,117,25);">上传认证证件成功，已进入审核阶段。可继续上传。</p>
         <div class="realNameMain">
         	<ul>
         		<li class="clear">
@@ -215,8 +230,8 @@
           ifRNA:"",
           openOrPrivacy:[]
         },
-        showAlert:{nickName:false,psnName:false,},//提示框显隐
-	      alertText:{nickName:null,psnName:null,},
+        showAlert:{nickName:false,psnName:false,alipay:false},//提示框显隐
+	      alertText:{nickName:null,psnName:null,alipay:null},
         textLeng:{
           nickName:0,
           psnName:0
@@ -318,6 +333,7 @@
 	//				contentType:"application/json;charset=utf-8",
 					async:false,
 				},function(data){
+					console.log(data)
 					if(data.code==0){
             that.baseInfo = data.msg;
 						//判断用户的全部信息为空值
@@ -352,6 +368,7 @@
 			      that.reveal.openOrPrivacy.push(that.baseInfo.ageVisable)
 			      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
 			      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
+			      that.reveal.openOrPrivacy.push(that.baseInfo.phoneNumberVisable)
 			      /*初始化openOrPrivacy*/
 						
 						for(var i=0;i<that.reveal.openOrPrivacy.length;i++){
@@ -399,7 +416,7 @@
 	      this.localBaseInfo.psnMail=emptyText(this.localBaseInfo.psnMail);
 	      this.localBaseInfo.phoneNumber=emptyText(this.localBaseInfo.phoneNumber);
 				var d = new Date();
-				console.log(d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate())
+//				console.log(d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate())
 				if(this.localBaseInfo.dateOfBirth == "（暂无信息）"){
 					
 					this.localBaseInfo.dateOfBirth =d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
@@ -461,6 +478,7 @@
       /*性别选择*/
       cancelEdit(){//从编辑状态退出
         Vue.set(this.reveal,"edit",true)
+        this.updateData();
       },
       addFile(){
         console.log("ok")
@@ -468,13 +486,7 @@
       submitEdit(){//保存编辑
       	
         /*没有数据输入的处理函数*/
-        if(this.localBaseInfo.nickName.trim().length!=0&&this.localBaseInfo.psnName.trim().length!=0){
-          Vue.set(this.reveal,"edit",true)
-          /*只有当昵称，和名字不为空的时候，保存按钮才可用*/
-        }else {
-          Vue.set(this.reveal,"edit",false)
-          /*只有当昵称，和名字不为空的时候，保存按钮才可用*/
-        }
+        
         //上传之前处理一下Boolean值
 	    	for(var i=0;i<this.reveal.openOrPrivacy.length;i++){
 					if(this.reveal.openOrPrivacy[i] == false){
@@ -488,30 +500,45 @@
 	    	this.localBaseInfo.ageVisable = this.reveal.openOrPrivacy[2];
 	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
+	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[5];//支付宝账号
 	    	if(this.localBaseInfo.sex=='男'){
 	    		this.localBaseInfo.sex = "0";
 	    	}else if(this.localBaseInfo.sex=='女'){
 	    		this.localBaseInfo.sex = "1";
 	    	}
+	    	
 	    	var that = this;
-	    	var url = MyAjax.urlsy+"/personalbasicinfo/update";
-	    	$.ajaxSetup({ contentType : 'application/json' });
-	    	MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: JSON.stringify(that.localBaseInfo),
-					dataType: "json",
-					contentType:"application/json;charset=utf-8",//
-					async:false,
-				}, function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
-	    	that.updateData();
+	    	if(that.localBaseInfo.phoneNumber.trim().length===0){
+	    		that.showAlert.alipay = true;
+	    		that.alertText.alipay = "请填写支付宝账号"
+	    	}else if(that.localBaseInfo.phoneNumber.trim().length!=0){
+	    		var url = MyAjax.urlsy+"/personalbasicinfo/update";
+		    	$.ajaxSetup({ contentType : 'application/json' });
+		    	MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localBaseInfo),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",//
+						async:false,
+					}, function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})
+		    	that.updateData();
+		    	if(this.localBaseInfo.nickName.trim().length!=0&&this.localBaseInfo.psnName.trim().length!=0){
+          Vue.set(this.reveal,"edit",true)
+	          /*只有当昵称，和名字不为空的时候，保存按钮才可用*/
+	        }else {
+	          Vue.set(this.reveal,"edit",false)
+	          /*只有当昵称，和名字不为空的时候，保存按钮才可用*/
+	        }
+	    	}
+	    	
       },
       /*提交和取消按钮*/
-     
+     	
      	
       addRealName(){//实名认证
         //console.log(this.localBaseInfo.realName)
@@ -539,6 +566,7 @@
 	    	this.baseInfo.ageVisable = this.reveal.openOrPrivacy[2];
 	    	this.baseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.baseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
+	    	this.baseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[5];//zhifubao
 	    	console.log(this.baseInfo)
 	    	var that = this;
 	    	var url = MyAjax.urlsy+"/personalbasicinfo/update";
@@ -670,7 +698,7 @@
             float: right;
             margin-right:50px;
             width: 25px;
-            height: 14px;
+            height: 15px;
             background: url("../../../assets/img/personal/basicInfo/icon_available.png") left center no-repeat;
             margin-top: 10px;
           }
@@ -781,6 +809,20 @@
           }
            input{
           	width: 384px;
+          }
+        }
+        li:nth-child(7){
+        	position: relative;
+          h5{
+            background: url("../../../assets/img/personal/basicInfo/icon_mail.png") left center no-repeat;
+          }
+           input{
+          	width: 365px;
+          }
+          .alet_container{
+          	right: 120px;
+          	top: 10px;
+          	bottom: 0;
           }
         }
         .cancelSubmit{

@@ -19,15 +19,15 @@
           <li v-bind:class="{beforeSearch:!reveal.searchShow}" class="clear">
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
-            <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
-            <button  v-on:click="search" @keydown="keySearch">
+             <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
+            <button  v-on:click="search" @keydown="keySearch($event)">
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
             </button>
           </li>
           <li v-if="reveal.searchShow" class="clear">
             <h6>搜索结果</h6>
-            <p v-if="!reveal.modal" style="color: #e0e0e0;">抱歉，未找到该公司，请重新搜索</p>
+            <p v-if="!reveal.modal" style="color: #999999;">抱歉，未找到该公司，请重新搜索</p>
             <div v-if="reveal.modal">
               <p v-for="(item,index) in searchResult" v-on:click="selectCompanyName(index)">
                 <span>{{item.companyName}}</span>
@@ -62,6 +62,21 @@
               <li v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[index]}" v-on:click="openOrPrivacy(index)">{{reveal.openOrPrivacyText[index]}}</li>
               <li v-on:click="editInfo(index)">编辑</li>
               <li v-on:click="deleteInfo(index)">删除</li>
+              <!--确认删除该项目模态框-->
+			    			<div id="modal-overlay" v-bind:class="deleteModalClass[index]">
+									<div class="deleteWork">
+										<h5>删除</h5>
+										<span class="modalChaBtn" @click="closeModal(index)"></span>
+										<div class="content-wrap">
+										<p class="deleteOrNo">确定删除此条信息吗？</p>
+										<div class="btnBox">
+											<span class="cancelBtn" @click="cancleDele(index)">取消</span>
+											<span class="confirmBtn" @click="confirmDelete(index)">确认</span>
+										</div>
+										</div>
+									</div>
+								</div>
+			    		<!--确认删除该项目模态框-->
             </ul>
           </div>
           <!--头部信息-->
@@ -159,6 +174,7 @@
   import Datepicker from "../units/Datepicker.vue"
   import YearMonth from "../units/yearMonth.vue"
   import MyAjax from "../../../assets/js/MyAjax.js"
+  import Modal from "../../../assets/js/modal.js"
   
   export default {
     name:"workExperienceIndex",
@@ -173,6 +189,7 @@
         input:{value:""},//搜索公司时，自己输入的公司名称
         companyName:{name:''},//用来存放选择公司的索引
         buttonColor:{exist:[],add:true},//按钮颜色
+        deleteModalClass:[],
         reveal:{
           empty:true,//信息为空时，为空信息提示
           editInfo:[],//编辑信息的状态切换
@@ -271,6 +288,7 @@
         
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
+	    	that.deleteModalClass = [];
 	    	for(var i=0;i<that.workExperience.length;i++){
 	    		if(that.workExperience[i].ocupationTimeDown=="0002.12"){
 					 	that.workExperience[i].ocupationTimeDown = "至今";
@@ -282,7 +300,8 @@
 	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
           that.buttonColor.exist.push(true);//控制每一个保存按钮颜色
-          if(that.workExperience[i].ifVisable==1){
+	    	  that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
+	    		if(that.workExperience[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值		
 	    		}else{
@@ -389,6 +408,15 @@
         }
       },
       deleteInfo(index){//删除显示信息
+      	var aa = "deleteModalClass"+index;
+    		Modal.makeText($('.'+aa))
+      	
+      },
+      closeModal(index){
+				var aa = "deleteModalClass"+index;
+    		Modal.closeModal($('.'+aa))
+			},
+			confirmDelete(index){
       	if(this.workExperience.length==0){
           Vue.set(this.reveal,"empty",true)
         }
@@ -397,7 +425,12 @@
         var url = MyAjax.urlsy+"/psnWorkExperience/del/"+that.workExperience[index].pkid;
         MyAjax.delete(url);
         that.updateData();//更新一下数据
+        that.closeModal(index);
       },
+      cancleDele(index){
+    		//取消删除该项目
+    		this.closeModal(index);
+    	},
       addInfo(){//添加信息
         var model2= new ModalOpp("#modal-overlay2");
         model2.makeText();
@@ -441,12 +474,15 @@
         }
         
       },
-      keySearch(){//enter键登录事件
-			 	var event = event || window.event;  
-			 	if(event.keyCode==13){ 
+      keySearch($event){//enter键登录事件
+      	console.log("777")
+			 	var event = $event || window.event;  
+			 	if(event.keyCode===13){ 
 			 		console.log("222")
 			     this.search()
 			     event.returnValue = false;    
+	         event.cancelBubble=true;
+	         event.preventDefault();    
 			     return false;
 			  }
 			},
@@ -832,6 +868,88 @@
                 padding-left:27px;
                 background: url("../../../assets/img/personal/education/delete.png") left center no-repeat;
               }
+              .deleteWork{
+          			width: 549px;
+								overflow: hidden;
+						    position:absolute;top:50%;left:50%; 
+								transform:translate(-50%,-50%);
+								-webkit-transform:translate(-50%,-50%);
+								-moz-transform:translate(-50%,-50%);
+								-ms-transform:translate(-50%,-50%);
+								-o-transform:translate(-50%,-50%);
+						    background: #FFFFFF;
+						    border-radius: 10px;
+						    text-align: center;
+						    h5{
+							    color:$activeColor;
+							    font-size: 18px;
+							    height: 50px;
+							    line-height: 50px;
+							    text-align: left;
+							    background: #f7f7f7;
+							    padding: 0 40px;
+							     
+								}
+								.modalChaBtn{
+							     width: 20px;
+							     height: 20px;
+							     background: url(../../../assets/img/personal/teamexperience/icon_cannel_large.png) no-repeat center;
+							     position: absolute;
+							     top: 16px;
+							     right: 40px;
+							     cursor: pointer;
+						    }
+						    .content-wrap{
+						    	width: 100%;
+						    	overflow: hidden;
+						    		.deleteOrNo{
+						    			margin: 30px auto;
+						    			color: $activeColor;
+						    			font-size: 20px;
+						    		}
+						    		.btnBox{
+								    	height: 40px;
+								    	width: 330px;
+								    	margin:40px auto;
+								    	display: flex;
+								    	justify-content: space-between;
+								    	overflow: hidden;
+								    	margin-left: 110px;
+								    	span{
+								    		float: left;
+								    		/*margin-right: 50px;*/
+								    		width: 140px;
+								    		height: 40px;
+								    		line-height: 40px;
+								    		text-align: center;
+								    		vertical-align: middle;
+								    		font-size: 16px;
+								    		border-radius: 5px;
+								    		cursor: pointer;
+												padding-left: 0 !important;
+								    		&.cancelBtn{
+								    			border: 1px solid #e0e0e0;
+							
+								    			&:hover{
+								    				border: 1px solid $activeColor;
+								    				color: $activeColor;
+								    			}
+								    		}
+								    		&.confirmBtn{
+								    			background: url(../../../assets/img/personal/education/btn_save_normal.png.png) no-repeat center;
+								    			background-size: 100%;
+								    			color: #FFFFFF;
+								    			&:hover{
+								    				filter:alpha(opacity=80);       /* IE */
+												  -moz-opacity:0.8;              /* 老版Mozilla */
+												  -khtml-opacity:0.8;              /* 老版Safari */
+												   opacity: 0.8;           /* 支持opacity的浏览器*/
+								    			}
+								    		}
+						    			}
+						    		}		
+							    }
+              	}
             }
           }
           /*公司名字*/

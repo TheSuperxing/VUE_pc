@@ -817,7 +817,7 @@
             color: #4a4a4a;
             float: left;
             padding-left:25px;
-            background: url("../../../assets/img/personal/basicInfo/icon_confirm.png") left center no-repeat;
+            background: url("../../../assets/img/personal/basicInfo/realName.png") left center no-repeat;
             color: $hColor;
           }
           p{

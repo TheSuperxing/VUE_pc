@@ -6,7 +6,7 @@
       </li>
       <li>
         <input v-model="personalLoginInput.picConfirm" @blur="picConfirm"  type="text" placeholder="图形验证码"  class="pic"/>
-        <img class="picConfirm" :src="picSrc" alt="" @click="changePic"/>
+        <img class="picConfirm" :src="changePic" alt="" @click="changePic"/>
         <!--<p v-cloak @click="random">{{makeRandom.num}}</p>-->
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
@@ -160,7 +160,7 @@
      		}
 	    },
 	    changePic(){
-	    	this.picSrc = MyAjax.urlsy+"/captcha.jpg"
+	    	this.picSrc = MyAjax.urlsy+"/captcha.jpg?random="+Math.random()
 	    	$(".picConfirm").attr("src",this.picSrc)
 	    },
       picConfirm(){
@@ -270,9 +270,7 @@
     },
     destroyed(){
     	Vue.set(this.user,'userState',0)
-
       sessionStorage.setItem("state",this.user.userState)
-
     }
   }
 </script>

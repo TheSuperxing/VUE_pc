@@ -20,7 +20,7 @@
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
              <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
-            <button  v-on:click="search" @keydown="keySearch($event)"></button>
+            <button  v-on:click="search" @keydown="keySearch($event)">
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
             </button>
@@ -134,7 +134,7 @@
         <li class="clear">
           <h5>*&nbsp;公司名称</h5>
           <p v-if="reveal.customCompanyName">{{newWorkExperience.companyName}}</p>
-          <input v-if="!reveal.customCompanyName" type="text" placeholder="请输入公司名称" v-model="newWorkExperience.companyName">
+          <input @input="cusPosi" v-if="!reveal.customCompanyName" type="text" placeholder="请输入公司名称" v-model="newWorkExperience.companyName">
 
         </li>
         <li v-if="!reveal.customCompanyName" class="clear">
@@ -143,23 +143,23 @@
         </li>
         <li class="clear">
           <h5>*&nbsp;任职职位</h5>
-          <input v-model="newWorkExperience.ocupation" type="text" placeholder="请输入职位名称">
+          <input @input="cusPosi" v-model="newWorkExperience.ocupation" type="text" placeholder="请输入职位名称">
         </li>
         <li class="clear">
           <h5>*&nbsp;任职时间</h5>
           <!-- <datepicker v-model="newWorkExperience.ocupationTimeUp"></datepicker> -->
-          <year-month v-model="newWorkExperience.ocupationTimeUp"></year-month> 
+          <year-month @input="cusPosi" v-model="newWorkExperience.ocupationTimeUp"></year-month> 
           <span></span>
           <!-- <datepicker v-model="newWorkExperience.ocupationTimeDown"></datepicker> -->
-          <year-month v-model="newWorkExperience.ocupationTimeDown" :min="newWorkExperience.ocupationTimeUp" :today="true"></year-month>
+          <year-month @input="cusPosi" v-model="newWorkExperience.ocupationTimeDown" :min="newWorkExperience.ocupationTimeUp" :today="true"></year-month>
         </li>
         <li class="clear">
           <h5>职位描述</h5>
-          <textarea v-model="newWorkExperience.jobDescription" cols="66" rows="6" v-on:input="newTextLength"></textarea>
+          <textarea maxlength="500" v-model="newWorkExperience.jobDescription" cols="66" rows="6" v-on:input="newTextLength"></textarea>
           <i>{{reveal.newTextLength}}/500</i>
         </li>
         <li class="clear">
-          <button v-on:click="keepAdd" v-bind:class="{keepAdd:reveal.keepAdd}">保存</button>
+          <button v-on:click="keepAdd" v-bind:class="{keepAdd:buttonColor.add}">保存</button>
           <button v-on:click="cancelAdd">取消</button>
         </li>
       </ul>
@@ -188,7 +188,7 @@
         searchResult:[],
         input:{value:""},//搜索公司时，自己输入的公司名称
         companyName:{name:''},//用来存放选择公司的索引
-        buttonColor:{exist:[],add:true},//按钮颜色
+        buttonColor:{exist:[],add:false},//按钮颜色
         deleteModalClass:[],
         reveal:{
           empty:true,//信息为空时，为空信息提示
@@ -202,7 +202,7 @@
           iSelectActive:[],//搜索公司搜索结果的选定
           openOrPrivacy:[],//信息是否对外显示，样式控制
           openOrPrivacyText:[],//信息是否对外显示文本控制
-          keepAdd:false,//添加保存按钮是否可用，样式控制
+          //keepAdd:false,//添加保存按钮是否可用，样式控制
           customCompanyName:true,//是否自定义公司名称
         },
         workExperience:[],
@@ -299,7 +299,7 @@
 					that.reveal.textLength.push(0)//字数统计初始化为
 	    		that.workExperience[i].ocupation = emptyText(that.workExperience[i].ocupation);
 	    	  that.workExperience[i].jobDescription = emptyText(that.workExperience[i].jobDescription);
-          that.buttonColor.exist.push(true);//控制每一个保存按钮颜色
+          that.buttonColor.exist.push(false);//控制每一个保存按钮颜色
 	    	  that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
 	    		if(that.workExperience[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
@@ -371,8 +371,8 @@
       changeWEXP(index){//编辑状态下，工作经历的变化的input事件
         console.log(this.localWorkExperience[index])
         let condition=this.localWorkExperience[index].ocupation.length!=0
-        &&this.localWorkExperience[index].ocupationTimeUp.length!=0
-        &&this.localWorkExperience[index].ocupationTimeDown.length!=0;//按钮的颜色是否可用颜色的判断条件
+          &&this.localWorkExperience[index].ocupationTimeUp.length!=0
+          &&this.localWorkExperience[index].ocupationTimeDown.length!=0;//按钮的颜色是否可用颜色的判断条件
         if(condition){
           Vue.set(this.buttonColor.exist,[index],false)
         }else{
@@ -393,7 +393,10 @@
         }
       },
       keepEdit(index){//编辑状态下的保存按钮
-        if(this.localWorkExperience[index].ocupation.length!=0&&this.localWorkExperience[index].ocupationTimeUp.length!=0&&this.localWorkExperience[index].ocupationTimeDown.length!=0){
+      let condition=this.localWorkExperience[index].ocupation.length!=0
+        &&this.localWorkExperience[index].ocupationTimeUp.length!=0
+        &&this.localWorkExperience[index].ocupationTimeDown.length!=0
+        if(condition){
           var that = this;
           if(that.localWorkExperience[index].ocupationTimeDown=="至今"){
             that.localWorkExperience[index].ocupationTimeDown = "0000.00.00";
@@ -523,12 +526,23 @@
          var modal2= new ModalOpp("#modal-overlay2");
          modal2.closeModal();
          Vue.set(this.reveal,"modal",false);
-         Vue.set(this.reveal,"keepAdd",true);//设置保存按钮的颜色
+         Vue.set(this.buttonColor,"add",true);//设置保存按钮的颜色
          Vue.set(this.reveal,"addOrShow",false);//添加按钮视图切换
 					
          Vue.set(this.reveal,"searchShow",false)//搜索恢复没有显示状态
          Vue.set(this.input,"value","")//每次确认选择公司信息后都会把输入要搜索的公司的信息清空
        }
+      },
+      cusPosi(){//自定义公司，公司名词、任职职位、任职事件是否为空的input事件
+        let condition=this.newWorkExperience.companyName.length!=0
+          &&this.newWorkExperience.ocupation.length!=0
+          &&this.newWorkExperience.ocupationTimeUp.length!=0
+          &&this.newWorkExperience.ocupationTimeDown.length!=0;
+        if(condition){
+          Vue.set(this.buttonColor,"add",true);//设置保存按钮的颜色
+        }else{
+          Vue.set(this.buttonColor,"add",false);//设置保存按钮的颜色
+        }
       },
       newTextLength(){//添加模式下，计算多行文本框的字符个数
         Vue.set(this.reveal,"newTextLength",this.newWorkExperience.jobDescription.length);
@@ -537,8 +551,15 @@
         }
       },
       keepAdd(){//添加模式下，确认添加按钮
+      let condition=this.newWorkExperience.companyName.length!=0
+          &&this.newWorkExperience.ocupation.length!=0
+          &&this.newWorkExperience.ocupationTimeUp.length!=0
+          &&this.newWorkExperience.ocupationTimeDown.length!=0;
       	var that = this;
-        if(that.newWorkExperience.companyName.length!=0&&that.newWorkExperience.jobDescription.length!=0){//保证公司信息不为空才能进行操作
+        if(that.newWorkExperience.ocupationTimeDown=="至今"){
+						that.newWorkExperience.ocupationTimeDown = "0000.00.00";
+					}
+        if(condition){//保证公司信息不为空才能进行操作
           that.reveal.editInfo.push(true);//在是否编辑的状态里添加一条新的状态
           that.reveal.openOrPrivacy.push(true);//在是否让他人查看添加一条新的信息
           that.reveal.openOrPrivacyText.push("显示");//在是否让他人查看添加一条新的信息
@@ -557,10 +578,10 @@
 					},function(err){
 						console.log(err)
 					})
-	        
           /*确定添加后信息的清除*/
+          that.updateData();
         }
-        that.updateData();
+       
       },
       cancelAdd(){
         Vue.set(this.reveal,"addOrShow",true)//切换到显示信息页
@@ -1065,10 +1086,10 @@
             .textArea{
               position: relative;
               border-radius: 5px;
-              
+              line-height: 20px;
               i{
                 position: absolute;
-                bottom: 0;
+                bottom: 13px;
                 margin-left:5px;
               }
             }

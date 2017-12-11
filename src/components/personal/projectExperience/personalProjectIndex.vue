@@ -170,8 +170,13 @@
 	    		that.show.tag[i]=true;
 	    		that.updowntxt.push("展开查看更多");
 	    		that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
-	    		that.openOrPrivacy.push(true);
-		      	that.openOrPrivacyText.push("显示");
+				if(that.proInfo[i].ifVisable==1){
+					that.openOrPrivacy.push(true);
+					that.openOrPrivacyText.push("显示")
+				}else{
+					that.openOrPrivacy.push(false);
+					that.openOrPrivacyText.push("隐藏")
+				}
 		      /*对每一个循环列表的对外显示赋初始值*/
 	    	}
 		},
@@ -190,12 +195,11 @@
 				console.log(err)
 			})
 		},
-			goToEditPro(index,item){
-				console.log(item.projectID,item.psnProExpeID)
-				router.push({name:'editPerProject',query:{proId:item.projectID,psnId:item.psnProExpeID}})
-				/*通过路由传值*/
-			},
-    	
+		goToEditPro(index,item){
+			console.log(item.projectID,item.psnProExpeID)
+			router.push({name:'editPerProject',query:{proId:item.projectID,psnId:item.psnProExpeID}})
+			/*通过路由传值*/
+		},
     	upDown(index){
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
@@ -211,14 +215,41 @@
 				console.log(this.show.picList)
     	},
     	OpenOrPrivacy(index){//显示隐藏按钮，通过这个按钮可以控制显示到别人查看信息页的信息
-    		
-        Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index])
-        if(this.openOrPrivacyText[index]=="显示"){
-          Vue.set(this.openOrPrivacyText,[index],"隐藏")
-        }else {
-          Vue.set(this.openOrPrivacyText,[index],"显示")
-        }
-      },
+			Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index])
+			// if(this.openOrPrivacyText[index]=="显示"){
+			// 	Vue.set(this.openOrPrivacyText,[index],"隐藏")
+			// }else {
+			// 	Vue.set(this.openOrPrivacyText,[index],"显示")
+			// }
+			if(this.openOrPrivacy[index]){
+				this.proInfo[index].ifVisable=1
+				Vue.set(this.openOrPrivacyText,[index],"隐藏")
+			}else{
+				this.proInfo[index].ifVisable = 0;
+				Vue.set(this.openOrPrivacyText,[index],"显示")
+			}
+			var that=this;
+			if(that.proInfo[index].partakeTimeDown=="至今"){
+				that.proInfo[index].partakeTimeDown = "0000.00.00";
+			}
+			console.log(that.proInfo[index])
+			var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe/";
+			$.ajaxSetup({ contentType : 'application/json' });
+			MyAjax.ajax({
+				type: "POST",
+				url:url,
+				data:JSON.stringify(that.proInfo[index]),
+				dataType: "json",
+				async:false,
+			},function(data){
+				if(data.code == 0){
+					that.updateData();
+				}
+				
+			},function(err){
+				console.log(err)
+			})
+      	},
     	deletePro(index){
     		//删除模态框的弹出按钮事件
     		var aa = "deleteModalClass"+index;
@@ -299,10 +330,7 @@
 				var that = this;
 				console.log(that.chosedOne.projectID,that.chosedOne.psnProExpeID)
 				router.push({name:'editPerProject',query:{proId:that.chosedOne.projectID,psnId:that.chosedOne.psnProExpeID}})
-        
 			}
-	
-    
     }
   }
 </script>
@@ -601,35 +629,37 @@ $activeColor: rgb(242,117,25);
 					}
 				}
 				.openOrPrivacy{
-	        background: url("../../../assets/img/personal/education/hidden.png") left center no-repeat!important;
-	        color: #353535;
-	        margin-right: 17px;
-	      }
+					background: url("../../../assets/img/personal/education/hidden.png") left center no-repeat!important;
+					color: #353535;
+					margin-right: 17px;
+				}
 			}
 			.pr-wrap-a{
-        height: 18px;
-        line-height: 18px;
-        font-size: 14px;
-        color: rgb(61,61,61);
-        font-family: "microsoft yahei";
-        line-height: 18px;
-        margin: 20px 0;
-        &:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
-        .completeTime{
-	        font-size: 14px;
-	        font-family: "microsoft yahei";
-	        float: left;
-        }
-        .takeOfficeBar{
-	        font-size: 14px;
-	        font-family: "microsoft yahei";
-	        float: right;
-	        color: rgb(61,61,61);
-        }
-    	}
+				height: 18px;
+				line-height: 18px;
+				font-size: 14px;
+				color: rgb(61,61,61);
+				font-family: "microsoft yahei";
+				line-height: 18px;
+				margin: 20px 0;
+				&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+				.completeTime{
+					font-size: 14px;
+					font-family: "microsoft yahei";
+					float: left;
+					width: 230px;
+				}
+				.takeOfficeBar{
+					font-size: 14px;
+					font-family: "microsoft yahei";
+					float: left;
+					color: rgb(61,61,61);
+				}
+    		}
     	.pr-wrap-b{
     		color: #666666;
-    		text-align: justify;
+			word-wrap: break-word;
+    		white-space: normal;
     	}
     	.morePics{
     		overflow: hidden;

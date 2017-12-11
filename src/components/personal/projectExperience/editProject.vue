@@ -67,7 +67,7 @@
 			</li>
 			<li class="duty-wrap">
 				<span class="table-wrap-left">* 项目职责</span>
-				<input type="text" placeholder="请输入公司在项目中所属职位" maxlength="30"  v-model="project.takeOffice"/>
+				<input @input="dutyWrap" type="text" placeholder="请输入公司在项目中所属职位" maxlength="30"  v-model="project.takeOffice"/>
 				<p class="limit-words">{{dutycont}}/30</p>
 			</li>
 			<li class="detail-wrap">
@@ -158,7 +158,7 @@
 	</div>
 	<div class="btnBox">
 		<!--<router-link to="/company/companyProject/index">-->
-		<span class="saveBtn" @click="saveEdit" >保存</span>
+		<span :class="{saveBtn:buttonColor,disabled:!buttonColor}" @click="saveEdit" >保存</span>
 		<!--</router-link>-->
 		<span class="cancelBtn" @click="cancelEdit">取消</span>
 	</div>
@@ -200,6 +200,7 @@
 			parTakeTime:[],
 			picList:[],
 			picNum:"",
+			buttonColor:true,//控制编辑按钮的颜色
 	      }
 	    },
 	   	created(){
@@ -348,7 +349,20 @@
 				var modal = $('.modal-a')
 				Modal.closeModal(modal)
 			},
+			dutyWrap(){
+				let condition=this.project.takeOffice.length!=0
+				&&this.project.partakeTimeUp.length!=0
+				&&this.project.partakeTimeDown.length!=0;
+				if(condition){
+					this.buttonColor=true;
+				}else{
+					this.buttonColor=false;
+				}
+			},
 			saveEdit(){
+				let condition=this.project.takeOffice.length!=0
+				&&this.project.partakeTimeUp.length!=0
+				&&this.project.partakeTimeDown.length!=0;
 				function emptyText(text) {
 				    if(text=="（暂无信息）"){
 				      return " ";
@@ -366,24 +380,25 @@
 				if(that.project.partakeTimeDown=="至今"){
 				 	that.project.partakeTimeDown = "0000.00";
 				}
-			    console.log(JSON.stringify(that.project))
-			    var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe/";
-			    $.ajaxSetup({ contentType : 'application/json' });
-			    MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data:JSON.stringify(that.project),
-					dataType: "json",
-					async:false,
-				},function(data){
-					console.log(data)
-					if(data.code == 0){
-						router.push("/yhzx/personal/info/personalProject/index")
-					}
-					
-				},function(err){
-					console.log(err)
-				})
+			    if(condition){
+					var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe/";
+					$.ajaxSetup({ contentType : 'application/json' });
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.project),
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+						if(data.code == 0){
+							router.push("/yhzx/personal/info/personalProject/index")
+						}
+						
+					},function(err){
+						console.log(err)
+					})
+				}
 				
 			},
 			cancelEdit(){
@@ -636,6 +651,17 @@ $activeColor: rgb(242,117,25);
 			   opacity: 0.8;           /* 支持opacity的浏览器*/
 			}
 		}
+		&.disabled{
+			border:0px;
+			color: #fff;
+			background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat;
+			&:hover{
+				filter:alpha(opacity=80);       /* IE */
+			  -moz-opacity:0.8;              /* 老版Mozilla */
+			  -khtml-opacity:0.8;              /* 老版Safari */
+			   opacity: 0.8;           /* 支持opacity的浏览器*/
+			}
+		}
 		}
 	}
 	.modifyTable{
@@ -702,11 +728,10 @@ $activeColor: rgb(242,117,25);
 						line-height: 24px;
 						border: 1px solid #EBEBEB;
 						border-radius: 5px;
-						text-indent: 15px;
 						border-radius: 5px;
 						color: #353535;
 						text-align: justify;
-						padding: 0 5px;
+						padding: 0 12px;
 					}
 					.limit-words{
 						position: absolute;

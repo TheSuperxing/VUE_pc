@@ -52,7 +52,8 @@
 
           <ul class="editEduInfo" v-show="editEdu.edit[index]">
             <li class="clear">
-              <span class="wrap-left">*学校名称</span><input v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)"><span>{{textLeng.schoolName[index]}}/30</span>
+              <span class="wrap-left">*学校名称</span>
+							<input maxlength="30" v-model="localEdu[index].schoolName"  type="text" placeholder="请输入学校名称" v-on:input="changeShoolName(index)"><span>{{textLeng.schoolName[index]}}/30</span>
 						  <alertTip v-if="showAlert.schoolName" :showHide="showAlert.schoolName"  :alertText="alertText.schoolName"></alertTip>
             	
             </li>
@@ -68,12 +69,20 @@
             </li>
             <li class="clear">
               <label>
-                <span class="wrap-left">专业名称</span><input v-model="localEdu[index].professionName" v-on:input="changeProfession(index)" type="text" placeholder="请输入专业名称"><span>{{textLeng.profession[index]}}/30</span>
+                <span class="wrap-left">专业名称</span>
+								<input maxlength="30" v-model="localEdu[index].professionName" v-on:input="changeProfession(index)" type="text" placeholder="请输入专业名称"><span>{{textLeng.profession[index]}}/30</span>
               </label>
             </li>
             <li class="clear">
               <label>
-                <span class="wrap-left">所获学历 </span><input v-model="localEdu[index].education" type="text" placeholder="请选择学校">
+                <span class="wrap-left">所获学历 </span>
+								<select v-model="localEdu[index].education">
+									<option value="大专">大专</option>
+									<option value="本科">本科</option>
+									<option value="硕士">硕士</option>
+									<option value="博士">博士</option>
+									<option value="其他">其他</option>
+								</select>
               </label>
             </li>
             <li class="img-wrap clear" >
@@ -160,7 +169,6 @@
               <button v-bind:class="{eduDisabled: buttonColor.exist[index]}" v-on:click="keepEditEduExist(index)">保存</button>
               <button v-on:click="cancellEditEduExist(index)">取消</button>
             </li>
-
           </ul>
         </div>
 
@@ -169,7 +177,8 @@
       <ul class="editEduInfo" v-show="editEdu.add">
         <li class="clear">
           <label>
-           <span class="wrap-left">*学校名称 </span><input v-model="newInputValue.schoolName" v-on:input="addShoolName" type="text" placeholder="请输入学校名称"><span>{{newTextLeng.schoolName[0]}}/30</span>
+           <span class="wrap-left">*学校名称 </span>
+					 <input maxlength="30" v-model="newInputValue.schoolName" v-on:input="addShoolName" type="text" placeholder="请输入学校名称"><span>{{newTextLeng.schoolName[0]}}/30</span>
           </label>
         </li>
         <li class="clear">
@@ -182,12 +191,20 @@
 				</li>
         <li class="clear">
           <label>
-            <span class="wrap-left">专业名称</span> <input v-model="newInputValue.professionName" v-on:input="addProfession" type="text" placeholder="请输入专业名称"><span>{{newTextLeng.profession[0]}}/30</span>
+            <span class="wrap-left">专业名称</span> 
+						<input maxlength="30" v-model="newInputValue.professionName" v-on:input="addProfession" type="text" placeholder="请输入专业名称"><span>{{newTextLeng.profession[0]}}/30</span>
           </label>
         </li>
         <li class="clear">
           <label>
-            <span class="wrap-left">所获学历</span><input v-model="newInputValue.education" type="text" placeholder="请选择学校">
+            <span class="wrap-left">所获学历</span>
+						<select v-model="newInputValue.education">
+							<option value="大专">大专</option>
+							<option value="本科">本科</option>
+							<option value="硕士">硕士</option>
+							<option value="博士">博士</option>
+							<option value="其他">其他</option>
+						</select>
           </label>
         </li>
         <li class="img-wrap clear">
@@ -309,7 +326,7 @@
         showAlert:{schoolName:false,schoolName:false},//提示框显隐
 	      alertText:{schoolName:null,schoolName:null},
         //字符段长度
-        openOrPrivacy:[false,true,false,true],//信息是否公开显示,通过服务器获取的数据
+        openOrPrivacy:[],//信息是否公开显示,通过服务器获取的数据
         openOrPrivacyText:[],//信息是否公开显示,文本信息
         education:[],//用于存放请求的数据；
         localEdu:[],//本地用于编辑的数据
@@ -482,19 +499,30 @@
       },
       openOrPrivacyInfo(index){//是否显示隐藏按钮的事件
         Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index]);//通过类名控制图片和文字颜色
-        if(!this.openOrPrivacy[index]){
-          Vue.set(this.openOrPrivacyText,[index],"隐藏")
-        }else{
-          Vue.set(this.openOrPrivacyText,[index],"显示")
-        }
-        for(let i=0;i<this.openOrPrivacy.length;i++){
-        	if(this.openOrPrivacy[i]==false){
-        		this.education[i].ifVisable = 0;
-        	}else{
-        		this.education[i].ifVisable = 1;
-        	}
-        }
+        // if(!this.openOrPrivacy[index]){
+          
+        // }else{
+          
+        // }
+        // for(let i=0;i<this.openOrPrivacy.length;i++){
+        // 	if(this.openOrPrivacy[i]==false){
+        // 		this.education[i].ifVisable = 0;
+        // 	}else{
+        // 		this.education[i].ifVisable = 1;
+        // 	}
+        // }
+
+				if(this.openOrPrivacy[index]){
+					this.education[index].ifVisable=1
+					Vue.set(this.openOrPrivacyText,[index],"隐藏")
+				}else{
+					this.education[index].ifVisable = 0;
+					Vue.set(this.openOrPrivacyText,[index],"显示")
+				}
         var that = this;
+				if(that.education[index].schoolTimeDown=="至今"){
+				 	that.education[index].schoolTimeDown = "0000.00.00";
+				 }
         var url = MyAjax.urlsy +"/psnEduBackGround/update"
         $.ajaxSetup({ contentType : 'application/json' });
         MyAjax.ajax({
@@ -514,6 +542,11 @@
         /*显示隐藏文字切换*/
       },
       async editEduExist(index){//编辑按钮事件，进入编辑模式
+				let professionName=this.localEdu[index].professionName;
+				let education=this.localEdu[index].education; 
+        professionName=="（暂无信息）" ? this.localEdu[index].professionName="":professionName=professionName;
+				education=="（暂无信息）"?this.localEdu[index].education="":education=education;
+				//如果将要编辑的数据为（暂无信息），则重置位空
       	var that = this;
       	//promise 的then方法里面去读取已经上传的图片张数，然后实例化上传组件，以便控制可上传的图片张数
       	const getPic = await that.getPicture(index);
@@ -597,7 +630,10 @@
       },
       cancellEditEduExist(index){//编辑模式取消编辑事件
         Vue.set(this.editEdu.edit,[index],false);
-				$("#"+this.fineUploaderId[index]).html("");
+				setTimeout(() => {
+ 					$("#"+this.fineUploaderId[index]).html("");
+ 				}, 1);
+ 				this.localEdu[index]=JSON.parse(JSON.stringify(this.education[index]));
       },
       
       deleteEduExist(index){//删除按钮事件
@@ -634,7 +670,10 @@
         if(this.localEdu[index].schoolName.length>=30){
           //this.localEdu[index].schoolName=this.localEdu[index].schoolName.slice(0,29);
         }
-        if(this.localEdu[index].schoolName.length!=0){
+				let condition=this.localEdu[index].schoolName.length!=0
+					&&this.localEdu[index].schoolTimeUp.length!=0
+					&&this.localEdu[index].schoolTimeDown.length!=0;
+        if(condition){
           Vue.set(this.buttonColor.exist,[index],false)
         }else {
           Vue.set(this.buttonColor.exist,[index],true)
@@ -653,7 +692,10 @@
       },
       //以上是改变数据
 			keepEditEduExist(index){//编辑状态，提交保存
-				if(this.localEdu[index].schoolName.length!=0&&this.localEdu[index].schoolTimeUp.length!=0&&this.localEdu[index].schoolTimeDown.length!=0){
+			let condition=this.localEdu[index].schoolName.length!=0
+				&&this.localEdu[index].schoolTimeUp.length!=0
+				&&this.localEdu[index].schoolTimeDown.length!=0;
+				if(condition){
 					//必填项是否为空判断
 					var that = this;
 					if(that.localEdu[index].schoolTimeDown=="至今"){
@@ -674,7 +716,7 @@
 						}else{
 							that.updateData();
 							setTimeout(() => {
-								$("#"+this.fineUploaderId[index]).html("")
+								$("#"+that.fineUploaderId[index]).html("")
 							}, 1);
 							Vue.set(that.editEdu.edit,[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
 						}
@@ -700,16 +742,21 @@
         Vue.set(this.newInputValue,"schoolTimeDown","")
         Vue.set(this.newInputValue,"professionName","")
         Vue.set(this.newInputValue,"education","")
-        $("#fine-uploader-manual-trigger").html("")
+        setTimeout(() => {
+					$("#fine-uploader-manual-trigger").html("")
+				}, 1);
         /*取消添加后，清除之前添加的数据*/
       },
       addShoolName(){//添加模式下，添加校名
         Vue.set(this.newTextLeng.schoolName,[0],this.newInputValue.schoolName.length)
         //当input的值改变时改变相应的数字
         if(this.newInputValue.schoolName.length>=30){
-          this.newInputValue.schoolName=this.newInputValue.schoolName.slice(0,29);
+          //this.newInputValue.schoolName=this.newInputValue.schoolName.slice(0,29);
         }
-        if(this.newInputValue.schoolName.length!=0){
+				let condition=this.newInputValue.schoolName.length!=0
+				&&this.newInputValue.schoolTimeUp.length!=0
+				&&this.newInputValue.schoolTimeDown.length!=0;//必填项是否全部填写
+        if(condition){
           Vue.set(this.buttonColor,"add",false)
         }else {
           Vue.set(this.buttonColor,"add",true)
@@ -717,18 +764,28 @@
         //通过学校名字的长度，设置提交按钮的不同样式
       },
 			addShoolTime(){
-
+				let condition=this.newInputValue.schoolName.length!=0
+				&&this.newInputValue.schoolTimeUp.length!=0
+				&&this.newInputValue.schoolTimeDown.length!=0;//必填项是否全部填写
+				if(condition){
+					Vue.set(this.buttonColor,"add",false)
+				}else {
+          Vue.set(this.buttonColor,"add",true)
+        }
 			},
       addProfession(){//添加模式下，添加专业名
         Vue.set(this.newTextLeng.profession,[0],this.newInputValue.professionName.length)
         //当input的值改变时改变相应的数字
 
         if(this.newInputValue.professionName.length>=30){
-          this.newInputValue.professionName=this.newInputValue.professionName.slice(0,29);
+          //this.newInputValue.professionName=this.newInputValue.professionName.slice(0,29);
         }
       },
       keepEditEduNew(){//添加模式下保存
-				if(this.newInputValue.schoolName.length!=0){
+				let condition=this.newInputValue.schoolName.length!=0
+					&&this.newInputValue.schoolTimeUp.length!=0
+					&&this.newInputValue.schoolTimeDown.length!=0;//必填项是否全部填写
+				if(condition){
           this.localEdu.push(JSON.parse(JSON.stringify(this.newInputValue)))
           /*添加的数据，追加到本地数据里一份*/
           this.editEdu.delete.push(true)//解决添加数据后视图部更新
@@ -754,6 +811,7 @@
 						console.log(err)
 					})
 					that.updateData();
+
 					setTimeout(function(){
 						$("#fine-uploader-manual-trigger").html("")
 					},1)
@@ -823,7 +881,7 @@
             color: $themeColor;
             padding-bottom:12px;
             h4{
-              font-size: 18px;
+              font-size: 14px;
               float: left;
             }
             ul{
@@ -945,12 +1003,12 @@
               float: left;
               font-size:14px;
             }
-            p:nth-child(1){
-              width:292px;
+            p:nth-child(1){//显示列表，时间
+              width:154px;
               height: 21px;
             }
-            p:nth-child(2){
-              width:214px;
+            p:nth-child(2){//显示列表，专业
+              width:500px;
               height: 21px;
             }
           }
@@ -1048,14 +1106,14 @@
           }*/
 
         }
-        li:nth-child(1){
+        li:nth-child(1){//学校名称
         	 height: 55px;
           input{
             width:480px;
             /*margin-left:26px;*/
           }
         }
-        li:nth-child(2){
+        li:nth-child(2){//在校时间
           color: #000;
           span{
             float: left;
@@ -1073,15 +1131,20 @@
             margin:0 20px;
           }
         }
-        li:nth-child(3){
+        li:nth-child(3){//专业名词
         	height: 55px;
           input{
             width:480px;
           }
         }
-        li:nth-child(4){
-          input{
-            width:480px;
+        li:nth-child(4){//学历下拉
+          select{
+						width:100px;
+						height: 35px;
+						border-radius: 5px;
+						color: #363636;
+						border: 1px solid #ebebeb;
+						padding-left: 12px;
           }
         }
         li.img-wrap{

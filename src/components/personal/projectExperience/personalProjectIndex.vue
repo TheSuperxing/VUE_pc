@@ -64,7 +64,9 @@
     		<span class="completeTime">{{item.partakeTimeUp}} — {{item.partakeTimeDown}}</span>
   			<span class="takeOfficeBar">项目责任：<em class="takeOffice">{{item.takeOffice}}</em></span>
     	</div>
-    	<div class="pr-wrap-b">责任描述：{{item.detailDes}}
+    	<div class="pr-wrap-b">责任描述：
+    		<em>{{item.detailDes}}</em>
+    		
     	</div>
     	
     	<div class="morePics" v-if="!show.tag[$index]">
@@ -658,8 +660,12 @@ $activeColor: rgb(242,117,25);
     		}
     	.pr-wrap-b{
     		color: #666666;
-			word-wrap: break-word;
-    		white-space: normal;
+    		em{
+    			text-align: justify;
+	    		flex-wrap: wrap;
+	    		word-wrap:break-word;
+    		}
+    		
     	}
     	.morePics{
     		overflow: hidden;

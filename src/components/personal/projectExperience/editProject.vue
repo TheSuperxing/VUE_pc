@@ -64,11 +64,15 @@
 				<span class="heng"></span>
 				<!-- <datepicker class="datePicker" v-model="project.partakeTimeDown"></datepicker> -->
 				<year-month v-model="project.partakeTimeDown" :min="project.partakeTimeUp" :today="true"></year-month>
+				<alertTip v-if="showAlert.partakeTime" :showHide="showAlert.partakeTime"  :alertText="alertText.partakeTime"></alertTip>
+			
 			</li>
 			<li class="duty-wrap">
 				<span class="table-wrap-left">* 项目职责</span>
-				<input @input="dutyWrap" type="text" placeholder="请输入公司在项目中所属职位" maxlength="30"  v-model="project.takeOffice"/>
+				<input @input="dutyWrap" type="text" placeholder="请输入项目职责" maxlength="30"  v-model="project.takeOffice"/>
 				<p class="limit-words">{{dutycont}}/30</p>
+				<alertTip v-if="showAlert.takeOffice" :showHide="showAlert.takeOffice"  :alertText="alertText.takeOffice"></alertTip>
+			
 			</li>
 			<li class="detail-wrap">
 				<span class="table-wrap-left">详细描述</span>
@@ -176,12 +180,14 @@
 	import qq from "fine-uploader"
     import MyAjax from "../../../assets/js/MyAjax.js"
 	import {singleManualUploader} from "../../../assets/js/manualUploader.js"
+	import alertTip from "../units/alertTip.vue"
 	
 	export default {
 	    name:"editProject",
 	    components:{
 		  Datepicker,
-		  YearMonth
+		  YearMonth,
+		  alertTip
 	    },
 	    data:function(){
 	      return {
@@ -201,6 +207,8 @@
 			picList:[],
 			picNum:"",
 			buttonColor:true,//控制编辑按钮的颜色
+			showAlert:{partakeTime:false,takeOffice:false},//提示框显隐
+	        alertText:{partakeTime:null,takeOffice:null},
 	      }
 	    },
 	   	created(){
@@ -260,12 +268,17 @@
 	    	that.project.partakeTimeDown = emptyText2(that.project.partakeTimeDown);
 	    	that.project.takeOffice = emptyText2(that.project.takeOffice);
 	    	that.project.detailDes = emptyText2(that.project.detailDes);
+	    	that.showAlert.partakeTime = false;
+	    	that.showAlert.takeOffice = false;
+	    	that.alertText.partakeTime = null;
+	    	that.alertText.takeOffice = null;
 	    	if(that.project.architectFunctions[0]==""){
 	    		that.project.architectFunctions[0] = "（暂无信息）"
 	    	}
 	    	if(that.project.partakeTimeDown=="0002.12"){
 			 	that.project.partakeTimeDown = "至今";
 			}
+	    	
 	    	//空值的处理
 	    	
 	   	},
@@ -360,9 +373,9 @@
 				}
 			},
 			saveEdit(){
-				let condition=this.project.takeOffice.length!=0
-				&&this.project.partakeTimeUp.length!=0
-				&&this.project.partakeTimeDown.length!=0;
+				let condition=this.project.takeOffice.trim().length!=0
+				&&this.project.partakeTimeUp.trim().length!=0
+				&&this.project.partakeTimeDown.trim().length!=0;
 				function emptyText(text) {
 				    if(text=="（暂无信息）"){
 				      return " ";
@@ -377,10 +390,10 @@
 		    		this.project.architectFunctions = [];
 		    	}
 				var that = this;
-				if(that.project.partakeTimeDown=="至今"){
-				 	that.project.partakeTimeDown = "0000.00";
-				}
 			    if(condition){
+					if(that.project.partakeTimeDown=="至今"){
+						that.project.partakeTimeDown = "0000.00";
+					}
 					var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe/";
 					$.ajaxSetup({ contentType : 'application/json' });
 					MyAjax.ajax({
@@ -398,8 +411,22 @@
 					},function(err){
 						console.log(err)
 					})
+				}else{
+					if(that.project.takeOffice.trim().length===0){
+						that.showAlert.takeOffice = true;
+						that.alertText.takeOffice = "请输入项目职责"
+					}else{
+						that.showAlert.takeOffice = false;
+						that.alertText.takeOffice = ""
+					}
+					if(that.project.partakeTimeUp.trim().length===0||that.project.partakeTimeDown.trim().length===0){
+						that.showAlert.partakeTime = true;
+						that.alertText.partakeTime = "请输入参与时间"
+					}else{
+						that.showAlert.partakeTime = false;
+						that.alertText.partakeTime = ""
+					}
 				}
-				
 			},
 			cancelEdit(){
 				//console.log(55)
@@ -698,6 +725,12 @@ $activeColor: rgb(242,117,25);
 					position: relative;
 					height: 35px;
 					line-height: 35px;
+					position: relative;
+					.alet_container{
+				      	right: 10px;
+				      	top: 8px;
+				      	bottom: 0;
+				      }
 					input{
 						width: 480px;
 						height: 35px;
@@ -728,6 +761,7 @@ $activeColor: rgb(242,117,25);
 						line-height: 24px;
 						border: 1px solid #EBEBEB;
 						border-radius: 5px;
+						text-indent: 12px;
 						border-radius: 5px;
 						color: #353535;
 						text-align: justify;

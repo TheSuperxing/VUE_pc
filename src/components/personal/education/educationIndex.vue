@@ -180,6 +180,8 @@
            <span class="wrap-left">*学校名称 </span>
 					 <input maxlength="30" v-model="newInputValue.schoolName" v-on:input="addShoolName" type="text" placeholder="请输入学校名称"><span>{{newTextLeng.schoolName[0]}}/30</span>
           </label>
+					<alertTip v-if="showAlert.schoolName" :showHide="showAlert.schoolName"  :alertText="alertText.schoolName"></alertTip>
+          
         </li>
         <li class="clear">
           <span class="wrap-left">*在校时间</span>
@@ -188,7 +190,9 @@
           <span>——</span>
           <!-- <datepicker v-model="newInputValue.schoolTimeDown" v-bind:value="{type:['month']}"></datepicker> -->
 					<year-month v-on:input="addShoolTime" v-model="newInputValue.schoolTimeDown" :min="newInputValue.schoolTimeUp" :today="true"></year-month>
-				</li>
+					<alertTip v-if="showAlert.schoolTime" :showHide="showAlert.schoolTime"  :alertText="alertText.schoolTime"></alertTip>
+				
+        </li>
         <li class="clear">
           <label>
             <span class="wrap-left">专业名称</span> 
@@ -401,12 +405,16 @@
 	        that.editEdu.delete = [];
 	        that.textLeng.schoolName = [];
 	        that.textLeng.profession = [];
+	        that.showAlert.schoolName = false;
+	        that.showAlert.schoolTime = false;
+	        that.alertText.schoolName = null;
+	        that.alertText.schoolTime = null;
 	        that.buttonColor.exist = [];
 	        that.show.tag=[];
 	    		that.updowntxt=[];
 	    		that.deleteModalClass = [];
-					if(this.education.length!=0){
-						Vue.set(this.empty,"promote",false)
+					if(that.education.length!=0){
+						Vue.set(that.empty,"promote",false)
 						//if 有信息 信息为空的提升隐藏
 						for(let i=0;i<that.education.length;i++){
 							if(that.education[i].schoolTimeDown=="0002.12"){
@@ -685,9 +693,7 @@
         Vue.set(this.textLeng.profession,[index],this.localEdu[index].professionName.length)
         //当input的值改变时改变相应的数字
         if(this.localEdu[index].professionName.length>=30){
-
           //this.localEdu[index].professionName=this.localEdu[index].professionName.slice(0,29);
-
         }
       },
       //以上是改变数据
@@ -700,7 +706,7 @@
 					var that = this;
 					if(that.localEdu[index].schoolTimeDown=="至今"){
 						that.localEdu[index].schoolTimeDown = "0000.00.00";
-					}
+					}		
 					var url = MyAjax.urlsy+"/psnEduBackGround/update"
 					$.ajaxSetup({ contentType : 'application/json' });
 					MyAjax.ajax({//更新到服务器
@@ -720,15 +726,25 @@
 							}, 1);
 							Vue.set(that.editEdu.edit,[index],false);//如果数据没有进行修改不会进行视图切换，单击取消视图会切换
 						}
-					},function(err){
-						console.log(err)
+						
 					})
-					//保存之后再重新拉取数据
-				}
-        
+				}	else{
+						if(that.localEdu[index].schoolName.trim().length===0){
+							that.showAlert.schoolName = true;
+							that.alertText.schoolName = "请输入学校名称"
+						}else{
+							that.showAlert.schoolName = false;
+							that.alertText.schoolName = ""
+						}
+						if(that.localEdu[index].schoolTimeUp.trim().length===0||that.localEdu[index].schoolTimeDown.trim().length===0){
+							that.showAlert.schoolTime = true;
+							that.alertText.schoolTime = "请输入在校时间"
+						}else{
+							that.showAlert.schoolTime = false;
+							that.alertText.schoolTime = ""
+						}
+					}
         //提交编辑后的数据
-				
-			
 
       },
       //提交数据
@@ -745,6 +761,7 @@
         setTimeout(() => {
 					$("#fine-uploader-manual-trigger").html("")
 				}, 1);
+				this.updateData();
         /*取消添加后，清除之前添加的数据*/
       },
       addShoolName(){//添加模式下，添加校名
@@ -786,17 +803,15 @@
 					&&this.newInputValue.schoolTimeUp.length!=0
 					&&this.newInputValue.schoolTimeDown.length!=0;//必填项是否全部填写
 				if(condition){
-          this.localEdu.push(JSON.parse(JSON.stringify(this.newInputValue)))
-          /*添加的数据，追加到本地数据里一份*/
-          this.editEdu.delete.push(true)//解决添加数据后视图部更新
-          Vue.set(this.editEdu,"add",false);//如果学校名称为空不能提交，视图不会切换
-          this.openOrPrivacy.push(true);//是否显示样式
-					this.openOrPrivacyText.push("显示");//是否显示文本信息
-					//以上是一些状态的控制
-					var that = this;
 					if(that.newInputValue.schoolTimeDown=="至今"){
 						that.newInputValue.schoolTimeDown = "0000.00.00";
 					}
+          this.localEdu.push(JSON.parse(JSON.stringify(this.newInputValue)))
+          /*添加的数据，追加到本地数据里一份*/
+         
+					//以上是一些状态的控制
+					var that = this;
+					
 					var url = MyAjax.urlsy+"/psnEduBackGround/insert";
 					$.ajaxSetup({ contentType : 'application/json' });
 					MyAjax.ajax({
@@ -815,7 +830,22 @@
 					setTimeout(function(){
 						$("#fine-uploader-manual-trigger").html("")
 					},1)
-        } 
+        }else{
+					if(that.newInputValue.schoolName.trim().length===0){
+						that.showAlert.schoolName = true;
+						that.alertText.schoolName = "请输入学校名称"
+					}else{
+						that.showAlert.schoolName = false;
+						that.alertText.schoolName = ""
+					} 
+					if (that.newInputValue.schoolTimeUp.trim().length===0||that.newInputValue.schoolTimeDown.trim().length===0){
+						that.showAlert.schoolTime = true;
+						that.alertText.schoolTime = "请输入在校时间"
+					}else{
+						that.showAlert.schoolTime = false;
+						that.alertText.schoolTime = ""
+					}
+				}
 	    }
 
       //新建部分
@@ -1076,6 +1106,7 @@
         /*border-bottom:1px solid $borderColor;*/
         li{
           padding:10px 0;
+          position: relative;
           .wrap-left{
           	width: 80px;
           	line-height: 35px;
@@ -1104,7 +1135,11 @@
           /*input[type=month]::-webkit-datetime-edit-fields-wrapper{
             visibility: hidden;
           }*/
-
+					.alet_container{
+          	right: 10px;
+          	top: 15px;
+          	bottom: 0;
+          }
         }
         li:nth-child(1){//学校名称
         	 height: 55px;

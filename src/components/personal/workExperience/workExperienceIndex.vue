@@ -20,7 +20,7 @@
             <h6>公司名称</h6>
             <!--<input type="text" autocomplete="off"/>-->
              <input v-model="input.value" type="text" placeholder="请输入公司名称" autocomplete="off"/> 
-            <button  v-on:click="search" @keydown="keySearch($event)">
+              <button  v-on:click="search" @keydown="keySearch($event)">
               <img src="../../../assets/img/personal/workexperience/icon.search.png" alt="">
               <p>搜索</p>
             </button>
@@ -95,14 +95,20 @@
               <h5>*&nbsp;公司名称</h5>
               <p v-if="reveal.editDetailInfo[index]">{{localWorkExperience[index].companyName}}</p>
               <p v-if="!reveal.editDetailInfo[index]">{{localWorkExperience[index].companyName}}</p>
+					    <alertTip v-if="showAlert.companyName" :showHide="showAlert.companyName"  :alertText="alertText.companyName"></alertTip>
+          		
             </li>
             <li  v-if="!reveal.editDetailInfo[index]" class="companyAddress clear">
               <h5>公司地址</h5>
               <input type="text" v-model="localWorkExperience[index].companyAddress" placeholder="请输入公司地址">
+
+            	
             </li>
             <li class="clear">
               <h5>*&nbsp;任职职位</h5>
               <input @input="changeWEXP(index)" type="text" v-model="localWorkExperience[index].ocupation" >
+					    <alertTip v-if="showAlert.ocupation" :showHide="showAlert.ocupation"  :alertText="alertText.ocupation"></alertTip>
+            
             </li>
             <li class="clear">
               <h5>*&nbsp;任职时间</h5>
@@ -111,6 +117,7 @@
               <span></span>
               <!-- <datepicker v-model="localWorkExperience[index].ocupationTimeDown"></datepicker> -->
               <year-month v-model="localWorkExperience[index].ocupationTimeDown" :min="localWorkExperience[index].ocupationTimeUp" :today="true"></year-month>
+					    <alertTip v-if="showAlert.ocupationTime" :showHide="showAlert.ocupationTime"  :alertText="alertText.ocupationTime"></alertTip>
             </li>
             <li class="textArea clear">
               <h5>职位描述</h5>
@@ -135,7 +142,8 @@
           <h5>*&nbsp;公司名称</h5>
           <p v-if="reveal.customCompanyName">{{newWorkExperience.companyName}}</p>
           <input @input="cusPosi" v-if="!reveal.customCompanyName" type="text" placeholder="请输入公司名称" v-model="newWorkExperience.companyName">
-
+					<alertTip v-if="showAlert.companyName" :showHide="showAlert.companyName"  :alertText="alertText.companyName"></alertTip>
+					
         </li>
         <li v-if="!reveal.customCompanyName" class="clear">
           <h5>公司地址</h5>
@@ -144,6 +152,8 @@
         <li class="clear">
           <h5>*&nbsp;任职职位</h5>
           <input @input="cusPosi" v-model="newWorkExperience.ocupation" type="text" placeholder="请输入职位名称">
+					<alertTip v-if="showAlert.ocupation" :showHide="showAlert.ocupation"  :alertText="alertText.ocupation"></alertTip>
+       		
         </li>
         <li class="clear">
           <h5>*&nbsp;任职时间</h5>
@@ -152,6 +162,8 @@
           <span></span>
           <!-- <datepicker v-model="newWorkExperience.ocupationTimeDown"></datepicker> -->
           <year-month @input="cusPosi" v-model="newWorkExperience.ocupationTimeDown" :min="newWorkExperience.ocupationTimeUp" :today="true"></year-month>
+					<alertTip v-if="showAlert.ocupationTime" :showHide="showAlert.ocupationTime"  :alertText="alertText.ocupationTime"></alertTip>
+        	
         </li>
         <li class="clear">
           <h5>职位描述</h5>
@@ -175,12 +187,14 @@
   import YearMonth from "../units/yearMonth.vue"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import Modal from "../../../assets/js/modal.js"
+	import alertTip from "../units/alertTip.vue"
   
   export default {
     name:"workExperienceIndex",
     components:{
       Datepicker,
-      YearMonth
+      YearMonth,
+      alertTip
     },
     data(){
       return {
@@ -190,6 +204,8 @@
         companyName:{name:''},//用来存放选择公司的索引
         buttonColor:{exist:[],add:false},//按钮颜色
         deleteModalClass:[],
+        showAlert:{companyName:false,ocupation:false,ocupationTime:false},//提示框显隐
+	      alertText:{companyName:null,ocupation:null,ocupationTime:null},
         reveal:{
           empty:true,//信息为空时，为空信息提示
           editInfo:[],//编辑信息的状态切换
@@ -289,6 +305,12 @@
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	that.deleteModalClass = [];
+	    	that.showAlert.companyName = false;
+	    	that.showAlert.ocupation = false;
+	    	that.showAlert.ocupationTime = false;
+	    	that.alertText.companyName = null;
+	    	that.alertText.ocupation = null;
+	    	that.alertText.ocupationTime = null;
 	    	for(var i=0;i<that.workExperience.length;i++){
 	    		if(that.workExperience[i].ocupationTimeDown=="0002.12"){
 					 	that.workExperience[i].ocupationTimeDown = "至今";
@@ -393,32 +415,57 @@
         }
       },
       keepEdit(index){//编辑状态下的保存按钮
-      let condition=this.localWorkExperience[index].ocupation.length!=0
-        &&this.localWorkExperience[index].ocupationTimeUp.length!=0
-        &&this.localWorkExperience[index].ocupationTimeDown.length!=0
+      let condition=this.localWorkExperience[index].ocupation.trim().length!=0
+        &&this.localWorkExperience[index].ocupationTimeUp.trim().length!=0
+        &&this.localWorkExperience[index].ocupationTimeDown.trim().length!=0
         if(condition){
           var that = this;
-          if(that.localWorkExperience[index].ocupationTimeDown=="至今"){
-            that.localWorkExperience[index].ocupationTimeDown = "0000.00.00";
+          if(that.localWorkExperience[index].companyName.trim().length===0){
+          	that.showAlert.companyName = true;
+          	that.alertText.companyName = "请输入公司名称"
+          }else{
+          	that.showAlert.companyName = false;
+          	that.alertText.companyName = ""
           }
-          var url = MyAjax.urlsy+"/psnWorkExperience/update"
-          $.ajaxSetup({ contentType : 'application/json' });
-          MyAjax.ajax({
-            type: "POST",
-            url:url,
-            data: JSON.stringify(that.localWorkExperience[index]),
-            dataType: "json",
-            contentType:"application/json;charset=utf-8",
-            async:false,
-          },function(data){
-            console.log(data)
-          },function(err){
-            console.log(err)
-          })//更新到服务器
-          //保存之后再重新拉取数据
-          that.updateData();
-          Vue.set(that.reveal.editInfo,[index],true);
-          /*视图的切换*/
+          if(that.localWorkExperience[index].ocupation.trim().length===0){
+          	that.showAlert.ocupation = true;
+          	that.alertText.ocupation = "请输入任职职位"
+          }else{
+          	that.showAlert.ocupation = false;
+          	that.alertText.ocupation = ""
+          }
+          if(that.localWorkExperience[index].ocupationTimeUp.trim().length===0||that.localWorkExperience[index].ocupationTimeDown.trim().length===0){
+          	that.showAlert.ocupationTime = true;
+          	that.alertText.ocupationTime = "请输入任职时间"
+          }else{
+          	that.showAlert.ocupationTime = false;
+          	that.alertText.ocupationTime = ""
+          }
+          if(that.localWorkExperience[index].companyName.trim().length!=0&&that.localWorkExperience[index].ocupation.trim().length!=0&&
+          (that.localWorkExperience[index].ocupationTimeUp.trim().length!=0||that.localWorkExperience[index].ocupationTimeDown.trim().length!=0)){
+          	if(that.localWorkExperience[index].ocupationTimeDown=="至今"){
+	            that.localWorkExperience[index].ocupationTimeDown = "0000.00.00";
+	          }
+	          var url = MyAjax.urlsy+"/psnWorkExperience/update"
+	          $.ajaxSetup({ contentType : 'application/json' });
+	          MyAjax.ajax({
+	            type: "POST",
+	            url:url,
+	            data: JSON.stringify(that.localWorkExperience[index]),
+	            dataType: "json",
+	            contentType:"application/json;charset=utf-8",
+	            async:false,
+	          },function(data){
+	            console.log(data)
+	          },function(err){
+	            console.log(err)
+	          })//更新到服务器
+	          //保存之后再重新拉取数据
+	          that.updateData();
+	          Vue.set(that.reveal.editInfo,[index],true);
+	          /*视图的切换*/
+          }
+          
         }
       },
       deleteInfo(index){//删除显示信息
@@ -534,10 +581,10 @@
        }
       },
       cusPosi(){//自定义公司，公司名词、任职职位、任职事件是否为空的input事件
-        let condition=this.newWorkExperience.companyName.length!=0
-          &&this.newWorkExperience.ocupation.length!=0
-          &&this.newWorkExperience.ocupationTimeUp.length!=0
-          &&this.newWorkExperience.ocupationTimeDown.length!=0;
+        let condition=this.newWorkExperience.companyName.trim().length!=0
+          &&this.newWorkExperience.ocupation.trim().length!=0
+          &&this.newWorkExperience.ocupationTimeUp.trim().length!=0
+          &&this.newWorkExperience.ocupationTimeDown.trim().length!=0;
         if(condition){
           Vue.set(this.buttonColor,"add",true);//设置保存按钮的颜色
         }else{
@@ -551,15 +598,15 @@
         }
       },
       keepAdd(){//添加模式下，确认添加按钮
-      let condition=this.newWorkExperience.companyName.length!=0
-          &&this.newWorkExperience.ocupation.length!=0
-          &&this.newWorkExperience.ocupationTimeUp.length!=0
-          &&this.newWorkExperience.ocupationTimeDown.length!=0;
+      let condition=this.newWorkExperience.companyName.trim().length!=0
+          &&this.newWorkExperience.ocupation.trim().length!=0
+          &&this.newWorkExperience.ocupationTimeUp.trim().length!=0
+          &&this.newWorkExperience.ocupationTimeDown.trim().length!=0;
       	var that = this;
-        if(that.newWorkExperience.ocupationTimeDown=="至今"){
-						that.newWorkExperience.ocupationTimeDown = "0000.00.00";
-					}
         if(condition){//保证公司信息不为空才能进行操作
+          if(that.newWorkExperience.ocupationTimeDown=="至今"){
+              that.newWorkExperience.ocupationTimeDown = "0000.00.00";
+            }
           that.reveal.editInfo.push(true);//在是否编辑的状态里添加一条新的状态
           that.reveal.openOrPrivacy.push(true);//在是否让他人查看添加一条新的信息
           that.reveal.openOrPrivacyText.push("显示");//在是否让他人查看添加一条新的信息
@@ -580,6 +627,28 @@
 					})
           /*确定添加后信息的清除*/
           that.updateData();
+        }else{
+          if(that.newWorkExperience.companyName.trim().length===0){
+            that.showAlert.companyName = true;
+            that.alertText.companyName = "请输入公司名称"
+          }else{
+            that.showAlert.companyName = false;
+            that.alertText.companyName = ""
+          }
+          if(that.newWorkExperience.ocupation.trim().length===0){
+            that.showAlert.ocupation = true;
+            that.alertText.ocupation = "请输入任职岗位"
+          }else{
+            that.showAlert.ocupation = false;
+            that.alertText.ocupation = ""
+          }
+          if(that.newWorkExperience.ocupationTimeUp.trim().length===0||that.newWorkExperience.ocupationTimeDown.trim().length===0){
+            that.showAlert.ocupationTime = true;
+            that.alertText.ocupationTime = "请输入任职时间"
+          }else{
+            that.showAlert.ocupationTime = false;
+            that.alertText.ocupationTime = ""
+          }
         }
        
       },
@@ -1102,6 +1171,12 @@
         padding-top:20px;
         li{
           margin:10px 0;
+          position: relative;
+          .alet_container{
+          	right: 10px;
+          	top: 10px;
+          	bottom: 0;
+          }
           .date-picker{
             width:140px;
             float: left;

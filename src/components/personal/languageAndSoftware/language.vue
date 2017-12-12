@@ -42,9 +42,7 @@
             </ul>
           </div>
           <div class="languageInfoBody">
-            <p v-cloak>{{item.proficiency}}</p>
-
-
+            <p v-cloak>熟练程度：{{item.proficiency}}</p>
             <div class="morePics" v-if="!show.tag[index]">
                 <img v-for="item in show.picList[index]" :src="item.pic" />
                 <!-- <img v-for="item in show.picList" :src="data:image/png;base64,item.pic" /> -->
@@ -67,13 +65,19 @@
             <li class="clear">
               <label>
                 <h5>*&nbsp;语言种类</h5>
-                <input v-model="localLanguage[index].language" type="text" placeholder="请输入语言种类">
+                <input  @input="btnColor(index)" v-model="localLanguage[index].language" type="text" placeholder="请输入语言种类">
               </label>
             </li>
             <li class="clear">
               <label>
-                <h5>熟练程度</h5>
-                <input v-model="localLanguage[index].proficiency" type="text" placeholder="请输入熟练程度">
+                <h5>*&nbsp;熟练程度</h5>
+                <!-- <input v-model="localLanguage[index].proficiency" type="text" placeholder="请输入熟练程度"> -->
+                <select  @input="btnColor(index)" v-model="localLanguage[index].proficiency">
+									<option value="初级（入门）">初级（入门）</option>
+									<option value="中级（日常会话）">中级（日常会话）</option>
+									<option value="高级（商务对话）">高级（商务对话）</option>
+									<option value="母语">母语</option>
+								</select>
               </label>
             </li>
             <li class="img-wrap clear">
@@ -153,7 +157,7 @@
 				      <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
 				    </li>
             <li class="clear">
-              <button v-on:click="languageEditKeep(index)">保存</button>
+              <button v-bind:class="{btn_disable:reveal.btnColor[index]}" v-on:click="languageEditKeep(index)">保存</button>
               <button v-on:click="languageEditCancel(index)">取消</button>
             </li>
           </ul>
@@ -173,8 +177,14 @@
         </li>
         <li class="clear">
           <label>
-            <h5>熟练程度</h5>
-            <input v-model="newLanguage.proficiency" type="text" placeholder="请输入熟练程度">
+            <h5>*&nbsp;熟练程度</h5>
+            <!-- <input v-model="newLanguage.proficiency" type="text" placeholder="请输入熟练程度"> -->
+            <select  v-model="newLanguage.proficiency">
+									<option value="初级（入门）">初级（入门）</option>
+									<option value="中级（日常会话）">中级（日常会话）</option>
+									<option value="高级（商务对话）">高级（商务对话）</option>
+									<option value="母语">母语</option>
+								</select>
           </label>
         </li>
         <li class="img-wrap clear">
@@ -250,7 +260,7 @@
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
         <li class="clear">
-          <button v-bind:class="{keepAdd:reveal.keepAddLanguage}" v-on:click="keepNewLanguage">保存</button>
+          <button v-bind:class="{btn_disable:reveal.keepAddLanguage}" v-on:click="keepNewLanguage">保存</button>
           <button v-on:click="cancelNewLanguage">取消</button>
         </li>
       </ul>
@@ -277,6 +287,7 @@
           editInfo:[],//是否编辑信息
           addLanguage:true,//是否添加信息
           keepAddLanguage:true,//添加模式下，保存按钮是否可用
+          btnColor:[],//编辑模式下，保存按钮是否可用颜色控制
         },
 
         updowntxt:[],
@@ -312,11 +323,9 @@
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newLanguage.language.length!=0){
-        if(this.newLanguage.language.trim().length!=0){
-          Vue.set(this.reveal,"keepAddLanguage",false);//控制保存按钮的背景颜色
-          Vue.set(this.newLanguage,"language",this.newLanguage.language.trim())//进行必填项的空格去除处理
-        }
+      if(this.newLanguage.language.trim().length!=0&&this.newLanguage.proficiency.trim().length!=0){
+        Vue.set(this.reveal,"keepAddLanguage",false);//控制保存按钮的背景颜色
+        Vue.set(this.newLanguage,"language",this.newLanguage.language.trim())//进行必填项的空格去除处理
       }else {
         Vue.set(this.reveal,"keepAddLanguage",true);//控制保存按钮的背景颜色
       }
@@ -334,8 +343,14 @@
 	//				content-type: "text/plain;charset=UTF-8",
 					async: false,
 				},function(data){
-					data = data.msg;
-					that.language = data;
+          if(data.code==0){
+            that.language = data.msg;
+            console.log(data.msg)
+          }else{
+            console.log("错误返回");
+          }
+					
+          //console.log(data.msg)
 				},function(err){
 					console.log(err)
 				})
@@ -352,10 +367,12 @@
           for(var i=0;i<that.language.length;i++){
             that.fineUploaderId.push("fine-uploader-manual-trigger-language"+that.language[i].pkid);
             that.qqTemplate.push("qq-template-manual-trigger-language"+that.language[i].pkid);
+            //通过pkid生成fineuploader特有的模版和对应模版容器
             that.show.tag[i]=true;
             that.updowntxt.push("展开查看更多");
 						that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
             that.reveal.editInfo.push(false);//信息是否可以编辑赋初始值
+            that.reveal.btnColor.push(false);//编辑按钮是否可用颜色控制
             if(that.language[i].ifVisable==1){
               that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
               that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值	  	
@@ -519,6 +536,15 @@
         
 
       },
+      btnColor(index){//
+			  let condition=this.localLanguage[index].language.trim().length!=0
+          &&this.localLanguage[index].proficiency.trim().length!=0
+				if(condition){
+					Vue.set(this.reveal.btnColor,[index],false);
+				}else{
+					Vue.set(this.reveal.btnColor,[index],true);
+				}
+			},
       languageEditKeep(index){//编辑状态，保存按钮
         var that = this;
         var url = MyAjax.urlsy+"/psnlanguage/update"
@@ -540,7 +566,9 @@
 				if(that.localLanguage[index].length!=0){
           Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
         }
-        $("#"+that.fineUploaderId[index]).html("");
+        setTimeout(() => {
+          $("#"+that.fineUploaderId[index]).html("");
+        }, 1);
       },
       languageEditCancel(index){//编辑状态，取消按钮
        Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -548,7 +576,9 @@
         this.localLanguage[index]=JSON.parse(JSON.stringify(this.language[index]));
 
         /*如果是取消编辑，从新从Vuex中得到数据*/
-        $("#"+this.fineUploaderId[index]).html("")
+        setTimeout(() => {
+          $("#"+this.fineUploaderId[index]).html("")
+        }, 1);
       },
       languageEditDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -612,7 +642,9 @@
 				})
         that.updateData();
 
-        $("#fine-template-manual-trigger-language").html("")
+        setTimeout(() => {
+          $("#fine-template-manual-trigger-language").html("")
+        }, 1);
       },
       cancelNewLanguage(){
         Vue.set(this.reveal,"addLanguage",true);
@@ -620,7 +652,9 @@
         Vue.set(this.newLanguage,"language","");
         Vue.set(this.newLanguage,"proficiency","");
         /*清除数据，保证下次输入时输入框为空*/
-        $("#fine-template-manual-trigger-language").html("")
+        setTimeout(() => {
+          $("#fine-template-manual-trigger-language").html("")
+        }, 1);
       }
     }
   }
@@ -861,7 +895,7 @@
                 float: left;
                 height:35px;
                 margin-left:22px;
-                padding-left:15px;
+                padding-left:12px;
                 border-radius: 5px;
                 border:1px solid $borderColor;
                 cursor: pointer;
@@ -875,17 +909,24 @@
               button{
                 cursor: pointer;
               }
+              select{
+                width:150px;
+                height: 35px;
+                border-radius: 5px;
+                color: #363636;
+                border: 1px solid #ebebeb;
+                padding-left: 12px;
+                margin-left: 22px;
+              }
             }
             li:nth-child(1){
               color: #909090;
               margin-top:30px;
               margin-bottom:20px;
             }
-            li:nth-child(2){
-              h5{
-                margin-left:-12px;
-              }
-            }
+            // li:nth-child(2){
+              
+            // }
             li.img-wrap{
 		        	/*padding-left: 30px;*/
 		        	>div{
@@ -908,6 +949,9 @@
 				        cursor: pointer;
 				        background: url("../../../assets/img/personal/education/btn_save_normal.png.png") left center no-repeat;
 				      }
+              .btn_disable{
+                background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
+              }
 				      button:nth-child(1){
 				      	&:hover{
 				      		opacity: 0.8;
@@ -966,16 +1010,20 @@
           button{
             cursor: pointer;
           }
+          select{
+            width:150px;
+            height: 35px;
+            border-radius: 5px;
+            color: #363636;
+            border: 1px solid #ebebeb;
+            padding-left: 12px;
+            margin-left: 22px;
+          }
         }
         li:nth-child(1){
           color: #909090;
           margin-top:30px;
           margin-bottom:20px;
-        }
-        li:nth-child(2){
-          h5{
-            margin-left:-12px;
-          }
         }
         li.img-wrap{
         	/*padding-left: 30px;*/
@@ -999,6 +1047,9 @@
 		        cursor: pointer;
 		        background: url("../../../assets/img/personal/education/btn_save_normal.png.png") left center no-repeat;
 		      }
+          .btn_disable{
+            background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
+          }
 		      button:nth-child(1){
 		      	&:hover{
 		      		opacity: 0.8;
@@ -1013,10 +1064,7 @@
 		        	color: $themeColor;
 		        	border:1px solid $themeColor;
 		        }
-		      }
-          .keepAdd{
-            background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
-          }
+		      } 
         }
       }
     }

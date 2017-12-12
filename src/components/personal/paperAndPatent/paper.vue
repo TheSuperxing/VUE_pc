@@ -42,8 +42,8 @@
             </ul>
           </div>
           <div class="paperInfoBody clear">
-            <p v-cloak>{{paper[index].journal}}</p>
-            <p v-cloak>{{paper[index].publicTime}}</p>
+            <p v-cloak>发表期刊：{{paper[index].journal}}</p>
+            <p v-cloak>发表时间：{{paper[index].publicTime}}</p>
 
             <div class="morePics" v-if="!show.tag[index]">
                 <img v-for="item in show.picList[index]" :src="item.pic" />
@@ -65,18 +65,18 @@
             <li class="clear">
               <label>
                 <h5>*&nbsp;论文名称</h5>
-                <input v-model="localPaper[index].paperTitle" type="text" placeholder="请输入论文名称">
+                <input @input="btnColor(index)" v-model="localPaper[index].paperTitle" type="text" placeholder="请输入论文名称">
               </label>
             </li>
             <li class="clear">
               <label>
                 <h5>发表期刊</h5>
-                <input v-model="localPaper[index].journal" type="text" placeholder="请输入熟练程度">
+                <input v-model="localPaper[index].journal" type="text" placeholder="请输入发表期刊">
               </label>
             </li>
             <li class="clear">
               <label>
-                <h5>发表时间</h5>
+                <h5>*&nbsp;发表时间</h5>
                 <!--<input v-model="localPaper.info.time[index]" type="month">-->
                 <!-- <datepicker v-model="localPaper[index].publicTime"></datepicker> -->
                 <year-month v-model="localPaper[index].publicTime"></year-month>
@@ -160,7 +160,7 @@
 				      <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
 				    </li>
             <li>
-              <button v-on:click="paperEditKeep(index)">保存</button>
+              <button  v-bind:class="{but_disable:reveal.btnColor[index]}" v-on:click="paperEditKeep(index)">保存</button>
               <button v-on:click="paperEditCancel(index)">取消</button>
             </li>
           </ul>
@@ -186,7 +186,7 @@
         </li>
         <li class="clear">
           <label>
-            <h5>发表时间</h5>
+            <h5>*&nbsp;发表时间</h5>
             <!--<input v-model="newPaper.info.time" type="month" placeholder="请输入发表时间">-->
             <!-- <datepicker v-model="newPaper.publicTime"></datepicker> -->
             <year-month v-model="newPaper.publicTime"></year-month> 
@@ -265,7 +265,7 @@
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
         <li class="clear">
-          <button v-bind:class="{keepAdd:reveal.keepAddPaper}" v-on:click="keepNewPaper">保存</button>
+          <button v-bind:class="{but_disable:reveal.keepAddPaper}" v-on:click="keepNewPaper">保存</button>
           <button v-on:click="cancelNewPaper">取消</button>
         </li>
       </ul>
@@ -297,6 +297,8 @@
           editInfo:[],//是否编辑信息
           addPaper:true,//是否添加信息
           keepAddPaper:true,//添加模式下，保存按钮是否可用
+          btnColor:[],//编辑模式下，保存按钮是否可用颜色控制
+          btnColor:[],//编辑模式下，保存按钮是否可用颜色控制
         },
 
         updowntxt:[],
@@ -347,11 +349,9 @@
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newPaper.paperTitle.length!=0){
-        if(this.newPaper.paperTitle.trim().length!=0){
-          Vue.set(this.reveal,"keepAddPaper",false);//控制保存按钮的背景颜色
-          Vue.set(this.newPaper,"paperName",this.newPaper.paperTitle.trim())//进行必填项的空格去除处理
-        }
+      if(this.newPaper.paperTitle.trim().length!=0&&this.newPaper.publicTime.trim().length!=0){
+        Vue.set(this.reveal,"keepAddPaper",false);//控制保存按钮的背景颜色
+        Vue.set(this.newPaper,"paperName",this.newPaper.paperTitle.trim())//进行必填项的空格去除处理
       }else {
         Vue.set(this.reveal,"keepAddPaper",true);//控制保存按钮的背景颜色
       }
@@ -368,7 +368,7 @@
         },function(data){
           if(data.code==0){
             that.paper=data.msg
-            console.log(data)
+            console.log(data.msg)
           }else{
             console.log("错误返回");
           }
@@ -377,6 +377,14 @@
           console.log(err)
         })
         // 从服务器获取数据
+        function emptyText(text){
+          if(text==null||text.length == 0){
+            return "（暂无信息）";
+          }else {
+            return text;
+          }
+        }
+
         that.localPaper=JSON.parse(JSON.stringify(this.paper));
         //数据库的数据放本地一份
 				that.fineUploaderId = [];
@@ -386,13 +394,17 @@
 	    	that.deleteModalClass = [];
 				
         for(var i=0;i<that.paper.length;i++){
+          that.paper[i].journal = emptyText(that.paper[i].journal);
+          that.paper[i].publicTime = emptyText(that.paper[i].publicTime);
+          // 进行为空的数据处理
           that.fineUploaderId.push("fine-uploader-manual-trigger-paper"+this.paper[i].pkid);
           that.qqTemplate.push("qq-template-manual-trigger-paper"+this.paper[i].pkid);
+          //通过pkid生成fineuploader特有的模版和对应模版容器
           that.qqTriggerUpload.push("trigger-upload"+this.paper[i].pkid);
           that.show.tag[i]=true;
           that.updowntxt.push("展开查看更多");
 					that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
-          
+          that.reveal.btnColor.push(false);//编辑按钮是否可用颜色控制
           if(that.paper[i].ifVisable==0){
 		        Vue.set(that.reveal.openOrPrivacyText,[i],"隐藏")
 		      }else{
@@ -466,6 +478,11 @@
       async paperEdit(index){//编辑状态进入按钮
       	//console.log(index)
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
+        let journal =this.localPaper[index].journal;
+        let publicTime=this.localPaper[index].publicTime;
+        journal=="（暂无信息）"?this.localPaper[index].journal="":journal=journal;
+        publicTime=="（暂无信息）"?this.localPaper[index].publicTime="":publicTime=publicTime;
+				//如果将要编辑的数据为（暂无信息），则重置位空
         var that = this;
         const getPic = await that.getPic(index);
       	if(getPic.code === 0){
@@ -543,6 +560,14 @@
         })
         
       },
+      btnColor(index){//
+			  let condition=this.localPaper[index].paperTitle.trim().length!=0
+				if(condition){
+					Vue.set(this.reveal.btnColor,[index],false);
+				}else{
+					Vue.set(this.reveal.btnColor,[index],true);
+				}
+			},
       paperEditKeep(index){//编辑状态，保存按钮
         var that=this;
         that.localPaper[index].picId=this.paper[index].picId;
@@ -564,7 +589,9 @@
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
           /*如果是保存，把数据保存到Vuex中*/
         }
-        $("#"+this.fineUploaderId[index]).html("");
+        setTimeout(() => {
+          $("#"+this.fineUploaderId[index]).html("");
+        }, 1);
       },
       paperEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -573,7 +600,9 @@
         this.localPaper[index].publicTime=this.paper[index].publicTime;
         /*如果是取消编辑，从新从Vuex中得到数据*/
         //console.log($("#"+this.fineUploaderId[index]+" .qq-uploader"))
-        $("#"+this.fineUploaderId[index]).html("");
+        setTimeout(() => {
+          $("#"+this.fineUploaderId[index]).html("");
+        }, 1);
       },
       paperEditDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -643,7 +672,9 @@
         Vue.set(this.newPaper,"journal","");
         Vue.set(this.newPaper,"publicTime","");
         /*清除数据，保证下次输入时输入框为空*/
-        $("#fine-uploader-manual-trigger-paper").html("")
+        setTimeout(() => {
+          $("#fine-uploader-manual-trigger-paper").html("")
+        }, 1);
       },
 
       cancelNewPaper(){
@@ -655,7 +686,9 @@
         Vue.set(this.newPaper,"journal","");
         Vue.set(this.newPaper,"publicTime","");
         /*清除数据，保证下次输入时输入框为空*/
-        $("#fine-uploader-manual-trigger-paper").html("")
+        setTimeout(() => {
+          $("#fine-uploader-manual-trigger-paper").html("")
+        }, 1);
       }
     }
   }
@@ -746,7 +779,7 @@
                   background: url("../../../assets/img/personal/education/edit.png") left center no-repeat;
                 }
               }
-              li:last-child{
+              li:nth-child(3){
                 p{
                   padding-right:0;
                   padding-left:21px;
@@ -903,6 +936,11 @@
                 margin-left:-12px;
               }
             }
+            li:nth-child(4){
+              h5{
+                margin-left:-12px;
+              }
+            }
             li.tip-wrap{
 				    	padding-left: 90px;
 				    	color: #999999;
@@ -918,6 +956,9 @@
 		            cursor: pointer;
 		            background: url("../../../assets/img/personal/education/btn_save_normal.png.png") left center no-repeat;
 		          }
+              .but_disable{
+                background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
+              }
 		          button:nth-child(1){
 		          	&:hover{
 		          		opacity: 0.8;
@@ -987,6 +1028,11 @@
             margin-left:-12px;
           }
         }
+        li:nth-child(4){
+          h5{
+            margin-left:-12px;
+          }
+        }
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{
@@ -1024,7 +1070,7 @@
             	border:1px solid $themeColor;
             }
           }
-          .keepAdd{
+          .but_disable{
             background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
           }
         }

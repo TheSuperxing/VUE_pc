@@ -70,13 +70,13 @@
             <li class="clear">
               <label>
                 <h5>*&nbsp;资格名称</h5>
-                <input v-model="localTitleInfo[index].titleName" type="text" placeholder="请输入资格名称">
+                <input @input="btnColor(index)" v-model="localTitleInfo[index].titleName" type="text" placeholder="请输入资格名称">
               </label>
             </li>
             <li class="clear">
               <label>
                 <h5>职称专业</h5>
-                <input v-model="localTitleInfo[index].professionalTitle" type="text" placeholder="请输入注册单位">
+                <input v-model="localTitleInfo[index].professionalTitle" type="text" placeholder="请输入职称专业">
               </label>
             </li>
             <li class="clear">
@@ -93,7 +93,7 @@
             </li>
             <li class="clear">
               <label>
-                <h5>评定日期</h5>
+                <h5>*&nbsp;评定日期</h5>
            			<!-- <datepicker class="datePicker" v-model="localTitleInfo[index].assessmentTime"></datepicker> -->
                 <year-month v-model="localTitleInfo[index].assessmentTime"></year-month> 	
               </label>
@@ -181,7 +181,7 @@
 						     <div :id="fineUploaderId[index]"></div>
 						</li>
             <li>
-              <button v-on:click="keepJobInfoEdit(index)">保存</button>
+              <button v-bind:class="{but_disable:reveal.btnColor[index]}" v-on:click="keepJobInfoEdit(index)">保存</button>
               <button v-on:click="cancelJobInfoEdit(index)">取消</button>
             </li>
           </ul>
@@ -219,9 +219,10 @@
         </li>
         <li class="clear">
           <label>
-            <h5>评定时间</h5>
+            <h5>*&nbsp;评定日期</h5>
            <!-- <input v-model="newTitleInfo.info.time" type="month" placeholder="请输入注册单位">-->
-           	<datepicker class="datePicker" v-model="newTitleInfo.assessmentTime"></datepicker>
+           	<!-- <datepicker class="datePicker" v-model="newTitleInfo.assessmentTime"></datepicker> -->
+						 <year-month v-model="newTitleInfo.assessmentTime"></year-month>
             <!--<datepicker v-model="newTitleInfo.assessmentTime"></datepicker>-->
           </label>
         </li>
@@ -304,7 +305,7 @@
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
         <li class="clear">
-          <button v-bind:class="{keepAdd:reveal.keepAdd}" v-on:click="keepJobInfoAdd">保存</button>
+          <button v-bind:class="{but_disable:reveal.keepAdd}" v-on:click="keepJobInfoAdd">保存</button>
           <button v-on:click="cancelJobInfoAdd">取消</button>
         </li>
       </ul>
@@ -338,6 +339,7 @@
           editInfo:[],//是否编辑信息
           addJobInfo:true,//是否添加信息
           keepAdd:true,//添加模式下，保存按钮是否可用
+					btnColor:[],//编辑模式下，保存按钮是否可用颜色控制
         },
         updowntxt:[],
         show:{
@@ -381,17 +383,17 @@
         }
       }
       /*以上是信息初始化*/
-      if(this.reveal.openOrPrivacy.length!=0){
-        for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
-          if(!this.reveal.openOrPrivacy[i]){
-            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
-            //this.reveal.openOrPrivacyText.push("显示")
-          }else{
-            Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
-            //this.reveal.openOrPrivacyText.push("隐藏")
-          }
-        }
-      }
+      // if(this.reveal.openOrPrivacy.length!=0){
+      //   for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
+      //     if(!this.reveal.openOrPrivacy[i]){
+      //       Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
+      //       //this.reveal.openOrPrivacyText.push("显示")
+      //     }else{
+      //       Vue.set(this.reveal.openOrPrivacyText,[i],"显示")
+      //       //this.reveal.openOrPrivacyText.push("隐藏")
+      //     }
+      //   }
+      // }
       
       
       
@@ -404,16 +406,13 @@
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newTitleInfo.titleName.length!=0){
-        if(this.newTitleInfo.titleName.trim().length!=0){
-          Vue.set(this.reveal,"keepAdd",false);
-          Vue.set(this.newTitleInfo,"titleName",this.newTitleInfo.titleName.trim())//进行空格去除处理
-        }
+      if(this.newTitleInfo.titleName.trim().length!=0&&this.newTitleInfo.assessmentTime.trim().length!=0){
+        Vue.set(this.reveal,"keepAdd",false);
+        Vue.set(this.newTitleInfo,"titleName",this.newTitleInfo.titleName.trim())//进行空格去除处理
       }else {
         Vue.set(this.reveal,"keepAdd",true);
       }
       /*控制保存按钮的背景颜色*/
-
     },
    
     methods:{
@@ -428,12 +427,14 @@
 				},function(data){
           if(data.code==0){
 						that.titleInfo = data.msg;
+						console.log(data.msg)
 					}else{
 						console.log("错误返回");
 					}
 				},function(err){
 					console.log(err)
 				})
+				/*数据同步本地一份开始*/
 	    	function emptyText(text) {
 			    if(text==null||text.length == 0){
 			      return "（暂无信息）";
@@ -441,8 +442,6 @@
 			      return text;
 			    }
 			  }
-	    	
-	    	/*数据同步本地一份开始*/
         that.localTitleInfo=JSON.parse(JSON.stringify(that.titleInfo));
         that.fineUploaderId = [];
 	    	that.qqTemplate = [];
@@ -458,12 +457,14 @@
 	    		that.titleInfo[i].certificateBody = emptyText(that.titleInfo[i].certificateBody);
 	    		that.titleInfo[i].certificateNumber = emptyText(that.titleInfo[i].certificateNumber);
 	    		that.titleInfo[i].professionalTitle = emptyText(that.titleInfo[i].professionalTitle);
+					// 进行为空的数据处理
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.titleInfo[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.titleInfo[i].pkid);
+					//通过pkid生成fineuploader特有的模版和对应模版容器
 	    		that.show.tag[i]=true;
 	    		that.updowntxt.push("展开查看更多");
 					that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
-	    		
+	    		that.reveal.btnColor.push(false);//编辑按钮是否可用颜色控制
 	    		if(that.titleInfo[i].ifVisable==0){
 	    			that.reveal.openOrPrivacy.push(false);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("隐藏");//信息是否对外显示文字切换赋初始值	
@@ -542,10 +543,20 @@
 				that.updateData();
       },
       async jobInfoEdit(index){//编辑状态进入按钮
-      	
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
+				let titleLevel =this.localTitleInfo[index].titleLevel;
+        let assessmentTime=this.localTitleInfo[index].assessmentTime;
+        let certificateBody=this.localTitleInfo[index].certificateBody;
+        let certificateNumber=this.localTitleInfo[index].certificateNumber;
+        let professionalTitle=this.localTitleInfo[index].professionalTitle;
+        titleLevel=="（暂无信息）"?this.localTitleInfo[index].titleLevel="":titleLevel=titleLevel;
+        assessmentTime=="（暂无信息）"?this.localTitleInfo[index].assessmentTime="":assessmentTime=assessmentTime;
+        certificateBody=="（暂无信息）"?this.localTitleInfo[index].certificateBody="":certificateBody=certificateBody;
+        certificateNumber=="（暂无信息）"?this.localTitleInfo[index].certificateNumber="":certificateNumber=certificateNumber;
+        professionalTitle=="（暂无信息）"?this.localTitleInfo[index].professionalTitle="":professionalTitle=professionalTitle;
+				//如果将要编辑的数据为（暂无信息），则重置位空
+
         this.getPicture(index);
-        
         var that = this;
         const getPic = await that.getPicture(index);
       	if(getPic.code === 0){
@@ -624,6 +635,14 @@
       	
       	
       },
+			btnColor(index){//
+			let condition=this.localTitleInfo[index].titleName.trim().length!=0
+				if(condition){
+					Vue.set(this.reveal.btnColor,[index],false);
+				}else{
+					Vue.set(this.reveal.btnColor,[index],true);
+				}
+			},
       keepJobInfoEdit(index){//编辑状态，保存按钮
         if(this.titleInfo[index].titleName.trim().length!=0){
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -647,14 +666,25 @@
 				})//更新到服务器
 				//保存之后再重新拉取数据
 				that.updateData();
-        $("#"+this.fineUploaderId[index]).html("")
+        setTimeout(() => {
+					$("#"+this.fineUploaderId[index]).html("")
+				}, 1);
         
       },
       cancelJobInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-         this.localTitleInfo[index]=JSON.parse(JSON.stringify(this.titleInfo[index]));
+         //this.localTitleInfo[index]=JSON.parse(JSON.stringify(this.titleInfo[index]));
+				 this.localTitleInfo[index].titleName=this.titleInfo[index].titleName
+				this.localTitleInfo[index].professionalTitle=this.titleInfo[index].professionalTitle
+				this.localTitleInfo[index].titleLevel=this.titleInfo[index].titleLevel
+				this.localTitleInfo[index].certificateNumber=this.titleInfo[index].certificateNumber
+				this.localTitleInfo[index].assessmentTime=this.titleInfo[index].assessmentTime
+				this.localTitleInfo[index].certificateBody=this.titleInfo[index].certificateBody
+				
         /*如果是取消编辑，从新从Vuex中得到数据*/
-        $("#"+this.fineUploaderId[index]).html("")
+        setTimeout(() => {
+					$("#"+this.fineUploaderId[index]).html("")
+				}, 1);
         
       },
       jobInfoDel(index){//编辑状态，删除按钮
@@ -1037,6 +1067,11 @@
                 margin-left:-12px;
               }
             }
+						>li:nth-child(6){
+              h5{
+                margin-left:-12px;
+              }
+            }
             li.img-wrap{
 				    	/*padding-left: 30px;*/
 				    	.imgShow{
@@ -1091,6 +1126,9 @@
 		            cursor: pointer;
 		            background: url("../../../assets/img/personal/education/btn_save_normal.png.png") left center no-repeat;
 		          }
+							.but_disable{
+								background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
+							}
 		          button:nth-child(1){
 		          	&:hover{
 		          		opacity: 0.8;
@@ -1160,6 +1198,11 @@
             margin-left:-12px;
           }
         }
+				>li:nth-child(6){
+          h5{
+            margin-left:-12px;
+          }
+        }
         li.img-wrap{
 		    	/*padding-left: 30px;*/
 		    	>div{
@@ -1197,7 +1240,7 @@
             	border:1px solid $themeColor;
             }
           }
-          .keepAdd{
+          .but_disable{
             background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
           }
         }

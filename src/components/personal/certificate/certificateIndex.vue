@@ -65,7 +65,7 @@
             <li class="clear">
               <label>
                 <h5>*&nbsp;资格名称</h5>
-                <input v-model="localCertificate[index].qualificationName" type="text" placeholder="请输入资格名称">
+                <input @input="changeName(index)" v-model="localCertificate[index].qualificationName" type="text" placeholder="请输入资格名称">
               </label>
             </li>
             <li class="clear">
@@ -161,7 +161,7 @@
               <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
             </li>
             <li>
-              <button v-on:click="keepCertificateInfoEdit(index)">保存</button>
+              <button v-bind:class="{btn_disable:buttonColor[index]}" v-on:click="keepCertificateInfoEdit(index)">保存</button>
               <button v-on:click="cancelCertificateInfoEdit(index)">取消</button>
             </li>
           </ul>
@@ -264,7 +264,7 @@
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
         <li class="clear">
-          <button v-bind:class="{keepAdd:reveal.keepAdd}" v-on:click="keepCertificateInfoAdd">保存</button>
+          <button v-bind:class="{btn_disable:reveal.keepAdd}" v-on:click="keepCertificateInfoAdd">保存</button>
           <button v-on:click="cancelCertificateInfoAdd">取消</button>
         </li>
       </ul>
@@ -284,9 +284,10 @@
     data(){
       return {
         title:{text:"执业资格"},
+				buttonColor:[],//编辑状态
         reveal:{
           empty:true,//是否显示执业资格信息尚未添加
-          openOrPrivacy:[false,true,false,true,],//信息是否公开显示,通过服务器获取的数据
+          openOrPrivacy:[],//信息是否公开显示,通过服务器获取的数据
           openOrPrivacyText:[],//信息是否公开显示文本信息,通过服务器获取的数据
           editInfo:[],//是否编辑信息
           addCertificate:true,//是否添加信息
@@ -371,6 +372,13 @@
 					console.log(err)
 				})
 	    	/*数据同步本地一份开始*/
+				function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+        }
         that.localCertificate=JSON.parse(JSON.stringify(that.certificate));
         that.fineUploaderId = [];
 	    	that.qqTemplate = [];
@@ -383,9 +391,14 @@
 	    	for(var i=0;i<that.certificate.length;i++){
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.localCertificate[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.localCertificate[i].pkid);
+					//通过pkid生成fineuploader特有的模版和对应模版容器
+					that.certificate[i].certificateNumber=emptyText(that.certificate[i].certificateNumber);
+					that.certificate[i].registeredUnit=emptyText(that.certificate[i].registeredUnit);
+					// 进行为空的数据处理
 	    		that.show.tag[i]=true;
 					that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
 	    		that.updowntxt.push("展开查看更多");
+					that.buttonColor.push(false);//编辑按钮是否可用颜色控制
 	    		if(that.certificate[i].ifVisable==1){
 	    			that.reveal.openOrPrivacy.push(true);//信息是否对外显示赋初始值
 	        	that.reveal.openOrPrivacyText.push("显示");//信息是否对外显示文字切换赋初始值	
@@ -470,6 +483,11 @@
       },
       async certificateInfoEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
+				let certificateNumber=this.localCertificate[index].certificateNumber;
+        let registeredUnit=this.localCertificate[index].registeredUnit;
+        certificateNumber=="（暂无信息）"?this.localCertificate[index].certificateNumber="":certificateNumber=certificateNumber;
+        registeredUnit=="（暂无信息）"?this.localCertificate[index].registeredUnit="":registeredUnit=registeredUnit;
+        //如果将要编辑的数据为（暂无信息），则重置位空
         var that = this;
         const getPic = await that.getPicture(index);
         if(getPic.code === 0){
@@ -543,6 +561,13 @@
 				}
       	
       },
+			changeName(index){
+				if(this.localCertificate[index].qualificationName.trim().length!=0){
+					Vue.set(this.buttonColor,[index],false);
+				}else{
+					Vue.set(this.buttonColor,[index],true);
+				}
+			},
       keepCertificateInfoEdit(index){//编辑状态，保存按钮
       	var that = this;
         var url = MyAjax.urlsy+"/psnQualification/update"
@@ -643,6 +668,9 @@
         Vue.set(this.newCertificate,"certificateNumber","");
         Vue.set(this.newCertificate,"registeredUnit","");
         /*清除数据，保证下次输入时输入框为空*/
+				setTimeout(() => {
+					$("#fine-uploader-manual-trigger").html("")
+				}, 1);
       }
     }
   }
@@ -990,6 +1018,9 @@
           		opacity: 0.8;
           	}
           }
+					.btn_disable{
+            background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
+          }
           button:nth-child(2){
             background: #fff;
             color:#353535;
@@ -1078,7 +1109,7 @@
             color: #ffffff;
             background: url("../../../assets/img/personal/education/btn_save_normal.png.png") left center no-repeat;
           }
-          .keepAdd{
+          .btn_disable{
             background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
           }
         }

@@ -1,7 +1,7 @@
 <template>
   <div class="year-month">
     <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false"  @click="togglePanel">
-      <div class="input" v-text="value"></div>
+      <div class="input" v-text="value"></div> 
       <transition name="fade">
         <img class="cancel-btn" src="../../../assets/img/company/bottom.png"  v-show="showCancel">
       </transition>

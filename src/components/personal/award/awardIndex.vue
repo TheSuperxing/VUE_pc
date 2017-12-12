@@ -7,7 +7,7 @@
     </div>
     <!--personaltitle结束-->
     <div class="awardContainer" v-show="reveal.addAward">
-      <div class="personal-empty" v-if="reveal.empty">（您尚未添加收获奖励信息）</div>
+      <div class="personal-empty" v-if="reveal.empty">（您尚未添加所获奖励信息）</div>
       <!--显示、编辑已存在的信息开始-->
       <div class="awardInfo" v-for="(item,index) in this.award">
         <!--显示信息列表开始-->
@@ -66,7 +66,7 @@
             <li class="clear">
               <label>
                 <h5>*&nbsp;奖励名称</h5>
-                <input v-model="localAward[index].awardName" type="text" placeholder="请输入资格名称">
+                <input @input="btnColor(index)" v-model="localAward[index].awardName" type="text" placeholder="请输入资格名称">
               </label>
             </li>
             <li class="clear">
@@ -77,7 +77,7 @@
             </li>
             <li class="clear">
               <label>
-                <h5>评定日期</h5>
+                <h5>*&nbsp;评定日期</h5>
                 <!-- <datepicker v-model="localAward[index].awardingTime"></datepicker> -->
                 <year-month v-model="localAward[index].awardingTime"></year-month>
               </label>
@@ -158,7 +158,7 @@
               <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
             </li>
             <li class="clear">
-              <button v-on:click="keepAwardEdit(index)">保存</button>
+              <button v-bind:class="{but_disable:reveal.btnColor[index]}" v-on:click="keepAwardEdit(index)">保存</button>
               <button v-on:click="cancelAwardEdit(index)">取消</button>
             </li>
           </ul>
@@ -185,7 +185,7 @@
         </li>
         <li  class="clear">
           <label>
-            <h5>获奖时间</h5>
+            <h5>*&nbsp;获奖时间</h5>
             <!--<input v-model="newAward.info.time" type="month" placeholder="请输入注册单位">-->
             <!-- <datepicker v-model="newAward.time"></datepicker> -->
             <year-month v-model="newAward.time"></year-month>
@@ -264,7 +264,7 @@
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
         <li  class="clear">
-          <button v-bind:class="{keepAdd:reveal.keepAdd}" v-on:click="keepAwardAdd">保存</button>
+          <button v-bind:class="{but_disable:reveal.keepAdd}" v-on:click="keepAwardAdd">保存</button>
           <button v-on:click="cancelAwardAdd">取消</button>
         </li>
       </ul>
@@ -298,6 +298,7 @@
           editInfo:[],//是否编辑信息
           addAward:true,//是否添加信息
           keepAdd:true,//添加模式下，保存按钮是否可用
+          btnColor:[],//编辑模式下，保存按钮是否可用颜色控制
         },
         updowntxt:[],
         show:{
@@ -324,8 +325,6 @@
       this.getData()
     },
     mounted(){
-    	
-	    
       if(this.award.length==0){
         Vue.set(this.reveal,"empty",true)//是否显示执业资格信息尚未添加
       }else {
@@ -343,11 +342,9 @@
         Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
       }
       /*是否显示执业资格信息尚未添加*/
-      if(this.newAward.awardName.length!=0){
-        if(this.newAward.awardName.trim().length!=0){
-          Vue.set(this.reveal,"keepAdd",false);
-          Vue.set(this.newAward,"awardName",this.newAward.awardName.trim())//进行空格去除处理
-        }
+      if(this.newAward.awardName.trim().length!=0&&this.newAward.awardingTime.length!=0){
+        Vue.set(this.reveal,"keepAdd",false);
+        Vue.set(this.newAward,"awardName",this.newAward.awardName.trim())//进行空格去除处理
       }else {
         Vue.set(this.reveal,"keepAdd",true);
       }
@@ -365,7 +362,6 @@
             },function(data){
               if(data.code==0){
                 that.award=data.msg
-                //console.log()
               }else{
                 console.log("错误返回");
               }
@@ -374,6 +370,13 @@
               console.log(err)
             })
             // 从服务器获取数据
+            function emptyText(text){
+              if(text==null||text.length == 0){
+                return "（暂无信息）";
+              }else {
+                return text;
+              }
+            }
             that.localAward=JSON.parse(JSON.stringify(that.award));
             that.fineUploaderId = [];
             that.qqTemplate = [];
@@ -382,11 +385,16 @@
 	    	    that.deleteModalClass = [];
 	    	    
             for(let i=0;i<that.award.length;i++){//拼接fineUploader的ID
+              that.award[i].awardingBody = emptyText(that.award[i].awardingBody);
+              that.award[i].awardingTime = emptyText(that.award[i].awardingTime);
+              // 进行为空的数据处理
               that.fineUploaderId.push("fine-uploader-manual-trigger"+that.localAward[i].pkid);
               that.qqTemplate.push("qq-template-manual-trigger"+that.localAward[i].pkid);
+              //通过pkid生成fineuploader特有的模版和对应模版容器
          	    that.show.tag[i]=true;
 	    				that.updowntxt.push("展开查看更多");
 					    that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
+              that.reveal.btnColor.push(false);//编辑按钮是否可用颜色控制
 	    				if(this.award[i].ifVisable===0){
 		            Vue.set(this.reveal.openOrPrivacyText,[i],"隐藏")
 		            //this.reveal.openOrPrivacyText.push("显示")
@@ -395,6 +403,7 @@
 		            //this.reveal.openOrPrivacyText.push("隐藏")
 		          }
             }
+            console.log(this.award)
       },
       getPicture(index){
     		var that = this;
@@ -457,6 +466,11 @@
       },
       async awardEdit(index){//编辑状态进入按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//进入编辑状态
+        let awardingBody =this.localAward[index].awardingBody;
+        let awardingTime=this.localAward[index].awardingTime;
+        awardingBody=="（暂无信息）"?this.localAward[index].awardingBody="":awardingBody=awardingBody;
+        awardingTime=="（暂无信息）"?this.localAward[index].awardingTime="":awardingTime=awardingTime;
+				//如果将要编辑的数据为（暂无信息），则重置位空
         var that = this;
         const getPic = await that.getPicture(index);
         if(getPic.code === 0){
@@ -487,6 +501,14 @@
 				
 
       },
+      btnColor(index){//
+			  let condition=this.localAward[index].awardName.trim().length!=0
+				if(condition){
+					Vue.set(this.reveal.btnColor,[index],false);
+				}else{
+					Vue.set(this.reveal.btnColor,[index],true);
+				}
+			},
       keepAwardEdit(index){//编辑状态，保存按钮
         var that=this;
         if(this.localAward[index].awardName.trim().length!=0){
@@ -497,7 +519,7 @@
             data: JSON.stringify(that.localAward[index]),
             dataType: "json",
             contentType: "application/json;charset=UTF-8",
-            
+            async: false, 
           },function(data){
             //console.log(data)
           },function(err){
@@ -506,7 +528,9 @@
           that.getData();
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//取消编辑后视图切换回到原来查看页面
           /*如果是保存，把数据保存到Vuex中*/
-         	$("#"+this.fineUploaderId[index]).html("")
+         	setTimeout(() => {
+             $("#"+this.fineUploaderId[index]).html("")
+           }, 1);
         }
       },
       deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
@@ -563,6 +587,9 @@
         this.localAward[index].awardingBody=this.award[index].awardingBody;
         this.localAward[index].awardingTime=this.award[index].awardingTime;
         /*如果是取消编辑，从新从Vuex中得到数据*/
+        setTimeout(() => {
+          $("#"+this.fineUploaderId[index]).html("")
+        }, 1);
       },
       awardDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -617,7 +644,7 @@
               }),
               dataType: "json",
       			  contentType: "application/json;charset=UTF-8",
-              
+              async: false,
             },function(data){
               //console.log(data)
             },function(err){
@@ -633,7 +660,9 @@
         Vue.set(this.newAward,"time","");
         Vue.set(this.newAward,"organ","");
         
-        $("#fine-uploader-manual-trigger").html("")
+        setTimeout(() => {
+          $("#fine-uploader-manual-trigger").html("")
+        }, 1);
         /*清除数据，保证下次输入时输入框为空*/
       },
       cancelAwardAdd(){
@@ -643,7 +672,9 @@
         Vue.set(this.newAward,"time","");
         Vue.set(this.newAward,"organ","");
         /*清除数据，保证下次输入时输入框为空*/
-       	$("#fine-uploader-manual-trigger").html("");
+       	setTimeout(() => {
+           $("#fine-uploader-manual-trigger").html("");
+         }, 1);
       }
     }
   }
@@ -732,7 +763,7 @@
                   background: url("../../../assets/img/personal/education/edit.png") left center no-repeat;
                 }
               }
-              >li:last-child{
+              >li:nth-child(3){
                 p{
                   padding-right:0;
                   padding-left:21px;
@@ -949,6 +980,11 @@
                 margin-left:-12px;
               }
             }
+            >li:nth-child(4){
+              h5{
+                margin-left:-12px;
+              }
+            }
             li.img-wrap{
 		        	/*padding-left: 30px;*/
 		        	.imgShow{
@@ -1007,6 +1043,9 @@
 		            cursor: pointer;
 		            background: url("../../../assets/img/personal/education/btn_save_normal.png.png") left center no-repeat;
 		          }
+              .but_disable{
+                background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
+              }
 		          button:nth-child(1){
 		          	&:hover{
 		          		opacity: 0.8;
@@ -1076,6 +1115,11 @@
             margin-left:-12px;
           }
         }
+        li:nth-child(4){
+          h5{
+            margin-left:-12px;
+          }
+        }
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{
@@ -1113,7 +1157,7 @@
             	border:1px solid $themeColor;
             }
           }
-          .keepAdd{
+          .but_disable{
             background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
           }
         }

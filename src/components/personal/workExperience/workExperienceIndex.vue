@@ -403,7 +403,12 @@
       },
       cancelEdit(index){//编辑状态取消按钮的单击事件，取消编辑状态，回到显示状态
         Vue.set(this.reveal.editInfo,[index],true);//取消编辑的视图切换
-        this.localWorkExperience[index]=JSON.parse(JSON.stringify(this.workExperience[index]));
+        //this.localWorkExperience[index]=JSON.parse(JSON.stringify(this.workExperience[index]));
+        this.localWorkExperience[index].companyName=this.workExperience[index].companyName;
+        this.localWorkExperience[index].ocupation=this.workExperience[index].ocupation;
+        this.localWorkExperience[index].ocupationTimeUp=this.workExperience[index].ocupationTimeUp;
+        this.localWorkExperience[index].ocupationTimeDown=this.workExperience[index].ocupationTimeDown;
+        this.localWorkExperience[index].jobDescription=this.workExperience[index].jobDescription;
         //返回到更改之前,如果是暂无消息，重置为空
       },
       textLength(index){//编辑状态下记录输入多行文本的字数

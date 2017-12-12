@@ -7,7 +7,7 @@
     </div>
     <!--personaltitle结束-->
     <div class="patentContainer" v-show="reveal.addPatent">
-      <div class="personal-empty" v-if="reveal.empty">（您尚未添加论文信息）</div>
+      <div class="personal-empty" v-if="reveal.empty">（您尚未添加专利信息）</div>
       <!--显示、编辑已存在的信息开始-->
       <div class="patentInfo clear" v-for="(item,index) in patent">
         <!--显示信息列表开始-->
@@ -42,8 +42,9 @@
             </ul>
           </div>
           <div class="patentInfoBody clear">
-            <p v-cloak>{{patent[index].awardingBody}}</p>
+            <p v-cloak>颁发机构：{{patent[index].awardingBody}}</p>
             <div class="validityTime">
+              <em>有效期：</em>
               <p v-cloak>{{patent[index].validityTermS}}</p>
               <span>-</span>
               <p v-cloak>{{patent[index].validityTermE}}</p>
@@ -71,7 +72,7 @@
             <li class="clear">
               <label>
                 <h5>*&nbsp;专利名称</h5>
-                <input v-model="localPatent[index].patentName" type="text" placeholder="请输入专利名称">
+                <input @input="btnColor(index)" v-model="localPatent[index].patentName" type="text" placeholder="请输入专利名称">
               </label>
             </li>
             <li class="clear">
@@ -82,7 +83,7 @@
             </li>
             <li class="clear">
               <label>
-                <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
+                <h5>*&nbsp;有&nbsp;效&nbsp;期&nbsp;</h5>
                 <!--<input v-model="localPatent.info.time[index]" type="month">-->
                 <!-- <datepicker v-model="localPatent[index].validityTermS"></datepicker> -->
                 <year-month v-model="localPatent[index].validityTermS"></year-month>
@@ -169,7 +170,7 @@
 				      <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
 				    </li>
             <li class="clear">
-              <button v-on:click="paperEditKeep(index)">保存</button>
+              <button v-bind:class="{but_disable:reveal.btnColor[index]}" v-on:click="paperEditKeep(index)">保存</button>
               <button v-on:click="paperEditCancel(index)">取消</button>
             </li>
           </ul>
@@ -184,18 +185,18 @@
         <li  class="clear">
           <label>
             <h5>*&nbsp;专利名称</h5>
-            <input v-model="newPatent.patentName" type="text" placeholder="请输入论文">
+            <input v-model="newPatent.patentName" type="text" placeholder="请输入专利名称">
           </label>
         </li>
         <li  class="clear">
           <label>
             <h5>颁发机构</h5>
-            <input v-model="newPatent.awardingBody" type="text" placeholder="请输入发表期刊">
+            <input v-model="newPatent.awardingBody" type="text" placeholder="请输入颁发机构">
           </label>
         </li>
         <li  class="clear">
           <label>
-            <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
+            <h5>*&nbsp;有&nbsp;效&nbsp;期&nbsp;</h5>
             <!--<input v-model="newPatent.info.time" type="month" placeholder="请输入发表时间">-->
             <!-- <datepicker v-model="newPatent.validityTermS"></datepicker> -->
             <year-month v-model="newPatent.validityTermS"></year-month> 
@@ -278,7 +279,7 @@
           <p>( 可上传相关图片，支持JPG、PNG,不超过2M )</p>
         </li>
         <li class="clear">
-          <button v-bind:class="{keepAdd:reveal.keepAddPatent}" v-on:click="keepNewPatent">保存</button>
+          <button v-bind:class="{but_disable:reveal.keepAddPatent}" v-on:click="keepNewPatent">保存</button>
           <button v-on:click="cancelNewPatent">取消</button>
         </li>
       </ul>
@@ -310,6 +311,7 @@
           editInfo:[],//是否编辑信息
           addPatent:true,//是否添加信息
           keepAddPatent:true,//添加模式下，保存按钮是否可用
+          btnColor:[],//编辑模式下，保存按钮是否可用颜色控制
         },
 
         updowntxt:[],
@@ -377,7 +379,6 @@
           dataType: "json",
           async: false,
         },function(data){
-        	console.log(data)
           if(data.code==0){
             that.patent=data.msg
             console.log(data)
@@ -389,6 +390,13 @@
           console.log(err)
         })
         // 从服务器获取数据
+        function emptyText(text){
+          if(text==null||text.length == 0){
+            return "（暂无信息）";
+          }else {
+            return text;
+          }
+        }
         this.localPatent=JSON.parse(JSON.stringify(this.patent));
         that.fineUploaderId = [];
 				that.qqTemplate = [];
@@ -400,10 +408,11 @@
         for(var i=0;i<that.patent.length;i++){
           that.fineUploaderId.push("fine-uploader-manual-trigger-paper"+that.patent[i].pkid);
           that.qqTemplate.push("qq-template-manual-trigger-paper"+that.patent[i].pkid);
+          //通过pkid生成fineuploader特有的模版和对应模版容器
           that.show.tag[i]=true;
           that.updowntxt.push("展开查看更多");
 					that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
-          
+          that.reveal.btnColor.push(false);//编辑按钮是否可用颜色控制
           if(that.patent[i].ifVisable==0){
 		        Vue.set(that.reveal.openOrPrivacyText,[i],"隐藏")
 		      }else{
@@ -549,6 +558,14 @@
           canUploadNum : Math.floor(3-that.show.picNum[index]),
         })
       },
+      btnColor(index){//
+			  let condition=this.localPatent[index].patentName.trim().length!=0
+				if(condition){
+					Vue.set(this.reveal.btnColor,[index],false);
+				}else{
+					Vue.set(this.reveal.btnColor,[index],true);
+				}
+			},
       paperEditKeep(index){//编辑状态，保存按钮
         var that=this;
         if(this.localPatent[index].patentName.trim().length!=0){
@@ -569,7 +586,9 @@
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
         }
 
-        $("#"+this.fineUploaderId[index]).html("")
+        setTimeout(() => {
+          $("#"+this.fineUploaderId[index]).html("")
+        }, 1);
       },
       paperEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -579,7 +598,9 @@
         this.localPatent[index].validityTermE=this.patent[index].validityTermE;
        
         /*如果是取消编辑，从新从Vuex中得到数据*/
-         $("#"+this.fineUploaderId[index]).html("")
+         setTimeout(() => {
+           $("#"+this.fineUploaderId[index]).html("")
+         }, 1);
       },
       paperEditDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -651,7 +672,9 @@
         Vue.set(this.newPatent,"organ","");
         Vue.set(this.newPatent,"time","");
         /*清除数据，保证下次输入时输入框为空*/
-        $("#fine-uploader-manual-trigger-patent").html("")
+        setTimeout(() => {
+          $("#fine-uploader-manual-trigger-patent").html("")
+        }, 1);
       },
       cancelNewPatent(){
         Vue.set(this.reveal,"addPatent",true);
@@ -660,7 +683,9 @@
         Vue.set(this.newPatent,"organ","");
         Vue.set(this.newPatent,"time","");
         /*清除数据，保证下次输入时输入框为空*/
-        $("#fine-uploader-manual-trigger-patent").html("")
+        setTimeout(() => {
+          $("#fine-uploader-manual-trigger-patent").html("")
+        }, 1);
       }
     }
   }
@@ -862,6 +887,10 @@
               margin-bottom:17px;
               margin-top: 15px;
               overflow: hidden;
+              em{
+                float: left;
+                line-height: 14px;
+              }
               P{
               	float: left;
                 color: rgb(117, 117, 117);
@@ -932,6 +961,11 @@
                 margin-left:-12px;
               }
             }
+            li:nth-child(4){
+              h5{
+                margin-left:-12px;
+              }
+            }
             li.img-wrap{
 		        	/*padding-left: 30px;*/
 		        	>div{
@@ -955,6 +989,9 @@
 				        cursor: pointer;
 				        background: url("../../../assets/img/personal/education/btn_save_normal.png.png") left center no-repeat;
 				      }
+              .but_disable{
+                background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
+              }
 				      button:nth-child(1){
 				      	&:hover{
 				      		opacity: 0.8;
@@ -1033,6 +1070,11 @@
             margin-left:-12px;
           }
         }
+        li:nth-child(4){
+          h5{
+            margin-left:-12px;
+          }
+        }
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{
@@ -1071,7 +1113,7 @@
             	border:1px solid $themeColor;
             }
           }
-          .keepAdd{
+          .but_disable{
             background: url("../../../assets/img/personal/education/btn_save_disabled.png.png") left center no-repeat !important;
           }
         }

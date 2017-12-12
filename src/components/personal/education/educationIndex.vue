@@ -641,7 +641,11 @@
 				setTimeout(() => {
  					$("#"+this.fineUploaderId[index]).html("");
  				}, 1);
- 				this.localEdu[index]=JSON.parse(JSON.stringify(this.education[index]));
+ 				//this.localEdu[index]=JSON.parse(JSON.stringify(this.education[index]));
+				this.localEdu[index].education=this.education[index].education;
+				this.localEdu[index].professionName=this.education[index].professionName;
+				this.localEdu[index].schoolTimeUp=this.education[index].schoolTimeUp;
+				this.localEdu[index].schoolTimeDown=this.education[index].schoolTimeDown;
       },
       
       deleteEduExist(index){//删除按钮事件

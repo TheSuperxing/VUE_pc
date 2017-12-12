@@ -42,11 +42,11 @@
             </ul>
           </div>
           <div class="jobInfoInfoBody">
-            <p v-cloak>职称专业：<span>{{item.professionalTitle}}</span></p>
-            <p v-cloak>证书级别：<span>{{item.titleLevel}}</span></p>
+            <p v-cloak>职称名称：<span>{{item.titleName}}</span></p>
+            <p v-cloak>专业名称：<span>{{item.professionalTitle}}</span></p>
             <p v-cloak>证书编号：<span>{{item.certificateNumber}}</span></p>
-            <p v-cloak>评定日期：<span>{{item.assessmentTime}}</span></p>
-            <p v-cloak>发证机构：<span>{{item.certificateBody}}</span></p>
+            <p v-cloak>批准日期：<span>{{item.assessmentTime}}</span></p>
+            <p v-cloak>评审组织：<span>{{item.certificateBody}}</span></p>
           </div>
           <ul class="morePics" v-if="!show.tag[index]" >
 						<li v-for="item in picArr[index]">
@@ -72,40 +72,48 @@
                 <h5>*&nbsp;资格名称</h5>
                 <input @input="btnColor(index)" v-model="localTitleInfo[index].titleName" type="text" placeholder="请输入资格名称">
               </label>
+							<alertTip v-if="showAlert.titleName" :showHide="showAlert.titleName"  :alertText="alertText.titleName"></alertTip>
+            
             </li>
             <li class="clear">
               <label>
-                <h5>职称专业</h5>
-                <input v-model="localTitleInfo[index].professionalTitle" type="text" placeholder="请输入职称专业">
+                <h5>*&nbsp;专业名称</h5>
+                <input v-model="localTitleInfo[index].professionalTitle" type="text" placeholder="请输入专业名称">
               </label>
+							<alertTip v-if="showAlert.professionalTitle" :showHide="showAlert.professionalTitle"  :alertText="alertText.professionalTitle"></alertTip>
+            
             </li>
-            <li class="clear">
+            <!--<li class="clear">
               <label>
                 <h5>职称级别</h5>
                 <input v-model="localTitleInfo[index].titleLevel" type="text" placeholder="请输入职称级别">
               </label>
-            </li>
+            </li>-->
             <li class="clear">
               <label>
-                <h5>证书编号</h5>
+                <h5>*&nbsp;证书编号</h5>
                 <input v-model="localTitleInfo[index].certificateNumber" type="text" placeholder="请输入证件编号">
               </label>
+							<alertTip v-if="showAlert.certificateNumber" :showHide="showAlert.certificateNumber"  :alertText="alertText.certificateNumber"></alertTip>
+              
             </li>
             <li class="clear">
               <label>
-                <h5>*&nbsp;评定日期</h5>
-           			<!-- <datepicker class="datePicker" v-model="localTitleInfo[index].assessmentTime"></datepicker> -->
-                <year-month v-model="localTitleInfo[index].assessmentTime"></year-month> 	
+                <h5>*&nbsp;批准日期</h5>
+           			 <datepicker class="datePicker" v-model="localTitleInfo[index].assessmentTime"></datepicker> 
+                <!--<year-month v-model="localTitleInfo[index].assessmentTime"></year-month>--> 	
               </label>
+							<alertTip v-if="showAlert.assessmentTime" :showHide="showAlert.assessmentTime"  :alertText="alertText.assessmentTime"></alertTip>
+              
             </li>
             <li class="clear">
               <label>
-                <h5>发证机构</h5>
-                <input v-model="localTitleInfo[index].certificateBody" type="text" placeholder="请输入发证机构">
+                <h5>评审组织</h5>
+                <input v-model="localTitleInfo[index].certificateBody" type="text" placeholder="请输入评审组织">
               </label>
             </li>
             <li class="img-wrap clear" >
-							<span class="wrap-left">证书文件</span>
+							<h5 class="wrap-left">证书文件</h5>
 							<ul class="imgShow">
 								<li v-for="(item,$ind) in picArr[index]">
 									<img :src="item.pic"/>
@@ -198,42 +206,50 @@
             <h5>*&nbsp;职称名称</h5>
             <input v-model="newTitleInfo.titleName" type="text" placeholder="请输入资格名称">
           </label>
+					<alertTip v-if="showAlert.titleName" :showHide="showAlert.titleName"  :alertText="alertText.titleName"></alertTip>
+       
         </li>
         <li class="clear">
           <label>
-            <h5>职称专业</h5>
+            <h5>*&nbsp;专业名称</h5>
             <input v-model="newTitleInfo.professionalTitle" type="text" placeholder="请输入资格名称">
           </label>
+					<alertTip v-if="showAlert.professionalTitle" :showHide="showAlert.professionalTitle"  :alertText="alertText.professionalTitle"></alertTip>
+          
         </li>
-        <li class="clear">
+        <!--<li class="clear">
           <label>
             <h5>职称级别</h5>
             <input v-model="newTitleInfo.titleLevel" type="text" placeholder="请输入资格名称">
           </label>
-        </li>
+        </li>-->
         <li class="clear">
           <label>
-            <h5>证书编号</h5>
+            <h5>*&nbsp;证书编号</h5>
             <input v-model="newTitleInfo.certificateNumber" type="text" placeholder="请输入证件编号">
           </label>
+					<alertTip v-if="showAlert.certificateNumber" :showHide="showAlert.certificateNumber"  :alertText="alertText.certificateNumber"></alertTip>
+          
         </li>
         <li class="clear">
           <label>
-            <h5>*&nbsp;评定日期</h5>
+            <h5>*&nbsp;批准日期</h5>
            <!-- <input v-model="newTitleInfo.info.time" type="month" placeholder="请输入注册单位">-->
            	<!-- <datepicker class="datePicker" v-model="newTitleInfo.assessmentTime"></datepicker> -->
 						 <year-month v-model="newTitleInfo.assessmentTime"></year-month>
             <!--<datepicker v-model="newTitleInfo.assessmentTime"></datepicker>-->
           </label>
+					<alertTip v-if="showAlert.assessmentTime" :showHide="showAlert.assessmentTime"  :alertText="alertText.assessmentTime"></alertTip>
+          
         </li>
         <li class="clear">
           <label>
-            <h5>注册单位</h5>
-            <input v-model="newTitleInfo.certificateBody" type="text" placeholder="请输入注册单位">
+            <h5>评审组织</h5>
+            <input v-model="newTitleInfo.certificateBody" type="text" placeholder="请输入评审组织">
           </label>
         </li>
 				<li class="img-wrap clear">
-					<span class="wrap-left">证书文件</span>
+					<h5 class="wrap-left">证书文件</h5>
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -321,13 +337,14 @@
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 	import Modal from "../../../assets/js/modal.js"  
-  
+  import alertTip from "../units/alertTip.vue"
   
   export default {
     name:"titleInfo",
     components:{
       Datepicker,
-      YearMonth
+      YearMonth,
+      alertTip
     },
     data(){
       return {
@@ -345,6 +362,8 @@
         show:{
         	tag:[],
         },
+        showAlert:{titleName:false,professionalTitle:false,certificateNumber:false,assessmentTime:false},//提示框显隐
+	      alertText:{titleName:null,professionalTitle:null,certificateNumber:null,assessmentTime:null},
         deleteModalClass:[],
         titleInfo:[],
         localTitleInfo:[],
@@ -425,6 +444,7 @@
 					dataType: "json",
 					async:false,
 				},function(data){
+					console.log(data.msg)
           if(data.code==0){
 						that.titleInfo = data.msg;
 						console.log(data.msg)
@@ -450,9 +470,15 @@
 	    	that.show.tag=[];
         that.updowntxt=[];
 	    	that.deleteModalClass = [];
-        
+        that.showAlert.titleName = false;
+        that.alertText.titleName = null;
+        that.showAlert.professionalTitle = false;
+        that.alertText.professionalTitle = null;
+        that.showAlert.certificateNumber = false;
+        that.alertText.certificateNumber = null;
+        that.showAlert.assessmentTime = false;
+        that.alertText.assessmentTime = null;
 	    	for(var i=0;i<that.titleInfo.length;i++){
-	    		that.titleInfo[i].titleLevel = emptyText(that.titleInfo[i].titleLevel);
 	    		that.titleInfo[i].assessmentTime = emptyText(that.titleInfo[i].assessmentTime);
 	    		that.titleInfo[i].certificateBody = emptyText(that.titleInfo[i].certificateBody);
 	    		that.titleInfo[i].certificateNumber = emptyText(that.titleInfo[i].certificateNumber);
@@ -644,37 +670,72 @@
 				}
 			},
       keepJobInfoEdit(index){//编辑状态，保存按钮
-        if(this.titleInfo[index].titleName.trim().length!=0){
-          Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-          
-          /*如果是保存，把数据保存到Vuex中*/
-        }
-        var that = this;
-        var url = MyAjax.urlsy+"/psnTitleMessage/update"
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: JSON.stringify(that.localTitleInfo[index]),
-					dataType: "json",
-					contentType:"application/json;charset=utf-8",
-					async:false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})//更新到服务器
-				//保存之后再重新拉取数据
-				that.updateData();
-        setTimeout(() => {
-					$("#"+this.fineUploaderId[index]).html("")
-				}, 1);
+      	var that = this;
+      	let condition = that.localTitleInfo[index].titleName.trim().length!=0&&that.localTitleInfo[index].professionalTitle.trim().length!=0
+      	&&that.localTitleInfo[index].certificateNumber.trim().length!=0&&that.localTitleInfo[index].assessmentTime!=null;
+      	
+      	if(condition){
+      		console.log(333)
+      		var url = MyAjax.urlsy+"/psnTitleMessage/update"
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        console.log(JSON.stringify(that.localTitleInfo[index]))
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localTitleInfo[index]),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+						async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})//更新到服务器
+					//保存之后再重新拉取数据
+					that.updateData();
+					setTimeout(() => {
+						$("#"+that.fineUploaderId[index]).html("")
+					}, 1);
+					Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
+      	}else{
+      		if(that.localTitleInfo[index].titleName.trim().length===0){
+      			that.showAlert.titleName = true;
+      			that.alertText.titleName = "请输入职称名称"
+      		}else{
+      			that.showAlert.titleName = false;
+      			that.alertText.titleName = ""
+      		}
+      		if(that.localTitleInfo[index].professionalTitle.trim().length===0){
+      			that.showAlert.professionalTitle = true;
+      			that.alertText.professionalTitle = "请输入专业名称"
+      		}else{
+      			that.showAlert.professionalTitle = false;
+      			that.alertText.professionalTitle = ""
+      		}
+      		if(that.localTitleInfo[index].certificateNumber.trim().length===0){
+      			that.showAlert.certificateNumber = true;
+      			that.alertText.certificateNumber = "请输入证书编号"
+      		}else{
+      			that.showAlert.certificateNumber = false;
+      			that.alertText.certificateNumber = ""
+      		}
+      		if(that.localTitleInfo[index].assessmentTime===null){
+      			that.showAlert.assessmentTime = true;
+      			that.alertText.assessmentTime = "请输入批准日期"
+      		}else{
+      			that.showAlert.assessmentTime = false;
+      			that.alertText.assessmentTime = ""
+      		}
+      	}
+      
+      
+        
         
       },
       cancelJobInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
          //this.localTitleInfo[index]=JSON.parse(JSON.stringify(this.titleInfo[index]));
-				 this.localTitleInfo[index].titleName=this.titleInfo[index].titleName
+				this.localTitleInfo[index].titleName=this.titleInfo[index].titleName
 				this.localTitleInfo[index].professionalTitle=this.titleInfo[index].professionalTitle
 				this.localTitleInfo[index].titleLevel=this.titleInfo[index].titleLevel
 				this.localTitleInfo[index].certificateNumber=this.titleInfo[index].certificateNumber
@@ -685,6 +746,7 @@
         setTimeout(() => {
 					$("#"+this.fineUploaderId[index]).html("")
 				}, 1);
+	      this.updateData();
         
       },
       jobInfoDel(index){//编辑状态，删除按钮
@@ -727,30 +789,59 @@
 	      })
       },
       keepJobInfoAdd(){//添加模式下的保存
-        if(this.newTitleInfo.titleName.length!=0){
-          if(this.newTitleInfo.titleName.trim().length!=0){
-            this.reveal.openOrPrivacy.push(true)//设置是否对外显示
-            this.reveal.openOrPrivacyText.push("显示")//设置是否对外显示文本
-            Vue.set(this.reveal,"addJobInfo",true);
-          }
-        }
-        var that = this;
-//      console.log(that.software[index])
-        var url = MyAjax.urlsy+"/psnTitleMessage/insert";
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data:JSON.stringify(that.newTitleInfo),
-					dataType: "json",
-					async:false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
-        that.updateData();
-        $("#fine-uploader-manual-trigger").html("")
+      	var that = this;
+      	let condition = that.newTitleInfo.titleName.trim().length!=0&&that.newTitleInfo.professionalTitle.trim().length!=0
+      	&&that.newTitleInfo.certificateNumber.trim().length!=0&&that.newTitleInfo.assessmentTime.trim().length!=0;
+      	if(condition){
+      		var url = MyAjax.urlsy+"/psnTitleMessage/insert";
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.newTitleInfo),
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})
+	        that.updateData();
+	        setTimeout(()=>(
+	        	$("#fine-uploader-manual-trigger").html("")
+	        ),1)
+	        Vue.set(this.reveal,"addJobInfo",true);
+      	}else{
+      		if(that.newTitleInfo.titleName.trim().length===0){
+      			that.showAlert.titleName = true;
+      			that.alertText.titleName = "请输入职称名称"
+      		}else{
+      			that.showAlert.titleName = false;
+      			that.alertText.titleName = ""
+      		}
+      		if(that.newTitleInfo.professionalTitle.trim().length===0){
+      			that.showAlert.professionalTitle = true;
+      			that.alertText.professionalTitle = "请输入专业名称"
+      		}else{
+      			that.showAlert.professionalTitle = false;
+      			that.alertText.professionalTitle = ""
+      		}
+      		if(that.newTitleInfo.certificateNumber.trim().length===0){
+      			that.showAlert.certificateNumber = true;
+      			that.alertText.certificateNumber = "请输入证书编号"
+      		}else{
+      			that.showAlert.certificateNumber = false;
+      			that.alertText.certificateNumber = ""
+      		}
+      		if(that.newTitleInfo.assessmentTime.trim().length===0){
+      			that.showAlert.assessmentTime = true;
+      			that.alertText.assessmentTime = "请输入批准日期"
+      		}else{
+      			that.showAlert.assessmentTime = false;
+      			that.alertText.assessmentTime = ""
+      		}
+      	}
+      	
       },
       cancelJobInfoAdd(){
         Vue.set(this.reveal,"addJobInfo",true);
@@ -763,6 +854,7 @@
         Vue.set(this.newTitleInfo,"certificateBody","");
         /*清除数据，保证下次输入时输入框为空*/
         $("#fine-uploader-manual-trigger").html("")
+        this.updateData();
       }
     }
   }
@@ -779,6 +871,7 @@
     padding: 0 40px;
     background: $bfColor;
     min-height: 671px;
+    padding-bottom: 30px;
     .year-month{
       width:140px;
       float: left;
@@ -1025,18 +1118,20 @@
           >ul{
             li{
               margin:20px 0;
+              position: relative;
               .wrap-left{
 				      	line-height: 35px;
 				      	text-align: right;
 				      	float: left;
 				      	color:$themeColor;
-				      	margin-right: 25px;
 				      }
               h5{
                 float: left;
                 line-height: 35px;
                 color: $themeColor;
                 cursor: pointer;
+                width: 80px;
+                text-align: right;
               }
               input{
                 float: left;
@@ -1056,28 +1151,29 @@
               button{
                 cursor: pointer;
               }
+              .alet_container{
+		          	right: 10px;
+		          	top: 8px;
+		          	bottom: 0;
+		          }
+		          .date-picker{
+		          	width: 150px;
+		          	float: left;
+		          	margin-left: 25px;
+		          }
             }
             >li:nth-child(1){
               color: #909090;
               margin-top:30px;
               margin-bottom:20px;
             }
-            >li:nth-child(2){
-              h5{
-                margin-left:-12px;
-              }
-            }
-						>li:nth-child(6){
-              h5{
-                margin-left:-12px;
-              }
-            }
             li.img-wrap{
 				    	/*padding-left: 30px;*/
 				    	.imgShow{
 		        		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
-		        		width: 730px;
+		        		width: 710px;
 		        		float: left;
+		        		margin-left: 25px;
 		        		li{
 		        			float: left;
 		        			width: 200px;
@@ -1111,8 +1207,9 @@
 		        		
 		        	}
 				    	>div{
-				    		width: 730px;
+				    		width: 710px;
 				    		float: right;
+				    		margin-left: 25px;
 				    	}
 				    }
             >li:last-child{
@@ -1156,6 +1253,7 @@
       >ul{
         li{
           margin:20px 0;
+          position: relative;
           .wrap-left{
 		      	line-height: 35px;
 		      	text-align: right;
@@ -1168,6 +1266,8 @@
             line-height: 35px;
             color: $themeColor;
             cursor: pointer;
+            width: 90px;
+            text-align: right;
           }
           input{
             float: left;
@@ -1177,6 +1277,7 @@
             border-radius: 5px;
             border:1px solid $borderColor;
             cursor: pointer;
+            width: 480px;
           }
           input[type=text]{
             width:480px;
@@ -1187,22 +1288,23 @@
           button{
             cursor: pointer;
           }
+          .alet_container{
+          	right: 10px;
+          	top: 8px;
+          	bottom: 0;
+          }
+          .date-picker{
+          	width: 150px;
+          	float: left;
+          	margin-left: 25px;
+          }
         }
         >li:nth-child(1){
           color: #909090;
           margin-top:30px;
           margin-bottom:20px;
         }
-        >li:nth-child(2){
-          h5{
-            margin-left:-12px;
-          }
-        }
-				>li:nth-child(6){
-          h5{
-            margin-left:-12px;
-          }
-        }
+        
         li.img-wrap{
 		    	/*padding-left: 30px;*/
 		    	>div{

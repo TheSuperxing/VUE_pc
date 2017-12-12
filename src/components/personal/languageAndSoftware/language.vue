@@ -67,6 +67,8 @@
                 <h5>*&nbsp;语言种类</h5>
                 <input  @input="btnColor(index)" v-model="localLanguage[index].language" type="text" placeholder="请输入语言种类">
               </label>
+              <alertTip v-if="showAlert.language" :showHide="showAlert.language"  :alertText="alertText.language"></alertTip>
+              
             </li>
             <li class="clear">
               <label>
@@ -79,9 +81,11 @@
 									<option value="母语">母语</option>
 								</select>
               </label>
+              <alertTip v-if="showAlert.proficiency" :showHide="showAlert.proficiency"  :alertText="alertText.proficiency"></alertTip>
+              
             </li>
             <li class="img-wrap clear">
-							<span class="wrap-left">上传附件</span>
+							<h5 class="wrap-left">上传附件</h5>
               <div class="picListCont">
                 <div class="picList" v-for="(item,$index) in show.picList[index]">
                   <img :src="item.pic" alt="">
@@ -174,6 +178,8 @@
             <h5>*&nbsp;语言种类</h5>
             <input v-model="newLanguage.language" type="text" placeholder="请输入语言种类">
           </label>
+          <alertTip v-if="showAlert.language" :showHide="showAlert.language"  :alertText="alertText.language"></alertTip>
+          
         </li>
         <li class="clear">
           <label>
@@ -188,7 +194,7 @@
           </label>
         </li>
         <li class="img-wrap clear">
-					<span class="wrap-left">图片展示</span>
+					<h5 class="wrap-left">图片展示</h5>
 					<script type="text/template" id="qq-template-manual-trigger-language">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -274,9 +280,13 @@
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 	import Modal from "../../../assets/js/modal.js"  
+  import alertTip from "../units/alertTip.vue"
 	
   export default {
     name:"LanguageIndex",
+    components:{
+    	alertTip
+    },
     data(){
       return {
         title:"语言",
@@ -297,6 +307,8 @@
           picNum:[],
         },
         deleteModalClass:[],
+        showAlert:{language:false,proficiency:false},//提示框显隐
+	      alertText:{language:null,proficiency:null},
         language:[],
         localLanguage:[],
         picInfo:[require("../../../assets/img/images/captainmiao1.jpg"),require("../../../assets/img/images/captainmiao2.jpg")],
@@ -361,7 +373,10 @@
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	that.deleteModalClass = [];
-	    	
+	    	that.showAlert.language = false;
+	    	that.alertText.language = null;
+	    	that.showAlert.proficiency = false;
+	    	that.alertText.proficiency = null;
         if(this.language.length!=0){
           Vue.set(this.reveal,"empty",false)//是否显示执业资格信息尚未添加
           for(var i=0;i<that.language.length;i++){
@@ -547,38 +562,56 @@
 			},
       languageEditKeep(index){//编辑状态，保存按钮
         var that = this;
-        var url = MyAjax.urlsy+"/psnlanguage/update"
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: JSON.stringify(that.localLanguage[index]),
-					dataType: "json",
-					contentType:"application/json;charset=utf-8",
-					async:false,
-				},function(data){
-					//console.log(data)
-				},function(err){
-					console.log(err)
-				})//更新到服务器
-				//保存之后再重新拉取数据
-				that.updateData();
-				if(that.localLanguage[index].length!=0){
+        let condition = that.localLanguage[index].language.trim().length!=0;
+        if(condition){
+        	var url = MyAjax.urlsy+"/psnlanguage/update"
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localLanguage[index]),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+						async:false,
+					},function(data){
+						//console.log(data)
+					},function(err){
+						console.log(err)
+					})//更新到服务器
+					//保存之后再重新拉取数据
+					that.updateData();
+					setTimeout(()=>(
+       			$("#"+that.fineUploaderId[index]).html("")
+          ),1)
           Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
+					
+        }else{
+        	if(that.localLanguage[index].language.trim().length===0){
+        		that.showAlert.language = true;
+        		that.alertText.language = "请输入语言种类"
+        	}else{
+        		that.showAlert.language = false;
+        		that.alertText.language = ""
+        	}
+        	if(that.localLanguage[index].proficiency.trim().length===0){
+        		that.showAlert.proficiency = true;
+        		that.alertText.proficiency = "请输入熟练程度"
+        	}else{
+        		that.showAlert.proficiency = false;
+        		that.alertText.proficiency = ""
+        	}
         }
-        setTimeout(() => {
-          $("#"+that.fineUploaderId[index]).html("");
-        }, 1);
+        
+				
       },
       languageEditCancel(index){//编辑状态，取消按钮
-       Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        
+       	Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
         this.localLanguage[index]=JSON.parse(JSON.stringify(this.language[index]));
-
         /*如果是取消编辑，从新从Vuex中得到数据*/
-        setTimeout(() => {
-          $("#"+this.fineUploaderId[index]).html("")
-        }, 1);
+       	setTimeout(()=>(
+	   			$("#"+this.fineUploaderId[index]).html("")
+	      ),1)
+       	this.updateData();
       },
       languageEditDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -618,33 +651,44 @@
         })
       },
       keepNewLanguage(){//添加模式下的保存
-        if(this.newLanguage.language.length!=0){
-//      	this.localLanguage.push(JSON.parse(JSON.stringify(this.newLanguage)))
-//      	this.language.push(JSON.parse(JSON.stringify(this.newLanguage)))
+      	var that = this;
+        let condition = that.newLanguage.language.trim().length!=0;
+      	if(condition){
+      		var url = MyAjax.urlsy+"/psnlanguage/insert";
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.newLanguage),
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})
+	        that.updateData();
+	        setTimeout(()=>(
+						$("#fine-uploader-manual-trigger-paper").html("")
+        	),1)
 	        Vue.set(this.reveal,"addLanguage",true);
-	        this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-          this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
-        }
-        var that = this;
-//      console.log(that.software[index])
-        var url = MyAjax.urlsy+"/psnlanguage/insert";
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data:JSON.stringify(that.newLanguage),
-					dataType: "json",
-					async:false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
-        that.updateData();
-
-        setTimeout(() => {
-          $("#fine-template-manual-trigger-language").html("")
-        }, 1);
+      	}else{
+      		if(that.newLanguage.language.trim().length===0){
+        		that.showAlert.language = true;
+        		that.alertText.language = "请输入语言种类"
+        	}else{
+        		that.showAlert.language = false;
+        		that.alertText.language = ""
+        	}
+        	if(that.newLanguage.proficiency.trim().length===0){
+        		that.showAlert.proficiency = true;
+        		that.alertText.proficiency = "请输入熟练程度"
+        	}else{
+        		that.showAlert.proficiency = false;
+        		that.alertText.proficiency = ""
+        	}
+      	}
+       
       },
       cancelNewLanguage(){
         Vue.set(this.reveal,"addLanguage",true);
@@ -652,9 +696,8 @@
         Vue.set(this.newLanguage,"language","");
         Vue.set(this.newLanguage,"proficiency","");
         /*清除数据，保证下次输入时输入框为空*/
-        setTimeout(() => {
-          $("#fine-template-manual-trigger-language").html("")
-        }, 1);
+        $("#fine-template-manual-trigger-language").html("")
+        this.getData();
       }
     }
   }
@@ -878,6 +921,7 @@
           ul{
             li{
               margin:20px 0;
+              position: relative;
               .wrap-left{
 				      	line-height: 35px;
 				      	text-align: right;
@@ -890,6 +934,8 @@
                 line-height: 35px;
                 color: $themeColor;
                 cursor: pointer;
+                width: 90px;
+                text-align: right;
               }
               input{
                 float: left;
@@ -918,19 +964,21 @@
                 padding-left: 12px;
                 margin-left: 22px;
               }
+              .alet_container{
+				      	right: 10px;
+				      	top: 8px;
+				      	bottom: 0;
+				      }
             }
             li:nth-child(1){
               color: #909090;
               margin-top:30px;
               margin-bottom:20px;
             }
-            // li:nth-child(2){
-              
-            // }
             li.img-wrap{
 		        	/*padding-left: 30px;*/
 		        	>div{
-		        		width: 735px;
+		        		width: 700px;
 		        		float: right;
 		        	}
 		        }
@@ -979,6 +1027,7 @@
       >ul{
         >li{
           margin:20px 0;
+          position: relative;
           .wrap-left{
 		      	line-height: 35px;
 		      	text-align: right;
@@ -991,6 +1040,8 @@
             line-height: 35px;
             color: $themeColor;
             cursor: pointer;
+            width: 90px;
+            text-align: right;
           }
           input{
             float: left;
@@ -1019,16 +1070,22 @@
             padding-left: 12px;
             margin-left: 22px;
           }
+          .alet_container{
+		      	right: 10px;
+		      	top: 8px;
+		      	bottom: 0;
+		      }
         }
         li:nth-child(1){
           color: #909090;
           margin-top:30px;
           margin-bottom:20px;
         }
+        
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{
-        		width: 730px;
+        		width: 700px;
         		float: right;
         	}
         }
@@ -1113,7 +1170,7 @@
 			}
       // 显示图片样式
       .picListCont{
-        width: 730px;
+        width: 700px;
         float: left !important;
         .picList{
           float: left;

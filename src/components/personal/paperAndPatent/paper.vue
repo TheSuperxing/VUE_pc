@@ -67,6 +67,8 @@
                 <h5>*&nbsp;论文名称</h5>
                 <input @input="btnColor(index)" v-model="localPaper[index].paperTitle" type="text" placeholder="请输入论文名称">
               </label>
+              <alertTip v-if="showAlert.paperTitle" :showHide="showAlert.paperTitle"  :alertText="alertText.paperTitle"></alertTip>
+              
             </li>
             <li class="clear">
               <label>
@@ -81,9 +83,11 @@
                 <!-- <datepicker v-model="localPaper[index].publicTime"></datepicker> -->
                 <year-month v-model="localPaper[index].publicTime"></year-month>
               </label>
+              <alertTip v-if="showAlert.publicTime" :showHide="showAlert.publicTime"  :alertText="alertText.publicTime"></alertTip>
+              
             </li>
             <li class="img-wrap clear">
-							<span class="wrap-left">图片展示</span>
+							<h5 class="wrap-left">图片展示</h5>
 
               <div class="picListCont">
                 <div class="picList" v-for="(item,$index) in show.picList[index]">
@@ -177,6 +181,8 @@
             <h5>*&nbsp;论文名称</h5>
             <input v-model="newPaper.paperTitle" type="text" placeholder="请输入论文">
           </label>
+          <alertTip v-if="showAlert.paperTitle" :showHide="showAlert.paperTitle"  :alertText="alertText.paperTitle"></alertTip>
+          
         </li>
         <li class="clear">
           <label>
@@ -191,9 +197,11 @@
             <!-- <datepicker v-model="newPaper.publicTime"></datepicker> -->
             <year-month v-model="newPaper.publicTime"></year-month> 
           </label>
+          <alertTip v-if="showAlert.publicTime" :showHide="showAlert.publicTime"  :alertText="alertText.publicTime"></alertTip>
+          
         </li>
         <li class="img-wrap clear">
-					<span class="wrap-left">图片展示</span>
+					<h5 class="wrap-left">图片展示</h5>
 					<script type="text/template" id="qq-template-manual-trigger-paper">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -280,13 +288,16 @@
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
-	import Modal from "../../../assets/js/modal.js"  
+	import Modal from "../../../assets/js/modal.js"
+  import alertTip from "../units/alertTip.vue"
+	
 	
   export default {
     name:"PaperIndex",
     components:{
       datepicker,
-      YearMonth
+      YearMonth,
+      alertTip
     },
     data(){
       return {
@@ -308,6 +319,8 @@
           picNum:[],
         },
         deleteModalClass:[],
+        showAlert:{paperTitle:false,publicTime:false},//提示框显隐
+	      alertText:{paperTitle:null,publicTime:null},
         paper:[],
         localPaper:[],
         newPaper:{
@@ -392,7 +405,11 @@
 				that.qqTriggerUpload = [];
 				that.updowntxt = [];
 	    	that.deleteModalClass = [];
-				
+				that.showAlert.paperTitle = false;
+	    	that.alertText.paperTitle = null;
+	    	that.showAlert.publicTime = false;
+	    	that.alertText.publicTime = null;
+	    	
         for(var i=0;i<that.paper.length;i++){
           that.paper[i].journal = emptyText(that.paper[i].journal);
           that.paper[i].publicTime = emptyText(that.paper[i].publicTime);
@@ -570,9 +587,9 @@
 			},
       paperEditKeep(index){//编辑状态，保存按钮
         var that=this;
-        that.localPaper[index].picId=this.paper[index].picId;
-        if(this.localPaper[index].paperTitle.trim().length!=0){
-          var url = MyAjax.urlsy+"/psnPaperPatent/updatePaper";
+        let condition = that.localPaper[index].paperTitle.trim().length!=0;
+        if(condition){
+        	var url = MyAjax.urlsy+"/psnPaperPatent/updatePaper";
           MyAjax.ajax({
             type: "POST",
             url:url,
@@ -586,12 +603,27 @@
             console.log(err)
           })
           that.getData();
-          Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
-          /*如果是保存，把数据保存到Vuex中*/
+          Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
+          setTimeout(()=>(
+       			$("#"+that.fineUploaderId[index]).html("")
+          ),1)
+          that.localPaper[index].picId=that.paper[index].picId;
+        }else{
+        	if(that.localPaper[index].paperTitle.trim().length===0){
+        		that.showAlert.paperTitle = true;
+        		that.alertText.paperTitle = "请输入论文名称"
+        	}else{
+        		that.showAlert.paperTitle = false;
+        		that.alertText.paperTitle = ""
+        	}
+        	if(that.localPaper[index].publicTime.trim().length===0){
+        		that.showAlert.publicTime = true;
+        		that.alertText.publicTime = "请输入发表时间"
+        	}else{
+        		that.showAlert.publicTime = false;
+        		that.alertText.publicTime = ""
+        	}
         }
-        setTimeout(() => {
-          $("#"+this.fineUploaderId[index]).html("");
-        }, 1);
       },
       paperEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -600,9 +632,10 @@
         this.localPaper[index].publicTime=this.paper[index].publicTime;
         /*如果是取消编辑，从新从Vuex中得到数据*/
         //console.log($("#"+this.fineUploaderId[index]+" .qq-uploader"))
-        setTimeout(() => {
-          $("#"+this.fineUploaderId[index]).html("");
-        }, 1);
+        setTimeout(()=>(
+	   			$("#"+this.fineUploaderId[index]).html("")
+	      ),1)
+        
       },
       paperEditDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -642,39 +675,47 @@
 
       },
       keepNewPaper(){//添加模式下的保存
-
-        if(this.newPaper.paperTitle.length!=0){
-          if(this.newPaper.paperTitle.trim().length!=0){
-            var that=this;
-            var url = MyAjax.urlsy+"/psnPaperPatent/insertPaper";
-            MyAjax.ajax({
-              type: "POST",
-              url:url,
-      				data: JSON.stringify(that.newPaper),
-              dataType: "json",
-      			  contentType: "application/json;charset=UTF-8",
-              async: false,
-            },function(data){
-              //console.log(data)
-            },function(err){
-              console.log(err)
-            })
-            this.getData();
-            // 从新获取数据
-            
-            Vue.set(this.reveal,"addPaper",true);
-            //视图切换到执业资格的首页
-            this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-          }
+        var that=this;
+        let condition = that.newPaper.paperTitle.trim().length!=0;
+        if(condition){
+        	var url = MyAjax.urlsy+"/psnPaperPatent/insertPaper";
+	        MyAjax.ajax({
+	          type: "POST",
+	          url:url,
+	  				data: JSON.stringify(that.newPaper),
+	          dataType: "json",
+	  			  contentType: "application/json;charset=UTF-8",
+	          async: false,
+	        },function(data){
+	          //console.log(data)
+	        },function(err){
+	          console.log(err)
+	        })
+	        this.getData();
+	        // 从新获取数据
+	        setTimeout(()=>(
+        		$("#fine-uploader-manual-trigger-paper").html("")
+	        ),1)
+	        Vue.set(this.reveal,"addPaper",true);
+	        Vue.set(this.newPaper,"paperTitle","");
+	        Vue.set(this.newPaper,"journal","");
+	        Vue.set(this.newPaper,"publicTime","");
+        }else{
+        	if(that.newPaper.paperTitle.trim().length===0){
+        		that.showAlert.paperTitle = true;
+        		that.alertText.paperTitle = "请输入论文名称"
+        	}else{
+        		that.showAlert.paperTitle = false;
+        		that.alertText.paperTitle = ""
+        	}
+        	if(that.newPaper.publicTime.trim().length===0){
+        		that.showAlert.publicTime = true;
+        		that.alertText.publicTime = "请输入发表时间"
+        	}else{
+        		that.showAlert.publicTime = false;
+        		that.alertText.publicTime = ""
+        	}
         }
-
-        Vue.set(this.newPaper,"paperTitle","");
-        Vue.set(this.newPaper,"journal","");
-        Vue.set(this.newPaper,"publicTime","");
-        /*清除数据，保证下次输入时输入框为空*/
-        setTimeout(() => {
-          $("#fine-uploader-manual-trigger-paper").html("")
-        }, 1);
       },
 
       cancelNewPaper(){
@@ -686,9 +727,10 @@
         Vue.set(this.newPaper,"journal","");
         Vue.set(this.newPaper,"publicTime","");
         /*清除数据，保证下次输入时输入框为空*/
-        setTimeout(() => {
-          $("#fine-uploader-manual-trigger-paper").html("")
-        }, 1);
+       	setTimeout(()=>(
+    			$("#fine-uploader-manual-trigger-paper").html("")
+        ),1)
+       	this.getData();
       }
     }
   }
@@ -901,11 +943,14 @@
           ul{
             li{
               margin:20px 0;
+              position: relative;
               h5{
                 float: left;
                 line-height: 35px;
                 color: $themeColor;
                 cursor: pointer;
+                width: 90px;
+                text-align: right;
               }
               input{
                 float: left;
@@ -925,22 +970,18 @@
               button{
                 cursor: pointer;
               }
+              .alet_container{
+				      	right: 10px;
+				      	top: 8px;
+				      	bottom: 0;
+				      }
             }
             li:nth-child(1){
               color: #909090;
               margin-top:30px;
               margin-bottom:20px;
             }
-            li:nth-child(2){
-              h5{
-                margin-left:-12px;
-              }
-            }
-            li:nth-child(4){
-              h5{
-                margin-left:-12px;
-              }
-            }
+            
             li.tip-wrap{
 				    	padding-left: 90px;
 				    	color: #999999;
@@ -986,6 +1027,7 @@
       ul{
         li{
           margin:20px 0;
+          position: relative;
           .wrap-left{
 		      	line-height: 35px;
 		      	text-align: right;
@@ -998,6 +1040,8 @@
             line-height: 35px;
             color: $themeColor;
             cursor: pointer;
+            width: 90px;
+            text-align: right;
           }
           input{
             float: left;
@@ -1017,26 +1061,22 @@
           button{
             cursor: pointer;
           }
+          .alet_container{
+          	right: 10px;
+          	top: 8px;
+          	bottom: 0;
+          }
         }
         li:nth-child(1){
           color: #909090;
           margin-top:30px;
           margin-bottom:20px;
         }
-        li:nth-child(2){
-          h5{
-            margin-left:-12px;
-          }
-        }
-        li:nth-child(4){
-          h5{
-            margin-left:-12px;
-          }
-        }
+       
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{
-        		width: 730px;
+        		width: 700px;
         		float: right;
         	}
         }
@@ -1121,7 +1161,7 @@
 			}
       // 显示图片样式
       .picListCont{
-        width: 730px;
+        width: 700px;
         float: left;
         .picList{
           float: left !important;

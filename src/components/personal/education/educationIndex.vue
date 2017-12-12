@@ -394,7 +394,7 @@
 			    }else {
 			      return text;
 			    }
-			}
+			  }
 
 	        that.localEdu=JSON.parse(JSON.stringify(that.education));
 	    		that.openOrPrivacy = [];

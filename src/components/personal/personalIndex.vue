@@ -636,6 +636,8 @@
             p{
               float: left;
               padding-bottom:17px;
+              word-wrap: break-word;
+              white-space: normal;
               span{
                 float: left;
               }

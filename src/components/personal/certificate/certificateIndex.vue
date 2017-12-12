@@ -42,8 +42,16 @@
             </ul>
           </div>
           <div class="certificateInfoBody">
-            <p v-cloak>注册单位  : {{item.registeredUnit}}</p>
-            <p v-cloak>证书编号  ：{{item.certificateNumber}}</p>
+          	<p v-cloak><em>专业类别  ：</em>{{item.professionCategory}}</p>
+            <p v-cloak><em>岗位名称  ：</em>{{item.postName}}</p>
+            <p v-cloak><em>批准日期  ：</em>{{item.approveDate}}</p>
+            <p v-cloak><em>专业类别  ：</em>{{item.issueUnit}}</p>
+            <p v-cloak><em>签发日期  ：</em>{{item.issueDate}}</p>
+            <p v-cloak><em>有效期至  ：</em>{{item.validTill}}</p>
+            <p v-cloak><em>管理号  ：</em>{{item.manageNo}}</p>
+            <p v-cloak><em>证书编号  ：</em>{{item.certificateNumber}}</p>
+            
+            
           </div>
           <ul class="morePics" v-if="!show.tag[index]">
 		    		<li v-for="item in picArr[index]">
@@ -67,11 +75,48 @@
                 <h5>*&nbsp;资格名称</h5>
                 <input v-model="localCertificate[index].qualificationName" type="text" placeholder="请输入资格名称">
               </label>
+							<alertTip v-if="showAlert.qualificationName" :showHide="showAlert.qualificationName"  :alertText="alertText.qualificationName"></alertTip>
             </li>
             <li class="clear">
               <label>
-                <h5>注册单位</h5>
-                <input v-model="localCertificate[index].registeredUnit" type="text" placeholder="请输入注册单位">
+                <h5>专业类别</h5>
+                <input v-model="localCertificate[index].professionCategory" type="text" placeholder="请输入资格名称">
+              </label>
+            </li>
+            <li class="clear">
+              <label>
+                <h5>岗位名称</h5>
+                <input v-model="localCertificate[index].postName" type="text" placeholder="请输入资格名称">
+              </label>
+            </li>
+            <li class="clear">
+              <label>
+                <h5>批准日期</h5>
+                <datepicker class="datePicker" v-model="localCertificate[index].approveDate"></datepicker>
+              </label>
+            </li>
+           	 <li class="clear">
+              <label>
+                <h5>签发单位</h5>
+                <input v-model="localCertificate[index].issueUnit" type="text" placeholder="请输入资格名称">
+              </label>
+            </li>
+            <li class="clear">
+              <label>
+                <h5>签发日期</h5>
+                <datepicker class="datePicker" v-model="localCertificate[index].issueDate"></datepicker>
+              </label>
+            </li>
+            <li class="clear">
+              <label>
+                <h5>有效期至</h5>
+                <datepicker class="datePicker" v-model="localCertificate[index].validTill"></datepicker>
+              </label>
+            </li>
+            <li class="clear">
+              <label>
+                <h5>管理号</h5>
+                <input v-model="localCertificate[index].manageNo" type="text" placeholder="请输入证件编号">
               </label>
             </li>
             <li class="clear">
@@ -81,7 +126,7 @@
               </label>
             </li>
             <li class="img-wrap clear" >
-							<span class="wrap-left">图片展示</span>
+							<h5 class="wrap-left">图片展示</h5>
 							<ul class="imgShow">
 								<li v-for="(item,$ind) in picArr[index]">
 									<img :src="item.pic"/>
@@ -178,21 +223,60 @@
             <h5>*&nbsp;资格名称</h5>
             <input v-model="newCertificate.qualificationName" type="text" placeholder="请输入资格名称">
           </label>
+					<alertTip v-if="showAlert.qualificationName" :showHide="showAlert.qualificationName"  :alertText="alertText.qualificationName"></alertTip>
+        
         </li>
-        <li  class="clear">
+        <li class="clear">
           <label>
-            <h5>注册单位</h5>
-            <input v-model="newCertificate.registeredUnit" type="text" placeholder="请输入注册单位">
+            <h5>专业类别</h5>
+            <input v-model="newCertificate.professionCategory" type="text" placeholder="请输入资格名称">
           </label>
         </li>
-        <li  class="clear">
+        <li class="clear">
+          <label>
+            <h5>岗位名称</h5>
+            <input v-model="newCertificate.postName" type="text" placeholder="请输入资格名称">
+          </label>
+        </li>
+        <li class="clear">
+          <label>
+            <h5>批准日期</h5>
+            <datepicker class="datePicker" v-model="newCertificate.approveDate"></datepicker>
+          </label>
+        </li>
+       	 <li class="clear">
+          <label>
+            <h5>签发单位</h5>
+            <input v-model="newCertificate.issueUnit" type="text" placeholder="请输入资格名称">
+          </label>
+        </li>
+        <li class="clear">
+          <label>
+            <h5>签发日期</h5>
+            <datepicker class="datePicker" v-model="newCertificate.issueDate"></datepicker>
+          </label>
+        </li>
+        <li class="clear">
+          <label>
+            <h5>有效期至</h5>
+            <datepicker class="datePicker" v-model="newCertificate.validTill"></datepicker>
+          </label>
+        </li>
+        <li class="clear">
+          <label>
+            <h5>管理号</h5>
+            <input v-model="newCertificate.manageNo" type="text" placeholder="请输入证件编号">
+          </label>
+        </li>
+        <li class="clear">
           <label>
             <h5>证件编号</h5>
             <input v-model="newCertificate.certificateNumber" type="text" placeholder="请输入证件编号">
           </label>
         </li>
+        
         <li class="img-wrap clear">
-					<span class="wrap-left">图片展示</span>
+					<h5 class="wrap-left">图片展示</h5>
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -278,6 +362,8 @@
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 	import Modal from "../../../assets/js/modal.js"  
+  import Datepicker from "../units/Datepicker.vue"
+  import alertTip from "../units/alertTip.vue"
   
   export default {
     name:"certificateIndex",
@@ -296,6 +382,8 @@
         show:{
         	tag:[],
         },
+        showAlert:{qualificationName:false},//提示框显隐
+	      alertText:{qualificationName:null},
         deleteModalClass:[],
         certificate:[],
         localCertificate:[],
@@ -318,7 +406,10 @@
         
       }
     },
-
+		components:{
+			alertTip,
+			Datepicker
+		},
     mounted(){
     	this.updateData();
     	//上传图片
@@ -370,6 +461,13 @@
 				},function(err){
 					console.log(err)
 				})
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			  }
 	    	/*数据同步本地一份开始*/
         that.localCertificate=JSON.parse(JSON.stringify(that.certificate));
         that.fineUploaderId = [];
@@ -379,8 +477,18 @@
 	    	that.show.tag=[];
 	    	that.updowntxt=[];
 	    	that.deleteModalClass = [];
-	    	
+	    	that.showAlert.qualificationName = false;
+	    	that.alertText.qualificationName = null;
 	    	for(var i=0;i<that.certificate.length;i++){
+	    		that.certificate[i].professionCategory = emptyText(that.certificate[i].professionCategory);
+	    		that.certificate[i].postName = emptyText(that.certificate[i].postName);
+	    		that.certificate[i].approveDate = emptyText(that.certificate[i].approveDate);
+	    		that.certificate[i].issueUnit = emptyText(that.certificate[i].issueUnit);
+	    		that.certificate[i].issueDate = emptyText(that.certificate[i].issueDate);
+	    		that.certificate[i].validTill = emptyText(that.certificate[i].validTill);
+	    		that.certificate[i].manageNo = emptyText(that.certificate[i].manageNo);
+	    		that.certificate[i].certificateNumber = emptyText(that.certificate[i].certificateNumber);
+	    		
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger"+that.localCertificate[i].pkid);
 	    		that.qqTemplate.push("qq-template-manual-trigger"+that.localCertificate[i].pkid);
 	    		that.show.tag[i]=true;
@@ -545,28 +653,37 @@
       },
       keepCertificateInfoEdit(index){//编辑状态，保存按钮
       	var that = this;
-        var url = MyAjax.urlsy+"/psnQualification/update"
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: JSON.stringify(that.localCertificate[index]),
-					dataType: "json",
-					contentType:"application/json;charset=utf-8",
-					async:false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})//更新到服务器
-				//保存之后再重新拉取数据
-				that.updateData();
-        $("#"+this.fineUploaderId[index]).html("")
-				
-        if(that.localCertificate[index].qualificationName.trim().length!=0){
-          Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        }
-        
+      	let condition = that.localCertificate[index].qualificationName.trim().length!=0;
+      	if(condition){
+      		var url = MyAjax.urlsy+"/psnQualification/update"
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localCertificate[index]),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+						async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})//更新到服务器
+					//保存之后再重新拉取数据
+					that.updateData();
+					setTimeout(() => {
+						$("#"+that.fineUploaderId[index]).html("")
+					}, 1);
+					Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
+      	}else{
+      		if(that.localCertificate[index].qualificationName.trim().length===0){
+      			that.showAlert.qualificationName = true;
+      			that.alertText.qualificationName = "请输入资格名称"
+      		}else{
+      			that.showAlert.qualificationName = false;
+      			that.alertText.qualificationName = ""
+      		}
+      	}
       },
       cancelCertificateInfoEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -610,31 +727,36 @@
 	      })
       },
       keepCertificateInfoAdd(){
-        if(this.newCertificate.qualificationName.length!=0){
-            /*同步信息到个人信息首页*/
-            Vue.set(this.reveal,"addCertificate",true);
-            //视图切换到执业资格的首页
-            /*清除数据，保证下次输入时输入框为空*/
-            this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-            this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
-        }
-        
-        var that = this;
-        var url = MyAjax.urlsy+"/psnQualification/insert";
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data:JSON.stringify(that.newCertificate),
-					dataType: "json",
-					async:false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
-        that.updateData();
-        $("#fine-uploader-manual-trigger").html("")
+      	var that = this;
+      	let condition = that.newCertificate.qualificationName.trim().length!=0;
+      	if(condition){
+      		var url = MyAjax.urlsy+"/psnQualification/insert";
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.newCertificate),
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})
+	        that.updateData();
+	        setTimeout(() => {
+						$("#fine-uploader-manual-trigger").html("")
+					}, 1);
+	        Vue.set(this.reveal,"addCertificate",true);
+      	}else{
+      		if(that.newCertificate.qualificationName.trim().length===0){
+      			that.showAlert.qualificationName = true;
+      			that.alertText.qualificationName = "请输入资格名称"
+      		}else{
+      			that.showAlert.qualificationName = false;
+      			that.alertText.qualificationName = ""
+      		}
+      	}
       },
       cancelCertificateInfoAdd(){
         Vue.set(this.reveal,"addCertificate",true);
@@ -709,9 +831,16 @@
               li{
                 float: left;
                 cursor: pointer;
+                position: relative;
                 p{
+                	em{
+                		display: inline-block;
+                		width: 90px;
+                		text-align: right;
+                	}
                   padding:0 17px 0 12px;
                 }
+                
               }
               li:nth-child(1){
                 p{
@@ -826,12 +955,17 @@
 
           }
           .certificateInfoBody{
-            p:nth-child(1){
-              /*color: rgb(186,186,186);*/
-              margin-bottom: 11px;
-            }
-            p:last-child{
-              margin-bottom:17px;
+            
+            p{
+            	color:#666666;
+            	em{
+            		color: #353535;
+            		width: 90px;
+            		display: inline-block;
+            		text-align: right;
+            		margin-right: 10px;
+            	}
+              margin-bottom:10px;
             }
           }
           .morePics{
@@ -887,24 +1021,27 @@
           .edit-wrap{
             >li{
               margin:20px 0;
+              position: relative;
               .wrap-left{
 				      	/*width: 80px;*/
 				      	line-height: 35px;
 				      	text-align: right;
 				      	float: left;
 				      	color:$themeColor;
-				      	margin-right: 35px;
+				      	margin-right: 25px;
 				      }
               h5{
                 float: left;
                 line-height: 35px;
                 color: $themeColor;
                 cursor: pointer;
+                width: 90px;
+                text-align: right;
               }
               input{
                 float: left;
                 height:35px;
-                margin-left:22px;
+                margin-left:25px;
                 width:480px;
                 padding-left:15px;
                 border-radius: 5px;
@@ -914,17 +1051,23 @@
               button{
                 cursor: pointer;
               }
+              .alet_container{
+		          	right: 10px;
+		          	top: 8px;
+		          	bottom: 0;
+		          }
+		          .date-picker{
+		          	float: left;
+		          	width: 130px;
+		          	margin-left: 25px;
+		          }
             }
             >li:nth-child(1){
               color: #909090;
               margin-top:30px;
               margin-bottom:20px;
             }
-            >li:nth-child(2){
-              h5{
-                margin-left:-12px;
-              }
-            }
+            
             li.tip-wrap{
 		        	padding-left: 90px;
 		        	color: #999999;
@@ -970,7 +1113,7 @@
 		        		
 		        	}
 				    	>div{
-				    		width: 730px;
+				    		width: 710px;
 				    		float: right;
 				    	}
 				    }
@@ -1012,24 +1155,27 @@
       >ul{
         li{
           margin:20px 0;
+          position: relative;
           .wrap-left{
 		      	/*width: 80px;*/
 		      	line-height: 35px;
 		      	text-align: right;
 		      	float: left;
 		      	color:$themeColor;
-		      	margin-right: 35px;
+		      	margin-right: 25px;
 		      }
           h5{
             float: left;
             line-height: 35px;
             color: $themeColor;
             cursor: pointer;
+            width: 90px;
+            text-align: right;
           }
           input{
             float: left;
             height:35px;
-            margin-left:22px;
+            margin-left:25px;
             width:480px;
             padding-left:15px;
             border-radius: 5px;
@@ -1039,17 +1185,23 @@
           button{
             cursor: pointer;
           }
+          .alet_container{
+          	right: 10px;
+          	top: 8px;
+          	bottom: 0;
+          }
+		      .date-picker{
+          	float: left;
+          	width: 130px;
+          	margin-left: 25px;
+          }
         }
         li:nth-child(1){
           color: #909090;
           margin-top:30px;
           margin-bottom:20px;
         }
-        li:nth-child(2){
-          h5{
-            margin-left:-12px;
-          }
-        }
+       
         li.tip-wrap{
         	padding-left: 90px;
         	color: #999999;

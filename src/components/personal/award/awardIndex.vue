@@ -68,7 +68,8 @@
                 <h5>*&nbsp;奖励名称</h5>
                 <input v-model="localAward[index].awardName" type="text" placeholder="请输入资格名称">
               </label>
-            </li>
+              <alertTip v-if="showAlert.awardName" :showHide="showAlert.awardName"  :alertText="alertText.awardName"></alertTip>
+            </li>	
             <li class="clear">
               <label>
                 <h5>颁发机构</h5>
@@ -77,12 +78,15 @@
             </li>
             <li class="clear">
               <label>
-                <h5>评定日期</h5>
+                <h5>*&nbsp;评定日期</h5>
                 <!-- <datepicker v-model="localAward[index].awardingTime"></datepicker> -->
                 <year-month v-model="localAward[index].awardingTime"></year-month>
               </label>
+              <alertTip v-if="showAlert.awardingTime" :showHide="showAlert.awardingTime"  :alertText="alertText.awardingTime"></alertTip>
+              
+            </li>
             <li class="img-wrap clear">
-							<span class="wrap-left">图片展示</span>
+							<h5 class="wrap-left">图片展示</h5>
 							<ul class="imgShow">
 								<li v-for="(item,$ind) in picArr[index]">
 									<img :src="item.pic"/>
@@ -176,23 +180,27 @@
             <h5>*&nbsp;奖励名称</h5>
             <input v-model="newAward.awardName" type="text" placeholder="请输入资格名称">
           </label>
+					<alertTip v-if="showAlert.awardName" :showHide="showAlert.awardName"  :alertText="alertText.awardName"></alertTip>
+          
         </li>
         <li  class="clear">
           <label>
             <h5>颁发机构</h5>
-            <input v-model="newAward.organ" type="text" placeholder="请输入注册单位">
+            <input v-model="newAward.awardingBody" type="text" placeholder="请输入注册单位">
           </label>
         </li>
         <li  class="clear">
           <label>
-            <h5>获奖时间</h5>
+            <h5>*&nbsp;评定日期</h5>
             <!--<input v-model="newAward.info.time" type="month" placeholder="请输入注册单位">-->
             <!-- <datepicker v-model="newAward.time"></datepicker> -->
-            <year-month v-model="newAward.time"></year-month>
+            <year-month v-model="newAward.awardingTime"></year-month>
           </label>
+          <alertTip v-if="showAlert.awardingTime" :showHide="showAlert.awardingTime"  :alertText="alertText.awardingTime"></alertTip>
+          
         </li>
         <li class="img-wrap clear">
-					<span class="wrap-left">图片展示</span>
+					<h5 class="wrap-left">图片展示</h5>
 					<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -280,13 +288,15 @@
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 	import Modal from "../../../assets/js/modal.js"  
+  import alertTip from "../units/alertTip.vue"
   
 
   export default {
     name:"awardIndex",
     components:{
       datepicker,
-      YearMonth
+      YearMonth,
+      alertTip
     },
     data(){
       return {
@@ -304,13 +314,14 @@
         	tag:[],
         },
         deleteModalClass:[],
-        
+        showAlert:{awardName:false,awardingTime:false},//提示框显隐
+	      alertText:{awardName:null,awardingTime:null},
         award:[],
         localAward:[],
         newAward:{
           awardName:"",
-          organ:"",
-          time:"",
+          awardingBody:"",
+          awardingTime:"",
           picId:[],
         },
         picArr:[],//图片展示的数组
@@ -380,6 +391,10 @@
             that.show.tag=[];
 	    	    that.updowntxt=[];
 	    	    that.deleteModalClass = [];
+	    	    that.showAlert.awardName = false;
+	    	    that.alertText.awardName = null;
+	    	    that.showAlert.awardingTime = false;
+	    	    that.alertText.awardingTime = null;
 	    	    
             for(let i=0;i<that.award.length;i++){//拼接fineUploader的ID
               that.fineUploaderId.push("fine-uploader-manual-trigger"+that.localAward[i].pkid);
@@ -489,25 +504,43 @@
       },
       keepAwardEdit(index){//编辑状态，保存按钮
         var that=this;
-        if(this.localAward[index].awardName.trim().length!=0){
-          var url = MyAjax.urlsy+"/psnAwards/update/";
+        let condition = that.localAward[index].awardName.trim().length!=0&&that.localAward[index].awardingTime.trim().length!=0;
+        if(condition){
+        	var url = MyAjax.urlsy+"/psnAwards/update/";
           MyAjax.ajax({
             type: "POST",
             url:url,
             data: JSON.stringify(that.localAward[index]),
             dataType: "json",
             contentType: "application/json;charset=UTF-8",
-            
+            async:false,
           },function(data){
-            //console.log(data)
+              console.log(data)
           },function(err){
             console.log(err)
           })
           that.getData();
-          Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index]);//取消编辑后视图切换回到原来查看页面
-          /*如果是保存，把数据保存到Vuex中*/
-         	$("#"+this.fineUploaderId[index]).html("")
+          Vue.set(that.reveal.editInfo,[index],!that.reveal.editInfo[index]);//取消编辑后视图切换回到原来查看页面
+          setTimeout(()=>(
+          	$("#"+that.fineUploaderId[index]).html("")
+          ),1)
+        }else{
+        	if(that.localAward[index].awardName.trim().length===0){
+        		that.showAlert.awardName = true;
+        		that.alertText.awardName = "请输入奖励名称"
+        	}else{
+        		that.showAlert.awardName = false;
+        		that.alertText.awardName = ""
+        	}
+        	if(that.localAward[index].awardingTime.trim().length===0){
+        		that.showAlert.awardingTime = true;
+        		that.alertText.awardingTime = "请输入评定日期"
+        	}else{
+        		that.showAlert.awardingTime = false;
+        		that.alertText.awardingTime = ""
+        	}
         }
+        
       },
       deleThisPicPromise(id){//封装删除图片的promise，异步操作动态改变可上传数量
       	var that = this;
@@ -559,10 +592,11 @@
       },
       cancelAwardEdit(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
-        this.localAward[index].awardName=this.award[index].awardName;
-        this.localAward[index].awardingBody=this.award[index].awardingBody;
-        this.localAward[index].awardingTime=this.award[index].awardingTime;
+        this.getData();
         /*如果是取消编辑，从新从Vuex中得到数据*/
+       	setTimeout(()=>(
+	      	$("#"+this.fineUploaderId[index]).html("")
+	      ),1)
       },
       awardDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -598,52 +632,57 @@
 	      })
       },
       keepAwardAdd(){//添加模式下的保存
-        if(this.newAward.awardName.length!=0){
-
-          if(this.newAward.awardName.trim().length!=0){
-            Vue.set(this.reveal,"addAward",true);
-            //视图切换到执业资格的首页
-            this.reveal.openOrPrivacyText.push("隐藏")//设置是否对外显示文本
-            var that=this;
-            var url = MyAjax.urlsy+"/psnAwards/insert";
-            MyAjax.ajax({
-              type: "POST",
-              url:url,
-      				data: JSON.stringify({
-                accountID:"string",
-                awardName:that.newAward.awardName,
-                awardingBody:that.newAward.organ,
-                awardingTime:that.newAward.time,
-              }),
-              dataType: "json",
-      			  contentType: "application/json;charset=UTF-8",
-              
-            },function(data){
-              //console.log(data)
-            },function(err){
-              console.log(err)
-            })
-            this.getData();
-            // 从新获取数据
-            
-          }
-        }
-
-        Vue.set(this.newAward,"awardName","");
-        Vue.set(this.newAward,"time","");
-        Vue.set(this.newAward,"organ","");
-        
-        $("#fine-uploader-manual-trigger").html("")
-        /*清除数据，保证下次输入时输入框为空*/
+      	var that=this;
+        let condition = that.newAward.awardName.trim().length!=0&&that.newAward.awardingTime.trim().length!=0;
+      	if(condition){
+      		var url = MyAjax.urlsy+"/psnAwards/insert";
+	        MyAjax.ajax({
+	          type: "POST",
+	          url:url,
+	  				data: JSON.stringify(that.newAward),
+	          dataType: "json",
+	  			  contentType: "application/json;charset=UTF-8",
+	          async:false,
+	        },function(data){
+	          console.log(data)
+	        },function(err){
+	          console.log(err)
+	        })
+	        that.getData();
+	        Vue.set(this.reveal,"addAward",true);
+	        Vue.set(this.newAward,"awardName","");
+	        Vue.set(this.newAward,"awardingTime","");
+	        Vue.set(this.newAward,"awardingBody","");
+	        setTimeout(()=>(
+	        	$("#fine-uploader-manual-trigger").html("")
+	        ),1)
+      	}else{
+      		if(that.newAward.awardName.trim().length===0){
+        		that.showAlert.awardName = true;
+        		that.alertText.awardName = "请输入奖励名称"
+        	}else{
+        		that.showAlert.awardName = false;
+        		that.alertText.awardName = ""
+        	}
+        	if(that.newAward.awardingTime.trim().length===0){
+        		that.showAlert.awardingTime = true;
+        		that.alertText.awardingTime = "请输入评定日期"
+        	}else{
+        		that.showAlert.awardingTime = false;
+        		that.alertText.awardingTime = ""
+        	}
+      	}
       },
       cancelAwardAdd(){
         Vue.set(this.reveal,"addAward",true);
         //视图切换到执业资格的首页
         Vue.set(this.newAward,"awardName","");
-        Vue.set(this.newAward,"time","");
-        Vue.set(this.newAward,"organ","");
+        Vue.set(this.newAward,"awardingTime","");
+        Vue.set(this.newAward,"awardingBody","");
         /*清除数据，保证下次输入时输入框为空*/
-       	$("#fine-uploader-manual-trigger").html("");
+       	setTimeout(()=>(
+	    		$("#fine-uploader-manual-trigger").html("")
+	    	),1)
       }
     }
   }
@@ -907,18 +946,21 @@
           >ul{
             li{
               margin:20px 0;
+              position: relative;
               .wrap-left{
 				      	line-height: 35px;
 				      	text-align: right;
 				      	float: left;
 				      	color:$themeColor;
-				      	margin-right: 35px;
+				      	margin-right:25px;
 				      }
               h5{
                 float: left;
                 line-height: 35px;
                 color: $themeColor;
                 cursor: pointer;
+                width: 90px;
+           		  text-align: right;	
               }
               input{
                 float: left;
@@ -938,17 +980,18 @@
               button{
                 cursor: pointer;
               }
+              .alet_container{
+		          	right: 10px;
+		          	top: 8px;
+		          	bottom: 0;
+		          }
             }
             >li:nth-child(1){
               color: #909090;
               margin-top:30px;
               margin-bottom:20px;
             }
-            >li:nth-child(2){
-              h5{
-                margin-left:-12px;
-              }
-            }
+            
             li.img-wrap{
 		        	/*padding-left: 30px;*/
 		        	.imgShow{
@@ -988,7 +1031,7 @@
 		        		
 		        	}
 		        	>div{
-		        		width: 730px;
+		        		width: 700px;
 		        		float: right;
 		        	}
 		        }
@@ -1034,18 +1077,21 @@
       ul{
         li{
           margin:20px 0;
+          position: relative;
           .wrap-left{
 		      	line-height: 35px;
 		      	text-align: right;
 		      	float: left;
 		      	color:$themeColor;
-		      	margin-right: 35px;
+		      	margin-right: 25px;
 		      }
           h5{
             float: left;
             line-height: 35px;
             color: $themeColor;
             cursor: pointer;
+            width: 90px;
+            text-align: right;
           }
           input{
             float: left;
@@ -1065,21 +1111,22 @@
           button{
             cursor: pointer;
           }
+          .alet_container{
+          	right: 10px;
+          	top: 8px;
+          	bottom: 0;
+          }
         }
         li:nth-child(1){
           color: #909090;
           margin-top:30px;
           margin-bottom:20px;
         }
-        li:nth-child(2){
-          h5{
-            margin-left:-12px;
-          }
-        }
+        
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{
-        		width: 680px;
+        		width: 700px;
         		float: left;
         	}
         }

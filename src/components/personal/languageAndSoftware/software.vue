@@ -65,9 +65,11 @@
             <li>带&nbsp;*&nbsp;号为必选项</li>
             <li class="clear">
               <label>
-                <h5>*&nbsp;语言种类</h5>
+                <h5>*&nbsp;软件名称</h5>
                 <input v-model="localSoftware[index].software" type="text" placeholder="请输入语言种类">
               </label>
+              <alertTip v-if="showAlert.software" :showHide="showAlert.software"  :alertText="alertText.software"></alertTip>
+              
             </li>
             <li class="clear">
               <label>
@@ -170,6 +172,8 @@
             <h5>*&nbsp;软件名称</h5>
             <input v-model="newSoftware.software" type="text" placeholder="请输入软件名称">
           </label>
+          <alertTip v-if="showAlert.software" :showHide="showAlert.software"  :alertText="alertText.software"></alertTip>
+          
         </li>
         <li class="clear">
           <label>
@@ -263,9 +267,14 @@
   import qq from "fine-uploader"
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
-	import Modal from "../../../assets/js/modal.js"  
+	import Modal from "../../../assets/js/modal.js" 
+  import alertTip from "../units/alertTip.vue"
+	
   export default {
     name:"SoftwareIndex",
+    components:{
+    	alertTip
+    },
     data(){
       return {
         title:"软件",
@@ -285,6 +294,8 @@
           picNum:[],
         },
         deleteModalClass:[],
+        showAlert:{software:false},//提示框显隐
+	      alertText:{software:null},
         picInfo:[require("../../../assets/img/images/captainmiao1.jpg"),require("../../../assets/img/images/captainmiao2.jpg")],
         software:[],
         localSoftware:[],
@@ -350,7 +361,8 @@
 	    	that.reveal.openOrPrivacyText = [];
 	    	that.reveal.openOrPrivacy = [];
 	    	that.deleteModalClass = [];
-	    	
+	    	that.showAlert.software = false;
+	    	that.alertText.software = null;
 	    	for(var i=0;i<that.software.length;i++){
 	    		that.fineUploaderId.push("fine-uploader-manual-trigger-software"+that.software[i].pkid);
           that.qqTemplate.push("qq-template-manual-trigger-software"+that.software[i].pkid);
@@ -515,27 +527,37 @@
       softwareEditKeep(index){//编辑状态，保存按钮
         
         var that = this;
-        var url = MyAjax.urlsy+"/psnsoftware/update"
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data: JSON.stringify(that.localSoftware[index]),
-					dataType: "json",
-					contentType:"application/json;charset=utf-8",
-					async: false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})//更新到服务器
-				//保存之后再重新拉取数据
-				that.updateData();
-				if(this.localSoftware[index].length!=0){
-          Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
+        let condition = that.localSoftware[index].software.trim().length!=0;
+        if(condition){
+        	var url = MyAjax.urlsy+"/psnsoftware/update"
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localSoftware[index]),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+						async: false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})//更新到服务器
+					//保存之后再重新拉取数据
+					that.updateData();
+					setTimeout(()=>(
+       			$("#"+that.fineUploaderId[index]).html("")
+          ),1)
+					Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
+        }else{
+        	if(that.localSoftware[index].software.trim().length===0){
+        		that.showAlert.software = true;
+        		that.alertText.software = "请输入软件名称"
+        	}else{
+        		that.showAlert.software = false;
+        		that.alertText.software = ""
+        	}
         }
-
-        $("#"+this.fineUploaderId[index]).html("")
       },
       
       softwareEditCancel(index){//编辑状态，取消按钮
@@ -544,7 +566,10 @@
         this.localSoftware[index]=JSON.parse(JSON.stringify(this.software[index]));
 
         /*如果是取消编辑，从新从Vuex中得到数据*/
-        $("#"+this.fineUploaderId[index]).html("")
+       	setTimeout(()=>(
+	   			$("#"+this.fineUploaderId[index]).html("")
+	      ),1)
+       	this.updateData();
       },
       softwareEditDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -586,38 +611,37 @@
 
       },
       keepNewSoftware(){//添加模式下的保存
-        if(this.newSoftware.software.length!=0){
-						console.log(this.newSoftware);
-            this.localSoftware.push(JSON.parse(JSON.stringify(this.newSoftware)));
-            //同步信息到编辑状态页
-            this.software.push(JSON.parse(JSON.stringify(this.newSoftware)))
-            /*同步信息到个人信息首页*/
-            Vue.set(this.reveal,"addSoftware",true);
-            //视图切换到执业资格的首页
-            /*清除数据，保证下次输入时输入框为空*/
-            this.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-            this.reveal.openOrPrivacy.push(true)//追加显示隐藏按钮状态
-            
+        var that = this;
+        let condition = that.newSoftware.software.trim().length!=0;
+        if(condition){
+        	var url = MyAjax.urlsy+"/psnsoftware/insert";
+	        $.ajaxSetup({ contentType : 'application/json' });
+	        MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.newSoftware),
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+					})
+	        that.updateData();
+					setTimeout(()=>(
+						$("#fine-uploader-manual-trigger-paper").html("")
+        	),1)
+					Vue.set(this.reveal,"addSoftware",true);
+        }else{
+        	if(that.newSoftware.software.trim().length===0){
+        		that.showAlert.software = true;
+        		that.alertText.software = "请输入软件名称"
+        	}else{
+        		that.showAlert.software = false;
+        		that.alertText.software = ""
+        	}
         }
         
-        var that = this;
-//      console.log(that.software[index])
-        var url = MyAjax.urlsy+"/psnsoftware/insert";
-        $.ajaxSetup({ contentType : 'application/json' });
-        MyAjax.ajax({
-					type: "POST",
-					url:url,
-					data:JSON.stringify(that.newSoftware),
-					dataType: "json",
-					async:false,
-				},function(data){
-					console.log(data)
-				},function(err){
-					console.log(err)
-				})
-        that.updateData();
-
-        $("#fine-template-manual-trigger-software").html("")
       },
       cancelNewSoftware(){
         Vue.set(this.reveal,"addSoftware",true);
@@ -625,8 +649,10 @@
         Vue.set(this.newSoftware,"software","");
         Vue.set(this.newSoftware,"proficiency","");
         /*清除数据，保证下次输入时输入框为空*/
-
-       $("#fine-template-manual-trigger-software").html("")
+				setTimeout(()=>(
+					$("#fine-uploader-manual-trigger-paper").html("")
+	    	),1)
+				this.updateData();
       }
     }
   }
@@ -845,6 +871,7 @@
           >ul{
             >li{
               margin:20px 0;
+              position: relative;
               .wrap-left{
 				      	line-height: 35px;
 				      	text-align: right;
@@ -876,6 +903,11 @@
               button{
                 cursor: pointer;
               }
+              .alet_container{
+				      	right: 10px;
+				      	top: 8px;
+				      	bottom: 0;
+				      }
             }
             li:nth-child(1){
               color: #909090;
@@ -937,6 +969,7 @@
       >ul{
        > li{
           margin:20px 0;
+          position: relative;
           .wrap-left{
 		      	line-height: 35px;
 		      	text-align: right;
@@ -968,6 +1001,11 @@
           button{
             cursor: pointer;
           }
+          .alet_container{
+		      	right: 10px;
+		      	top: 8px;
+		      	bottom: 0;
+		      }
         }
         li:nth-child(1){
           color: #909090;

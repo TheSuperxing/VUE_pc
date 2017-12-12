@@ -73,6 +73,8 @@
                 <h5>*&nbsp;专利名称</h5>
                 <input v-model="localPatent[index].patentName" type="text" placeholder="请输入专利名称">
               </label>
+              <alertTip v-if="showAlert.patentName" :showHide="showAlert.patentName"  :alertText="alertText.patentName"></alertTip>
+              
             </li>
             <li class="clear">
               <label>
@@ -82,7 +84,7 @@
             </li>
             <li class="clear">
               <label>
-                <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
+                <h5>*&nbsp;有&nbsp;效&nbsp;期&nbsp;</h5>
                 <!--<input v-model="localPatent.info.time[index]" type="month">-->
                 <!-- <datepicker v-model="localPatent[index].validityTermS"></datepicker> -->
                 <year-month v-model="localPatent[index].validityTermS"></year-month>
@@ -90,9 +92,11 @@
                 <!-- <datepicker v-model="localPatent[index].validityTermE"></datepicker> -->
                 <year-month v-model="localPatent[index].validityTermE" :min="localPatent[index].validityTermS" :today="true"></year-month>
               </label>
+              <alertTip v-if="showAlert.validityTerm" :showHide="showAlert.validityTerm"  :alertText="alertText.validityTerm"></alertTip>
+              
             </li>
             <li class="img-wrap clear">
-							<span class="wrap-left">图片展示</span>
+							<h5 class="wrap-left">图片展示</h5>
 							
               <div class="picListCont">
                 <div class="picList" v-for="(item,$index) in show.picList[index]">
@@ -186,6 +190,8 @@
             <h5>*&nbsp;专利名称</h5>
             <input v-model="newPatent.patentName" type="text" placeholder="请输入论文">
           </label>
+          <alertTip v-if="showAlert.patentName" :showHide="showAlert.patentName"  :alertText="alertText.patentName"></alertTip>
+          
         </li>
         <li  class="clear">
           <label>
@@ -195,7 +201,7 @@
         </li>
         <li  class="clear">
           <label>
-            <h5>有&nbsp;效&nbsp;期&nbsp;</h5>
+            <h5>*&nbsp;有&nbsp;效&nbsp;期&nbsp;</h5>
             <!--<input v-model="newPatent.info.time" type="month" placeholder="请输入发表时间">-->
             <!-- <datepicker v-model="newPatent.validityTermS"></datepicker> -->
             <year-month v-model="newPatent.validityTermS"></year-month> 
@@ -203,9 +209,11 @@
             <!-- <datepicker v-model="newPatent.validityTermE"></datepicker> -->
             <year-month v-model="newPatent.validityTermE" :min="newPatent.validityTermS" :today="true"></year-month>
           </label>
+          <alertTip v-if="showAlert.validityTerm" :showHide="showAlert.validityTerm"  :alertText="alertText.validityTerm"></alertTip>
+          
         </li>
         <li class="img-wrap clear">
-					<span class="wrap-left">图片展示</span>
+					<h5 class="wrap-left">图片展示</h5>
 					
 					<script type="text/template" id="qq-template-manual-trigger-patent">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -294,12 +302,13 @@
   import MyAjax from "../../../assets/js/MyAjax.js"
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
 	import Modal from "../../../assets/js/modal.js"  
-
+  import alertTip from "../units/alertTip.vue"
   export default {
     name:"PatentIndex",
     components:{
       datepicker,
-      YearMonth
+      YearMonth,
+      alertTip
     },
     data(){
       return {
@@ -319,6 +328,8 @@
           picNum:[],
         },
         deleteModalClass:[],
+        showAlert:{patentName:false,validityTerm:false},//提示框显隐
+	      alertText:{patentName:null,validityTerm:null},
         patent:[],
         localPatent:[],
         newPatent:{
@@ -395,6 +406,10 @@
 				that.qqTriggerUpload = [];
 				that.updowntxt = [];
 	    	that.deleteModalClass = [];
+				that.showAlert.patentName = false;
+				that.alertText.patentName = null;
+				that.showAlert.validityTerm = false;
+				that.alertText.validityTerm = null;
 				
         //数据库的数据放本地一份
         for(var i=0;i<that.patent.length;i++){
@@ -551,8 +566,9 @@
       },
       paperEditKeep(index){//编辑状态，保存按钮
         var that=this;
-        if(this.localPatent[index].patentName.trim().length!=0){
-          var url = MyAjax.urlsy+"/psnPaperPatent/updatePatent";
+        let condition = that.localPatent[index].patentName.trim().length!=0&&(that.localPatent[index].validityTermS.trim().length!=0||that.localPatent[index].validityTermE.trim().length!=0);
+        if(condition){
+        	var url = MyAjax.urlsy+"/psnPaperPatent/updatePatent";
           MyAjax.ajax({
             type: "POST",
             url:url,
@@ -567,9 +583,26 @@
           })
           that.getData();
           Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//确认编辑后视图切换回到原来查看页面
+          setTimeout(()=>(
+       			$("#"+that.fineUploaderId[index]).html("")
+          ),1)
+        }else{
+        	if(that.localPatent[index].patentName.trim().length===0){
+        		that.showAlert.patentName = true;
+        		that.alertText.patentName = "请输入专利名称"
+        	}else{
+        		that.showAlert.patentName = false;
+        		that.alertText.patentName = ""
+        	}
+        	if(that.localPatent[index].validityTermS.trim().length===0||that.localPatent[index].validityTermE.trim().length===0){
+        		that.showAlert.validityTerm = true;
+        		that.alertText.validityTerm = "请输入有效期"
+        	}else{
+        		that.showAlert.validityTerm = false;
+        		that.alertText.validityTerm = ""
+        	}
         }
-
-        $("#"+this.fineUploaderId[index]).html("")
+        
       },
       paperEditCancel(index){//编辑状态，取消按钮
         Vue.set(this.reveal.editInfo,[index],!this.reveal.editInfo[index])//取消编辑后视图切换回到原来查看页面
@@ -579,7 +612,9 @@
         this.localPatent[index].validityTermE=this.patent[index].validityTermE;
        
         /*如果是取消编辑，从新从Vuex中得到数据*/
-         $("#"+this.fineUploaderId[index]).html("")
+       	setTimeout(()=>(
+   				$("#"+this.fineUploaderId[index]).html("")
+     		),1)
       },
       paperEditDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -617,41 +652,49 @@
         })
       },
       keepNewPatent(){//添加模式下的保存
-        if(this.newPatent.patentName.length!=0){
-          if(this.newPatent.patentName.trim().length!=0){
-            var that=this;
-            var url = MyAjax.urlsy+"/psnPaperPatent/insertPatent";
-            MyAjax.ajax({
-              type: "POST",
-              url:url,
-      				data: JSON.stringify(that.newPatent),
-              dataType: "json",
-      			  contentType: "application/json;charset=UTF-8",
-              async:false,
-            },function(data){
+      	var that = this;
+      	let condition = that.newPatent.patentName.trim().length!=0&&(that.newPatent.validityTermS.trim().length!=0||that.newPatent.validityTermE.trim().length!=0);
+      	if(condition){
+      		var url = MyAjax.urlsy+"/psnPaperPatent/insertPatent";
+	        MyAjax.ajax({
+	          type: "POST",
+	          url:url,
+	  				data: JSON.stringify(that.newPatent),
+	          dataType: "json",
+	  			  contentType: "application/json;charset=UTF-8",
+	          async:false,
+	        },function(data){
 	            console.log(data)
 	            if(data.code===0){
 	            	that.getData();
 	            }
-            },function(err){
-              console.log(err)
-            })
-            
-            // 从新获取数据
-            
-            
-            Vue.set(that.reveal,"addPatent",true);
-            //视图切换到执业资格的首页
-            
-            that.reveal.openOrPrivacyText.push("显示")//追加显示隐藏按钮文字
-            //this.reveal.openOrPrivacy.push(false)//追加显示隐藏按钮状态
-          }
-        }
-        Vue.set(this.newPatent,"patentName","");
-        Vue.set(this.newPatent,"organ","");
-        Vue.set(this.newPatent,"time","");
-        /*清除数据，保证下次输入时输入框为空*/
-        $("#fine-uploader-manual-trigger-patent").html("")
+	        },function(err){
+	          console.log(err)
+	        })
+	        Vue.set(that.reveal,"addPatent",true);
+	        Vue.set(this.newPatent,"patentName","");
+	        Vue.set(this.newPatent,"organ","");
+	        Vue.set(this.newPatent,"time","");
+	        setTimeout(()=>(
+						$("#fine-uploader-manual-trigger-paper").html("")
+        	),1)
+      	}else{
+      		if(that.newPatent.patentName.trim().length===0){
+        		that.showAlert.patentName = true;
+        		that.alertText.patentName = "请输入专利名称"
+        	}else{
+        		that.showAlert.patentName = false;
+        		that.alertText.patentName = ""
+        	}
+        	if(that.newPatent.validityTermS.trim().length===0||that.newPatent.validityTermE.trim().length===0){
+        		that.showAlert.validityTerm = true;
+        		that.alertText.validityTerm = "请输入有效期"
+        	}else{
+        		that.showAlert.validityTerm = false;
+        		that.alertText.validityTerm = ""
+        	}
+      	}
+        
       },
       cancelNewPatent(){
         Vue.set(this.reveal,"addPatent",true);
@@ -660,7 +703,10 @@
         Vue.set(this.newPatent,"organ","");
         Vue.set(this.newPatent,"time","");
         /*清除数据，保证下次输入时输入框为空*/
-        $("#fine-uploader-manual-trigger-patent").html("")
+       	setTimeout(()=>(
+					$("#fine-uploader-manual-trigger-paper").html("")
+	    	),1)
+       	this.getData()
       }
     }
   }
@@ -880,18 +926,21 @@
           ul{
             li{
               margin:20px 0;
+              position: relative;
               .wrap-left{
 				      	line-height: 35px;
 				      	text-align: right;
 				      	float: left;
 				      	color:$themeColor;
-				      	margin-right: 35px;
+				      	margin-right: 25px;
 				      }
               h5{
                 float: left;
                 line-height: 35px;
                 color: $themeColor;
                 cursor: pointer;
+                width: 90px;
+                text-align: right;
               }
               input{
                 float: left;
@@ -916,6 +965,11 @@
                 height: 31px;
                 line-height: 31px;
               }
+              .alet_container{
+				      	right: 10px;
+				      	top: 8px;
+				      	bottom: 0;
+				      }
               .year-month{
                 float: left;
                 margin-left: 22px;
@@ -927,15 +981,11 @@
               margin-top:30px;
               margin-bottom:20px;
             }
-            li:nth-child(2){
-              h5{
-                margin-left:-12px;
-              }
-            }
+            
             li.img-wrap{
 		        	/*padding-left: 30px;*/
 		        	>div{
-		        		width: 720px;
+		        		width: 700px;
 		        		float: right;
 		        	}
 
@@ -982,18 +1032,21 @@
       >ul{
         li{
           margin:20px 0;
+          position: relative;
           .wrap-left{
 		      	line-height: 35px;
 		      	text-align: right;
 		      	float: left;
 		      	color:$themeColor;
-		      	margin-right: 35px;
+		      	margin-right: 25px;
 		      }
           h5{
             float: left;
             line-height: 35px;
             color: $themeColor;
             cursor: pointer;
+            width: 90px;
+            text-align: right;
           }
           input{
             float: left;
@@ -1018,6 +1071,11 @@
             height: 31px;
             line-height: 31px;
           }
+          .alet_container{
+		      	right: 10px;
+		      	top: 8px;
+		      	bottom: 0;
+		      }
           .year-month{
             float: left;
             margin-right: 22px;
@@ -1028,11 +1086,7 @@
           margin-top:30px;
           margin-bottom:20px;
         }
-        li:nth-child(2){
-          h5{
-            margin-left:-12px;
-          }
-        }
+        
         li.img-wrap{
         	/*padding-left: 30px;*/
         	>div{

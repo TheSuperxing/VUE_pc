@@ -184,7 +184,7 @@
             this.year = this.tmpYear
             this.month = this.tmpMonth
             this.date = date.value
-            let value = `${this.tmpYear}-${('0' + (this.month + 1)).slice(-2)}-${('0' + this.date).slice(-2)}`
+            let value = `${this.tmpYear}.${('0' + (this.month + 1)).slice(-2)}.${('0' + this.date).slice(-2)}`
             this.$emit('input', value)
             this.panelState = false
           }else if(this.range && !this.rangeStart){
@@ -211,7 +211,7 @@
               this.tmpStartMonth = tmpM
               this.tmpStartDate = tmpD
             }
-            let RangeStart = `${this.tmpStartYear}-${('0' + (this.tmpStartMonth + 1)).slice(-2)}-${('0' + this.tmpStartDate).slice(-2)}`
+            let RangeStart = `${this.tmpStartYear}.${('0' + (this.tmpStartMonth + 1)).slice(-2)}.${('0' + this.tmpStartDate).slice(-2)}`
             let RangeEnd = `${this.tmpEndYear}-${('0' + (this.tmpEndMonth + 1)).slice(-2)}-${('0' + this.tmpEndDate).slice(-2)}`
             let value = [RangeStart, RangeEnd]
             this.$emit('input', value)

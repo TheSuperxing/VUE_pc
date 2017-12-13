@@ -12,7 +12,7 @@
 				<p>如您修改其中内容，已添加过的该项目信息也会随之变化</p>
 				<div class="btnBox">
 					<span class="cancelBtn" @click="closeModalA">取消</span>
-					<span class="confirmBtn" @click="closeModalA">确认</span>
+					<span class="confirmBtn" @click="closeModalA()">确认</span>
 				</div>
 			</div>
 		</div>
@@ -240,11 +240,12 @@
 			
 		
 			
-			if(that.project.ifPublish==false){
+			if(that.project.ifPublish==0){
 				that.isMine = true;
-			}else{
+			}else if(that.project.ifPublish==1){
 				that.isMine = false;
-			}
+			}//判断是否为本人创建的项目，”是isMine“就可以编辑
+			
 	    	function emptyText(text) {
 			    if(text == null||text.length == 0){
 			      return "（暂无信息）";
@@ -358,9 +359,10 @@
 	    		var modal = $('.modal-a')
 				Modal.makeText(modal)
 			},
-			closeModalA(){
+			closeModalA(id){
 				var modal = $('.modal-a')
 				Modal.closeModal(modal)
+				router.push({name:"definedProject",query:{proId:this.projectID,psnId:this.psnProExpeID}})
 			},
 			dutyWrap(){
 				let condition=this.project.takeOffice.length!=0
@@ -562,7 +564,7 @@ $activeColor: rgb(242,117,25);
 					line-height: 40px;
 					text-align: center;
 					vertical-align: middle;
-					font-size: 18px;
+					font-size: 16px;
 					border-radius: 5px;
 					cursor: pointer;
 			

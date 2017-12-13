@@ -47,13 +47,13 @@
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
         <li class="clear">
-        	<h5>支付宝账号:</h5>
+        	<h5>支付宝账号 :</h5>
         	<p>{{baseInfo.alipayAccount}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[5]}" v-on:click="openOrPrivacy(5)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
         <li class="clear">
-        	<h5>微信账号:</h5>
+        	<h5>微信账号 :</h5>
         	<p>{{baseInfo.wechatAccount}}</p>
           <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[5]}" v-on:click="openOrPrivacy(5)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>

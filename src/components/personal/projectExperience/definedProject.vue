@@ -13,7 +13,7 @@
 			</li>
 			<li class="place-wrap">
 				<span class="table-wrap-left">* 项目地址</span>
-				<provinces-city v-on:accpt-province-change="changeProjectAds"></provinces-city>
+				<provinces-city :accptProvince="projectInfo.projectPlaceObj" v-on:accpt-province-change="changeProjectAds"></provinces-city>
 				
 				
 			</li>
@@ -42,7 +42,10 @@
 						<em></em>
 						<p>{{item}}</p>
 					</label>
-					
+					<!--<label  v-for="(item,index) in projectInfo.architectFunctions" v-on:click="changeProjectTypeColor(index)" v-bind:class="{projectTypeColor:projectTypeColor[index]}">
+						<em></em>
+						<p>{{item}}</p>
+					</label>-->
 					<label><em></em><input type="text" placeholder="可自行填写建筑功能" @blur="keepAddProjectTypeName" v-model="addProjectType.value"/></label>
 				</div>
 			</li>
@@ -61,8 +64,8 @@
 				<alertTip v-if="showAlert.parTakeTime" :showHide="showAlert.parTakeTime" @closeTip="closeTip" :alertText="alertText.parTakeTime"></alertTip>
 			</li>
 			<li class="duty-wrap">
-				<span class="table-wrap-left">* 公司职责</span>
-				<input type="text" placeholder="请输入公司在项目中所属职位" maxlength="30"  v-model="projectInfo.takeOffice"/>
+				<span class="table-wrap-left">* 项目职责</span>
+				<input type="text" placeholder="请输入在项目中所属职位" maxlength="30"  v-model="projectInfo.takeOffice"/>
 				<p class="limit-words">{{dutycont}}/30</p>
 				<alertTip v-if="showAlert.takeOffice" :showHide="showAlert.takeOffice" @closeTip="closeTip" :alertText="alertText.takeOffice"></alertTip>
 			</li>
@@ -74,6 +77,12 @@
 			</li>
 			<li class="img-wrap">
 				<span class="table-wrap-left">图片展示</span>
+				<div class="picListCont">
+					<div class="picList" v-for="(item,$index) in picList">
+						<img :src="item.pic" alt="">
+						<button @click="deletePic(index,$index)"></button>
+					</div>
+				</div>
 				<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!-- <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -191,9 +200,16 @@
             projectStateColor:[],//项目状态的选中(单选)
             projectTypeColor:[],//建筑功能的选中(多选)
 	        complated:false,//项目状态在建或者是建成的标志，控制建成时间的可操作性
+	        exceedProjectType:false,
+	        
 	        projectInfo:{//新增的项目信息采集
 	        	projectName:"",//同步到项目主页的信息 (必填*)
-				projectPlaceObj:{},//项目地址
+				projectPlaceObj:{
+					city:"北京市",
+					county:"东城区",
+					province:"北京市",
+					street:"",
+				},//项目地址
 				projectState:"",//项目状态projectState
 				completeTime:"",//同步到项目主页的信息 (必填*)
 				architectFunctions:[],//建筑功能种类projectType
@@ -205,40 +221,192 @@
 				"ifVisable": 1,
 				picId:[],//上传图片返回的ID
 	        },
+	        picList:[],
 	        picNum:"",
 	      }
 	    },
-	    mounted(){
-			//载入页面的时候就把项目地址的onchange事件调用一次  完成赋值
-	    	this.projectInfo.projectPlaceObj = {
-				city:"北京市",
-				county:"东城区",
-				province:"北京市",
-				street:"",
-	    	}
-			var that=this;
-	    	$(document.body).css("overflow","scroll");
+	    created(){
+	    	var that = this;
+			that.projectID = that.$route.query.proId;
+			that.psnProExpeID = that.$route.query.psnId;
+			
+			if(that.psnProExpeID == undefined){
+				that.psnProExpeID = '""';
+			}
+			if(that.projectID == undefined){
+				that.projectID = '""';
+			}
+			var url = MyAjax.urlsy+"/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
+	    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				async:false,
+			},function(data){
+				if(data.code==-1){
+					Vue.set(that,"projectInfo",that.projectInfo)
+				}else if(data.code==0){
+					console.log(data.msg)
+					
+					Vue.set(that,"projectInfo",data.msg)
+					that.projectInfo.picId=[];
+				}
+				
+				console.log(that.projectInfo)
+			},function(err){
+				console.log(err)
+			})
+	    	if(that.projectInfo.partakeTimeDown=="0002.12"){
+			 	that.projectInfo.partakeTimeDown = "至今";
+			}
 	    	for(var i=0;i<this.addNewProject.projectState.length;i++){
 	    		this.projectStateColor.push(false)
 	    	};
 	    	for(var i=0;i<this.addNewProject.projectType.length;i++){
 	    		this.projectTypeColor.push(false)
 	    	}
+	    	switch (that.projectInfo.projectState){
+	    		case "建成":
+	    			Vue.set(that.projectStateColor,[0],true)
+	    			break;
+	    		case "在建":
+	    			Vue.set(that.projectStateColor,[1],true)
+	    			break;
+	    		case "未建":
+	    			Vue.set(that.projectStateColor,[2],true)
+	    			break;
+	    		default:
+	    			break;
+	    	}
+	    	if(that.addNewProject.projectType.length<that.projectInfo.architectFunctions.length){
+	    		Vue.set(that,"exceedProjectType",true)//项目建筑功能类型超过原有平台展示的
+	    	}else{
+	    		Vue.set(that,"exceedProjectType",false)
+	    	}
+			var flag=[];
+	    	for(let i=0;i<that.projectInfo.architectFunctions.length;i++){
+	    		flag[i]=false;
+	    		for(let j=0;j<that.addNewProject.projectType.length;j++){
+					if(that.projectInfo.architectFunctions[i]==that.addNewProject.projectType[j]){
+						flag[i]=true;
+						console.log(flag[i]+"________");
+						
+					}
+	    			
+	    		}
+	    		if(!flag[i]){
+	    			that.addNewProject.projectType.push(that.projectInfo.architectFunctions[i])//添加到建筑功能列表里
+	    			that.projectTypeColor.push(true);//使得新添加的建筑功能被选中
+	    		}
+	    		switch (that.projectInfo.architectFunctions[i]){
+		    		case "绿地":
+		    			Vue.set(that.projectTypeColor,[0],true)
+		    			break;
+		    		case "公园":
+		    			Vue.set(that.projectTypeColor,[1],true)
+		    			break;
+		    		case "住宅":
+		    			Vue.set(that.projectTypeColor,[2],true)
+		    			break;
+		    		case "写字楼":
+		    			Vue.set(that.projectTypeColor,[3],true)
+		    			break;
+		    		case "交通枢纽":
+		    			Vue.set(that.projectTypeColor,[4],true)
+		    			break;
+		    		case "文化场馆":
+		    			Vue.set(that.projectTypeColor,[5],true)
+		    			break;
+		    		case "体育场馆":
+		    			Vue.set(that.projectTypeColor,[6],true)
+		    			break;
+		    		case "展示中心":
+		    			Vue.set(that.projectTypeColor,[7],true)
+		    			break;
+		    		default:
+		    			break;
+		    	}
+	    		that.addNewProject.projectType.push.apply(that.addNewProject.projectType,[])//去重
+	    		console.log(that.addNewProject.projectType)
+	    	}
+	    	
+	    	
+	    },
+	    async mounted(){
 			
+			
+			$(document.body).css("overflow-y","scroll");
+			var that = this;
 			//上传图片
-			singleManualUploader({
-				element:"fine-uploader-manual-trigger",
-        		template: "qq-template-manual-trigger",
-				url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
-				picIdCont:that.projectInfo.picId,
-				btnPrimary:".btn-primary",
-				canUploadNum:Math.floor(3-that.picNum),
-			})
-		},
+			const data = await that.getPic(that.psnProExpeID)
+			if(data.code===0){
+				Vue.set(that,"picList",data.msg)
+			    Vue.set(that,"picNum",data.msg.length)
+			}
+			console.log(that.picList)
+			console.log(that.picNum)
+			console.log(Math.floor(8-that.picNum))
+			if(Math.floor(8-that.picNum)>0){
+				singleManualUploader({
+					element:"fine-uploader-manual-trigger",
+	        		template: "qq-template-manual-trigger",
+					url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+					picIdCont:that.projectInfo.picId,
+					btnPrimary:".btn-primary",
+					canUploadNum:Math.floor(8-that.picNum),
+				})
+			}
+	    },
 		methods: {
+			getPic(psnProExpeID){
+				var that=this;
+				var url=MyAjax.urlsy+"/psnProjExpe/findById/"+psnProExpeID;
+				return new Promise((resolve, reject) => {
+					MyAjax.ajax({
+				        type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				    	resolve(data)
+				    },(err) => {
+				        reject(err);
+					});
+				})
+			},
+			async deletePic(index,$index){
+				var that =this;
+				var url = MyAjax.urlsy+"/psnProjExpe/delPic/"+this.picList[$index].id
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					dataType: "json",
+					async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+				})
+				const data = await that.getPic(that.psnProExpeID) 
+				if(data.code===0){
+					Vue.set(that,"picList",data.msg)
+				    Vue.set(that,"picNum",data.msg.length)
+				}
+				$("#fine-uploader-manual-trigger").html("")
+				if(Math.floor(8-that.picNum)>0){
+					singleManualUploader({
+						element:"fine-uploader-manual-trigger",
+		        		template: "qq-template-manual-trigger",
+						url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+						picIdCont:that.projectInfo.picId,
+						btnPrimary:".btn-primary",
+						canUploadNum:Math.floor(8-that.picNum),
+					})
+				}
+			},
 		    changeProjectAds(val){//通过事件同步子组件信息
 		        this.projectInfo.projectPlaceObj=val;
-		        console.log(this.projectInfo.projectPlaceObj)
+		        //console.log(this.projectInfo.projectPlaceObj)
 		    },
 		    changeProjectStateColor(index){//添加模式下，标记项目状态选中
 			    for(var i=0 ; i<this.addNewProject.projectState.length ; i++){
@@ -278,13 +446,14 @@
 			    }
 			},
 			keepAddProjectTypeName(){//添加模式下，建筑功能的扩展的保存
-		        Vue.set(this.addProjectType,"type",false);
-		        if(this.addProjectType.value.trim()!=''){
-		          this.addNewProject.projectType.push(this.addProjectType.value)//添加到建筑功能列表里
-		          this.projectInfo.architectFunctions.push(this.addProjectType.value);//更改项目建筑功能名
-			      this.projectInfo.architectFunctions.push.apply(this.projectInfo.architectFunctions,[])//去重
-		          Vue.set(this.addProjectType,"value","");//清空input框的内容
-		          this.projectTypeColor.push(true);//使得新添加的建筑功能被选中
+				var that = this;
+		        Vue.set(that.addProjectType,"type",false);
+		        if(that.addProjectType.value.trim()!=''){
+		          that.addNewProject.projectType.push(that.addProjectType.value)//添加到建筑功能列表里
+		          that.projectInfo.architectFunctions.push(that.addProjectType.value);//更改项目建筑功能名
+			      that.projectInfo.architectFunctions.push.apply(that.projectInfo.architectFunctions,[])//去重
+		          Vue.set(that.addProjectType,"value","");//清空input框的内容
+		          that.projectTypeColor.push(true);//使得新添加的建筑功能被选中
 		          
 		        }
 		
@@ -322,10 +491,14 @@
 				}else{
 					this.showAlert.takeOffice = false;
 				};//判断项目职责不能为空
-				if(this.complated=false){//判断是否为在建，在建的话建成时间为必填
+				if(this.complated==false){//判断是否为在建，在建的话建成时间为必填
+					console.log(this.complated)
 					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.completeTime.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
 					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0&&this.projectInfo.projectPlaceObj.street.trim().length!=0){
 						var that = this;
+						if(that.projectInfo.partakeTimeDown=="至今"){
+							that.projectInfo.partakeTimeDown = "0000.00";
+						}
 					    console.log(JSON.stringify(that.projectInfo))
 					    var url = MyAjax.urlsy+"/psnProjExpe/insertProjAndProjExpe";
 					    $.ajaxSetup({ contentType : 'application/json' });
@@ -334,7 +507,7 @@
 							url:url,
 							data:JSON.stringify(that.projectInfo),
 							dataType: "json",
-							
+							async:false,
 						},function(data){
 							console.log(data)
 							if(data.code == 0){
@@ -350,6 +523,9 @@
 					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
 					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0&&this.projectInfo.projectPlaceObj.street.trim().length!=0){
 						var that = this;
+						if(that.projectInfo.partakeTimeDown=="至今"){
+							that.projectInfo.partakeTimeDown = "0000.00";
+						}
 					    console.log(JSON.stringify(that.projectInfo))
 					    var url = MyAjax.urlsy+"/psnProjExpe/insertProjAndProjExpe";
 					    $.ajaxSetup({ contentType : 'application/json' });
@@ -358,7 +534,7 @@
 							url:url,
 							data:JSON.stringify(that.projectInfo),
 							dataType: "json",
-							
+							async:false,
 						},function(data){
 							console.log(data)
 							if(data.code == 0){
@@ -393,6 +569,7 @@
 	    	this.procont = num3;
             if(this.projectInfo.projectState=="在建"||this.projectInfo.projectState=="未建"){
             	this.complated = true;//true表示在建状态  建成时间不可选
+            	this.projectInfo.completeTime="";
             }else{
             	this.complated = false;
             }
@@ -698,7 +875,7 @@ $activeColor: rgb(242,117,25);
 						text-indent: 8px;
 						border-radius: 5px;
 						color: #353535;
-						padding: 5px 0;
+						padding: 5px;
 						text-align: justify;
 					}
 					.limit-words{
@@ -714,6 +891,34 @@ $activeColor: rgb(242,117,25);
 					.table-wrap-left{
 						float: left;
 						margin-top: 40px;
+					}
+					.picListCont{
+						width: 700px;
+						float: left;
+						.picList{
+							float: left;
+							width: 200px;
+							height: 200px;
+							padding: 8px;
+							background: rgba(210,210,210,.3);
+							border-radius: 10px;
+							margin-left: 10px;
+							margin-bottom: 10px;
+							position: relative;
+							img{
+								width: 182px;
+							}
+							button{
+								border-style: none;
+								width: 21px;
+								height: 21px;
+								position: absolute;
+								top: 10px;
+								right: 10px;
+								cursor: pointer;
+								background: url("../../../assets/img/personal/common/picDelete.png") no-repeat center;
+							}
+						}
 					}
 					.img-show{
 						float: left;

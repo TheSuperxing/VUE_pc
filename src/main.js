@@ -1,6 +1,6 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import 'babel-polyfill'
+import 'babel-polyfill'//IE打包样式丢失问题，可能是babel-polyfillnode模块装载的位置有关
 import Vue from 'vue'
 import App from './App'
 import router from './router'

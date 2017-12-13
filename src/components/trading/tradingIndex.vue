@@ -11,7 +11,7 @@
 				<li>需求对象</li>
 			</ul>
 			<ul class="result-list">
-				<li class="list-wrap">
+				<!-- <li class="list-wrap">
 					<div><router-link :to="{name:'DemandDetail',query:{id:'000'}}">一个需求</router-link></div>
 					<div>2017.10.26</div>
 					<div>8000</div>
@@ -26,18 +26,18 @@
 							收藏
 						</span>
 					</div>
-				</li>
-				<li v-for="item in dataInfo" class="list-wrap">
+				</li> -->
+				<li v-for="(item,index) in dataInfo" class="list-wrap">
 					<div><router-link :to="{name:'DemandDetail',query:{id:'000'}}">{{item.goodsName}}</router-link></div>
 					<div>{{item.discount}}</div>
 					<div>{{item.price}}</div>
 					<div>{{item.discount}}/{{item.price}}</div>
 					<div class="obj-wrap"><span class="demandObj">{{item.className}}<i>;</i></span><span class="demandObj">{{item.className}}<i>;</i></span></div>
 					<div class="collect">
-						<span class="cancelBtn" @click="cancelCollect()" v-if="haveCollect">
+						<span class="cancelBtn" @click="cancelCollect(index)" v-if="haveCollect[index]">
 							取消收藏
 						</span>
-						<span class="collectBtn" v-if="!haveCollect" @click="collectThis()">
+						<span class="collectBtn" v-if="!haveCollect[index]" @click="collectThis(index)">
 							<img src="../../assets/img/demand/icon002.png"/>
 							收藏
 						</span>
@@ -82,7 +82,7 @@
 		        goodsIArr:[],
 		        goodsTArr:[],
 		        dataInfo:[],
-		        haveCollect:false,//有没有在收藏里
+		        haveCollect:[],//有没有在收藏里
 		    }
         },
         mounted() {
@@ -97,7 +97,6 @@
 //			},function(err){
 //				console.log(err)
 //			})
-			console.log(MyAjax.ajax)
 			MyAjax.ajax({
 				type: "POST",
 				url:url,
@@ -107,9 +106,11 @@
 //				data = data.replace("callback(","").slice(0,-1);
 //				data = data.slice(0,-1);
 //				data = JSON.parse(data);
-				console.log(data)
 				that.dataInfo = data;
-				console.log(that.dataInfo)
+				for(let i=0;i<data.length;i++){
+					that.haveCollect.push(false)
+				}
+				console.log(that.haveCollect)
 			},function(err){
 				console.log(err)
 			})
@@ -192,25 +193,25 @@
 					}
 				})
     		},
-    		pagePlus() {
+    		pagePlus() {//向上翻页
     			this.current_page++;
 //  			return this.current_page;
     		},
-    		pageMinus() {
+    		pageMinus() {//向上翻页
     			this.current_page--;
 //  			return this.current_page;
     		},
-    		cancelCollect(){//取消收藏
+    		cancelCollect(index){//取消收藏
 //				for(let i=0;i<this.colletionInfo.length;i++){
 //					if(id==this.colletionInfo[i].id){
 //						this.colletionInfo.splice(i,1)
 //					}
 //				}
-				console.log(this.colletionInfo)
-				this.haveCollect = false;
+				Vue.set(this.haveCollect,[index],false)
+				//this.haveCollect[index] = false;
 
 			},
-			collectThis(){
+			collectThis(index){//收藏这条
 //				for(let i=0;i<this.colletionInfo.length;i++){
 //					if(id==this.colletionInfo[i].id){
 //						this.colletionInfo.splice(i,1,this.detailInfo)
@@ -218,8 +219,8 @@
 //						this.colletionInfo.push(this.detailInfo)
 //					}
 //				}
-				console.log(this.colletionInfo)
-				this.haveCollect = true;
+				Vue.set(this.haveCollect,[index],true)
+				//this.haveCollect[index] = true;
 			},
     	},
     	watch:{

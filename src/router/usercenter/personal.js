@@ -61,7 +61,7 @@ var personalRouterChildren=[
 				      	    path:"/yhzx/personal/info/personalProject/editProject",component:editProject,name:'editPerProject'
 				      	},
 				        {
-				      		path:"/yhzx/personal/info/personalProject/definedProject",component:definedProject
+				      		path:"/yhzx/personal/info/personalProject/definedProject",component:definedProject,name:'definedProject'
 				        },
 //				        {
 //				      		path:"/yhzx/personal/info/personalProject/detail",component:comProDetail,

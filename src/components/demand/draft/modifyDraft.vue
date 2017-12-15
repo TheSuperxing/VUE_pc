@@ -4,13 +4,13 @@
 		<ul class="edit_table">
 			<li>
 				<p class="wrap-left">*需求名称</p>
-				<input type="text" placeholder="请输入需求名称..." v-model="DemandInfo.name"/>
+				<input type="text" placeholder="请输入需求名称..." v-model="DemandInfo.demandbasicinfo.demandName"/>
 				<alertTip v-if="showAlert.name" :showHide="showAlert.name" @closeTip="closeTip" :alertText="alertText.name"></alertTip>
 				
 			</li>
 			<li>
 				<p class="wrap-left">*需求描述</p>
-				<textarea maxlength="500" placeholder="请输入 需求详细描述文案..." v-model="DemandInfo.describe"></textarea>
+				<textarea maxlength="500" placeholder="请输入 需求详细描述文案..." v-model="DemandInfo.demandbasicinfo.describe"></textarea>
 				<span>{{describeCont}}/500</span>
 				<alertTip v-if="showAlert.describe" :showHide="showAlert.describe" @closeTip="closeTip" :alertText="alertText.describe"></alertTip>
 				
@@ -18,7 +18,7 @@
 			<li>
 				<p class="wrap-left">*完成时间</p>
 				<!--<input type="text" placeholder="请输入完成时间..." />-->
-				<datepicker class="datePicker" v-model="DemandInfo.complateTime"></datepicker>
+				<datepicker class="datePicker" v-model="DemandInfo.demandbasicinfo.complateTime"></datepicker>
 				<alertTip v-if="showAlert.complateTime" :showHide="showAlert.complateTime" @closeTip="closeTip" :alertText="alertText.complateTime"></alertTip>
 				
 			</li>
@@ -34,20 +34,20 @@
 			</li>
 			<li>
 				<p class="wrap-left">*对象要求</p>
-				<textarea  maxlength="500" placeholder="请输入对象要求..." v-model="DemandInfo.objRequire"></textarea>
+				<textarea  maxlength="500" placeholder="请输入对象要求..." v-model="DemandInfo.demandbasicinfo.objRequire"></textarea>
 				<span>{{requireCont}}/500</span>
 				<alertTip v-if="showAlert.objRequire" :showHide="showAlert.objRequire" @closeTip="closeTip" :alertText="alertText.objRequire"></alertTip>
 				
 			</li>
 			<li>
 				<p class="wrap-left">*需求酬劳</p>
-				<input type="text" placeholder="请输入需求酬劳..." v-model="DemandInfo.reword"/>
+				<input type="text" placeholder="请输入需求酬劳..." v-model="DemandInfo.demandbasicinfo.reword"/>
 				<alertTip v-if="showAlert.reword" :showHide="showAlert.reword" @closeTip="closeTip" :alertText="alertText.reword"></alertTip>
 				
 			</li>
 			<li>
 				<p class="wrap-left">*备注信息</p>
-				<textarea  maxlength="500" placeholder="请输入备注信息..." v-model="DemandInfo.remark"></textarea>
+				<textarea  maxlength="500" placeholder="请输入备注信息..." v-model="DemandInfo.demandbasicinfo.remark"></textarea>
 				<span>{{remarkCont}}/500</span>
 			</li>
 			<div class="btnBox">
@@ -78,7 +78,7 @@
 					<dt>
 						<span>{{item.name}}</span>
 						<span v-if="item.coIntention=='1'" class="alreadySent">
-								已达成合作意向
+							已达成合作意向
 						</span>
 						<span v-if="item.coIntention=='0'" v-bind:class="['notyetSent',{disabled:!haveOffLine}]" @click="sentIntention(index)">同意合作申请</span>
 					</dt>
@@ -110,6 +110,8 @@
 	import Modal from "../../../assets/js/modal"
 	import Datepicker from "../units/Datepicker.vue"
 	import AlertTip from "../units/alertTip.vue"
+    import MyAjax from "../../../assets/js/MyAjax.js"
+	
 	export default{
 		name:"modifyDraft",
 		data:function(){
@@ -130,7 +132,7 @@
 				describeCont:"0",//描述文字字数
 				requireCont:"0",//要求文字字数
 				remarkCont:"0",
-				selectedStyle:[],//需求对象的选中样式
+				selectedStyle:[false,false,false],//需求对象的选中样式
 				havePublished:false,//有没有被发布过
 				haveCooper:true,//有无申请方
 				haveDeal:true,//有无关联协议
@@ -147,89 +149,144 @@
 		 	Datepicker,
 		 	AlertTip,
 		},
-	    computed:mapState({
-  			demandInfo:state=>state.demand.demandInfo,/*获取vuex数据*/
-  			unvalidInfo:state=>state.demand.unvalidInfo,
-  			draftInfo:state=>state.demand.draftInfo,/*获取vuex数据   需求草稿的数据*/
-		}),
-		mounted(){
+//	    computed:mapState({
+//			demandInfo:state=>state.demand.demandInfo,/*获取vuex数据*/
+//			unvalidInfo:state=>state.demand.unvalidInfo,
+//			draftInfo:state=>state.demand.draftInfo,/*获取vuex数据   需求草稿的数据*/
+//		}),
+		created(){
 			
 			this.id = this.$route.query.id;
 			console.log(this.id);
-			for(var i=0;i<this.demandInfo.length;i++){
-				if(this.demandInfo[i].id==this.id){
-					this.DemandInfo = JSON.parse(JSON.stringify(this.demandInfo[i]));
-				}
-			}
-			for(var i=0;i<this.unvalidInfo.length;i++){
-				if(this.unvalidInfo[i].id==this.id){
-					this.DemandInfo = JSON.parse(JSON.stringify(this.unvalidInfo[i]));
-				}
-			}
-			for(var i=0;i<this.draftInfo.length;i++){
-				if(this.draftInfo[i].id==this.id){
-					this.DemandInfo = JSON.parse(JSON.stringify(this.draftInfo[i]));
-				}
-			}
-			
-			
-			for(var i=0;i<this.DemandInfo.demandObj.length;i++){//需求对象的单选按钮
-				console.log(this.DemandInfo.demandObj[i])
-				if(this.DemandInfo.demandObj[i]!=""){
-					
-					this.selectedStyle.push(true);
-				}else{
-					this.selectedStyle.push(false);
+			var that = this;
+			var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.id
+	    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				async:false,
+			},function(data){
+				console.log(data)
+				if(data.code==0){
+					console.log(data.msg)
+					Vue.set(that,"DemandInfo",data.msg)
 				}
 				
+				console.log(that.DemandInfo)
+			},function(err){
+				console.log(err)
+			})
+//			for(var i=0;i<this.demandInfo.length;i++){
+//				if(this.demandInfo[i].id==this.id){
+//					this.DemandInfo = JSON.parse(JSON.stringify(this.demandInfo[i]));
+//				}
+//			}
+//			for(var i=0;i<this.unvalidInfo.length;i++){
+//				if(this.unvalidInfo[i].id==this.id){
+//					this.DemandInfo = JSON.parse(JSON.stringify(this.unvalidInfo[i]));
+//				}
+//			}
+//			for(var i=0;i<this.draftInfo.length;i++){
+//				if(this.draftInfo[i].id==this.id){
+//					this.DemandInfo = JSON.parse(JSON.stringify(this.draftInfo[i]));
+//				}
+//			}
+//			
+			that.DemandInfo.demandobjs = that.DemandInfo.demandobjs[0].split(",")
+			console.log(that.DemandInfo.demandobjs)
+			for(var i=0;i<that.DemandInfo.demandobjs.length;i++){//需求对象的单选按钮
+				switch (that.DemandInfo.demandobjs[i]){
+					case '1001':
+						Vue.set(that.selectedStyle,[0],true)
+						break;
+					case '1002':
+						Vue.set(that.selectedStyle,[1],true)
+						break;
+					case '1003':
+						Vue.set(that.selectedStyle,[2],true)
+						break;
+				}
 			}
 			console.log(this.selectedStyle)
-			if(this.DemandInfo.applicant.length!=0){
-				Vue.set(this,'haveCooper',true)
-			}else{
-				Vue.set(this,'haveCooper',false)
-			}
-			
-			if(this.DemandInfo.relatedDeal.length!=0){
-				Vue.set(this,'haveDeal',true)
-			}else{
-				Vue.set(this,'haveDeal',false)
-			}
-			//判断该需求草稿的来源，即判断有没有被发布过，来判定申请者及以后模块的有无。
-			if(this.DemandInfo.havePublished==false){
-				Vue.set(this,"havePublished",false)
-			}else{
-				Vue.set(this,"havePublished",true)
-			}
-			
-			
-			//申请者合作意向的判定
-			for(var i=0;i<this.DemandInfo.applicant.length;i++){
-				
-				if(this.DemandInfo.applicant[i].coIntention!=true){
-					this.intentionTxt.push("发送合作意向") ;
-//					Vue.set(this,'intentionTxt',"发送合作意向")
-//					console.log(this.intentionTxt)
-				}else{
-					this.intentionTxt.push("已达成合作意向") ;
-//					Vue.set(this,'intentionTxt',"已达成合作意向")
-				}
-			}
+//			if(this.DemandInfo.applicant.length!=0){
+//				Vue.set(this,'haveCooper',true)
+//			}else{
+//				Vue.set(this,'haveCooper',false)
+//			}
+//			
+//			if(this.DemandInfo.relatedDeal.length!=0){
+//				Vue.set(this,'haveDeal',true)
+//			}else{
+//				Vue.set(this,'haveDeal',false)
+//			}
+//			//判断该需求草稿的来源，即判断有没有被发布过，来判定申请者及以后模块的有无。
+//			if(this.DemandInfo.havePublished==false){
+//				Vue.set(this,"havePublished",false)
+//			}else{
+//				Vue.set(this,"havePublished",true)
+//			}
+//			
+//			
+//			//申请者合作意向的判定
+//			for(var i=0;i<this.DemandInfo.applicant.length;i++){
+//				
+//				if(this.DemandInfo.applicant[i].coIntention!=true){
+//					this.intentionTxt.push("发送合作意向") ;
+////					Vue.set(this,'intentionTxt',"发送合作意向")
+////					console.log(this.intentionTxt)
+//				}else{
+//					this.intentionTxt.push("已达成合作意向") ;
+////					Vue.set(this,'intentionTxt',"已达成合作意向")
+//				}
+//			}
 			
 		},
 		methods:{
 			selectObj(index){
-				console.log(this.DemandInfo.demandObj)
 				for(var i=0;i<this.demandObj.length;i++){
+					
 					if(i==index){
+						                                                                                                                                  
 						if(this.selectedStyle[index]==false){
 				      		Vue.set(this.selectedStyle,[index],true);
-				      		this.DemandInfo.demandObj[index]=this.demandObj[index];//更改项目功能名
-		
+				      		switch (index){
+								case 0:
+									this.DemandInfo.demandobjs.push("1001")
+									break;
+								case 1:
+									this.DemandInfo.demandobjs.push("1002")
+									break;
+								case 2:
+									this.DemandInfo.demandobjs.push("1003")
+									break;
+							}
+				      		this.DemandInfo.demandobjs.push.apply(this.DemandInfo.demandobjs,[])
+//				      		Vue.set(this.DemandInfo.demandobjs[index],"demandObj",this.demandObj[index]);
+//				      		this.DemandInfo.demandobjs[index].demandObj=this.demandObj[index];//更改项目功能名
+				      		
 				      	}else{
 				      		console.log(333)
 				      		Vue.set(this.selectedStyle,[index],false);
-				      		this.DemandInfo.demandObj[index]="";
+				      		Array.prototype.remove = function(val) {
+								var index = this.indexOf(val);
+								if (index > -1) {
+									this.splice(index, 1);
+								}
+							};
+							switch (index){
+								case 0:
+									this.DemandInfo.demandobjs.remove("1001")
+									break;
+								case 1:
+									this.DemandInfo.demandobjs.remove("1002")
+									break;
+								case 2:
+									this.DemandInfo.demandobjs.remove("1003")
+									break;
+							}
+							console.log(this.DemandInfo.demandobjs)
+//				      		Vue.set(this.DemandInfo.demandobjs[index],"demandObj","");
+//				      		this.DemandInfo.demandobjs[index].demandObj="";
 				      		
 				      	}
 						//赋值到本地信息里
@@ -240,32 +297,32 @@
 //						this.selectedStyle[i] = false;
 					}
 				}
-				console.log(this.DemandInfo.demandObj)
+				console.log(this.DemandInfo.demandobjs)
 			},
-			commitDemand(){
-				if(this.DemandInfo.name.trim().length==0){
+			mustConfirm(){
+				if(this.DemandInfo.demandbasicinfo.demandName.trim().length==0){
 					this.showAlert.name = true;
 					this.alertText.name = "需求名称为必填项"
 				}else{
 					this.showAlert.name = false;
 				};//判断项目名称不能为空
 				
-				if(this.DemandInfo.describe.trim().length==0){
+				if(this.DemandInfo.demandbasicinfo.describe.trim().length==0){
 					this.showAlert.describe = true;
 					this.alertText.describe = "需求描述为必填项"
 				}else{
 					this.showAlert.describe = false;
 //					
 				};//判断项目名称不能为空
-				if(this.DemandInfo.complateTime.trim().length==0){
+				if(this.DemandInfo.demandbasicinfo.complateTime.trim().length==0){
 					this.showAlert.complateTime = true;
 					this.alertText.complateTime = "需求时间为必填项"
 				}else{
 					this.showAlert.complateTime = false;
 //					
 				};//判断项目名称不能为空
-				for(var i=0;i<this.DemandInfo.demandObj.length;i++){
-					if(this.DemandInfo.demandObj[i]!=""){
+				for(var i=0;i<this.DemandInfo.demandobjs.length;i++){
+					if(this.DemandInfo.demandobjs.length==0){
 						this.showAlert.demandObj = true;
 						this.alertText.demandObj = "需求对象为必填项"
 					}else{
@@ -273,31 +330,30 @@
 	//					
 					};//判断需求对象不能为空
 				}
-				if(this.DemandInfo.objRequire.trim().length==0){
+				if(this.DemandInfo.demandbasicinfo.objRequire.trim().length==0){
 					this.showAlert.objRequire = true;
 					this.alertText.objRequire = "对象需求为必填项"
 				}else{
 					this.showAlert.objRequire = false;
 //					
 				};//判断对象需求不能为空
-				if(this.DemandInfo.reword.trim().length==0){
+				if(this.DemandInfo.demandbasicinfo.reword.trim().length==0){
 					this.showAlert.reword = true;
-					this.alertText.reword = "需求酬劳为必填项"
+					this.alertText.reword = "需求酬劳为必填项";
 				}else{
 					this.showAlert.reword = false;
 //					
 				};//判断酬金不能为空
-				if(this.DemandInfo.name.trim().length!=0&&this.DemandInfo.describe.trim().length!=0&&this.DemandInfo.complateTime.trim().length!=0
-				&&this.DemandInfo.objRequire.trim().length!=0&&this.DemandInfo.reword.trim().length!=0){
-					for(var i=0;i<this.DemandInfo.demandObj.length;i++){
-						if(this.DemandInfo.demandObj[i]!=""){
-							Modal.makeText($('.confirmCommit'));
-							break;
-						}else{
-							this.showAlert.demandObj = false;
-		//					
-						};//判断项目名称不能为空
-					}
+			},
+			commitDemand(){
+				
+				if(this.DemandInfo.demandbasicinfo.demandName.trim().length!=0&&this.DemandInfo.demandbasicinfo.describe.trim().length!=0
+				&&this.DemandInfo.demandbasicinfo.complateTime.trim().length!=0&&this.DemandInfo.demandobjs.length!=0
+				&&this.DemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.DemandInfo.demandbasicinfo.reword.toString().trim().length!=0){
+					Modal.makeText($('.confirmCommit'));
+					this.showAlert.demandObj = false;
+				}else{
+					this.mustConfirm();
 				}
 				
 //				
@@ -309,96 +365,72 @@
 						return false;
 					}
 				}
-				this.DemandInfo.auditStatus = "0";//需求进入审核状态。
-				for(let i=0;i<this.demandInfo.length;i++){
-					if(this.id==this.demandInfo[i].id){
-						this.demandInfo.splice(i,1,this.DemandInfo)
-						break;
-					}else{
-						this.demandInfo.push(this.DemandInfo);
-						break;
-					}
+//				this.DemandInfo.auditStatus = "0";//需求进入审核状态。
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/insertOrUpdate/" + 'valid' 
+		    	
+		    	if(that.DemandInfo.demandbasicinfo.complateTime=="至今"){
+					that.DemandInfo.demandbasicinfo.complateTime = "0000.00";
 				}
-				console.log(this.demandInfo)
-				for(let i=0;i<this.draftInfo.length;i++){
-					if(this.id==this.draftInfo[i].id){
-						this.draftInfo.splice(i,1)
-						break;
-					}
-				}//从需求草稿里删除；
-				console.log(this.demandInfo)
-				router.push("/yhzx/demand/draft/index");
-				this.closeModal();
-			},
-			saveToDraft(){
-				if(this.DemandInfo.name.trim().length==0){
-					this.showAlert.name = true;
-					this.alertText.name = "需求名称为必填项"
-				}else{
-					this.showAlert.name = false;
-				};//判断项目名称不能为空
-				
-				if(this.DemandInfo.describe.trim().length==0){
-					this.showAlert.describe = true;
-					this.alertText.describe = "需求描述为必填项"
-				}else{
-					this.showAlert.describe = false;
-//					
-				};//判断项目名称不能为空
-				if(this.DemandInfo.complateTime.trim().length==0){
-					this.showAlert.complateTime = true;
-					this.alertText.complateTime = "需求时间为必填项"
-				}else{
-					this.showAlert.complateTime = false;
-//					
-				};//判断项目名称不能为空
-				for(var i=0;i<this.DemandInfo.demandObj.length;i++){
-					if(this.DemandInfo.demandObj[i]!=""){
-						this.showAlert.demandObj = true;
-						this.alertText.demandObj = "需求对象为必填项"
-					}else{
-						this.showAlert.demandObj = false;
-	//					
-					};//判断需求对象不能为空
-				}
-				
-				if(this.DemandInfo.objRequire.trim().length==0){
-					this.showAlert.objRequire = true;
-					this.alertText.objRequire = "对象需求为必填项"
-				}else{
-					this.showAlert.objRequire = false;
-//					
-				};//判断项目名称不能为空
-				if(this.DemandInfo.reword.trim().length==0){
-					this.showAlert.reword = true;
-					this.alertText.reword = "需求酬劳为必填项"
-				}else{
-					this.showAlert.reword = false;
-//					
-				};//判断项目名称不能为空
-				console.log(this.DemandInfo)	
-				if(this.DemandInfo.name.trim().length!=0&&this.DemandInfo.describe.trim().length!=0&&this.DemandInfo.complateTime.trim().length!=0
-				&&this.DemandInfo.objRequire.trim().length!=0&&this.DemandInfo.reword.trim().length!=0){
-					for(var i=0;i<this.DemandInfo.demandObj.length;i++){
-						if(this.DemandInfo.demandObj[i]!=""){
-							for(let i=0;i<this.draftInfo.length;i++){
-								if(this.id==this.draftInfo[i].id){
-									this.draftInfo.splice(i,1,this.DemandInfo)
-									break;
-								}else{
-									this.draftInfo.push(this.DemandInfo)
-								}
-							}
-							console.log(this.draftInfo)
-							router.push("/yhzx/demand/draft/index");
-							this.closeModal();
-							break;
-						}else{
-							this.showAlert.demandObj = false;
-		//					
-						};//判断项目名称不能为空
+			    console.log(JSON.stringify(that.DemandInfo))
+			    $.ajaxSetup({ contentType : 'application/json' });
+			    MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.DemandInfo),
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					
+					if(data.code == 0){
+						router.go(-1);
+//						router.push("/yhzx/demand/publish/index")
+						that.closeModal();
 					}
 					
+				},function(err){
+					console.log(err)
+				})
+				
+			},
+			saveToDraft(){
+				
+				console.log(this.DemandInfo)	
+				if(this.DemandInfo.demandbasicinfo.demandName.trim().length!=0&&this.DemandInfo.demandbasicinfo.describe.trim().length!=0
+				&&this.DemandInfo.demandbasicinfo.complateTime.trim().length!=0&&this.DemandInfo.demandobjs.length!=0
+				&&this.DemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.DemandInfo.demandbasicinfo.reword.toString().trim().length!=0){
+					var that = this;
+					var url = MyAjax.urlhw+"/demandbasicinfo/insertOrUpdate/" + 'draft' 
+			    	
+			    	if(that.DemandInfo.demandbasicinfo.complateTime=="至今"){
+						that.DemandInfo.demandbasicinfo.complateTime = "0000.00";
+					}
+				    console.log(JSON.stringify(that.DemandInfo))
+				    $.ajaxSetup({ contentType : 'application/json' });
+				    MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.DemandInfo),
+						dataType: "json",   
+						async:false,
+					},function(data){
+						console.log(data)
+						
+						if(data.code == 0){
+							router.go(-1);
+//							router.push("/yhzx/demand/draft/index");
+
+							that.closeModal();
+						}
+						
+					},function(err){
+						console.log(err)
+					})
+					
+					
+				}else{
+					this.mustConfirm();
 				}
 				
 			},
@@ -406,12 +438,12 @@
 				Modal.closeModal($('.confirmCommit'))
 			},
 			cancelDeal(index){
-				this.DemandInfo.relatedDeal.splice(index,1)
-				if(this.DemandInfo.relatedDeal.length!=0){
-					Vue.set(this,'haveDeal',true)
-				}else{
-					Vue.set(this,'haveDeal',false)
-				}
+//				this.DemandInfo.relatedDeal.splice(index,1)
+//				if(this.DemandInfo.relatedDeal.length!=0){
+//					Vue.set(this,'haveDeal',true)
+//				}else{
+//					Vue.set(this,'haveDeal',false)
+//				}
 			},
 			addDeal(){
 				
@@ -428,9 +460,9 @@
 			},
 		},
 		updated(){
-			this.describeCont = this.DemandInfo.describe.length;
-			this.requireCont = this.DemandInfo.objRequire.length;
-			this.remarkCont = this.DemandInfo.remark.length;
+			this.describeCont = this.DemandInfo.demandbasicinfo.describe.length;
+			this.requireCont = this.DemandInfo.demandbasicinfo.objRequire.length;
+			this.remarkCont = this.DemandInfo.demandbasicinfo.remark.length;
 		}
 	}
 </script>

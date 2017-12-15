@@ -97,7 +97,7 @@
 						dataType: "json",
 						async:false,
 					}, function(data){
-						//console.log(data)
+						console.log(data)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
               console.log("success")
@@ -105,11 +105,16 @@
 							//router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
-//								case "100008":
-//									console.log(222)
-//									that.showAlert = true;
-//									that.alertText = "手机号未注册";
-//									break;
+								case "100001":
+									console.log(222)
+									that.showAlert = true;
+									that.alertText = "手机号或密码错误";
+									break;
+								case "100008":
+									console.log(222)
+									that.showAlert = true;
+									that.alertText = "手机号未注册";
+									break;
 								case "100005":
 									that.showAlert = true;
 									that.alertText = "图片验证码不一致";

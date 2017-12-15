@@ -44,13 +44,14 @@
 			return {
 				tab:[
 					{
+						style:"personStyle",text:"个人注册",
+					},
+					{
 						style:"comStyle",text:"公司注册",
 					},{
 						style:"teamStyle",text:"团队注册",
 					},
-//					{
-//						style:"personStyle",text:"个人注册",
-//					}
+					
 				],
 				indexActive:""
 			}
@@ -125,7 +126,7 @@
 
 					li{
 						float: left;
-						width: 198px;
+						width: 132px;
 						height: 46px;
 						border-bottom: 2px solid #cfcfcf;
 						a{
@@ -140,19 +141,19 @@
 
 
 						}
-						&:nth-child(1){
+						&:nth-child(2){
 							a.router-link-active{
 								color: #2EB3CF !important;
 								border-bottom: 2px solid #2EB3CF;
 							}
 						}
-						&:nth-child(2){
+						&:nth-child(3){
 							a.router-link-active{
 								color: #02a672 !important;
 								border-bottom: 2px solid #02a672;
 							}
 						}
-						&:nth-child(3){
+						&:nth-child(1){
 							a.router-link-active{
 								color: rgb(242,117,25) !important;
 								border-bottom: 2px solid rgb(242,117,25);

@@ -3,26 +3,26 @@
 		<ul class="draftTable">
 			<li v-for="(item,index) in draftInfo">
 				<h3>
-					<router-link :to="{path:'/yhzx/demand/draft/detail',query:{id:item.id}}">{{item.name}}</router-link>
-					<span @click="deleteThis(item.id)">
+					<router-link :to="{path:'/yhzx/demand/draft/detail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.demandName}}</router-link>
+					<span @click="deleteThis(item.demandbasicinfo.pkid)">
 						<img src="../../../assets/img/demand/delete-black.png" />
 						<img src="../../../assets/img/demand/icon49.png" />
 						删除
 					</span>
-					<span @click="goToModify(item.id)">
+					<span @click="goToModify(item.demandbasicinfo.pkid)">
 						<img src="../../../assets/img/demand/icon3.png" />
 						<img src="../../../assets/img/demand/icon1.png" />
 						编辑
 					</span>
 				</h3>
-				<p>创建时间：{{item.complateTime}}</p>
+				<p>创建时间：{{item.demandbasicinfo.creTime}}</p>
 				<div id="modal-overlay" v-bind:class="confirmDelete[index]">
 					<div class="detail-wrap">
 						<h5></h5>
-						<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+						<span class="modalChaBtn" @click="closeModal(item.demandbasicinfo.pkid)"></span>
 						<p>确定删除该草稿吗？</p>
 						
-						<div class="confirmBtn" @click="cfmDelete(item.id)">
+						<div class="confirmBtn" @click="cfmDelete(item.demandbasicinfo.pkid)">
 							确认删除
 						</div>
 					</div>
@@ -40,50 +40,84 @@
 	import {mapState} from "vuex"
 	import router from '../../../router'
 	import Modal from "../../../assets/js/modal"
+    import MyAjax from "../../../assets/js/MyAjax.js"
+	
 	export default{
 		name:"demandDraft",
 		data:function(){
 			return{
 				confirmDelete:[],//确认删除的模态框类名
+				draftInfo:[],
 			}
 		},
-		computed:mapState({
-  			draftInfo:state=>state.demand.draftInfo/*获取vuex数据*/
-		}),
+//		computed:mapState({
+//			draftInfo:state=>state.demand.draftInfo/*获取vuex数据*/
+//		}),
+		created(){
+			this.getData();
+		},
 		mounted(){
 			$(document.body).scrollTop(0)
 			//遍历所有需求列获取需求个数来确定模态框个数；
-			for(var i=0;i<this.draftInfo.length;i++){
-				
-				this.confirmDelete.push("confirmDelete"+this.draftInfo[i].id);
-			}
+			
 		},
 		methods:{
+			getData(){
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/findByMySelf/" + "draft"
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"draftInfo",data.msg)
+					}
+					
+					console.log(that.draftInfo)
+				},function(err){
+					console.log(err)
+				})
+		    	that.confirmDelete = [];
+		    	for(var i=0;i<that.draftInfo.length;i++){
+					that.confirmDelete.push("confirmDelete"+that.draftInfo[i].demandbasicinfo.pkid);
+				}
+			},
 			deleteThis(id){
 				var deleteMoadl = "confirmDelete"+id;
 				Modal.makeText($("."+deleteMoadl));
 				
 			},
 			goToModify(id){
+				this.closeModal(id);
 				router.push({name:"modifyDraft",query:{id:id}})
 			},
 			cfmDelete(id){
-				for(var i=0;i<this.draftInfo.length;i++){
-					if(id==this.draftInfo[i].id){
-						this.draftInfo.splice(i,1);
+				
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/del/" + id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal(id);
 					}
-				}
+				},function(err){
+					console.log(err)
+				})
 				
-				this.confirmDelete =[];//每删除一次清空类名数组，从新push类名
-				for(var i=0;i<this.draftInfo.length;i++){
-				
-					this.confirmDelete.push("confirmDelete"+this.draftInfo[i].id);
-				}
-				this.closeModal(id);
 			},
 			closeModal(id){
 				var deleteMoadl = "confirmDelete"+id;
-				Modal.makeText($("."+deleteMoadl));
+				Modal.closeModal($("."+deleteMoadl));
 			}
 		}
 		

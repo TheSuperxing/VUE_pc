@@ -28,11 +28,14 @@
 					</div>
 				</li> -->
 				<li v-for="(item,index) in dataInfo" class="list-wrap">
-					<div><router-link :to="{name:'DemandDetail',query:{id:'000'}}">{{item.goodsName}}</router-link></div>
-					<div>{{item.discount}}</div>
-					<div>{{item.price}}</div>
-					<div>{{item.discount}}/{{item.price}}</div>
-					<div class="obj-wrap"><span class="demandObj">{{item.className}}<i>;</i></span><span class="demandObj">{{item.className}}<i>;</i></span></div>
+					<div><router-link :to="{name:'DemandDetail',query:{id:item.demandID,watchTimes:item.watchTimes}}">{{item.demandName}}</router-link></div>
+					<div>{{item.publishTime}}</div>
+					<div>{{item.reword}}</div>
+					<div>{{item.appTimes}}/{{item.watchTimes}}</div>
+					<div class="obj-wrap">
+						<span class="demandObj" v-for="demand in item.demandobjs">{{demand.demandObj}}<i>;</i></span>
+						<!-- <span class="demandObj">{{item.className}}<i>;</i></span> -->
+					</div>
 					<div class="collect">
 						<span class="cancelBtn" @click="cancelCollect(index)" v-if="haveCollect[index]">
 							取消收藏
@@ -48,7 +51,7 @@
 			
 			  <div class="page"  v-show="show">
 			    <div class="pagelist">
-			      <span class="pre"  @click="pageMinus"></span>
+			      <span class="pre" :class="{disabled:pstart}"  @click="pageMinus"></span>
 			      <span v-show="current_page>5" class="jump" @click="jumpPage(1)">1</span>
 			      <span class="ellipsis"  v-show="efont">...</span>
 			      <span class="jump" v-for="num in indexs" :class="{bgprimary:current_page==num}" @click="jumpPage(num)">{{num}}</span>
@@ -60,7 +63,6 @@
 			      <span :class="{disabled:pend}" class="next" @click="pagePlus"></span>
 			    </div>
 			  </div>
-			
 		</div>
 	</div>
 </template>
@@ -76,44 +78,20 @@
 		data:function(){
 			return{
 				current_page: 1, //当前页
-		        pages: "50", //总页数
+		        pages: "1", //总页数
 		        changePage:'1',//跳转页
 		        nowIndex: 0,
 		        goodsIArr:[],
 		        goodsTArr:[],
 		        dataInfo:[],
-		        haveCollect:[],//有没有在收藏里
+				haveCollect:[],//有没有在收藏里
 		    }
-        },
+		},
+		created(){
+			this.current_page=this.$route.query.page;
+		},
         mounted() {
-        	var that = this;
-			var url = "http://datainfo.duapp.com/shopdata/getGoods.php"
-//			MyAjax.fetchJsonp(url, function(data){
-//				console.log(data)
-////				data = data.replace("callback(","");
-//				Vue.set(that,"dataInfo",data);
-//				console.log(that.dataInfo);
-//				
-//			},function(err){
-//				console.log(err)
-//			})
-			MyAjax.ajax({
-				type: "POST",
-				url:url,
-				data: {classID:that.changePage},
-				dataType:"jsonp",
-			}, function(data){
-//				data = data.replace("callback(","").slice(0,-1);
-//				data = data.slice(0,-1);
-//				data = JSON.parse(data);
-				that.dataInfo = data;
-				for(let i=0;i<data.length;i++){
-					that.haveCollect.push(false)
-				}
-				console.log(that.haveCollect)
-			},function(err){
-				console.log(err)
-			})
+			this.jumpPage(this.current_page);
         },
     	computed: {
     		show: function() {
@@ -135,7 +113,6 @@
     			return nowAy[nowAy.length - 1] != this.pages;
     		},
     		indexs: function() {
-
     			var left = 1,
     				right = this.pages,
     				ar = [];
@@ -162,70 +139,73 @@
     		},
     	},
     	methods: {
-    		jumpPage(num){
-    			
-    			var that = this;
-				var url = "http://datainfo.duapp.com/shopdata/getGoods.php"
-	//			MyAjax.fetchJsonp(url, function(data){
-	//				console.log(data)
-	////				data = data.replace("callback(","");
-	////				Vue.set(this,"dataInfo",data);
-	////				console.log(this.dataInfo);
-	//				
-	//			},function(err){
-	//				console.log(err)
-	//			})
-				this.current_page = num;
-				$.ajax({
+    		jumpPage(current_page){
+				this.haveCollect=[];
+				var url = MyAjax.urlsy+"/tradeHall/findDemands/"+current_page
+				var that = this;
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType:"json",
+					async: false,
+					contentType:"application/json;charset=utf-8",
+				}, function(data){
+					if(data.code==0){
+						that.dataInfo = data.msg.records;//取出当前获取的所有需求
+						that.current_page=data.msg.current;//设置当前页
+						that.pages=data.msg.pages;//设置最大页数
+						for(let i=0;i<that.dataInfo.length;i++){
+							that.dataInfo[i].status=="1"?that.haveCollect.push(true):that.haveCollect.push(false);
+						}
+					}else{
+						router.push("/error/500")
+						console.log("错误返回")
+					}
+				},function(err){
+					router.push("/error/404")
+					console.log(err)
+				})
+			},
+			tradeColl(index){
+				var url = MyAjax.urlsy +"/tradeHall/collect"
+				var that=this;
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
 					type: "POST",
 					url:url,
-					data: {classID:this.current_page},
-					success:function(data){
-						data = data.replace("callback(","").slice(0,-1);
-		//				data = data.slice(0,-1);
-						data = JSON.parse(data);
-//						console.log(data)
-						that.dataInfo = data
-//						console.log(that.dataInfo)
-					},
-					error:function(err){
-						console.log(err)
+					data: JSON.stringify(that.dataInfo[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					if(data.conde==0){
+						that.jumpPage(this.current_page);
 					}
-				})
-    		},
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+			},
     		pagePlus() {//向上翻页
-    			this.current_page++;
-//  			return this.current_page;
+				this.current_page<this.pages?this.current_page++:this.current_page;
     		},
-    		pageMinus() {//向上翻页
-    			this.current_page--;
-//  			return this.current_page;
+			pageMinus() {//向上翻页
+				this.current_page>1?this.current_page--:this.current_page;
     		},
     		cancelCollect(index){//取消收藏
-//				for(let i=0;i<this.colletionInfo.length;i++){
-//					if(id==this.colletionInfo[i].id){
-//						this.colletionInfo.splice(i,1)
-//					}
-//				}
 				Vue.set(this.haveCollect,[index],false)
-				//this.haveCollect[index] = false;
-
+				this.dataInfo[index].status="0"
+				this.tradeColl(index);
 			},
 			collectThis(index){//收藏这条
-//				for(let i=0;i<this.colletionInfo.length;i++){
-//					if(id==this.colletionInfo[i].id){
-//						this.colletionInfo.splice(i,1,this.detailInfo)
-//					}else{
-//						this.colletionInfo.push(this.detailInfo)
-//					}
-//				}
 				Vue.set(this.haveCollect,[index],true)
-				//this.haveCollect[index] = true;
+				this.dataInfo[index].status="1"
+				this.tradeColl(index);
 			},
     	},
     	watch:{
     		current_page:function(){
-    			this.jumpPage(this.current_page);
+				location.hash=location.hash.split("=")[0]+"="+this.current_page
+				this.jumpPage(this.current_page);
     		}
     	}
 	}
@@ -506,7 +486,7 @@ $bfColor : #ffffff;
 				}
 				.disabled {
 					pointer-events: none;
-					background: #ddd;
+					background: #ffffff;
 				}
 			}
 		}

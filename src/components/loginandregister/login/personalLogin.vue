@@ -11,22 +11,23 @@
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
       <li>
-        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入短信验证码" @blur="msgConfirm($event)" @keydown="keydown($event)"
-        	v-bind:html="personalLoginInput.messageConfirm"></div> 
-        <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button>
+        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入密码" @blur="msgConfirm($event)" @keydown="keydown($event)"
+        	v-bind:html="personalLoginInput.messageConfirm"></div>
+        <!-- <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button> 从新获取短信验证码-->
       </li>
       
     </ul>
 		<alertTip v-if="showAlert" :showHide="showAlert" :alertText="alertText"></alertTip>
-     <div class="b_tips">
-    	<p><router-link to="/register">立即注册>></router-link></p>
-    </div> 
+    
     <ul class="loginSubmit">
       <li>
         <button @click="personalLogin"><router-link to="">登录</router-link></button>
       </li>
-    </ul>
-    
+      <li>
+         <p>忘记密码？</p>
+    	  <!-- <p><router-link to="/register">立即注册>></router-link></p> -->
+      </li>
+    </ul>  
   </div>
 </template>
 <script>
@@ -178,7 +179,7 @@
         this.personalLoginInput.messageConfirm=event.currentTarget.innerText
       	if(this.personalLoginInput.messageConfirm.trim().length==0){
       		this.showAlert = true;
-          this.alertText  = "请输入短信验证码";
+          this.alertText  = "请输入密码";
           Vue.set(this.reveal,"focus",false)
       	}else{
           this.showAlert = false;
@@ -259,6 +260,7 @@
 		 },
      keydown(event){
        this.personalLoginInput.messageConfirm=event.currentTarget.innerText
+       console.log(this.personalLoginInput.messageConfirm)
        Vue.set(this.reveal,"focus",true)
        var event = event || window.event;  
        
@@ -296,7 +298,7 @@
   }  
 
   .alet_container{
-  	bottom:150px !important;
+  	bottom:185px !important;
   	left: 100px;
   	font-size: 14px;
   	.tip_text_container{
@@ -367,23 +369,12 @@
       }
     }
   }
-  .b_tips{
-  	margin-top: 15px;
-  	margin-bottom: 20px;
-  	float: right;
-  	p:nth-child(1){
-  		float: right;
-  		font-size: 14px;
-  		a{
-  			color: $personalThemeColor;
-  		}
-  	}
-  }
   .loginSubmit{
 
     li{
       width: 314px;
       margin:18px auto;
+      margin-top: 26px;
       margin-bottom: 0;
       cursor: pointer;
       button{
@@ -403,6 +394,19 @@
           color: #ffffff;
         }
       }
+      p{
+        color: $personalThemeColor;
+        cursor: pointer;
+      }
+      p:nth-child(1){
+        float: left;
+      }
+      // p:nth-child(2){
+      //   float: right;
+      //   a{
+      //     color: $personalThemeColor;
+      //   }
+      // }
     }
   }
 </style>

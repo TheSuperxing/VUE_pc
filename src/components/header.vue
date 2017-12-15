@@ -95,7 +95,7 @@
           active: false
         }, {
           text: "交易大厅",
-          rout: ["/trading","/trading","/trading"],
+          rout: [{path:"/trading",query:{page:1}},{path:"/trading",query:{page:1}},{path:"/trading",query:{page:1}}],
           active: false
         },],
 
@@ -126,11 +126,11 @@
 					dataType: "json",
 					async:false,					
 				},function(data){
-					data = data.msg;
+          data = data.msg;
 					if(data == "100004"){
 						cookieTool.delCookie("token")
 						router.push("/login")
-					}
+          } 
 				},function(err){
 					console.log(err)
 				})

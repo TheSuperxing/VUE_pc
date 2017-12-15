@@ -50,7 +50,7 @@
 			</router-link>
 		</p>
 	</ul>
-	<!--<ul class="person-wrap" v-if="state==2">
+	<ul class="person-wrap" v-if="state==2">
 		<li>
 			<input type="text"  placeholder="请输入手机号" v-model="personalRegInput.tel" @blur="personTelCfm"/>
 		</li>
@@ -78,7 +78,7 @@
 				[buildingshop用户协议]
 			</router-link>
 		</p>
-	</ul>-->
+	</ul>
 	
 </div>
 </template>

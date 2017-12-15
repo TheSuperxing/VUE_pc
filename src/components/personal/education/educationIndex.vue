@@ -593,7 +593,7 @@
       	var url = MyAjax.urlsy + "/psnEduBackGround/delPic/"+ id
       	var p = new Promise((resolve, reject) => {
 			    MyAjax.ajax({
-			      type: "POST",
+			    type: "POST",
 					url:url,
 					dataType: "json",
 					async: true, 

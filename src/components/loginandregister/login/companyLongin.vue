@@ -127,14 +127,14 @@
         cursor: pointer;
       }
       p:nth-child(1){
-        float: right;
+        float: left;
       }
-      p:nth-child(2){
-        float: right;
-        a{
-          color: $companyThemeColor;
-        }
-      }
+      // p:nth-child(2){
+      //   float: right;
+      //   a{
+      //     color: $companyThemeColor;
+      //   }
+      // }
     }
   }
 </style>

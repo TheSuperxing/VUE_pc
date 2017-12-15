@@ -39,7 +39,7 @@
 			},function(err){
 				console.log(err)
 			})
-    	$(document.body).css("overflow-y","scoll");
+    	//$(document.body).css("overflow-y","scoll");
 		},
   }
 </script>

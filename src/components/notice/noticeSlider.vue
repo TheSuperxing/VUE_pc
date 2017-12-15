@@ -26,8 +26,6 @@
         pics:[
           {text:"系统通知",pic2:require("../../assets/img/personal/siderbar/individual.png"),pic1:require("../../assets/img/personal/siderbar/individual.gray.png"),route:"/notice/stytem"},
           {text:"需求通知",pic1:require("../../assets/img/personal/siderbar/massage.gray.png"),pic2:require("../../assets/img/personal/siderbar/massage.png"),route:"/notice/demand"},
-          {text:"协议通知",pic1:require("../../assets/img/personal/siderbar/education.gray.png"),pic2:require("../../assets/img/personal/siderbar/education.png"),route:"/notice/deal"},
-          {text:"交易通知",pic1:require("../../assets/img/personal/siderbar/we.gray.png"),pic2:require("../../assets/img/personal/siderbar/we.png"),route:"/notice/merchandise"},
         ]
       }
     },

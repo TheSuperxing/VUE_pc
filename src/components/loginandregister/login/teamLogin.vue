@@ -14,7 +14,7 @@
       </li>
       <li>
         <p>忘记密码？</p>
-        <p><router-link to="/register">立即注册>></router-link></p>
+        <!-- <p><router-link to="/register">立即注册>></router-link></p> -->
       </li>
     </ul>
   </div>
@@ -110,12 +110,12 @@
       p:nth-child(1){
         float: left;
       }
-      p:nth-child(2){
-        float: right;
-        a{
-          color: $teamThemeColor;
-        }
-      }
+      // p:nth-child(2){
+      //   float: right;
+      //   a{
+      //     color: $teamThemeColor;
+      //   }
+      // }
     }
   }
 </style>

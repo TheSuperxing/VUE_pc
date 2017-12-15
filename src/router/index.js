@@ -32,6 +32,10 @@ var routerChildren = userRouter();
 import {noticeRouter} from "./notice/notice"
 var notice=noticeRouter();
 /*通知部分路由结束*/
+/*错误路由开始*/
+import {errorRouter} from "./error/error"
+var error=errorRouter();
+/*错误路由结束*/
 /*主体路由开始*/
 Vue.use(Router)
 
@@ -75,8 +79,9 @@ export default new Router({
     {
       path:"/yhzx", name:"Users",component:Users,
       children:routerChildren
-	},
-	notice,
+		},
+		notice,
+		error
   ],
   scrollBehavior (to,from,savedPosition) {
 	  if (savedPosition) {

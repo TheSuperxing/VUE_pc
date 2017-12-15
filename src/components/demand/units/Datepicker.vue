@@ -1,9 +1,9 @@
 <template>
   <div class="date-picker">
-    <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false">
+    <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false" @click="togglePanel">
       <div class="input" v-text="range ? value[0] + ' -- ' + value[1] : value"></div>
       <transition name="fade">
-        <img class="cancel-btn" src="../../../assets/img/demand/bottom.png"  v-show="showCancel" @click="togglePanel">
+        <img class="cancel-btn" src="../../../assets/img/company/bottom.png"  v-show="showCancel">
       </transition>
     </div>
     <transition name="toggle">
@@ -184,7 +184,7 @@
             this.year = this.tmpYear
             this.month = this.tmpMonth
             this.date = date.value
-            let value = `${this.tmpYear}-${('0' + (this.month + 1)).slice(-2)}-${('0' + this.date).slice(-2)}`
+            let value = `${this.tmpYear}.${('0' + (this.month + 1)).slice(-2)}.${('0' + this.date).slice(-2)}`
             this.$emit('input', value)
             this.panelState = false
           }else if(this.range && !this.rangeStart){
@@ -211,7 +211,7 @@
               this.tmpStartMonth = tmpM
               this.tmpStartDate = tmpD
             }
-            let RangeStart = `${this.tmpStartYear}-${('0' + (this.tmpStartMonth + 1)).slice(-2)}-${('0' + this.tmpStartDate).slice(-2)}`
+            let RangeStart = `${this.tmpStartYear}.${('0' + (this.tmpStartMonth + 1)).slice(-2)}.${('0' + this.tmpStartDate).slice(-2)}`
             let RangeEnd = `${this.tmpEndYear}-${('0' + (this.tmpEndMonth + 1)).slice(-2)}-${('0' + this.tmpEndDate).slice(-2)}`
             let value = [RangeStart, RangeEnd]
             this.$emit('input', value)
@@ -249,9 +249,9 @@
           this.rangeStart = false
         }
       },
-      clear() {
-        this.$emit('input', this.range ? ['', ''] : '')
-      }
+//    clear() {
+//      this.$emit('input', this.range ? ['', ''] : '')
+//    }
     },
     watch: {
       min (v) {
@@ -371,7 +371,7 @@
 </script>
 
 <style scoped lang='scss'>
-  $themeColor:#546686;
+  $themeColor: rgb(242,117,25);
   $borderColor:#ebebeb;
   ul{
     padding: 0;
@@ -390,19 +390,20 @@
     justify-content: space-between;
     flex-flow: row nowrap;
     align-items: center;
-    padding-left:12px;
+    padding-left:15px;
     height: 33px;
     line-height: 33px;
     box-sizing: border-box;
-    padding-right:10px;
+    padding-right:15px;
   }
   .input{
     height: 100%;
     width: 100%;
     font-size: inherit;
-    padding-left: 4px;
+    padding-left: 8px;
     box-sizing: border-box;
     outline: none;
+    text-align: left;
   }
   .cancel-btn{
     height: 10px;
@@ -412,7 +413,7 @@
   .date-panel{
     position: absolute;
     left: -90px;
-    z-index: 5000;
+    z-index: 9000;
     border: 1px solid #eee;
     box-sizing: border-box;
     width: 320px;

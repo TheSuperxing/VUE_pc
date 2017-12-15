@@ -1,7 +1,7 @@
 <template>
 	<div class="alet_container">
 	    <section class="tip_text_container">
-            <div class="tip_icon" @click="closeTip">
+            <div class="tip_icon">
                 <span></span>
                 <span></span>
                 <img src="../../../assets/img/connect/guanbi1.png"/>
@@ -25,9 +25,9 @@
         },
         props: ['alertText'],
         methods: {
-            closeTip(){
-                this.$emit('closeTip')
-            }
+//          closeTip(){
+//              this.$emit('closeTip')
+//          }
         }
     }
 </script>

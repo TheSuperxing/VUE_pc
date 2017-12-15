@@ -1,6 +1,35 @@
 <template>
 <div class="regkind">
-	<ul class="com-wrap" v-if="state==0">
+	<ul class="person-wrap" v-if="state==0" @keydown="keyRegisterDonePer($event)">
+		<li>
+			<input type="text"  placeholder="请输入手机号" v-model="personalRegInput.tel" @blur="personTelCfm" class="tel"/>
+		</li>
+		<li>
+			
+			<input v-model="personalRegInput.picConfirm" @blur="picConfirm" type="text" placeholder="图形验证码" class="pic"/>
+		    <img class="picConfirm" :src="picSrc" alt="" @click="changePic"/>
+		    <span v-if="reveal.error">图片验证码错误</span>
+		</li>
+		<li>
+			<input type="text" placeholder="请确认短信验证码" v-model="personalRegInput.messageConfirm" @blur="personalMsgCfm" class="msg"/>
+			<button @click="settime" class="msgConfirm" :disabled="!show">
+			     <span v-if="show">获取验证码</span>
+			     <span v-if="!show" class="count">{{count}} s</span>
+			</button>
+		</li>
+		<alertTip v-if="personalRegInput.showAlert" :showHide="personalRegInput.showAlert" @closeTip="closeTip" :alertText="personalRegInput.alertText"></alertTip>
+		<div class="regBtn" @click="goRegisterDonePer" >
+			注册
+		</div>
+		<p class="notice">
+			<span v-bind:class="{'selected':agree[2]}" @click="agreeDeal" class="agreeBtn"></span>
+			您已阅读并同意
+			<router-link to="">
+				[buildingshop用户协议]
+			</router-link>
+		</p>
+	</ul>
+	<ul class="com-wrap" v-if="state==1">
 		<li>
 			<input type="text"  placeholder="请输入公司名" v-model="comRegInput.name" @blur="nameConfirm"/>
 		</li>
@@ -25,7 +54,7 @@
 			</router-link>
 		</p>
 	</ul>
-	<ul class="team-wrap" v-if="state==1">
+	<ul class="team-wrap" v-if="state==2">
 		<li>
 			<input type="text"  placeholder="请输入公司名" v-model="teamRegInput.name" @blur="nameConfirm"/>
 		</li>
@@ -50,6 +79,7 @@
 			</router-link>
 		</p>
 	</ul>
+<<<<<<< HEAD
 	<ul class="person-wrap" v-if="state==2">
 		<li>
 			<input type="text"  placeholder="请输入手机号" v-model="personalRegInput.tel" @blur="personTelCfm"/>
@@ -79,6 +109,9 @@
 			</router-link>
 		</p>
 	</ul>
+=======
+	
+>>>>>>> 5b6e26e00938fdea7ede2844cff783ba90cffebb
 	
 </div>
 </template>
@@ -165,12 +198,12 @@
 				
 				
 				var that = this;
-				var url = MyAjax.urlhw + "/accountmanainfo/registorMobileCode/" + that.personalRegInput.tel;
+				var url = MyAjax.urlsy + "/accountmanainfo/registorMobileCode/" + that.personalRegInput.tel;
 		        MyAjax.ajax({
 					type: "GET",
 					url:url,
 					dataType: "json",
-					
+					async:false,
 				},function(data){
 					console.log(data)
 					if(data.code==-1){
@@ -203,8 +236,10 @@
 				})
 			},
 			changePic(){
-		    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
+				this.picSrc = MyAjax.urlsy+"/captcha.jpg?random="+Math.random()
+//		    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
 		    	$(".picConfirm").attr("src",this.picSrc)
+		    	
 		    },
 		    goRegisterDoneCom(){
 		    	
@@ -212,9 +247,23 @@
 		    goRegisterDoneTeam(){
 		    	
 		    },
+		    keyRegisterDonePer($event){//enter键登录事件
+		    	
+		      var event = $event || window.event;  
+		      console.log(666)
+			 	if(event.keyCode==13){ 
+			     this.goRegisterDonePer()
+		         event.returnValue = false;    
+		         event.cancelBubble=true;
+		         event.preventDefault();
+		         //event.stopProgagation();
+		         return false;
+		      } 
+		
+			},
 			goRegisterDonePer(){
 				var that = this;
-				var url = MyAjax.urlhw+"/accountmanainfo/register";
+				var url = MyAjax.urlsy+"/accountmanainfo/register";
 				if(that.personalRegInput.tel.trim().length!=0&&that.personalRegInput.picConfirm.trim().length!=0&&that.personalRegInput.messageConfirm.trim().length!=0){
 					MyAjax.ajax({
 						type: "POST",
@@ -226,7 +275,7 @@
 						console.log(data.token)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
-							router.push("/login")
+							router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
 								case "100002":
@@ -237,10 +286,17 @@
 								case "100005":
 									that.personalRegInput.showAlert = true;
 									that.personalRegInput.alertText = "图片验证码不一致";
+									that.personalRegInput.picConfirm = "";
+		    						$(".pic").focus();
+		    						that.changePic();
 									break;
 								case "100006":
 									that.personalRegInput.showAlert = true;
 									that.personalRegInput.alertText = "短信验证码错误";
+									break;
+								case "100007":
+									that.personalRegInput.showAlert = true;
+									that.personalRegInput.alertText = "手机号已经注册";
 									break;
 								
 								default:
@@ -353,7 +409,7 @@
 		    personTelCfm(){/*验证个人登录的手机号*/
 		    	if(!/^1[34578]\d{9}$/gi.test(this.personalRegInput.tel)){
 		    		this.personalRegInput.showAlert = true;
-		    		this.personalRegInput.alertText = '您输入的手机号码格式不正确';
+		    		this.personalRegInput.alertText = '请输入正确的手机号码';
 		    	}else{
 		    		this.personalRegInput.showAlert = false;
 		    	}
@@ -484,11 +540,11 @@
 			li{
 				border-bottom: 1px solid #EAEAEA;
 				padding-left:48px;
-				height: 35px;
+				height: 48px;
 				input{
 					width: 300px;
-					height: 30px;
-					line-height: 30px;
+					height: 45px;
+					line-height:45px;
 					text-align: left;
 				}
 				&:nth-child(1){
@@ -505,7 +561,7 @@
 						background: #E6E6E6;
 						position: absolute;
 						right: 20px;
-						top: 15px;
+						top: 10px;
 						
 					}
 					position: relative;
@@ -543,6 +599,7 @@
 						width: 80px;
 						height: 20px;
 						background: none;
+						margin-top: 12px;
 					}
 					.count{
 						color:rgb(242,117,25);

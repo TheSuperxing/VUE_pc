@@ -1,7 +1,7 @@
 <template>
 	<div class="publishmentIndex">
 		<div class="table-bar">
-			<p v-for="(item,$index) in tabbarInfo"  @click="switchTab($index)" :class="[{'activeBar':active==$index},{'unactiveBar':active!=$index}]">
+			<p v-for="(item,$index) in tabbarInfo" @click="switchTab($index)"  :class="[{'activeBar':active==$index},{'unactiveBar':!active==$index}]">
 				<img :src="item.pic1" />
 				<img :src="item.pic2" />
 				{{item.txt}}
@@ -11,34 +11,34 @@
         	<p class="stateNone">(此处暂无需求)</p>
         </div>-->
         <div class="demandList">
-        	<ul v-if="tab.aa[0]">
+        	<ul v-show="tab.aa[0]">
         		<li class="stateNone" v-if="!have.value[0]">此处暂无数据</li>
-        		<li v-for="(item,$index) in demandInfo" v-if="have.value[0]">
+        		<li v-for="(item,$index) in validDemand" v-if="have.value[0]">
         			<h3>
-        				<router-link :to="{name:'publishmentDetail',query:{id:item.id}}">{{item.name}}</router-link>
+        				<router-link :to="{name:'publishmentDetail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.demandName}}</router-link>
         				
-						<span @click="toDelete(item.id)" v-if="!haveAuditStatus[$index]">
+						<span @click="toDelete(item.demandbasicinfo.pkid)" v-if="!haveAuditStatus[$index]">
 							<img src="../../../assets/img/demand/icon50.png" />
 							<img src="../../../assets/img/demand/icon51.png" />
 							下线
 						</span>
-						<span @click="toModify(item.id)" v-if="!haveAuditStatus[$index]">
+						<span @click="toModify(item.demandbasicinfo.pkid)" v-if="!haveAuditStatus[$index]">
 							<img src="../../../assets/img/demand/icon3.png" />
 							<img src="../../../assets/img/demand/icon1.png" />
 							编辑
 						</span>
 						<em class="auditStatus" v-if="haveAuditStatus[$index]">{{auditStatusTxt[$index]}}</em>
 					</h3>
-					<p>创建时间：{{item.complateTime}}</p>
+					<p>创建时间：{{item.demandbasicinfo.creTime}}</p>
 				<!--编辑此需求的模态框 start-->
 					<div id="modal-overlay" v-bind:class="confirmModify.valid[$index]">
 						<div class="detail-wrap">
 							<h5></h5>
-							<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+							<span class="modalChaBtn" @click="closeModal(item.demandbasicinfo.pkid)"></span>
 							<p>进入编辑状态后，该需求将在需求中心下线。</p>
 							<p>且编辑后需等待管理员审核通过后才可再次进入需求重心。</p>
 							<p>是否确认进入编辑？</p>
-							<div class="confirmBtn" @click="cfmModify(item.id)">
+							<div class="confirmBtn" @click="cfmModify(item.demandbasicinfo.pkid)">
 								进入编辑
 							</div>
 						</div>
@@ -47,40 +47,40 @@
 					<div id="modal-overlay" v-bind:class="confirmDelete.valid[$index]">
 						<div class="detail-wrap">
 							<h5></h5>
-							<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+							<span class="modalChaBtn" @click="closeModal(item.demandbasicinfo.pkid)"></span>
 							<p>如您确认进行下线操作，该需求将在需求中心下线。</p>
 							<p>您可在  "我的发布"——"无效需求"  中进行查看。</p>
-							<div class="confirmBtn" @click="cfmDeleteValid(item.id)">
+							<div class="confirmBtn" @click="cfmDeleteValid(item.demandbasicinfo.pkid)">
 								确认下线
 							</div>
 						</div>
 					</div>
         		</li>
         	</ul>
-        	<ul v-if="tab.aa[1]">
+        	<ul v-show="tab.aa[1]">
         		<li class="stateNone" v-if="!have.value[1]">此处暂无数据</li>
-        		<li v-for="(item,$index) in unvalidInfo" v-if="have.value[1]">
+        		<li v-for="(item,$index) in invalidDemand" v-if="have.value[1]">
         			<h3 class="unvalidName">
-        				<router-link :to="{name:'publishmentDetail',query:{id:item.id}}">{{item.name}}</router-link>
-					<span @click="toDelete(item.id)">
+        				<router-link :to="{name:'publishmentDetail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.demandName}}</router-link>
+					<span @click="toDelete(item.demandbasicinfo.pkid)">
 						<img src="../../../assets/img/demand/delete-black.png" />
 						<img src="../../../assets/img/demand/icon49.png" />
 						删除
 					</span>
-					<span @click="toModify(item.id)">
+					<span @click="toModify(item.demandbasicinfo.pkid)">
 						<img src="../../../assets/img/demand/icon3.png" />
 						<img src="../../../assets/img/demand/icon1.png" />
 						编辑
 					</span>
 				</h3>
-				<p>创建时间：{{item.complateTime}}</p>
+				<p>创建时间：{{item.demandbasicinfo.creTime}}</p>
 				<!--编辑此需求的模态框 start-->
 				<div id="modal-overlay" v-bind:class="confirmModify.unvalid[$index]">
 					<div class="detail-wrap">
 						<h5></h5>
-						<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+						<span class="modalChaBtn" @click="closeModal(item.demandbasicinfo.pkid)"></span>
 						<p>您可对该无效需求进行重新编辑，并重新提交审核。</p>
-						<div class="confirmBtn" @click="cfmModify(item.id)">
+						<div class="confirmBtn" @click="cfmModify(item.demandbasicinfo.pkid)">
 							进入编辑
 						</div>
 					</div>
@@ -89,9 +89,9 @@
 				<div id="modal-overlay" v-bind:class="confirmDelete.unvalid[$index]">
 					<div class="detail-wrap">
 						<h5></h5>
-						<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+						<span class="modalChaBtn" @click="closeModal(item.demandbasicinfo.pkid)"></span>
 						<p>是否确认删除该需求？</p>
-						<div class="confirmBtn" @click="cfmDeleteUnvalid(item.id)">
+						<div class="confirmBtn" @click="cfmDeleteUnvalid(item.demandbasicinfo.pkid)">
 							确认删除
 						</div>
 					</div>
@@ -107,6 +107,7 @@
 	import {mapState} from "vuex"
 	import Modal from "../../../assets/js/modal.js"
 	import router from '../../../router'
+    import MyAjax from "../../../assets/js/MyAjax.js"
 	
 	export default{
 		name:"publishmentIndex",
@@ -120,6 +121,8 @@
 		        	    pic2:require("../../../assets/img/demand/unvalid-blackblue.png"),
 		        	}
 		        ],
+		        validDemand:[],
+		        invalidDemand:[],
 		        have:{value:[true,false]},//有无需求数据的状态控制
 		        active:0,//默认的活动bar
 		        tab:{aa:[true,false]},//默认现实的列表
@@ -129,61 +132,121 @@
 		        haveAuditStatus:[],//正在审核与否 有无编辑按钮
 			}
 		},
-		computed:mapState({
-		  demandInfo:state=>state.demand.demandInfo/*获取vuex数据*/,
-		  unvalidInfo:state=>state.demand.unvalidInfo,
-		  draftInfo:state=>state.demand.draftInfo,/*获取vuex数据   需求草稿的数据*/
-		}),
-		mounted(){
+//		computed:mapState({
+//		  demandInfo:state=>state.demand.demandInfo/*获取vuex数据*/,
+//		  unvalidInfo:state=>state.demand.unvalidInfo,
+//		  draftInfo:state=>state.demand.draftInfo,/*获取vuex数据   需求草稿的数据*/
+//		}),
+		created(){
+			this.getData();
+			    	
+		},
+		updated(){
 			
-			if(this.demandInfo.length!=0){
-				Vue.set(this.have.value,[0],true)
-//				console.log(this.have.value)
-			}else{
-				Vue.set(this.have.value,[0],false)
-			};//判断有效需求里面有没有数据
-			
-			if(this.unvalidInfo.length!=0){
-				Vue.set(this.have.value,[1],true)
-//				console.log(this.have.value)
-			}else{
-				Vue.set(this.have.value,[1],false)
-			};//判断无效需求里面有没有数据；
+//			if(this.validDemand.length!=0){
+//				Vue.set(this.have.value,[0],true)
+////				console.log(this.have.value)
+//			}else{
+//				Vue.set(this.have.value,[0],false)
+//			};//判断有效需求里面有没有数据
+//			
+//			if(this.invalidDemand.length!=0){
+//				Vue.set(this.have.value,[1],true)
+////				console.log(this.have.value)
+//			}else{
+//				Vue.set(this.have.value,[1],false)
+//			};//判断无效需求里面有没有数据；
 //			this.confirmModify.valid = [];
 //			this.confirmDelete.valid = [];
 //			this.confirmModify.unvalid = [];
 //			this.confirmDelete.unvalid = [];
-			for(let i=0;i<this.demandInfo.length;i++){
-//				console.log(this.demandInfo[i].id)
-				
-				this.confirmModify.valid.push("validConfirmModify"+this.demandInfo[i].id);
-				this.confirmDelete.valid.push("validConfirmDelete"+this.demandInfo[i].id);
-				//判断审核状态
-				if(this.demandInfo[i].auditStatus=="0"){
-					this.auditStatusTxt.push("需求正在审核中");
-					this.haveAuditStatus.push(true);
-				}else if(this.demandInfo[i].auditStatus=="1"){
-					this.auditStatusTxt.push("");
-					this.haveAuditStatus.push(false);
-				}
-			}
-//			console.log(this.auditStatusTxt)
-			for(let j=0;j<this.unvalidInfo.length;j++){
-				
-				this.confirmModify.unvalid.push("unvalidConfirmModify"+this.unvalidInfo[j].id);
-				this.confirmDelete.unvalid.push("unvalidConfirmDelete"+this.unvalidInfo[j].id);
-			}
-//			console.log(this.confirmModify.unvalid)
-			
-			
-			
 		},
 		
 		methods:{
+			getData(){
+				var that = this;
+				var url_valid = MyAjax.urlhw+"/demandbasicinfo/findByMySelf/" + "valid"
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url_valid,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"validDemand",data.msg)
+					}
+					
+					console.log(that.validDemand)
+				},function(err){
+					console.log(err)
+				})
+		    	
+		    	var url_invalid = MyAjax.urlhw+"/demandbasicinfo/findByMySelf/" + "invalid"
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url_invalid,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"invalidDemand",data.msg)
+					}
+					
+					console.log(that.invalidDemand)
+				},function(err){
+					console.log(err)
+				})
+		    	that.confirmModify.valid = [];
+				that.confirmDelete.valid = [];
+				that.confirmModify.unvalid = [];
+				that.confirmDelete.unvalid = [];
+		    	for(let i=0;i<that.validDemand.length;i++){
+				
+					that.confirmModify.valid.push("validConfirmModify"+that.validDemand[i].demandbasicinfo.pkid);
+					that.confirmDelete.valid.push("validConfirmDelete"+that.validDemand[i].demandbasicinfo.pkid);
+					//判断审核状态
+					if(that.validDemand[i].demandreviewinfo.applyStatus=="2"){
+						this.auditStatusTxt.push("需求正在审核中");
+						this.haveAuditStatus.push(true);
+					}else if(that.validDemand[i].demandreviewinfo.applyStatus=="3"){
+						this.auditStatusTxt.push("");
+						this.haveAuditStatus.push(false);
+					}
+	//				if(this.demandInfo[i].auditStatus=="0"){
+	//					this.auditStatusTxt.push("需求正在审核中");
+	//					this.haveAuditStatus.push(true);
+	//				}else if(this.demandInfo[i].auditStatus=="1"){
+	//					this.auditStatusTxt.push("");
+	//					this.haveAuditStatus.push(false);
+	//				}
+				}
+				for(let j=0;j<that.invalidDemand.length;j++){
+							
+					that.confirmModify.unvalid.push("unvalidConfirmModify"+that.invalidDemand[j].demandbasicinfo.pkid);
+					that.confirmDelete.unvalid.push("unvalidConfirmDelete"+that.invalidDemand[j].demandbasicinfo.pkid);
+				}
+				if(that.validDemand.length!=0){
+					Vue.set(that.have.value,[0],true)
+		//				console.log(this.have.value)
+				}else{
+					Vue.set(that.have.value,[0],false)
+				};//判断有效需求里面有没有数据
+				
+				if(that.invalidDemand.length!=0){
+					Vue.set(that.have.value,[1],true)
+						console.log(that.have.value)
+				}else{
+					Vue.set(that.have.value,[1],false)
+				};
+			},
 			switchTab(index){
-				this.active = index;
-
-
+				this.active = index 
+//				this.getData();
+				
 	    		for(var i = 0 ; i < this.tabbarInfo.length;i++){
 	    			if(i!=index){
 	    				Vue.set(this.tab.aa,[i],false)
@@ -191,6 +254,7 @@
 		    			Vue.set(this.tab.aa,[index],true)
 		    		}
 	    		}
+				console.log(index)	    	
 			},
 			toModify(id){
 				var validModify = "validConfirmModify"+id;
@@ -199,25 +263,25 @@
 				Modal.makeText($("."+unvalidModify));
 			},
 			cfmModify(id){
-				for(var i=0;i<this.demandInfo.length;i++){
-					if(id==this.demandInfo[i].id){
-						this.demandInfo[i].auditStatus = "2";//有效需求下线进入需求草稿。
-						console.log(this.draftInfo)
-						this.draftInfo.push(this.demandInfo[i])
-						this.demandInfo.splice(i,1);
-						break;
-					}
-				}
-				console.log(this.demandInfo)
-				for(var i=0;i<this.unvalidInfo.length;i++){
-					if(id==this.unvalidInfo[i].id){
-						this.unvalidInfo[i].auditStatus = "2";//无效需求进入需求草稿。
-						this.draftInfo.push(this.unvalidInfo[i])
-						this.unvalidInfo.splice(i,1);
-						break;
-					}
-				}
-				this.closeModal();
+//				for(var i=0;i<this.demandInfo.length;i++){
+//					if(id==this.demandInfo[i].id){
+//						this.demandInfo[i].auditStatus = "2";//有效需求下线进入需求草稿。
+//						console.log(this.draftInfo)
+//						this.draftInfo.push(this.demandInfo[i])
+//						this.demandInfo.splice(i,1);
+//						break;
+//					}
+//				}
+//				console.log(this.demandInfo)
+//				for(var i=0;i<this.unvalidInfo.length;i++){
+//					if(id==this.unvalidInfo[i].id){
+//						this.unvalidInfo[i].auditStatus = "2";//无效需求进入需求草稿。
+//						this.draftInfo.push(this.unvalidInfo[i])
+//						this.unvalidInfo.splice(i,1);
+//						break;
+//					}
+//				}
+				this.closeModal(id);
 				router.push({name:"modifyDraft",query:{id:id}});
 			},
 			toDelete(id){
@@ -229,81 +293,69 @@
 			},
 			cfmDeleteValid(id){//下线有效需求到无效需求列表里
 				
-				for(var i=0;i<this.demandInfo.length;i++){
-					if(id==this.demandInfo[i].id){
-						let index = i;
-						this.demandInfo[index].auditStatus = "2";
-						this.demandInfo[index].haveOffLine = false;
-						this.unvalidInfo.push(this.demandInfo[index])
-						this.demandInfo.splice(i,1);
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/invalid/" + id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal(id);
 					}
-				}
-				
-				console.log(this.unvalidInfo)
+				},function(err){
+					console.log(err)
+				})
+		    	
+//				for(var i=0;i<this.demandInfo.length;i++){
+//					if(id==this.demandInfo[i].id){
+//						let index = i;
+//						this.demandInfo[index].auditStatus = "2";
+//						this.demandInfo[index].haveOffLine = false;
+//						this.unvalidInfo.push(this.demandInfo[index])
+//						this.demandInfo.splice(i,1);
+//					}
+//				}
+//				//重新更新classname组
+//				for(var i=0;i<this.demandInfo.length;i++){
+//					
+//					this.confirmModify.valid.push("validConfirmModify"+this.demandInfo[i].id);
+//					this.confirmDelete.valid.push("validConfirmDelete"+this.demandInfo[i].id);
+//					//重新判断审核状态
+//					if(this.demandInfo[i].auditStatus=="0"){
+//						this.auditStatusTxt.push("需求正在审核中");
+//						this.haveAuditStatus.push(true);
+//					}else if(this.demandInfo[i].auditStatus=="1"){
+//						this.auditStatusTxt.push("");
+//						this.haveAuditStatus.push(false);
+//					}
+//				}
 				//重新更新classname组
-				this.confirmModify.valid = [];
-				this.confirmDelete.valid = [];
-				this.auditStatusTxt=[];
-				this.haveAuditStatus=[];
-				for(var i=0;i<this.demandInfo.length;i++){
-					
-					this.confirmModify.valid.push("validConfirmModify"+this.demandInfo[i].id);
-					this.confirmDelete.valid.push("validConfirmDelete"+this.demandInfo[i].id);
-					//重新判断审核状态
-					if(this.demandInfo[i].auditStatus=="0"){
-						this.auditStatusTxt.push("需求正在审核中");
-						this.haveAuditStatus.push(true);
-					}else if(this.demandInfo[i].auditStatus=="1"){
-						this.auditStatusTxt.push("");
-						this.haveAuditStatus.push(false);
-					}
-				}
-				//重新更新classname组
-				this.confirmModify.unvalid = [];
-				this.confirmDelete.unvalid = [];
-				for(let j=0;j<this.unvalidInfo.length;j++){
 				
-					this.confirmModify.unvalid.push("unvalidConfirmModify"+this.unvalidInfo[j].id);
-					this.confirmDelete.unvalid.push("unvalidConfirmDelete"+this.unvalidInfo[j].id);
-					
-				}
-				console.log(this.confirmModify.unvalid)
+//				console.log(this.confirmModify.unvalid)
 				
-				if(this.unvalidInfo.length!=0){
-					Vue.set(this.have.value,[1],true)
-				}else{
-					Vue.set(this.have.value,[1],false)
-				};//再次判断无效需求里面有没有数据
-				if(this.demandInfo.length!=0){
-					Vue.set(this.have.value,[0],true)
-	//				console.log(this.have.value)
-				}else{
-					Vue.set(this.have.value,[0],false)
-				};//再次判断有效需求里面有没有数据
-//				console.log(this.have.value)
-				this.closeModal(id);
+				
 			},
 			cfmDeleteUnvalid(id){//删除无效需求
-				for(var i=0;i<this.unvalidInfo.length;i++){
-					if(id==this.unvalidInfo[i].id){
-						let index = i;
-						this.unvalidInfo.splice(index,1)
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/del/" + id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal(id);
 					}
-				}
-				
-				this.confirmModify.unvalid = [];
-				this.confirmDelete.unvalid = [];
-				for(var i=0;i<this.unvalidInfo.length;i++){
-					this.confirmModify.unvalid.push("unvalidConfirmModify"+this.unvalidInfo[i].id);
-					this.confirmDelete.unvalid.push("unvalidConfirmDelete"+this.unvalidInfo[i].id);
-				}
-				if(this.unvalidInfo.length!=0){
-					Vue.set(this.have.value,[1],true)
-	//				console.log(this.have.value)
-				}else{
-					Vue.set(this.have.value,[1],false)
-				};//再次判断wu效需求里面有没有数据
-				this.closeModal(id);
+				},function(err){
+					console.log(err)
+				})
 			},
 			closeModal(id){
 				var validModify = "validConfirmModify"+id;

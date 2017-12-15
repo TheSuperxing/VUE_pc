@@ -327,9 +327,9 @@
 		    			break;
 		    	}
 	    		that.addNewProject.projectType.push.apply(that.addNewProject.projectType,[])//去重
-	    		console.log(that.addNewProject.projectType)
+	    		
 	    	}
-	    	
+	    	console.log(that.addNewProject.projectType)
 	    	
 	    },
 	    async mounted(){
@@ -343,9 +343,9 @@
 				Vue.set(that,"picList",data.msg)
 			    Vue.set(that,"picNum",data.msg.length)
 			}
-			console.log(that.picList)
-			console.log(that.picNum)
-			console.log(Math.floor(8-that.picNum))
+//			console.log(that.picList)
+//			console.log(that.picNum)
+//			console.log(Math.floor(8-that.picNum))
 			if(Math.floor(8-that.picNum)>0){
 				singleManualUploader({
 					element:"fine-uploader-manual-trigger",
@@ -444,6 +444,7 @@
 			      }
 			      
 			    }
+			    console.log(this.projectInfo.architectFunctions)
 			},
 			keepAddProjectTypeName(){//添加模式下，建筑功能的扩展的保存
 				var that = this;

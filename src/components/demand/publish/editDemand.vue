@@ -4,13 +4,13 @@
 		<ul class="edit_table">
 			<li>
 				<p class="wrap-left">*需求名称</p>
-				<input type="text" placeholder="请输入需求名称..." v-model="newDemandInfo.name"/>
+				<input type="text" placeholder="请输入需求名称..." v-model="newDemandInfo.demandbasicinfo.demandName"/>
 				<alertTip v-if="showAlert.name" :showHide="showAlert.name" @closeTip="closeTip" :alertText="alertText.name"></alertTip>
 				
 			</li>
 			<li>
 				<p class="wrap-left">*需求描述</p>
-				<textarea maxlength="500" placeholder="请输入 需求详细描述文案..." v-model="newDemandInfo.describe"></textarea>
+				<textarea maxlength="500" placeholder="请输入 需求详细描述文案..." v-model="newDemandInfo.demandbasicinfo.describe"></textarea>
 				<span>{{describeCont}}/500</span>
 				<alertTip v-if="showAlert.describe" :showHide="showAlert.describe" @closeTip="closeTip" :alertText="alertText.describe"></alertTip>
 				
@@ -18,7 +18,7 @@
 			<li>
 				<p class="wrap-left">*完成时间</p>
 				<!--<input type="text" placeholder="请输入完成时间..." />-->
-				<datepicker class="datePicker" v-model="newDemandInfo.complateTime"></datepicker>
+				<datepicker class="datePicker" v-model="newDemandInfo.demandbasicinfo.complateTime"></datepicker>
 				<alertTip v-if="showAlert.complateTime" :showHide="showAlert.complateTime" @closeTip="closeTip" :alertText="alertText.complateTime"></alertTip>
 				
 			</li>
@@ -33,20 +33,20 @@
 			</li>
 			<li>
 				<p class="wrap-left">*对象要求</p>
-				<textarea  maxlength="500" placeholder="请输入对象要求..." v-model="newDemandInfo.objRequire"></textarea>
+				<textarea  maxlength="500" placeholder="请输入对象要求..." v-model="newDemandInfo.demandbasicinfo.objRequire"></textarea>
 				<span>{{requireCont}}/500</span>
 				<alertTip v-if="showAlert.objRequire" :showHide="showAlert.objRequire" @closeTip="closeTip" :alertText="alertText.objRequire"></alertTip>
 				
 			</li>
 			<li>
 				<p class="wrap-left">*需求酬劳</p>
-				<input type="text" placeholder="请输入需求酬劳（为若干位数字）..." v-model="newDemandInfo.reword"/>
+				<input type="text" placeholder="请输入需求酬劳（为若干位数字）..." v-model="newDemandInfo.demandbasicinfo.reword"/>
 				<alertTip v-if="showAlert.reword" :showHide="showAlert.reword" @closeTip="closeTip" :alertText="alertText.reword"></alertTip>
 				
 			</li>
 			<li>
 				<p class="wrap-left">备注信息</p>
-				<textarea  maxlength="500" placeholder="请输入备注信息..." v-model="newDemandInfo.remark"></textarea>
+				<textarea  maxlength="500" placeholder="请输入备注信息..." v-model="newDemandInfo.demandbasicinfo.remark"></textarea>
 				<span>{{remarkCont}}/500</span>
 			</li>
 			<div class="btnBox">
@@ -78,6 +78,8 @@
 	import Modal from "../../../assets/js/modal"
 	import AlertTip from "../units/alertTip.vue"
 	import Datepicker from "../units/Datepicker.vue"
+    import MyAjax from "../../../assets/js/MyAjax.js"
+	
 	export default{
 		name:"editDemand",
 		data:function(){
@@ -85,28 +87,49 @@
 				demandObj:[
 				"个人","公司","团队"
 				],
+//				newDemandInfo:{
+//					id:"7",
+//					name:"",//需求名称
+//					describe:"",//需求描述
+//					complateTime:"",//完成时间
+//					demandObj:["","",""],//对象
+//					objRequire:"",//对象的要求
+//					reword:"",//酬劳
+//					remark:"",//备注
+//					applicant:[
+//					
+//					],//申请方
+//					relatedDeal:[
+//						{
+//							name:"华东设计",
+//						},{
+//							name:"万达有限公司",
+//						}
+//					],//关联协议
+//					auditStatus:"0",
+//					havePublished:false,//有没有被发布过
+//					haveOffLine:false,//有没有在线
+//				},
 				newDemandInfo:{
-					id:"7",
-					name:"",//需求名称
-					describe:"",//需求描述
-					complateTime:"",//完成时间
-					demandObj:["","",""],//对象
-					objRequire:"",//对象的要求
-					reword:"",//酬劳
-					remark:"",//备注
-					applicant:[
-					
-					],//申请方
-					relatedDeal:[
-						{
-							name:"华东设计",
-						},{
-							name:"万达有限公司",
-						}
-					],//关联协议
-					auditStatus:"0",
-					havePublished:false,//有没有被发布过
-					haveOffLine:false,//有没有在线
+					"demandbasicinfo": {
+				    "appTimes": 0,
+				    "complateTime": "",
+				    "demandName": "",
+				    "describe": "",
+				    "objRequire": "",
+				    "pkid": "",
+				    "pubAccountID": "",
+				    "pubName": "",
+				    "publishTime": "",
+				    "remark": "",
+				    "reword": 0,
+				    "type": 0,
+				    "watchTimes": 0
+				  },
+				  "demandobjs": [
+				    
+				  ],
+				  
 				},
 				describeCont:"0",//描述文字字数
 				requireCont:"0",//要求文字字数
@@ -128,55 +151,83 @@
 			for(var i=0;i<this.demandObj.length;i++){
 				this.selectedStyle.push(false);
 			}
-			this.newDemandInfo.id = Math.floor(Math.random()*1000);//随机设置需求的id
-		    console.log(Math.floor(Math.random()*1000))
+//			this.newDemandInfo.id = Math.floor(Math.random()*1000);//随机设置需求的id
+//		    console.log(Math.floor(Math.random()*1000))
 			
 		},
 		methods:{
 			selectObj(index){
 				for(var i=0;i<this.demandObj.length;i++){
 					if(i==index){
+						console.log(index)
 						if(this.selectedStyle[index]==false){
 							Vue.set(this.selectedStyle,[index],true);
-							this.newDemandInfo.demandObj[index]=this.demandObj[index];
-							
+							switch (index){
+								case 0:
+									this.newDemandInfo.demandobjs.push("1001")
+									break;
+								case 1:
+									this.newDemandInfo.demandobjs.push("1002")
+									break;
+								case 2:
+									this.newDemandInfo.demandobjs.push("1003")
+									break;
+							}
+							this.newDemandInfo.demandobjs.push.apply(this.newDemandInfo.demandobjs,[])
 						}else{
 							Vue.set(this.selectedStyle,[index],false);
-							this.newDemandInfo.demandObj[index] = "";
+							Array.prototype.remove = function(val) {
+								var index = this.indexOf(val);
+								if (index > -1) {
+									this.splice(index, 1);
+								}
+							};
+							switch (index){
+								case 0:
+									this.newDemandInfo.demandobjs.remove("1001")
+									break;
+								case 1:
+									this.newDemandInfo.demandobjs.remove("1002")
+									break;
+								case 2:
+									this.newDemandInfo.demandobjs.remove("1003")
+									break;
+							}
+							
 						}
 						
 						//赋值到本地信息里
-						
+						console.log(this.newDemandInfo.demandobjs)
 					}else{
-//						Vue.set(this.selectedStyle,[i],false)
-//						this.selectedStyle[i] = false;
+//						Vue.set(this.selectedStyle,[i],false);
+//						this.newDemandInfo.demandObj[i].demandObj = "";
 					}
 				}
-				console.log(this.newDemandInfo.demandObj)
+//				console.log(this.newDemandInfo.demandobjs)
 			},
-			commitDemand(){
-				if(this.newDemandInfo.name.trim().length==0){
+			mustConfirm(){
+				if(this.newDemandInfo.demandbasicinfo.demandName.trim().length==0){
 					this.showAlert.name = true;
 					this.alertText.name = "需求名称为必填项"
 				}else{
 					this.showAlert.name = false;
 				};//判断项目名称不能为空
 				
-				if(this.newDemandInfo.describe.trim().length==0){
+				if(this.newDemandInfo.demandbasicinfo.describe.trim().length==0){
 					this.showAlert.describe = true;
 					this.alertText.describe = "需求描述为必填项"
 				}else{
 					this.showAlert.describe = false;
 //					
 				};//判断项目名称不能为空
-				if(this.newDemandInfo.complateTime.trim().length==0){
+				if(this.newDemandInfo.demandbasicinfo.complateTime.trim().length==0){
 					this.showAlert.complateTime = true;
 					this.alertText.complateTime = "需求时间为必填项"
 				}else{
 					this.showAlert.complateTime = false;
 //					
 				};//判断项目名称不能为空
-				for(var i=0;i<this.newDemandInfo.demandObj.length;i++){
+				for(var i=0;i<this.newDemandInfo.demandbasicinfo.demandObj.length;i++){
 					if(this.newDemandInfo.demandObj[i]!=""){
 						this.showAlert.demandObj = true;
 						this.alertText.demandObj = "需求对象为必填项"
@@ -185,34 +236,32 @@
 	//					
 					};//判断需求对象不能为空
 				}
-				if(this.newDemandInfo.objRequire.trim().length==0){
+				if(this.newDemandInfo.demandbasicinfo.objRequire.trim().length==0){
 					this.showAlert.objRequire = true;
 					this.alertText.objRequire = "对象需求为必填项"
 				}else{
 					this.showAlert.objRequire = false;
 //					
 				};//判断对象需求不能为空
-				if(this.newDemandInfo.reword.trim().length==0){
+				if(this.newDemandInfo.demandbasicinfo.reword.trim().length==0){
 					this.showAlert.reword = true;
 					this.alertText.reword = "需求酬劳为必填项";
 				}else{
 					this.showAlert.reword = false;
 //					
 				};//判断酬金不能为空
+			},
+			commitDemand(){
+				
 				console.log(this.newDemandInfo)
-				if(this.newDemandInfo.name.trim().length!=0&&this.newDemandInfo.describe.trim().length!=0&&this.newDemandInfo.complateTime.trim().length!=0
-				&&this.newDemandInfo.objRequire.trim().length!=0&&this.newDemandInfo.reword.trim().length!=0
+				if(this.newDemandInfo.demandbasicinfo.demandName.trim().length!=0&&this.newDemandInfo.demandbasicinfo.describe.trim().length!=0&&this.newDemandInfo.demandbasicinfo.complateTime.trim().length!=0
+				&&this.newDemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.newDemandInfo.demandbasicinfo.reword.trim().length!=0
 				){
-					for(var i=0;i<this.newDemandInfo.demandObj.length;i++){
-						if(this.newDemandInfo.demandObj[i]!=""){
-							Modal.makeText($('.confirmCommit'));
-							break;
-						}else{
-							this.showAlert.demandObj = false;
-		//					
-						};//判断项目名称不能为空
+					Modal.makeText($('.confirmCommit'));
+					this.showAlert.demandObj = false;
 						
-					}
+				}else{
+					this.mustConfirm();
 				}
 //				
 			},
@@ -224,78 +273,88 @@
 						return false;
 					}
 				}
-				Vue.set(this.newDemandInfo,"havePublished",true)//设置已经发布过的标志
-				Vue.set(this.newDemandInfo,"haveOffLine",true)//设置（暂且把提交的新需求看为审核通过在线了）
-				this.demandInfo.push(this.newDemandInfo);
-				console.log(this.demandInfo)
-				router.push("/yhzx/demand/publish/index");
-				this.closeModal();
-			},
-			saveToDraft(){
-				if(this.newDemandInfo.name.trim().length==0){
-					this.showAlert.name = true;
-					this.alertText.name = "需求名称为必填项"
-				}else{
-					this.showAlert.name = false;
-				};//判断项目名称不能为空
-				
-				if(this.newDemandInfo.describe.trim().length==0){
-					this.showAlert.describe = true;
-					this.alertText.describe = "需求描述为必填项"
-				}else{
-					this.showAlert.describe = false;
-//					
-				};//判断项目名称不能为空
-				if(this.newDemandInfo.complateTime.trim().length==0){
-					this.showAlert.complateTime = true;
-					this.alertText.complateTime = "需求时间为必填项"
-				}else{
-					this.showAlert.complateTime = false;
-//					
-				};//判断项目名称不能为空
-				for(var i=0;i<this.newDemandInfo.demandObj.length;i++){
-					if(this.newDemandInfo.demandObj[i]!=""){
-						this.showAlert.demandObj = true;
-						this.alertText.demandObj = "需求对象为必填项"
-					}else{
-						this.showAlert.demandObj = false;
-	//					
-					};//判断需求对象不能为空
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/insertOrUpdate/" + 'valid' 
+		    	
+		    	if(that.newDemandInfo.demandbasicinfo.complateTime=="至今"){
+					that.newDemandInfo.demandbasicinfo.complateTime = "0000.00";
 				}
-				
-				if(this.newDemandInfo.objRequire.trim().length==0){
-					this.showAlert.objRequire = true;
-					this.alertText.objRequire = "对象需求为必填项"
-				}else{
-					this.showAlert.objRequire = false;
-//					
-				};//判断项目名称不能为空
-				if(this.newDemandInfo.reword.trim().length==0){
-					this.showAlert.reword = true;
-					this.alertText.reword = "需求酬劳为必填项"
-				}else{
-					this.showAlert.reword = false;
-//					
-				};//判断项目名称不能为空
-				console.log(this.newDemandInfo)	
-				if(this.newDemandInfo.name.trim().length!=0&&this.newDemandInfo.describe.trim().length!=0&&this.newDemandInfo.complateTime.trim().length!=0
-				&&this.newDemandInfo.objRequire.trim().length!=0&&this.newDemandInfo.reword.trim().length!=0){
-					for(var i=0;i<this.newDemandInfo.demandObj.length;i++){
-						if(this.newDemandInfo.demandObj[i]!=""){
-							Vue.set(this.newDemandInfo,"auditStatus","")//没有需求审核状态
-							Vue.set(this.newDemandInfo,"havePublished",false)//设置未发布过的标志
-							Vue.set(this.newDemandInfo,"haveOffLine",false)//设置有没有在线
-							this.draftInfo.push(this.newDemandInfo)//上传到需求草稿里
-							router.push("/yhzx/demand/publish/index");
-							this.closeModal();
-							break;
-						}else{
-							this.showAlert.demandObj = false;
-		//					
-						};//判断项目名称不能为空
-						
+			    console.log(JSON.stringify(that.newDemandInfo))
+			    $.ajaxSetup({ contentType : 'application/json' });
+			    MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.newDemandInfo),
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					
+					if(data.code == 0){
+						router.go(-1);
+//						router.push("/yhzx/demand/publish/index")
+						that.closeModal();
 					}
 					
+				},function(err){
+					console.log(err)
+				})
+//				Vue.set(that.newDemandInfo,"havePublished",true)//设置已经发布过的标志
+//				Vue.set(that.newDemandInfo,"haveOffLine",true)//设置（暂且把提交的新需求看为审核通过在线了）
+//				that.demandInfo.push(that.newDemandInfo);
+//				console.log(that.demandInfo)
+				
+			},
+			saveToDraft(){
+				
+				console.log(this.newDemandInfo)	
+				if(this.newDemandInfo.demandbasicinfo.demandName.trim().length!=0&&this.newDemandInfo.demandbasicinfo.describe.trim().length!=0&&this.newDemandInfo.demandbasicinfo.complateTime.trim().length!=0
+				&&this.newDemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.newDemandInfo.demandbasicinfo.reword.trim().length!=0){
+					var that = this;
+					var url = MyAjax.urlhw+"/demandbasicinfo/insertOrUpdate/" + 'draft' 
+			    	
+			    	if(that.newDemandInfo.demandbasicinfo.complateTime=="至今"){
+						that.newDemandInfo.demandbasicinfo.complateTime = "0000.00";
+					}
+				    console.log(JSON.stringify(that.newDemandInfo))
+				    $.ajaxSetup({ contentType : 'application/json' });
+				    MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.newDemandInfo),
+						dataType: "json",   
+						async:false,
+					},function(data){
+						console.log(data)
+						
+						if(data.code == 0){
+							router.go(-1);
+//							router.push("/yhzx/demand/publish/index")
+
+							that.closeModal();
+						}
+						
+					},function(err){
+						console.log(err)
+					})
+//					for(var i=0;i<this.newDemandInfo.demandObj.length;i++){
+//						if(this.newDemandInfo.demandObj[i]!=""){
+//							Vue.set(this.newDemandInfo,"auditStatus","")//没有需求审核状态
+//							Vue.set(this.newDemandInfo,"havePublished",false)//设置未发布过的标志
+//							Vue.set(this.newDemandInfo,"haveOffLine",false)//设置有没有在线
+//							this.draftInfo.push(this.newDemandInfo)//上传到需求草稿里
+//							router.push("/yhzx/demand/publish/index");
+//							this.closeModal();
+//							break;
+//						}else{
+//							this.showAlert.demandObj = false;
+//		//					
+//						};//判断项目名称不能为空
+//						
+//					}
+					
+				}else{
+					this.mustConfirm();
 				}
 				
 			},
@@ -309,9 +368,9 @@
 			}
 		},
 		updated(){
-			this.describeCont = this.newDemandInfo.describe.length;
-			this.requireCont = this.newDemandInfo.objRequire.length;
-			this.remarkCont = this.newDemandInfo.remark.length;
+			this.describeCont = this.newDemandInfo.demandbasicinfo.describe.length;
+			this.requireCont = this.newDemandInfo.demandbasicinfo.objRequire.length;
+			this.remarkCont = this.newDemandInfo.demandbasicinfo.remark.length;
 		}
 	}
 </script>

@@ -59,7 +59,7 @@
 					<span @click="toWithdraw(item.id)" v-if="!item.coIntention">
 						<img src="../../../assets/img/demand/icon54.png" />
 						<img src="../../../assets/img/demand/icon55.png" />
-						撤回申请
+						撤回申请ba
 					</span>
 					<span @click="toReturn(item.id)" v-if="item.coIntention">
 						<img src="../../../assets/img/demand/icon56.png" />

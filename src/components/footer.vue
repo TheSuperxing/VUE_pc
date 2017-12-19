@@ -1,17 +1,12 @@
 <template>
   <div class="footer">
-    <div class="footerNav">
-      <div class="contact">
-        <span v-cloak>{{mContact}}</span>
-        <span v-cloak v-html="cContact"></span>
-      </div>
-      <div class="contactAds">
-        {{contactAds}}
-      </div>
-    </div>
-    <div class="copyring">
-      <p>Copyring &copy;2014CCDI&nbsp;&nbsp;All&nbsp;&nbsp;right&nbsp;&nbsp;reserved&nbsp;&nbsp;沪ICP备16030624号-2</p>
-    </div>
+    <h3>BuildingShop</h3>
+   	<p>
+   		<span>联系手机：<em>150-8888-9999</em></span>
+   		<span>办公室电话：<em>020-666-8888&nbsp;&nbsp;&nbsp;&nbsp;020-8888-666</em></span>
+   	</p>
+   	<p>联系地址：<em>上海市杨浦区1758号奚地国际</em></p>
+    <p>Copyring &copy;2014CCDI&nbsp;&nbsp;All&nbsp;&nbsp;right&nbsp;&nbsp;reserved&nbsp;&nbsp;沪ICP备16030624号-2</p>
   </div>
 </template>
 
@@ -29,43 +24,29 @@
   }
 </script>
 <style scoped lang="scss">
+ $themeColor:#ff7403; 
   .footer{
     width:100%;
     min-width: 1200px;
-    height: 140px;
+    height: 232px;
     overflow: hidden;
-    background: #ffffff;
+    background: url(../assets/img/header/footer.png) no-repeat;
     font-size: 14px;
-    .footerNav{
-      width:1200px;
-      height:110px;
-      padding-top:30px;
-      margin: 0 auto;
-      line-height: 32px;
-      color: #353535;
-      .contact{
-        text-align: center;
-        span:nth-child(1){
-          padding-right:20px;
-        }
-      }
-      .contactAds{
-        text-align: center;
-      }
-      
+    color:#FFFFFF;
+    h3{
+    	width: 201px;
+    	margin: 58px auto;
+    	margin-bottom: 30px;
+    	font-size: 34px;
+    	line-height: 34px;
+    	text-align: center;
+    	color: $themeColor;
     }
-    .copyring{
-      height: 30px;
-      background: #353535;
-      p{
-        width: 1200px;
-        margin:0 auto;
-        text-align: center;
-        color: #FFF;
-        font-size: 14px;
-        line-height: 30px;
-      }
+    p{
+    	line-height: 28px;
+    	text-align: center;
     }
+    
   }
 </style>
 

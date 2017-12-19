@@ -89,6 +89,7 @@
 		},
 		created(){
 			this.current_page=this.$route.query.page;
+			
 		},
         mounted() {
 			this.jumpPage(this.current_page);
@@ -150,12 +151,14 @@
 					async: false,
 					contentType:"application/json;charset=utf-8",
 				}, function(data){
+					console.log(data.msg)
 					if(data.code==0){
 						that.dataInfo = data.msg.records;//取出当前获取的所有需求
 						that.current_page=data.msg.current;//设置当前页
 						that.pages=data.msg.pages;//设置最大页数
 						for(let i=0;i<that.dataInfo.length;i++){
 							that.dataInfo[i].status=="1"?that.haveCollect.push(true):that.haveCollect.push(false);
+							
 						}
 					}else{
 						router.push("/error/500")

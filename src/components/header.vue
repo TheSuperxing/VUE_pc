@@ -1,16 +1,16 @@
 <template>
   <div class="header">
-    <div class="headerTop">
+    <!--<div class="headerTop">
       <h2>{{petName}}</h2>
       <ul class="topRight">
         <li>
-          <!-- <p v-on:mouseover="outTogOver(tog)" v-on:mouseout="outTogOut(tog)">
+           <p v-on:mouseover="outTogOver(tog)" v-on:mouseout="outTogOut(tog)">
             <span>设置</span>
-          </p> -->
-          <!-- <div class="tuichu" v-if="tog.value">
+          </p> 
+           <div class="tuichu" v-if="tog.value">
             <span></span>
             <p><em>退出登录</em></p>
-          </div> -->
+          </div> 
         </li>
         <li class="notice">
           <router-link to="/notice">
@@ -19,7 +19,7 @@
           </router-link>
         </li>
       </ul>
-    </div>
+    </div>-->
 
     <div class="headerNavBg" v-if="user.userState==1">
       <div class="headerNav" >
@@ -59,7 +59,9 @@
     <!--个人状态的导航-->
     <div class="headerNavBg"  v-if="user.userState==0">
       <div class="headerNav" >
-        <h1>LOGO</h1>
+        <div class="wrap-left">
+        	<img src="../assets/img/header/001.png" />
+        </div>
         <ul class="navlist" v-bind:class="{'personStyle':user.userState==0}">
           <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[0]">{{item.text}}</router-link></li>
         	<li class="primary" >
@@ -71,6 +73,25 @@
 		        </ul>
         	</li>
         </ul>
+        <div class="search-wrap">
+        	<input type="text" placeholder="搜索个人、团队、公司" />
+        </div>
+        <div class="wrap-right">
+        	<div class="resLog" v-if="!haveLogin">
+        		<router-link to="/login">登录</router-link>
+        		<router-link to="/register">注册</router-link>
+        	</div>
+        	<div class="logState" v-if="haveLogin">
+        		<router-link to="/notice">通知</router-link>
+        		<div class="userImg">
+        			<img src="../assets/img/header/1515.png" alt="../assets/img/header/1515.png"/>
+        			<div class="log-out">
+        				<img src="../assets/img/header/1616.png" />
+        				<em>退出登录</em>
+        			</div>
+        		</div>
+        	</div>
+        </div>
       </div>
     </div>
   </div>
@@ -91,7 +112,7 @@
         tog:{value:false},
         nav: [{
           text: "首页",
-          rout: ["/index","/index","/index"],
+          rout: ["/indexcontent","/indexcontent","/indexcontent"],
           active: false
         }, {
           text: "交易大厅",
@@ -105,6 +126,7 @@
 
         /*导航颜色切换原始状态*/
        	state:"",
+       	haveLogin:true,
       }
     },
     computed:mapState({
@@ -183,6 +205,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+ $themeColor:#ff7403; 
   .header{
     width:100%;
     min-width: 1200px;
@@ -284,15 +307,81 @@
         height:70px;
         position: relative;
         margin: 0 auto;
-        h1{
+        .wrap-left{
           float: left;
-          line-height: 70px;
-          font-size:40px;
-          color: #2eb3df;
-          position: absolute;
-          top: 0;
-          left:0;
+          height: 100%;
+          margin-right: 140px;
+          img{
+          	width: 201px;
+          	height: 34px;
+          	margin-top: 17px;
+          }
 
+        }
+        .wrap-right{
+        	float: right;
+        	height: 70px;
+        	text-align: 70px;
+        	.resLog{
+        		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+        		a{
+	        		float: left;
+	        		color: $themeColor;
+	        		
+	        		&:first-child{
+	        			margin-right: 16px;
+	        		}
+	        		
+	        	}
+        	}
+        	.logState{
+        		height:70px;
+        		line-height:70px;
+        		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+        		a{
+        			float: left;
+        			color: $themeColor;
+        			margin-right: 16px;
+        			
+        		}
+        		.userImg{
+        			width: 40px;
+	        		height: 70px;
+	        		line-height: 70px;
+	        		border-radius:50%;
+	        		position:  relative;
+        			float: left;
+        			&:hover{
+        				.log-out{
+        					display: block;
+        					cursor: pointer;
+        				}
+        			}
+        			.log-out{
+        				position: absolute;
+        				top: 70px;
+        				left: -80%;
+        				width: 100px;
+        				height: 40px;
+        				line-height: 40px;
+        				text-align: center;
+        				padding-top: 3px;
+        				/*padding-left: 14px;*/
+        				background: url(../assets/img/header/圆角矩形2.png) no-repeat;
+        				color: #FFFFFF;
+        				display:none;
+        				img{
+        					margin-right: 5px;
+        					margin-bottom: 2px;
+        				}
+        				em{
+        					display: inline-block;
+        					
+        				}
+        			}
+        		}
+        	}
+        	
         }
 
         .comStyle{
@@ -324,7 +413,7 @@
 			  	.primary{
 			  		a{
 				  		&.router-link-active{
-					  		color: rgb(242,117,25);
+					  		color: #FFFFFF;
 		
 					  	}
 				  	}
@@ -332,17 +421,20 @@
 
 			  }
         .navlist{
-          position: absolute;
-          right: 0;
+          float: left;
           .primary{
             float: left;
+            width: 108px;
             height:70px;
             line-height: 70px;
 
             position:relative;
             cursor: pointer;
             &:hover{
-            	background: rgba(200,200,200,.2);
+            	background: #333333;
+            	a{
+            		color: #FFFFFF;
+            	}
 							.userNav{
 								display: block;
 							}
@@ -350,7 +442,8 @@
 
             a{
               width: 100%;
-              padding:0 50px 0 50px;
+              height: 100%;
+              text-align: center;
               color: #353535;
               text-decoration: none;
               display: block;
@@ -363,8 +456,10 @@
               }
             }
             .userNav{
-            	background: rgba(200,200,200,.5);
+            	width: 100%;
+            	background: #4d4d4d;
             	position: absolute;
+            	
             	left: 0;
             	top: 70px;
             	display: none;
@@ -374,29 +469,40 @@
 
 	          		a{
 	          			height: 100%;
-	          			padding:0 50px 0 50px;
 	          			width: 100%;
 	          			display: inline-block;
 	          			line-height: 40px;
 	          			text-align: center;
 	          		}
 	          		&:hover{
-	          			background: rgba(200,200,200,.8);
+	          			background: #333333;
 	          		}
 	          	}
 	          }
           }
 
          a.router-link-active{
-            /*color: #2eb3df;*/
-            background: -webkit-linear-gradient(top,rgba(109,125,155,0),rgba(109,125,155,.3)); /* Safari 5.1 - 6 */
-					  background: -o-linear-gradient(top,rgba(109,125,155,0),rgba(109,125,155,.3)); /* Opera 11.1 - 12*/
-					  background: -moz-linear-gradient(top,rgba(109,125,155,0),rgba(109,125,155,.3)); /* Firefox 3.6 - 15*/
-					  background: linear-gradient(to top, rgba(109,125,155,0), rgba(109,125,155,.3)); /* 标准的语法 */
+           	background: #333333;
             span{
               border-bottom-color: #2eb3df;
             }
           }
+        }
+        .search-wrap{
+        	width: 300px;
+        	height: 36px;
+        	box-shadow: 0 0 15px rgba(179,179,179,.5);
+        	border-radius: 17px;
+        	float: left;
+        	margin-left: 97px;
+        	margin-top: 15px;
+        	padding: 0 40px;
+        	background: url(../assets/img/header/002.png) no-repeat left center;
+        	background-position: 16px;
+        	input{
+        		width: 100%;
+        		height: 100%;
+        	}
         }
 
       }

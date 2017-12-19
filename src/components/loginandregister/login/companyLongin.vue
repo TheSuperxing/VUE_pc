@@ -63,7 +63,7 @@
       companyLogin(){
        var account = JSON.parse(sessionStorage.getItem("account"));
         if((this.reveal.username==account.username&&this.reveal.password==account.password)||(this.reveal.username=="root"&&this.reveal.password=="root")){
-          Vue.set(this.reveal,"path","/index")
+          Vue.set(this.reveal,"path","/indexcontent/index")
           location.hash="/index";
         }else if(this.reveal.username!=account.username&&this.reveal.username!="root"){
           alert("账号不存在")

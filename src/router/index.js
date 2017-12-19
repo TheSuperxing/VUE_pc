@@ -1,11 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Index from "../components/index.vue"
+import IndexContent from "../components/index/index_content.vue"
+import Index from "../components/index/index.vue"
+import SearchPersonal from "../components/index/search_personal.vue"
+import SearchTeam from "../components/index/search_team.vue"
+import SearchCompany from "../components/index/search_company.vue"
+import SearchProject from "../components/index/search_project.vue"
 import Trading from "../components/trading/trading.vue"
 import TradingIndex from "../components/trading/tradingIndex.vue"
 import DemandDetail from "../components/trading/demandDetail.vue"
 
-import Business from "../components/wdjy.vue"
 import Users from "../components/users.vue"
 import Register from "../components/loginandregister/register/Register.vue"
 import Login from "../components/loginandregister/login/loginIndex.vue"
@@ -60,9 +64,21 @@ export default new Router({
     },
     {
     	path:"/registerDone/:id",name:"RegisterDone",component:RegisterDone
-    },
-    {
-      path:'/index', name:'Index',component:Index,
+    },{
+    	path:"/indexcontent",name:"IndexContent",component:IndexContent,redirect:'/indexcontent/index',
+    	children:[
+    		{
+    			path:'/indexcontent/index', name:'Index',component:Index,
+    		},{
+    			path:'/indexcontent/serachperson', name:'SearchPersonal',component:SearchPersonal,
+    		},{
+    			path:'/indexcontent/serachteam', name:'SearchTeam',component:SearchTeam,
+    		},{
+    			path:'/indexcontent/serachcompany', name:'SearchCompany',component:SearchCompany,
+    		},{
+    			path:'/indexcontent/serachproject', name:'SearchProject',component:SearchProject,
+    		},
+    	]
     },{
     	path:"/trading",name:"Trading",component:Trading,redirect:"/trading/index",
     	children:[
@@ -72,9 +88,6 @@ export default new Router({
     			path:"/trading/detail",component:DemandDetail,name:"DemandDetail",
     		}
     	]
-    },
-    {
-      path:'/wdjy', name:"Business",component:Business
     },
     {
       path:"/yhzx", name:"Users",component:Users,

@@ -1,33 +1,33 @@
 <template>
 	<div class="demandDetail">
 		<div class="title-wrap">
-			<h3 class="D-title">{{detailInfo.name}}
-				<div class="toolsBox">
+			<h3 class="D-title">{{detailInfo.demandbasicinfo.demandName}}
+				<div class="toolsBox" v-if="canEdit">
 					<div v-if="isMine">
-						<span @click="toDelete(detailId.id)" class="deleteBtn" v-if="!haveOffLine">
+						<span @click="toDelete(detailInfo.demandbasicinfo.pkid)" class="deleteBtn" v-if="canDelete" >
 							<img src="../../assets/img/demand/delete-black.png" />
 							<img src="../../assets/img/demand/icon49.png" />
 							删除
 						</span>
-						<span @click="toOffLine(detailId.id)" class="offlineBtn" v-if="haveOffLine">
+						<span @click="toOffLine(detailInfo.demandbasicinfo.pkid)" class="offlineBtn" v-if="canOffline">
 							<img src="../../assets/img/demand/icon50.png" />
 							<img src="../../assets/img/demand/icon51.png" />
 							下线
 						</span>
-						<span @click="toModify(detailId.id)" class="editBtn">
+						<span @click="toModify(detailInfo.demandbasicinfo.pkid)" class="editBtn" v-if="canEdit">
 							<img src="../../assets/img/demand/icon3.png" />
 							<img src="../../assets/img/demand/icon1.png" />
 							编辑
 						</span>
-						<span class="auditStatus" v-if="!haveOffLine">{{auditStatusTxt}}</span>
+						<span class="auditStatus" >{{auditStatusTxt}}</span>
 					</div>
 					<div v-if="!isMine">
-						<span class="cancelBtn" @click="cancelCollect(detailId.id)" v-if="haveCollect">
+						<span class="cancelBtn" @click="cancelCollect(detailInfo.demandbasicinfo.pkid)" v-if="haveCollect">
 							<img src="../../assets/img/demand/icon59.png"/>
 							<img src="../../assets/img/demand/icon59.png"/>
 							取消收藏
 						</span>
-						<span v-if="!haveCollect" class="collectBtn" @click="collectThis(detailId.id)">
+						<span v-if="!haveCollect" class="collectBtn" @click="collectThis(detailInfo.demandbasicinfo.pkid)">
 							<img src="../../assets/img/demand/icon002.png"/>
 							收藏
 						</span>
@@ -41,7 +41,7 @@
 							<p>进入编辑状态后，该需求将在需求中心下线。</p>
 							<p>且编辑后需等待管理员审核通过后才可再次进入需求中心。</p>
 							<p>是否确认进入编辑？</p>
-							<div class="confirmBtn" @click="cfmModify(detailId.id)">
+							<div class="confirmBtn" @click="cfmModify(detailInfo.demandbasicinfo.pkid)">
 								进入编辑
 							</div>
 						</div>
@@ -61,9 +61,9 @@
 					<div id="modal-overlay" class="confirmDelete">
 						<div class="modal-wrap">
 							<h5></h5>
-							<span class="modalChaBtn" @click="closeModal(detailId.id)"></span>
+							<span class="modalChaBtn" @click="closeModal(detailInfo.demandbasicinfo.pkid)"></span>
 							<p>是否确认删除该需求？</p>
-							<div class="confirmBtn" @click="cfmDelete(detailId.id)">
+							<div class="confirmBtn" @click="cfmDelete(detailInfo.demandbasicinfo.pkid)">
 								确认删除
 							</div>
 						</div>
@@ -71,14 +71,14 @@
 				</div>
 				
 			</h3>
-			<p class="time-wrap">发布时间：{{detailInfo.complateTime}}</p>
+			<p class="time-wrap">发布时间：{{detailInfo.demandbasicinfo.complateTime}}</p>
 		</div>
 		<div class="info-wrap">
 			<div class="pub-wrap">
 				<h5 class="info-title">
 					<span>发布方</span>
 				</h5>
-				<p>{{detailInfo.pubID}}</p>
+				<p>{{detailInfo.demandbasicinfo.pubName}}</p>
 			</div>
 			<h5 class="info-title">
 				<span>我的需求</span>
@@ -88,34 +88,34 @@
 				<ul>
 					<li>
 						<div class="wrap-left">需求描述</div>
-						<p>{{detailInfo.describe}}</p>
+						<p>{{detailInfo.demandbasicinfo.describe}}</p>
 						<p v-if="!haveValue.describe">暂无信息</p>
 					</li>
 					<li>
 						<div class="wrap-left">完成时间</div>
-						<p>{{detailInfo.complateTime}}</p>
+						<p>{{detailInfo.demandbasicinfo.complateTime}}</p>
 						<p v-if="!haveValue.complateTime">暂无信息</p>
 					</li>
 					<li>
 						<div class="wrap-left">需求对象</div>
 						<p>
-							<em v-for="item in detailInfo.demandObj">{{item}}</em>
+							<em v-for="item in detailInfo.demandobjs">{{item}}</em>
 						</p>
 						<p v-if="!haveValue.demandObj">暂无信息</p>
 					</li>
 					<li> 
 						<div class="wrap-left">对象要求</div>
-						<p>{{detailInfo.objRequire}}</p>
+						<p>{{detailInfo.demandbasicinfo.objRequire}}</p>
 						<p v-if="!haveValue.objRequire">暂无信息</p>
 					</li>
 					<li>
 						<div class="wrap-left">需求酬劳</div>
-						<p>{{detailInfo.reword}}</p>
+						<p>{{detailInfo.demandbasicinfo.reword}}</p>
 						<p v-if="!haveValue.reword">暂无信息</p>
 					</li>
 					<li>
 						<div class="wrap-left">备注信息</div>
-						<p>{{detailInfo.remark}}</p>
+						<p>{{detailInfo.demandbasicinfo.remark}}</p>
 						<p v-if="!haveValue.remark">暂无信息</p>
 					</li>
 					
@@ -124,7 +124,7 @@
 				
 			</div>
 			<p class="border_bottom"></p>
-			<div class="applicant-wrap">
+			<div class="applicant-wrap" v-if="havePublished">
 				<h5 class="A-title">
 					<span>申请方</span>
 					<span class="submitApp" v-if="!isMine" v-show="!myIntention" @click="sendApply">提交申请</span>
@@ -175,7 +175,7 @@
 				</div>
 				
 			</div>
-			<div class="relatedDeal-wrap">
+			<div class="relatedDeal-wrap" v-if="havePublished">
 				<h5 class="A-title">关联协议</h5>
 				<ul class="content-relatedDeal">
 					<li class="noDeal" v-if="!haveDeal">暂无关联协议</p>
@@ -220,14 +220,16 @@
 				myIntention:false,//如果不是我的需求，判断我的合作意向是否达成
 				myIntentionTxt:"",
 				detailId:{id:""},//所查看的需求id
-//				detailInfo:"",//对应的所查看的需求详情信息
+				detailInfo:"",//对应的所查看的需求详情信息
 				updownText:"展开查看详情",
 				updownFlag:false,//false收起状态
 				mengShow:true,//true收起状态
 				haveCooper:true,//有无申请方
 				haveDeal:true,//有无关联协议
-				havePublished:false,//有没有被发布过
-				haveOffLine:false,//有没有在线
+				havePublished:false,//有没有被发布过(审核状态值是一个大于等于3的值说明已经通过审核)有申请者和关联协议
+				canEdit:false,//有没有在线(审核状态为"草稿1"、"已经通过2"、"未通过4"、"手动5和自动下线6")具有编辑的功能
+				canOffline:false,//可以进行下线操作（已经通过3）
+				canDelete:false,
 				haveCollect:false,
 				intentionTxt:[],//我发布的需求，针对申请者 有无合作意向之后的文字信息
 				auditStatusShow:false,//需求审核状态的提示显隐 为auditStatus='0'表示在审核中，'1'表示审核完成可以编辑,"2"表示需求下线
@@ -238,18 +240,70 @@
 				myOperate:"",
 			}
 		},
-		computed:mapState({
-			detailInfo:state=>state.demand.detailInfo,/*获取vuex数据  需求数组*/
-		    demandInfo:state=>state.demand.demandInfo,/*获取vuex数据  需求数组*/
-		    unvalidInfo:state=>state.demand.unvalidInfo,
-		    applicationInfo:state=>state.demand.applicationInfo,
-		    draftInfo:state=>state.demand.draftInfo,/*获取vuex数据  需求数组*/
-		    colletionInfo:state=>state.demand.colletionInfo,
-		    userID:state=>state.userState.user.userID,/*我的ID*/
-		   	
-		}),
+//		computed:mapState({
+//			detailInfo:state=>state.demand.detailInfo,/*获取vuex数据  需求数组*/
+//		    demandInfo:state=>state.demand.demandInfo,/*获取vuex数据  需求数组*/
+//		    unvalidInfo:state=>state.demand.unvalidInfo,
+//		    applicationInfo:state=>state.demand.applicationInfo,
+//		    draftInfo:state=>state.demand.draftInfo,/*获取vuex数据  需求数组*/
+//		    colletionInfo:state=>state.demand.colletionInfo,
+//		    userID:state=>state.userState.user.userID,/*我的ID*/
+//		   	
+//		}),
 		create(){
-			
+			this.id = this.$route.query.id;
+			console.log(this.id);
+			var that = this;
+			var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.$route.query.id
+	    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				async:false,
+			},function(data){
+				console.log(data)
+				if(data.code==0){
+					console.log(data.msg)
+					Vue.set(that,"detailInfo",data.msg)
+				}
+				
+				console.log(that.detailInfo)
+			},function(err){
+				console.log(err)
+			})
+	    	that.detailInfo.demandobjs = that.detailInfo.demandobjs[0].split(",")
+			console.log(that.detailInfo.demandobjs)
+			//判断是否为我发布的需求
+			if(that.detailInfo.mine==true){
+				Vue.set(that,"isMine",true)
+			}else{
+				Vue.set(that,"isMine",false)
+			}
+			//判断需求的状态
+			if(that.detailInfo.demandreviewinfo.applyStatus!="2"){
+				that.canEdit = true;//可以编辑
+			}else{
+				that.canEdit = false;//不可以编辑
+				Vue.set(that,'auditStatusTxt',"需求审核中");	
+			}
+			if(that.detailInfo.demandreviewinfo.applyStatus != "2"||that.detailInfo.demandreviewinfo.applyStatus != "3"){
+				Vue.set(that,"canDelete",true)
+			}
+			if(that.detailInfo.demandreviewinfo.applyStatus=="3"){
+				that.canOffline = true;//可以下线操作
+				Vue.set(that,"canDelete",false)
+			}else{
+				that.canOffline = false;
+				
+			}
+			if(that.detailInfo.demandreviewinfo.applyStatus=="5"||that.detailInfo.demandreviewinfo.applyStatus=="6"){
+				Vue.set(that,'auditStatusTxt',"需求已下线");//需求下线的情况
+			}
+			if(Math.floor(that.detailInfo.demandreviewinfo.applyStatus)>=3){
+				Vue.set(that,"havePublished",true)
+			}else{
+				Vue.set(that,"havePublished",false)
+			}
 		},
 		mounted(){
 						
@@ -568,7 +622,7 @@
 $bfColor:#ffffff;
 $activeColor:#546686;
 	.demandDetail{
-		width: 1200px;
+		width: 100%;
 		padding: 26px 20px;
 		background: #FFFFFF;
 		.title-wrap{
@@ -781,7 +835,7 @@ $activeColor:#546686;
 				height: 100px;
 				overflow: hidden;
 				ul{
-					width:1160px;
+					width:100%;
 					overflow: hidden;
 					li{
 						margin-top: 15px;
@@ -792,7 +846,7 @@ $activeColor:#546686;
 							
 						}
 						p{
-							width: 1080px;
+							width: 93%;
 							color: #8c8c8c;
 							float: right;
 							text-align: justify;

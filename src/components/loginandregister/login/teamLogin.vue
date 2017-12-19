@@ -45,7 +45,7 @@
       teamLogin(){
         var account = JSON.parse(sessionStorage.getItem("account"));
         if((this.reveal.username==account.username&&this.reveal.password==account.password)||(this.reveal.username=="root"&&this.reveal.password=="root")){
-          location.hash="/index";
+          location.hash="/indexcontent/index";
         }else if(this.reveal.username!=account.username&&this.reveal.username!="root"){
           alert("账号不存在")
         }else if(this.reveal.password!=account.password&&this.reveal.password!="root"){

@@ -102,7 +102,7 @@
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
               console.log("success")
-              window.location.hash="/index"
+              window.location.hash="/indexcontent/index"
 							//router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){

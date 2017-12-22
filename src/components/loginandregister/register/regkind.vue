@@ -79,39 +79,7 @@
 			</router-link>
 		</p>
 	</ul>
-<<<<<<< HEAD
-	<ul class="person-wrap" v-if="state==2">
-		<li>
-			<input type="text"  placeholder="请输入手机号" v-model="personalRegInput.tel" @blur="personTelCfm"/>
-		</li>
-		<li>
-			
-			<input v-model="personalRegInput.picConfirm" @blur="picConfirm" type="text" placeholder="图形验证码">
-		    <img class="picConfirm" :src="picSrc" alt="" @click="changePic"/>
-		    <span v-if="reveal.error">图片验证码错误</span>
-		</li>
-		<li>
-			<input type="text" placeholder="请确认短信验证码" v-model="personalRegInput.messageConfirm" @blur="personalMsgCfm"/>
-			<button @click="settime" class="msgConfirm" :disabled="!show">
-			     <span v-if="show">获取验证码</span>
-			     <span v-if="!show" class="count">{{count}} s</span>
-			</button>
-		</li>
-		<alertTip v-if="personalRegInput.showAlert" :showHide="personalRegInput.showAlert" @closeTip="closeTip" :alertText="personalRegInput.alertText"></alertTip>
-		<div class="regBtn" @click="goRegisterDonePer">
-			注册
-		</div>
-		<p class="notice">
-			<span v-bind:class="{'selected':agree[2]}" @click="agreeDeal" class="agreeBtn"></span>
-			您已阅读并同意
-			<router-link to="">
-				[buildingshop用户协议]
-			</router-link>
-		</p>
-	</ul>
-=======
-	
->>>>>>> 5b6e26e00938fdea7ede2844cff783ba90cffebb
+
 	
 </div>
 </template>
@@ -198,7 +166,7 @@
 				
 				
 				var that = this;
-				var url = MyAjax.urlsy + "/accountmanainfo/registorMobileCode/" + that.personalRegInput.tel;
+				var url = MyAjax.urlhw + "/accountmanainfo/registorMobileCode/" + that.personalRegInput.tel;
 		        MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -236,7 +204,7 @@
 				})
 			},
 			changePic(){
-				this.picSrc = MyAjax.urlsy+"/captcha.jpg?random="+Math.random()
+				this.picSrc = MyAjax.urlhw+"/captcha.jpg?random="+Math.random()
 //		    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
 		    	$(".picConfirm").attr("src",this.picSrc)
 		    	
@@ -263,7 +231,7 @@
 			},
 			goRegisterDonePer(){
 				var that = this;
-				var url = MyAjax.urlsy+"/accountmanainfo/register";
+				var url = MyAjax.urlhw+"/accountmanainfo/register";
 				if(that.personalRegInput.tel.trim().length!=0&&that.personalRegInput.picConfirm.trim().length!=0&&that.personalRegInput.messageConfirm.trim().length!=0){
 					MyAjax.ajax({
 						type: "POST",
@@ -275,7 +243,7 @@
 						console.log(data.token)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
-							router.push("/index")
+							router.push("/indexcontent")
 						}else if(data.code==-1){
 							switch (data.msg){
 								case "100002":
@@ -298,7 +266,10 @@
 									that.personalRegInput.showAlert = true;
 									that.personalRegInput.alertText = "手机号已经注册";
 									break;
-								
+								case "null":
+									that.personalRegInput.showAlert = true;
+									that.personalRegInput.alertText = "系统报错";
+									break;
 								default:
 									break;
 							}

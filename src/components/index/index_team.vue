@@ -255,6 +255,7 @@
 							padding: 18px;
 							h3{
 								line-height:24px;
+								height: 48px;
 								text-align: center;
 								color: #333333;
 								font-size: 18px;
@@ -271,6 +272,7 @@
 							p{
 								color: #333333;
 								line-height: 18px;
+								height: 18px;
 								font-size: 14px;
 								overflow : hidden;
 								text-overflow: ellipsis;

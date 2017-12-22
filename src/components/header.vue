@@ -22,7 +22,7 @@
     </div>-->
 
     <div class="headerNavBg" v-if="user.userState==1">
-      <div class="headerNav" >
+      <div class="headerNav">
         <h1>LOGO</h1>
         <ul class="navlist" v-bind:class="{'comStyle':user.userState==1}">
           <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[1]" @click="getState">{{item.text}}</router-link></li>
@@ -87,7 +87,7 @@
         			<img src="../assets/img/header/1515.png" alt="../assets/img/header/1515.png"/>
         			<div class="log-out">
         				<img src="../assets/img/header/1616.png" />
-        				<em>退出登录</em>
+        				<em @click="loginOut">退出登录</em>
         			</div>
         		</div>
         	</div>
@@ -116,7 +116,7 @@
           active: false
         }, {
           text: "交易大厅",
-          rout: [{path:"/trading",query:{page:1}},{path:"/trading",query:{page:1}},{path:"/trading",query:{page:1}}],
+          rout: [{path:"/trading",},{path:"/trading",},{path:"/trading",}],
           active: false
         },],
 
@@ -194,7 +194,16 @@
 					default:
 						break;
 				}
-				 event.stopPropagation();
+				event.stopPropagation();
+			},
+			loginOut(){
+				console.log(74837)
+				cookieTool.setCookie("token","")
+				console.log(cookieTool.getCookie("token"))
+				if(cookieTool.getCookie("token")==""){
+					router.push("/login")
+				}
+				console.log(cookieTool.getCookie("token"))
 			}
     },
 

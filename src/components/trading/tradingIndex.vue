@@ -37,10 +37,10 @@
 						<!-- <span class="demandObj">{{item.className}}<i>;</i></span> -->
 					</div>
 					<div class="collect">
-						<span class="cancelBtn" @click="cancelCollect(index)" v-if="haveCollect[index]">
+						<span class="cancelBtn" @click="cancelCollect(item.demandID,index)" v-if="haveCollect[index]">
 							取消收藏
 						</span>
-						<span class="collectBtn" v-if="!haveCollect[index]" @click="collectThis(index)">
+						<span class="collectBtn" v-if="!haveCollect[index]" @click="collectThis(item.demandID,index)">
 							<img src="../../assets/img/demand/icon002.png"/>
 							收藏
 						</span>
@@ -88,6 +88,7 @@
 		    }
 		},
 		created(){
+			this.$route.query.page = 1;
 			this.current_page=this.$route.query.page;
 			
 		},
@@ -151,7 +152,7 @@
 					async: false,
 					contentType:"application/json;charset=utf-8",
 				}, function(data){
-					console.log(data.msg)
+					console.log(data)
 					if(data.code==0){
 						that.dataInfo = data.msg.records;//取出当前获取的所有需求
 						that.current_page=data.msg.current;//设置当前页
@@ -161,28 +162,29 @@
 							
 						}
 					}else{
-						router.push("/error/500")
-						console.log("错误返回")
+//						router.push("/error/500")
+//						console.log("错误返回")
 					}
 				},function(err){
 					router.push("/error/404")
 					console.log(err)
 				})
 			},
-			tradeColl(index){
-				var url = MyAjax.urlsy +"/tradeHall/collect"
+			tradeColl(id,status){
+				var url = MyAjax.urlsy +"/tradeHall/collect/"+id+"/"+status
 				var that=this;
 				$.ajaxSetup({ contentType : 'application/json' });
 				MyAjax.ajax({
 					type: "POST",
 					url:url,
-					data: JSON.stringify(that.dataInfo[index]),
+//					data: JSON.stringify(that.dataInfo[index]),
 					dataType: "json",
 					contentType:"application/json;charset=utf-8",
 					async: false,
 				},function(data){
-					if(data.conde==0){
-						that.jumpPage(this.current_page);
+					console.log(data)
+					if(data.code==0){
+						that.jumpPage(that.current_page);
 					}
 				},function(err){
 					console.log(err)
@@ -194,15 +196,15 @@
 			pageMinus() {//向上翻页
 				this.current_page>1?this.current_page--:this.current_page;
     		},
-    		cancelCollect(index){//取消收藏
+    		cancelCollect(id,index){//取消收藏
 				Vue.set(this.haveCollect,[index],false)
-				this.dataInfo[index].status="0"
-				this.tradeColl(index);
+//				this.dataInfo[index].status="0"
+				this.tradeColl(id,"0");
 			},
-			collectThis(index){//收藏这条
+			collectThis(id,index){//收藏这条
 				Vue.set(this.haveCollect,[index],true)
-				this.dataInfo[index].status="1"
-				this.tradeColl(index);
+//				this.dataInfo[index].status="1"
+				this.tradeColl(id,"1");
 			},
     	},
     	watch:{

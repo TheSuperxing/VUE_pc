@@ -49,18 +49,17 @@ var personalRouterChildren=[
 		    children:[
 		    	
 		      {path:"/yhzx/personal/info/personalIndex", component:personalIndex},
-		      {path:"/yhzx/personal/info/basicInfo", component:personalBasicInfo},
+		      {path:"/yhzx/personal/info/basicInfo", component:personalBasicInfo,name:"perBasicInfo"},
 		      {path:"/yhzx/personal/info/educationIndex", component:educationIndex},
-		      {path:"/yhzx/personal/info/workExperienceIndex", component:workExperienceIndex},
+		      {path:"/yhzx/personal/info/workExperienceIndex", component:workExperienceIndex,name:"perWorkExperience"},
 		      {
 				    path:"/yhzx/personal/info/personalProject", component:personalProject, redirect:"/yhzx/personal/info/personalProject/index",
 				    children:[
 				        {
-				        	path:"/yhzx/personal/info/personalProject/index", component:personalProjectIndex},
-				        {
+				        	path:"/yhzx/personal/info/personalProject/index", component:personalProjectIndex,name:"perProject"
+				        },{
 				      	    path:"/yhzx/personal/info/personalProject/editProject",component:editProject,name:'editPerProject'
-				      	},
-				        {
+				      	},{
 				      		path:"/yhzx/personal/info/personalProject/definedProject",component:definedProject,name:'definedProject'
 				        },
 //				        {
@@ -70,7 +69,7 @@ var personalRouterChildren=[
 
 				    ]
 			  	},
-		      {path:"/yhzx/personal/info/teamExperienceIndex", component:teamExperienceIndex},
+		      {path:"/yhzx/personal/info/teamExperienceIndex", component:teamExperienceIndex,name:"perTeamIndex"},
 		      {path:"/yhzx/personal/info/certificateIndex", component:certificateIndex},
 		      {path:"/yhzx/personal/info/jobInfoIndex", component:jobInfoIndex},
 		      {path:"/yhzx/personal/info/awardIndex", component:awardIndex},

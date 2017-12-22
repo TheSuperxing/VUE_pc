@@ -2,8 +2,8 @@
 	<div class="demandDetail">
 		<div class="title-wrap">
 			<h3 class="D-title">{{detailInfo.demandbasicinfo.demandName}}
-				<div class="toolsBox" v-if="canEdit">
-					<div v-if="isMine">
+				<div class="toolsBox">
+					<div v-if="isMine"  v-show="canEdit">
 						<span @click="toDelete(detailInfo.demandbasicinfo.pkid)" class="deleteBtn" v-if="canDelete" >
 							<img src="../../assets/img/demand/delete-black.png" />
 							<img src="../../assets/img/demand/icon49.png" />
@@ -19,8 +19,8 @@
 							<img src="../../assets/img/demand/icon1.png" />
 							编辑
 						</span>
-						<span class="auditStatus" >{{auditStatusTxt}}</span>
 					</div>
+					<div class="auditStatus" >{{auditStatusTxt}}</div>
 					<div v-if="!isMine">
 						<span class="cancelBtn" @click="cancelCollect(detailInfo.demandbasicinfo.pkid)" v-if="haveCollect">
 							<img src="../../assets/img/demand/icon59.png"/>
@@ -53,7 +53,7 @@
 							<span class="modalChaBtn" @click="closeModal"></span>
 							<p>如您确认进行下线操作，该需求将在需求中心下线。</p>
 							<p>您可在  "我的发布"——"无效需求"  中进行查看。</p>
-							<div class="confirmBtn" @click="cfmOffLine">
+							<div class="confirmBtn" @click="cfmOffLine(detailInfo.demandbasicinfo.pkid)">
 								确认下线
 							</div>
 						</div>
@@ -127,49 +127,49 @@
 			<div class="applicant-wrap" v-if="havePublished">
 				<h5 class="A-title">
 					<span>申请方</span>
-					<span class="submitApp" v-if="!isMine" v-show="!myIntention" @click="sendApply">提交申请</span>
+					<span class="submitApp" v-if="!isMine" v-show="!myIntention" @click="sendApply(detailInfo.demandbasicinfo.pkid)">提交申请</span>
 				</h5>
 				<div class="content-applicant">
 					<p class="stateNone" v-if="!haveCooper">( 暂无申请方 )</p>
-					<dl v-for="(item,index) in detailInfo.applicant" v-if="!isMine">
-						<dd><img src="../../assets/img/demand/icon003.png"/></dd>
+					<dl v-for="(item,index) in detailInfo.demandappinfos" v-if="!isMine">
+						<dd><img :src="item.psnAvatar"/></dd>
 						<dt>
-							<p class="comName">{{item.name}}</p>
-							<span v-if="item.coIntention=='1'" class="alreadySent">
-								已达成合作意向
+							<p class="comName">{{item.nickName}}</p>
+							<span class="alreadySent">
+								{{intentionTxt[index]}}
 							</span>
-							<span v-if="item.id==userID" v-show="myIntention"  @click="callReturnModal()" class="notyetSent">{{myIntentionTxt}}</span>
-							<div id="modal-overlay" class="confirmWithdraw" v-if="item.id==userID">
+							<span v-if="item.app_isMine" @click="callReturnModal()" v-bind:class="['notyetSent',{disabled:!canOffline}]">{{myIntentionTxt}}</span>
+							<div id="modal-overlay" class="confirmWithdraw" v-if="item.app_isMine">
 								<div class="modal-wrap">
 									<h5></h5>
 									<span class="modalChaBtn" @click="closeModal()"></span>
 									<p>确认撤回对该需求的申请吗？</p>
 									
-									<div class="confirmBtn" @click="returnIntention(item.id)">
+									<div class="confirmBtn" @click="withdrowIntention(item.pkid,2)">
 										确认撤回
 									</div>
 								</div>
 							</div>
-							<div id="modal-overlay" class="confirmReturn" v-if="item.id==userID">
+							<div id="modal-overlay" class="confirmReturn" v-if="item.app_isMine">
 								<div class="modal-wrap">
 									<h5></h5>
 									<span class="modalChaBtn" @click="closeModal()"></span>
 									<p>是否退回对发布方的合作意向</p>
-									<div class="confirmBtn" @click="returnIntention(item.id)">
+									<div class="confirmBtn" @click="returnIntention(item.pkid,4)">
 										确认退回
 									</div>
 								</div>
 							</div>
 						</dt>
 					</dl>
-					<dl v-for="(item,index) in detailInfo.applicant" v-if="isMine">
-						<dd><img src="../../assets/img/demand/icon003.png"/></dd>
+					<dl v-for="(item,index) in detailInfo.demandappinfos" v-if="isMine">
+						<dd><img :src="item.psnAvatar"/></dd>
 						<dt>
-							<p class="comName">{{item.name}}</p>
-							<span v-if="item.coIntention=='1'" class="alreadySent">
-								已达成合作意向
+							<p class="comName">{{item.nickName}}</p>
+							<span class="alreadySent">
+								{{intentionTxt[index]}}
 							</span>
-							<span v-if="item.coIntention=='0'" v-bind:class="['notyetSent',{disabled:!haveOffLine}]" @click="sentIntention(index)">同意合作申请</span>
+							<span v-if="item.status=='1'" v-bind:class="['notyetSent',{disabled:!canOffline}]" @click="sentIntention(item.pkid,3)">同意合作申请</span>
 						</dt>
 					</dl>
 				</div>
@@ -184,7 +184,7 @@
 						<span class="cancleDeal" @click="cancelDeal(index)">取消协议</span>
 						<span class="dealState" v-bind:class="{valid:item.valid,unvalid:!item.valid}">{{dealValid[index]}}</span>
 					</li>
-					<p class="stateNone" v-bind:class="{disabled:!haveOffLine}"  @click="addDeal">添加关联协议</p>
+					<p class="stateNone" v-bind:class="{disabled:!canOffline}"  @click="addDeal">添加关联协议</p>
 					<div id="modal-overlay" class="addDealModal">
 						<div class="modal-wrap">
 							<h5>添加关联协议</h5>
@@ -217,15 +217,15 @@
 		data:function(){
 			return{
 				isMine:false,//是否是我发布的需求
-				myIntention:false,//如果不是我的需求，判断我的合作意向是否达成
+				myIntention:false,//如果不是我的需求，判断我是否申请了需求
 				myIntentionTxt:"",
 				detailId:{id:""},//所查看的需求id
 				detailInfo:"",//对应的所查看的需求详情信息
 				updownText:"展开查看详情",
 				updownFlag:false,//false收起状态
 				mengShow:true,//true收起状态
-				haveCooper:true,//有无申请方
-				haveDeal:true,//有无关联协议
+				haveCooper:false,//有无申请方
+				haveDeal:false,//有无关联协议
 				havePublished:false,//有没有被发布过(审核状态值是一个大于等于3的值说明已经通过审核)有申请者和关联协议
 				canEdit:false,//有没有在线(审核状态为"草稿1"、"已经通过2"、"未通过4"、"手动5和自动下线6")具有编辑的功能
 				canOffline:false,//可以进行下线操作（已经通过3）
@@ -250,256 +250,348 @@
 //		    userID:state=>state.userState.user.userID,/*我的ID*/
 //		   	
 //		}),
-		create(){
-			this.id = this.$route.query.id;
-			console.log(this.id);
-			var that = this;
-			var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.$route.query.id
-	    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-				async:false,
-			},function(data){
-				console.log(data)
-				if(data.code==0){
-					console.log(data.msg)
-					Vue.set(that,"detailInfo",data.msg)
-				}
-				
-				console.log(that.detailInfo)
-			},function(err){
-				console.log(err)
-			})
-	    	that.detailInfo.demandobjs = that.detailInfo.demandobjs[0].split(",")
-			console.log(that.detailInfo.demandobjs)
-			//判断是否为我发布的需求
-			if(that.detailInfo.mine==true){
-				Vue.set(that,"isMine",true)
-			}else{
-				Vue.set(that,"isMine",false)
-			}
-			//判断需求的状态
-			if(that.detailInfo.demandreviewinfo.applyStatus!="2"){
-				that.canEdit = true;//可以编辑
-			}else{
-				that.canEdit = false;//不可以编辑
-				Vue.set(that,'auditStatusTxt',"需求审核中");	
-			}
-			if(that.detailInfo.demandreviewinfo.applyStatus != "2"||that.detailInfo.demandreviewinfo.applyStatus != "3"){
-				Vue.set(that,"canDelete",true)
-			}
-			if(that.detailInfo.demandreviewinfo.applyStatus=="3"){
-				that.canOffline = true;//可以下线操作
-				Vue.set(that,"canDelete",false)
-			}else{
-				that.canOffline = false;
-				
-			}
-			if(that.detailInfo.demandreviewinfo.applyStatus=="5"||that.detailInfo.demandreviewinfo.applyStatus=="6"){
-				Vue.set(that,'auditStatusTxt',"需求已下线");//需求下线的情况
-			}
-			if(Math.floor(that.detailInfo.demandreviewinfo.applyStatus)>=3){
-				Vue.set(that,"havePublished",true)
-			}else{
-				Vue.set(that,"havePublished",false)
-			}
+		created(){
+			this.getData()
 		},
 		mounted(){
-						
-			Vue.set(this.detailId,"id",this.$route.query.id)
-			console.log(this.detailInfo.pubID)
 			//判断是否是我发布的需求；
-			if(this.detailInfo.pubID == this.userID){
-				this.isMine = true;//是我发布的需求
-				//继而判断已经达成合作意向，来控制退回意向按钮的显隐
-				for(var i=0;i<this.detailInfo.applicant.length;i++){
-					if(this.detailInfo.applicant[i].coIntention=="1"){
-						this.myIntention = true;
-						this.intentionTxt.push("退回合作意向")
-					}else if(this.detailInfo.applicant[i].coIntention=="0"){
-						this.myIntention = true;
-						this.intentionTxt.push( "同意合作申请");
-					}else{
-						this.myIntention = false;
-					}
-				}
-				
-			}else if(this.detailInfo.pubID != this.userID){
-				this.isMine = false;//不是我发布的需求
-				//继而判断我有没有达成合作意向，来控制提交申请的显隐
-				for(var i=0;i<this.detailInfo.applicant.length;i++){
-					if(this.detailInfo.applicant[i].id==this.userID){
-						if(this.detailInfo.applicant[i].coIntention=="1"){
-							this.myIntention = true;
-							this.myIntentionTxt = "退回合作意向"
-							break;
-						}else if(this.detailInfo.applicant[i].coIntention=="0"){
-							this.myIntention = true;
-							this.myIntentionTxt = "撤回申请"
-						}else{
-							this.myIntention = false;
-						}
-						console.log(this.myIntention)
-							
-					}else{
-							this.myIntention = false;
-					}
-				}
-				
-			}
-			console.log(this.isMine)
+//			if(this.detailInfo.pubID == this.userID){
+//				this.isMine = true;//是我发布的需求
+//				//继而判断已经达成合作意向，来控制退回意向按钮的显隐
+//				for(var i=0;i<this.detailInfo.applicant.length;i++){
+//					if(this.detailInfo.applicant[i].coIntention=="1"){
+//						this.myIntention = true;
+//						this.intentionTxt.push("退回合作意向")
+//					}else if(this.detailInfo.applicant[i].coIntention=="0"){
+//						this.myIntention = true;
+//						this.intentionTxt.push( "同意合作申请");
+//					}else{
+//						this.myIntention = false;
+//					}
+//				}
+//				
+//			}else if(this.detailInfo.pubID != this.userID){
+//				this.isMine = false;//不是我发布的需求
+//				//继而判断我有没有达成合作意向，来控制提交申请的显隐
+//				for(var i=0;i<this.detailInfo.applicant.length;i++){
+//					if(this.detailInfo.applicant[i].id==this.userID){
+//						if(this.detailInfo.applicant[i].coIntention=="1"){
+//							this.myIntention = true;
+//							this.myIntentionTxt = "退回合作意向"
+//							break;
+//						}else if(this.detailInfo.applicant[i].coIntention=="0"){
+//							this.myIntention = true;
+//							this.myIntentionTxt = "撤回申请"
+//						}else{
+//							this.myIntention = false;
+//						}
+//						console.log(this.myIntention)
+//							
+//					}else{
+//							this.myIntention = false;
+//					}
+//				}
+//				
+//			}
 //			console.log(this.detailInfo)
 
-			// 判断各项有无数据
-			if(this.detailInfo.describe!=""){
-				this.haveValue.describe=true;
-			}
-			if(this.detailInfo.complateTime!=""){
-				this.haveValue.complateTime=true;
-			}
-			if(this.detailInfo.objRequire!=""){
-				this.haveValue.objRequire=true;
-			}
-			if(this.detailInfo.reword!=""){
-				this.haveValue.reword=true;
-			}
-			if(this.detailInfo.remark!=""){
-				this.haveValue.remark=true;
-			}
-			for(let i=0;i<this.detailInfo.demandObj.length;i++){
-				if(this.detailInfo.demandObj[i]!=""){
-					this.haveValue.demandObj = true;
-					break;
-				}
-			}
 			
-			//判断有没有合作方
-			if(this.detailInfo.applicant.length!=0){
-				Vue.set(this,'haveCooper',true)
-			}else{
-				Vue.set(this,'haveCooper',false)
-			}
-			//判断有没有关联协议
-			if(this.detailInfo.relatedDeal.length!=0){
-				Vue.set(this,'haveDeal',true)
-			}else{
-				Vue.set(this,'haveDeal',false)
-			}
-			//判断该需求草稿的来源，即判断有没有被发布过，来判定申请者及以后模块的有无。
-			if(this.detailInfo.havePublished==false){
-				Vue.set(this,"havePublished",false)//有没有被发布过
-				
-			}else{
-				Vue.set(this,"havePublished",true)
-			}
+			
+//			if(this.detailInfo.applicant.length!=0){
+//				Vue.set(this,'haveCooper',true)
+//			}else{
+//				Vue.set(this,'haveCooper',false)
+//			}
+//			//判断有没有关联协议
+//			if(this.detailInfo.relatedDeal.length!=0){
+//				Vue.set(this,'haveDeal',true)
+//			}else{
+//				Vue.set(this,'haveDeal',false)
+//			}
+//			//判断该需求草稿的来源，即判断有没有被发布过，来判定申请者及以后模块的有无。
+//			if(this.detailInfo.havePublished==false){
+//				Vue.set(this,"havePublished",false)//有没有被发布过
+//				
+//			}else{
+//				Vue.set(this,"havePublished",true)
+//			}
 			//判断有没有在线（在需求中心）
 			
 			
-			for(var i=0;i<this.detailInfo.applicant.length;i++){
-				
-				
-				if(this.detailInfo.applicant[i].coIntention!="1"){
-					this.intentionTxt.push("发送合作意向") ;
-//					Vue.set(this,'intentionTxt',"发送合作意向")
-//					console.log(this.intentionTxt)
-				}else{
-					this.intentionTxt.push("已达成合作意向") ;
-//					Vue.set(this,'intentionTxt',"已达成合作意向")
-				}
-				
-			}
+//			for(var i=0;i<this.detailInfo.applicant.length;i++){
+//				
+//				
+//				if(this.detailInfo.applicant[i].coIntention!="1"){
+//					this.intentionTxt.push("发送合作意向") ;
+////					Vue.set(this,'intentionTxt',"发送合作意向")
+////					console.log(this.intentionTxt)
+//				}else{
+//					this.intentionTxt.push("已达成合作意向") ;
+////					Vue.set(this,'intentionTxt',"已达成合作意向")
+//				}
+//				
+//			}
 //			console.log(this.detailInfo.auditStatus)
 			//需求审核状态的显隐，有无编辑下线操作按钮
-			if(this.detailInfo.auditStatus==="0"){
-				Vue.set(this,'auditStatusShow',true);
-				Vue.set(this,'auditStatusTxt',"需求审核中");	
-				
-			}else if(this.detailInfo.auditStatus==="1"){
-				Vue.set(this,'auditStatusShow',false);//需求审核通过的情况
-				Vue.set(this,'auditStatusTxt',"");
-				Vue.set(this,"haveOffLine",true)
-			}else if(this.detailInfo.auditStatus==="2"){
-				Vue.set(this,'auditStatusShow',false);
-				Vue.set(this,'auditStatusTxt',"需求已下线");//需求下线的情况
-				Vue.set(this,"haveOffLine",false)
-			}else{
-				Vue.set(this,'auditStatusShow',false);
-				Vue.set(this,'auditStatusTxt',"");//需求还未上线的情况
-			}
+//			if(this.detailInfo.auditStatus==="0"){
+//				Vue.set(this,'auditStatusShow',true);
+//				Vue.set(this,'auditStatusTxt',"需求审核中");	
+//				
+//			}else if(this.detailInfo.auditStatus==="1"){
+//				Vue.set(this,'auditStatusShow',false);//需求审核通过的情况
+//				Vue.set(this,'auditStatusTxt',"");
+//				Vue.set(this,"haveOffLine",true)
+//			}else if(this.detailInfo.auditStatus==="2"){
+//				Vue.set(this,'auditStatusShow',false);
+//				Vue.set(this,'auditStatusTxt',"需求已下线");//需求下线的情况
+//				Vue.set(this,"haveOffLine",false)
+//			}else{
+//				Vue.set(this,'auditStatusShow',false);
+//				Vue.set(this,'auditStatusTxt',"");//需求还未上线的情况
+//			}
 			
 			//协议的状态
-			for(var j=0;j < this.detailInfo.relatedDeal.length;j++){
-				if(this.detailInfo.relatedDeal[j].valid != false){
-//					console.log(this.detailInfo.relatedDeal)
-					this.dealValid.push("已生效");
-				}else{
-					this.dealValid.push("待生效");
-				}
-			}
+//			for(var j=0;j < this.detailInfo.relatedDeal.length;j++){
+//				if(this.detailInfo.relatedDeal[j].valid != false){
+////					console.log(this.detailInfo.relatedDeal)
+//					this.dealValid.push("已生效");
+//				}else{
+//					this.dealValid.push("待生效");
+//				}
+//			}
 //			console.log(this.dealValid)
 			
 		},
 		methods:{
-			
-			cancelCollect(id){//取消收藏
-				for(let i=0;i<this.colletionInfo.length;i++){
-					if(id==this.colletionInfo[i].id){
-						this.colletionInfo.splice(i,1)
+			getData(){
+				console.log(this.$route.query.id)
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.$route.query.id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"detailInfo",data.msg)
+					}
+					console.log(that.detailInfo)
+				},function(err){
+					console.log(err)
+				})
+		    	that.detailInfo.demandobjs = that.detailInfo.demandobjs[0].split(",")
+		    	for(let i=0;i<that.detailInfo.demandobjs.length;i++){
+					if(that.detailInfo.demandobjs.length!=0){
+						that.haveValue.demandObj = true;
+					}
+					switch (that.detailInfo.demandobjs[i]){
+						case "1001":
+							Vue.set(that.detailInfo.demandobjs,[i],"个人")
+							break;
+						case "1002":
+							Vue.set(that.detailInfo.demandobjs,[i],"公司")
+							break;
+						case "1003":
+							Vue.set(that.detailInfo.demandobjs,[i],"团队")
+							break;
+						default:
+							break;
+					}
+					
+				}
+				console.log(that.detailInfo.demandobjs)
+				//判断是否为我发布的需求
+				if(that.detailInfo.basic_isMine==true){
+					Vue.set(that,"isMine",true)
+				}else{
+					Vue.set(that,"isMine",false)
+				}
+				//判断有没有被收藏
+				if(that.detailInfo.demandcolinfo.col_isMine==true){
+					Vue.set(that,"haveCollect",true)
+				}else{
+					Vue.set(that,"haveCollect",false)
+				}
+				// 判断各项有无数据
+				if(that.detailInfo.demandreviewinfo.describe!=""){
+					that.haveValue.describe=true;
+				}
+				if(that.detailInfo.demandreviewinfo.complateTime!=""){
+					that.haveValue.complateTime=true;
+				}
+				if(that.detailInfo.demandreviewinfo.objRequire!=""){
+					that.haveValue.objRequire=true;
+				}
+				if(that.detailInfo.demandreviewinfo.reword!=""){
+					that.haveValue.reword=true;
+				}
+				if(that.detailInfo.demandreviewinfo.remark!=""){
+					that.haveValue.remark=true;
+				}
+				
+				
+				//判断有没有合作方
+				
+				for(let i=0;i<that.detailInfo.demandappinfos.length;i++){
+					if(that.detailInfo.demandappinfos[0].pkid==null){
+						that.haveCooper = false ;
+						that.detailInfo.demandappinfos = []
+					}else{
+						that.haveCooper = true ;
 					}
 				}
-				console.log(this.colletionInfo)
-				this.haveCollect = false;
+				
+				//申请方各自的状态
+				that.intentionTxt = [];
+				for(let i=0;i<that.detailInfo.demandappinfos.length;i++){
+					if(that.detailInfo.demandappinfos[i].status=="1"){
+						that.intentionTxt.push("未达成合作意向")
+					}else if(that.detailInfo.demandappinfos[i].status=="3"){
+						that.intentionTxt.push("已达成合作意向")
+					}
+					
+					
+				}
+				for(let i=0;i<that.detailInfo.demandappinfos.length;i++){
+					if(that.detailInfo.demandappinfos[i].app_isMine==true){
+						if(that.detailInfo.demandappinfos[i].status=="1"){
+							Vue.set(that,"myIntention",true);//我已经发送了申请   未达成
+							Vue.set(that,"myIntentionTxt","撤回申请")
+						}else if(that.detailInfo.demandappinfos[i].status=="3"){
+							Vue.set(that,"myIntention",true);//我已经发送了申请并且   已达成
+							Vue.set(that,"myIntentionTxt","退回合作意向")//
+						}else{
+							Vue.set(that,"myIntention",false);//我已经发送了申请   未达成
+						}
+						break;
+					}else{
+						Vue.set(that,"myIntention",false);//我已经发送了申请
+					}
+				}
+				console.log(that.myIntention)
+				//判断需求的状态
+				if(that.detailInfo.demandreviewinfo.applyStatus!="2"){
+					that.canEdit = true;//可以编辑
+				}else{
+					that.canEdit = false;//不可以编辑
+					Vue.set(that,'auditStatusTxt',"需求审核中");	
+				}
+				if(that.detailInfo.demandreviewinfo.applyStatus != "2"||that.detailInfo.demandreviewinfo.applyStatus != "3"){
+					Vue.set(that,"canDelete",true)
+				}
+				if(that.detailInfo.demandreviewinfo.applyStatus=="3"){
+					that.canOffline = true;//可以下线操作
+					Vue.set(that,"canDelete",false)
+				}else{
+					that.canOffline = false;
+					
+				}
+				if(that.detailInfo.demandreviewinfo.applyStatus=="5"||that.detailInfo.demandreviewinfo.applyStatus=="6"){
+					Vue.set(that,'auditStatusTxt',"需求已下线");//需求下线的情况
+				}
+				if(Math.floor(that.detailInfo.demandreviewinfo.applyStatus)>=3){
+					Vue.set(that,"havePublished",true)
+				}else{
+					Vue.set(that,"havePublished",false)
+				}
+			},
+			cancelCollect(id){//取消收藏
+				var url = MyAjax.urlsy +"/tradeHall/collect/"+id+"/"+0;
+				var that=this;
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.detailInfo),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 
 			},
 			collectThis(id){
-				for(let i=0;i<this.colletionInfo.length;i++){
-					if(id==this.colletionInfo[i].id){
-						this.colletionInfo.splice(i,1,this.detailInfo)
-					}else{
-						this.colletionInfo.push(this.detailInfo)
-					}
-				}
-				console.log(this.colletionInfo)
-				this.haveCollect = true;
+				var url = MyAjax.urlsy +"/tradeHall/collect/"+id+"/"+1;
+				var that=this;
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data: JSON.stringify(that.detailInfo),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+//				this.haveCollect = true;
 			},
-			toModify(){
-				Modal.makeText($(".confirmModify"));
+			toModify(id){
+				if(this.detailInfo.demandreviewinfo.applyStatus=="3"){
+					Modal.makeText($(".confirmModify"));
+				}else{
+					router.push({name:"modifyDraft",query:{id:id}});
+				}
+				
 			},
 			cfmModify(id){
-				for(var i=0;i<this.demandInfo.length;i++){
-					if(id==this.demandInfo[i].id){
-						this.demandInfo[i].auditStatus = "2";//需求下线。
-						this.unvalidInfo.push(this.demandInfo[i])//转入无效需求中
-						this.demandInfo.splice(i,1);
-					}
-				}
-				console.log(this.unvalidInfo)
+				
 				this.closeModal();
 				router.push({name:"modifyDraft",query:{id:id}});
+				
 			},
 			toDelete(){
 				Modal.makeText($(".confirmDelete"));
 			},
 			cfmDelete(id){
-				for(var i=0;i<this.demandInfo.length;i++){
-					if(this.detailId.id==this.demandInfo[i].id){
-						this.demandInfo.splice(i,1);
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/invalid/" + id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.closeModal();
+						router.go(-1);
 					}
-				}
-				router.push("/trading/index");
-				this.closeModal();
+				},function(err){
+					console.log(err)
+				})
+				
+				
 			},
 			toOffLine(id){
 				Modal.makeText($(".confirmOffline"));
 			},
-			cfmOffLine(){//下线此需求
-				$('.auditStatus').show()
-				this.detailInfo.auditStatus = "2";//需求下线。
-				Vue.set(this,"haveOffLine",false)
-//				Vue.set(this,'auditStatusShow',true);
-				Vue.set(this,'auditStatusTxt',"需求已下线");
-				this.closeModal();
+			cfmOffLine(id){//下线此需求
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/invalid/" + id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.detailInfo.demandreviewinfo.applyStatus=="5";
+						that.getData();
+						that.closeModal();
+					}
+				},function(err){
+					console.log(err)
+				})
 			},
 			closeModal(){
 				Modal.closeModal($(".confirmModify"))
@@ -507,6 +599,8 @@
 				Modal.closeModal($(".addDealModal"))
 				Modal.closeModal($(".confirmReturn"))
 				Modal.closeModal($(".confirmWithdraw"))
+				Modal.closeModal($(".confirmDelete"))
+				
 			},
 			upDwon(){
 				var tempheight = $('.detail-wrap').css("height");
@@ -538,21 +632,40 @@
 				}
 				
 			},
-			sendApply(){
-				//提交申请后我的意向为true
-				this.myIntention = true;
-				this.myIntentionTxt = "撤回申请";
-				
-				$('.submitApp').css("display","none");
-				$('.notyetSent').show();
-				var myApplyInfo = {
-					id:this.userID,
-					name:"CCDI",
-					coIntention:"0",
-				}
-				console.log(myApplyInfo);
-				this.detailInfo.applicant.push(myApplyInfo)
-				console.log(this.detailInfo.applicant);
+			sendApply(id){
+				var url = MyAjax.urlsy +"/demandappinfo/insert/"+id;
+				var that=this;
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"myIntention",true)
+						that.getData();
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+//				this.haveCollect = true;
+//				//提交申请后我的意向为true
+//				
+//				this.myIntentionTxt = "撤回申请";
+//				
+//				$('.submitApp').css("display","none");
+//				$('.notyetSent').show();
+//				var myApplyInfo = {
+//					id:this.userID,
+//					name:"CCDI",
+//					coIntention:"0",
+//				}
+//				console.log(myApplyInfo);
+//				this.detailInfo.applicant.push(myApplyInfo)
+//				console.log(this.detailInfo.applicant);
 			},
 			callReturnModal(){//不是我发布的需求的情况下，我申请或者达成合作后撤回意向的模态框
 				if(this.myIntentionTxt == "撤回申请"){
@@ -563,25 +676,59 @@
 				
 				
 			},
-			returnIntention(id){
-				if(this.myIntentionTxt == "撤回申请"){
-					for(var i=0;i<this.detailInfo.applicant.length;i++){
-						if(this.detailInfo.applicant[i].id == id){
-							this.detailInfo.applicant.splice(i,1)
-						}
-					}
-					$('.submitApp').css("display","block");
-//					$('.notyetSent').hide()
-				}else if(this.myIntentionTxt == "退回合作意向"){
-					
-					for(var i=0;i<this.detailInfo.applicant.length;i++){
-						if(this.detailInfo.applicant[i].id == id){
-							this.detailInfo.applicant.splice(i,1)
-						}
-					}
-					$('.submitApp').css("display","block");
+			withdrowIntention(pkid,status){//撤回合作申请
+				var url = MyAjax.urlsy +"/demandappinfo/update/";
+				var that=this;
+				var data = {
+					"pkid": pkid,
+					"status":status
 				}
-				this.closeModal()
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"myIntention",false)
+						that.getData();
+						that.closeModal()
+						
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+			},
+			returnIntention(pkid,status){
+				var url = MyAjax.urlsy +"/demandappinfo/update/";
+				var that=this;
+				var data = {
+					"pkid": pkid,
+					"status":status
+				}
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"myIntention",false)
+						that.getData();
+						that.closeModal()
+						
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 			},
 			cancelDeal(index){
 				this.detailInfo.relatedDeal.splice(index,1)
@@ -592,20 +739,36 @@
 				}
 			},
 			addDeal(){
-				if(this.haveOffLine!=false){
+				if(this.canOffline!=false){
 					Modal.makeText($(".addDealModal"))
 				}
 			},
-			sentIntention(index){
-				if(this.haveOffLine!=false){
-					for(var i=0;i<this.detailInfo.applicant.length;i++){
-						if(i==index){
-							this.detailInfo.applicant[index].coIntention = '1';
-//						Vue.set(this,"detailInfo.applicant[index].coIntention",true)
-							this.intentionTxt[index] = "已达成合作意向"
-						}
-					}
+			sentIntention(pkid,status){
+				var url = MyAjax.urlsy +"/demandappinfo/update/";
+				var that=this;
+				var data = {
+					"pkid": pkid,
+					"status":status
 				}
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"myIntention",false)
+						that.getData();
+						that.closeModal()
+						
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 				
 				
 			},
@@ -633,17 +796,23 @@ $activeColor:#546686;
 				line-height: 50px;
 				font-size: 28px;
 				color: $activeColor;
-				.auditStatus{
-					float: right;
-					color: #f76c0f !important;
-					font-size: 14px;
-					margin-right: 30px;
-				}
+				
 				.toolsBox{
 					float: right;
 					margin-top: 10px;
 				    &:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
-					
+					>div{
+						float: right;
+						&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+					}
+					.auditStatus{
+						float: right;
+						color: #f76c0f !important;
+						font-size: 14px;
+						margin-right: 30px;
+						height: 30px;
+						line-height: 30px;
+					}
 					span{
 						/*position: absolute;*/
 						width: 80px;
@@ -905,18 +1074,26 @@ $activeColor:#546686;
 					margin-top: 10px;
 					&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
 					.stateNone{
-						height: 40px;
-						line-height: 40px;
+						height: 50px;
+						line-height: 50px;
 						color: #8C8C8C;
 					}
 					dl{
-						height: 220px;
+						height: 200px;
 						float: left;
 						margin-right: 30px;
 						margin-top: 10px;
 						dd{
 							margin-bottom: 10px;
 							text-align: center;
+							width: 80px;
+							height: 80px;
+							border-radius: 50%;
+							margin: 0 auto;
+							overflow: hidden;
+							img{
+								width: 100%;
+							}
 						}
 						dt{
 							/*height: 40px;*/
@@ -953,7 +1130,7 @@ $activeColor:#546686;
 								color: #f76c0f;
 							}
 							.notyetSent{
-								margin-top: 15px;
+								margin-top: 10px;
 								background: #353535;
 								color: #FFFFFF;
 								border-radius: 3px;

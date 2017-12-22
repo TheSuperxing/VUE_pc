@@ -190,6 +190,7 @@
 					font-size: 14px;
 					color: #FFFFFF;
 					line-height: 24px;
+					height: 192px;
 					overflow : hidden;
 					text-overflow: ellipsis;
 					display: -webkit-box;
@@ -198,6 +199,15 @@
 					margin-bottom: 5px;
 					margin-top: 20px;
 				}
+				/*p::after {
+				    content:"...";
+				    font-weight:bold;
+				    position:absolute;
+				    bottom:0;
+				    right:0;
+				    padding:0 20px 1px 45px;
+				    background:url(http://newimg88.b0.upaiyun.com/newimg88/2014/09/ellipsis_bg.png) repeat-y;
+				}*/
 				span{
 					float:right;
 					width: 102px;

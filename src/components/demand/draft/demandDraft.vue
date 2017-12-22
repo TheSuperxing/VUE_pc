@@ -1,6 +1,7 @@
 <template>
 	<div class="demandDraft">
 		<ul class="draftTable">
+			<li class="stateNone" v-if="!haveInfo">暂无草稿</li>
 			<li v-for="(item,index) in draftInfo">
 				<h3>
 					<router-link :to="{path:'/yhzx/demand/draft/detail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.demandName}}</router-link>
@@ -48,6 +49,7 @@
 			return{
 				confirmDelete:[],//确认删除的模态框类名
 				draftInfo:[],
+				haveInfo:false,
 			}
 		},
 //		computed:mapState({
@@ -75,6 +77,12 @@
 					if(data.code==0){
 						console.log(data.msg)
 						Vue.set(that,"draftInfo",data.msg)
+						if(that.draftInfo.length!=0){
+							Vue.set(that,"haveInfo",true)
+						}else{
+							Vue.set(that,"haveInfo",false)
+						}
+						console.log(that.haveInfo)
 					}
 					
 					console.log(that.draftInfo)
@@ -135,6 +143,13 @@ $bfColor:#ffffff;
 	border-radius: 5px;
 	padding: 30px 20px 50px;
 	.draftTable{
+		.stateNone{
+			border: none;
+			font-size: 18px;
+			line-height: 24px;
+			text-align: center;
+			color: #898989;
+		}
 		li{
 			padding:20px 0;
 			border-bottom: 1px solid #E0E0E0;

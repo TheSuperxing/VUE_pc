@@ -1,13 +1,13 @@
 <template>
 	<div class="collectionIndex">
 		<ul class="collectionTable">
-			<li class="stateNone" v-if="!haveValue">此处暂无数据</li>
-			<li v-for="(item,index) in colletionInfo">
+			<li class="stateNone" v-if="!haveValue">暂无数据</li>
+			<li v-for="(item,index) in collections">
 				<h3>
-					<router-link :to="{name:'colletionDetail',query:{id:item.id}}">{{item.name}}</router-link>
-					<span @click="cancelCollect(index)">取消收藏</span>
+					<router-link :to="{name:'colletionDetail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.name}}</router-link>
+					<span @click="cancelCollect(item.demandbasicinfo.pkid)">取消收藏</span>
 				</h3>
-				<p>创建时间：{{item.complateTime}}</p>
+				<p>创建时间：{{item.demandbasicinfo.creTime}}</p>
 			</li>
 		</ul>
 	</div>
@@ -18,11 +18,15 @@
 	import {mapState} from "vuex"
 	import Modal from "../../../assets/js/modal.js"
 	import router from '../../../router'
+    import MyAjax from "../../../assets/js/MyAjax.js"
+	
 	export default{
 		name:"collectionIndex",
 		data:function(){
 			return{
 				haveValue:true,
+				collections:[],
+				
 			}
 		},
 		computed:mapState({
@@ -31,20 +35,56 @@
 		  applicationInfo:state=>state.demand.applicationInfo,
 		}),
 		mounted(){
-			if(this.colletionInfo.length!=0){
-				Vue.set(this,'haveValue',true)
-			}else{
-				Vue.set(this,'haveValue',false)
-			};//判断有效需求里面有没有数据
+			
+		},
+		created(){
+			this.getData();
 		},
 		methods:{
-			cancelCollect(index){
-				this.colletionInfo.splice(index,1)
-				if(this.colletionInfo.length!=0){
-					Vue.set(this,'haveValue',true)
-				}else{
-					Vue.set(this,'haveValue',false)
-				};//判断有效需求里面有没有数据
+			getData(){
+				var that = this;
+				var url_valid = MyAjax.urlhw+"/demandbasicinfo/findByMySelf/" + "collect"
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url_valid,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"collections",data.msg)
+					}
+					console.log(that.collections)
+				},function(err){
+					console.log(err)
+				})
+		    	if(that.collections.length!=0){
+		    		Vue.set(this,'haveValue',true)
+		    	}else{
+		    		Vue.set(this,'haveValue',false)
+		    	}//判断有效需求里面有没有数据
+		    	
+			},
+			cancelCollect(id){
+				var url = MyAjax.urlsy +"/tradeHall/collect/"+id+"/"+"0";
+				var that=this;
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+//					data: JSON.stringify(that.dataInfo[index]),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 			}
 		}
 	}
@@ -58,8 +98,11 @@ $bfColor:#ffffff;
 	.collectionTable{
 		.stateNone{
 			border-bottom: none;
-			padding-left: 50px;
+			height:50px;
+			line-height: 50px;
+			text-align: center;
 			color: #858585;
+			font-size: 18px;
 		}
 		li{
 			padding:10px 0;

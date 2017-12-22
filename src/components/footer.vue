@@ -13,11 +13,7 @@
 
 <script>
   export default {
-<<<<<<< HEAD
     name: 'foot',
-=======
-    name: 'FooterNav',
->>>>>>> 7b7cf552f7787d5fa638fe3e7925c89fd445d76d
     data:function() {
     	return{
         mContact:"联系手机:150-8888-9999",

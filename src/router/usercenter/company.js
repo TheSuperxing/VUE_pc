@@ -87,7 +87,7 @@ var companyRouterChildren=[
 					    {
 						    path:"/yhzx/company/info/companyConfirm", component:companyConfirm, redirect:"/yhzx/company/info/companyConfirm/index",
 						    children:[
-						      {path:"/yhzx/company/info/companyConfirm/index", component:companyConfirmIndex}
+						      {path:"/yhzx/company/info/companyConfirm/index", component:companyConfirmIndex,name:"comConfirm"}
 						      ]
 						},
 					    {
@@ -118,7 +118,7 @@ var companyRouterChildren=[
 						    path: "/yhzx/company/info/companyTeam", component: companyTeam, redirect: "/yhzx/company/info/companyTeam/index",
 						    children: [
 						        {
-						        	path: "/yhzx/company/info/companyTeam/index", component: companyTeamIndex
+						        	path: "/yhzx/company/info/companyTeam/index", component: companyTeamIndex,name:"comTeamIndex"
 						        }
 						    ]
 						}

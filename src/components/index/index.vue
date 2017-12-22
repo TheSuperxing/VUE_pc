@@ -225,7 +225,7 @@
  		width: 1000px;
  		height: 150px;
  		position: absolute;
- 		z-index: 100;
+ 		z-index: 9;
  		top: 500px; left: 50%;
  		transform:translate(-50%,-50%);
 		 -webkit-transform:translate(-50%,-50%);

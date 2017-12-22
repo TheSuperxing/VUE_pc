@@ -11,29 +11,31 @@ import withdraw from "../../components/wallet/withdraw.vue"
 import payment from "../../components/wallet/payment.vue"
 import paymentPwd from "../../components/wallet/paymentPwd.vue"
 import payDone from "../../components/wallet/payDone.vue"
+import TradingRecord from "../../components/wallet/tradingRecord.vue"
+
 import Publishing from "../../components/demand/publish/publishing.vue"
 import EditDemand from "../../components/demand/publish/editDemand.vue"
 import PublishBtn from "../../components/demand/publish/PublishBtn.vue"
 import DraftIndex from "../../components/demand/draft/draftIndex.vue"
 import modifyDraft from "../../components/demand/draft/modifyDraft.vue"
 import demandDraft from "../../components/demand/draft/demandDraft.vue"
-import draftDetail from "../../components/demand/publishment/publishmentDetail.vue"
+import draftDetail from "../../components/trading/demandDetail.vue"
 import Application from "../../components/demand/application/application.vue"
 import ApplicationIndex from "../../components/demand/application/applicationIndex.vue"
-import ApplicationDetail from "../../components/demand/application/applicationDetail.vue"
+import ApplicationDetail from "../../components/trading/demandDetail.vue"
 import Publishment from "../../components/demand/publishment/publishment.vue"
 import PublishmentIndex from "../../components/demand/publishment/publishmentIndex.vue"
-import PublishmentDetail from "../../components/demand/publishment/publishmentDetail.vue"
+import PublishmentDetail from "../../components/trading/demandDetail.vue"
 import Collection from "../../components/demand/collection/collection.vue"
 import CollectionIndex from "../../components/demand/collection/collectionIndex.vue"
-import CollectionDetail from "../../components/demand/collection/collectionDetail.vue"
-
+import CollectionDetail from "../../components/trading/demandDetail.vue"
+//import DemandDetail from "../../components/trading/demandDetail.vue"
 var myDemand = [
 	{
 		path:"/yhzx/demand",name:"demand",component:Demand,redirect:"/yhzx/demand/publish",
 		children:[
 			{
-				path:"/yhzx/demand/wallet",component:Wallet,redirect:"/yhzx/demand/wallet/mywallet",
+				path:"/yhzx/demand/wallet",component:Wallet,redirect:"/yhzx/demand/wallet/tradingRecord",
 				children:[
 					{
 						path:"/yhzx/demand/wallet/mywallet",component:MyWallet,redirect:"/yhzx/demand/wallet/mywallet/index",
@@ -61,7 +63,9 @@ var myDemand = [
 						path:"/yhzx/demand/wallet/paymentPwd",component:paymentPwd,
 					},{
 						path:"/yhzx/demand/wallet/payDone",component:payDone,
-					},
+					},{
+						path:"/yhzx/demand/wallet/tradingRecord",component:TradingRecord,
+					}
 				]
 			},{
 				path:"/yhzx/demand/publish",component:Publishing,redirect:"/yhzx/demand/publish/index",
@@ -80,7 +84,7 @@ var myDemand = [
 					},{
 						path:"/yhzx/demand/draft/modify",component:modifyDraft,name:"modifyDraft"
 					},{
-						path:"/yhzx/demand/draft/detail",component:PublishmentDetail,
+						path:"/yhzx/demand/draft/detail",component:draftDetail,
 						name:"draftDetail",
 					}
 				]

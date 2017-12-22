@@ -10,41 +10,41 @@
 		<div class="demandList">
         	<ul v-if="tab.aa[0]">
         		<li class="stateNone" v-if="!have.value[0]">此处暂无数据</li>
-        		<li v-for="(item,$index) in applicationInfo" v-if="have.value[0]">
+        		<li v-for="(item,$index) in validDemand" v-if="have.value[0]">
         			<h3>
-        				<router-link :to="{name:'ApplicationDetail',query:{id:item.id}}">{{item.name}}</router-link>
+        				<router-link :to="{name:'ApplicationDetail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.demandName}}</router-link>
         				
-						<span @click="toWithdraw(item.id)" v-if="!item.coIntention">
+						<span @click="toWithdraw(item.demandappinfos[0].pkid)" v-if="item.demandappinfos[0].status==1">
 							<img src="../../../assets/img/demand/icon54.png" />
 							<img src="../../../assets/img/demand/icon55.png" />
 							撤回申请
 						</span>
-						<span @click="toReturn(item.id)" v-if="item.coIntention">
+						<span @click="toReturn(item.demandappinfos[0].pkid)" v-if="item.demandappinfos[0].status==3">
 							<img src="../../../assets/img/demand/icon56.png" />
 							<img src="../../../assets/img/demand/icon57.png" />
 							退回合作意向
 						</span>
 					</h3>
-					<p>创建时间：{{item.complateTime}}</p>
+					<p>创建时间：{{item.demandbasicinfo.creTime}}</p>
 					<!--编辑此需求的模态框 start-->
-					<div id="modal-overlay" v-bind:class="confirmWithdraw.valid[$index]" v-if="!item.coIntention">
+					<div id="modal-overlay" v-bind:class="confirmWithdraw.valid[$index]" v-if="item.demandappinfos[0].status==1">
 						<div class="detail-wrap">
 							<h5></h5>
-							<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+							<span class="modalChaBtn" @click="closeModal(item.demandappinfos[0].pkid)"></span>
 							<p>确认撤回对该需求的申请吗？</p>
 							
-							<div class="confirmBtn" @click="cfmWithdraw(item.id)">
+							<div class="confirmBtn" @click="cfmWithdraw(item.demandappinfos[0].pkid,2)">
 								确认撤回
 							</div>
 						</div>
 					</div>
 					<!--确认下线的模态框 start-->
-					<div id="modal-overlay" v-bind:class="confirmReturn.valid[$index]" v-if="item.coIntention">
+					<div id="modal-overlay" v-bind:class="confirmReturn.valid[$index]" v-if="item.demandappinfos[0].status==3">
 						<div class="detail-wrap">
 							<h5></h5>
-							<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+							<span class="modalChaBtn" @click="closeModal(item.demandappinfos[0].pkid)"></span>
 							<p>是否退回对发布方的合作意向</p>
-							<div class="confirmBtn" @click="cfmReturn(item.id)">
+							<div class="confirmBtn" @click="cfmReturn(item.demandappinfos[0].pkid,4)">
 								确认退回
 							</div>
 						</div>
@@ -53,40 +53,40 @@
         	</ul>
         	<ul v-if="tab.aa[1]">
         		<li class="stateNone" v-if="!have.value[1]">此处暂无数据</li>
-        		<li v-for="(item,$index) in applicationInfo	" v-if="have.value[1]">
+        		<li v-for="(item,$index) in invalidDemand	" v-if="have.value[1]">
         			<h3 class="unvalidName">
-        				<router-link :to="{name:'ApplicationDetail',query:{id:item.id}}">{{item.name}}</router-link>
-					<span @click="toWithdraw(item.id)" v-if="!item.coIntention">
+        				<router-link :to="{name:'ApplicationDetail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.demandName}}</router-link>
+					<span @click="toWithdraw(item.demandappinfos[0].pkid)" v-if="item.demandappinfos[0].status==1">
 						<img src="../../../assets/img/demand/icon54.png" />
 						<img src="../../../assets/img/demand/icon55.png" />
 						撤回申请ba
 					</span>
-					<span @click="toReturn(item.id)" v-if="item.coIntention">
+					<span @click="toReturn(item.demandappinfos[0].pkid)" v-if="item.demandappinfos[0].status==3">
 						<img src="../../../assets/img/demand/icon56.png" />
 						<img src="../../../assets/img/demand/icon57.png" />
 						退回合作意向
 					</span>
 				</h3>
-				<p>创建时间：{{item.complateTime}}</p>
+				<p>创建时间：{{item.demandbasicinfo.creTime}}</p>
 				<!--编辑此需求的模态框 start-->
-				<div id="modal-overlay" v-bind:class="confirmWithdraw.unvalid[$index]" v-if="!item.coIntention">
+				<div id="modal-overlay" v-bind:class="confirmWithdraw.unvalid[$index]" v-if="item.demandappinfos[0].status==1">
 					<div class="detail-wrap">
 						<h5></h5>
-						<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+						<span class="modalChaBtn" @click="closeModal(item.demandappinfos[0].pkid)"></span>
 						<p>确认撤回对该需求的申请吗？</p>
-						<div class="confirmBtn" @click="cfmWithdraw(item.id)">
+						<div class="confirmBtn" @click="cfmWithdraw(item.demandappinfos[0].pkid,2)">
 							确认撤回
 						</div>
 					</div>
 				</div>
 				<!--确认下线的模态框 start-->
-				<div id="modal-overlay" v-bind:class="confirmReturn.unvalid[$index]" v-if="item.coIntention">
+				<div id="modal-overlay" v-bind:class="confirmReturn.unvalid[$index]" v-if="item.demandappinfos[0].status==3">
 					<div class="detail-wrap">
 						<h5></h5>
-						<span class="modalChaBtn" @click="closeModal(item.id)"></span>
+						<span class="modalChaBtn" @click="closeModal(item.demandappinfos[0].pkid)"></span>
 						
 						<p>是否退回对发布方的合作意向</p>
-						<div class="confirmBtn" @click="cfmReturn(item.id)">
+						<div class="confirmBtn" @click="cfmReturn(item.demandappinfos[0].pkid,4)">
 							确认退回
 						</div>
 					</div>
@@ -102,6 +102,8 @@
 	import {mapState} from "vuex"
 	import Modal from "../../../assets/js/modal.js"
 	import router from '../../../router'
+    import MyAjax from "../../../assets/js/MyAjax.js"
+	
 	export default{
 		name:"applicationIndex",
 		data:function(){
@@ -114,10 +116,11 @@
 		        	    pic2:require("../../../assets/img/demand/unvalid-blackblue.png"),
 		        	}
 		        ],
+		        validDemand:[],
+		        invalidDemand:[],
 		        have:{value:[true,false]},//有无需求数据的状态控制
 		        active:0,//默认的活动bar
 		        tab:{aa:[true,false]},//默认现实的列表
-		        
 		        confirmWithdraw:{valid:[],unvalid:[]},//模态框类名数组
 		        confirmReturn:{valid:[],unvalid:[]},//确认下线的模态框
 			}
@@ -127,34 +130,113 @@
 		  unvalidInfo:state=>state.demand.unvalidInfo,
 		  applicationInfo:state=>state.demand.applicationInfo,
 		}),
+		created(){
+			this.getData();
+			    	
+		},
 		mounted(){
-			if(this.applicationInfo.length!=0){
-				Vue.set(this.have.value,[0],true)
-//				console.log(this.have.value)
-			}else{
-				Vue.set(this.have.value,[0],false)
-			};//判断有效需求里面有没有数据
-			
-			if(this.applicationInfo.length!=0){
-				Vue.set(this.have.value,[1],true)
-//				console.log(this.have.value)
-			}else{
-				Vue.set(this.have.value,[1],false)
-			};//判断无效需求里面有没有数据；
-			
-			for(let i=0;i<this.applicationInfo.length;i++){
-				console.log(this.applicationInfo[i].id)
-				
-				this.confirmWithdraw.valid.push("validConfirmWithdraw"+this.applicationInfo[i].id);
-				this.confirmReturn.valid.push("validConfirmReturn"+this.applicationInfo[i].id);
-			}
-			for(let j=0;j<this.applicationInfo.length;j++){
-				
-				this.confirmWithdraw.unvalid.push("unvalidConfirmWithdraw"+this.applicationInfo[j].id);
-				this.confirmReturn.unvalid.push("unvalidConfirmReturn"+this.applicationInfo[j].id);
-			}
+//			if(this.applicationInfo.length!=0){
+//				Vue.set(this.have.value,[0],true)
+////				console.log(this.have.value)
+//			}else{
+//				Vue.set(this.have.value,[0],false)
+//			};//判断有效需求里面有没有数据
+//			
+//			if(this.applicationInfo.length!=0){
+//				Vue.set(this.have.value,[1],true)
+////				console.log(this.have.value)
+//			}else{
+//				Vue.set(this.have.value,[1],false)
+//			};//判断无效需求里面有没有数据；
+//			
+//			for(let i=0;i<this.applicationInfo.length;i++){
+//				console.log(this.applicationInfo[i].id)
+//				
+//				this.confirmWithdraw.valid.push("validConfirmWithdraw"+this.applicationInfo[i].id);
+//				this.confirmReturn.valid.push("validConfirmReturn"+this.applicationInfo[i].id);
+//			}
+//			for(let j=0;j<this.applicationInfo.length;j++){
+//				
+//				this.confirmWithdraw.unvalid.push("unvalidConfirmWithdraw"+this.applicationInfo[j].id);
+//				this.confirmReturn.unvalid.push("unvalidConfirmReturn"+this.applicationInfo[j].id);
+//			}
 		},
 		methods:{
+			getData(){
+				var that = this;
+				var url_valid = MyAjax.urlhw+"/demandbasicinfo/findByMySelf/" + "applyValid"
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url_valid,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"validDemand",data.msg)
+					}
+					
+					console.log(that.validDemand)
+				},function(err){
+					console.log(err)
+				})
+		    	
+		    	var url_invalid = MyAjax.urlhw+"/demandbasicinfo/findByMySelf/" + "applyInvalid"
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url_invalid,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"invalidDemand",data.msg)
+					}
+					
+					console.log(that.invalidDemand)
+				},function(err){
+					console.log(err)
+				})
+		    	that.confirmWithdraw.valid = [];
+				that.confirmReturn.valid = [];
+				that.confirmWithdraw.unvalid = [];
+				that.confirmReturn.unvalid = [];
+		    	for(let i=0;i<that.validDemand.length;i++){
+				
+					that.confirmWithdraw.valid.push("validConfirmWithdraw"+that.validDemand[i].demandappinfos[0].pkid);
+					that.confirmReturn.valid.push("validConfirmReturn"+that.validDemand[i].demandappinfos[0].pkid);
+					//判断审核状态
+//					if(that.validDemand[i].demandreviewinfo.applyStatus=="2"){
+//						this.auditStatusTxt.push("需求正在审核中");
+//						this.haveAuditStatus.push(true);
+//					}else if(that.validDemand[i].demandreviewinfo.applyStatus=="3"){
+//						this.auditStatusTxt.push("");
+//						this.haveAuditStatus.push(false);
+//					}
+	//				
+				}
+				for(let j=0;j<that.invalidDemand.length;j++){
+							
+					that.confirmWithdraw.unvalid.push("unvalidConfirmWithdraw"+that.invalidDemand[j].demandappinfos[0].pkid);
+					that.confirmReturn.unvalid.push("unvalidConfirmReturn"+that.invalidDemand[j].demandappinfos[0].pkid);
+				}
+				
+				if(that.validDemand.length!=0){
+					Vue.set(that.have.value,[0],true)
+		//				console.log(this.have.value)
+				}else{
+					Vue.set(that.have.value,[0],false)
+				};//判断有效需求里面有没有数据
+				
+				if(that.invalidDemand.length!=0){
+					Vue.set(that.have.value,[1],true)
+						console.log(that.have.value)
+				}else{
+					Vue.set(that.have.value,[1],false)
+				};
+			},
 			switchTab(index){
 				this.active = index;
 
@@ -173,30 +255,32 @@
 				Modal.makeText($("."+validWithdraw));
 				Modal.makeText($("."+unvalidWithdraw));
 			},
-			cfmWithdraw(id){
+			cfmWithdraw(pkid,status){
 				
-				for(var i=0;i<this.applicationInfo.length;i++){//删除撤回申请的
-					if(id==this.applicationInfo[i].id){
-						this.applicationInfo.splice(i,1);
+				var url = MyAjax.urlsy +"/demandappinfo/update/";
+				var that=this;
+				var data = {
+					"pkid": pkid,
+					"status":status
+				}
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal(pkid)
+						
 					}
-				}
-				//删除后重新push模态框类名的数组
-				this.confirmWithdraw.valid=[];
-				this.confirmWithdraw.unvalid=[];
-				this.confirmReturn.valid = [];
-				this.confirmReturn.unvalid = [];
-				for(let i=0;i<this.applicationInfo.length;i++){
-					console.log(this.applicationInfo[i].id)
-					
-					this.confirmWithdraw.valid.push("validConfirmWithdraw"+this.applicationInfo[i].id);
-					this.confirmReturn.valid.push("validConfirmReturn"+this.applicationInfo[i].id);
-				}
-				for(let j=0;j<this.applicationInfo.length;j++){
-					
-					this.confirmWithdraw.unvalid.push("unvalidConfirmWithdraw"+this.applicationInfo[j].id);
-					this.confirmReturn.unvalid.push("unvalidConfirmReturn"+this.applicationInfo[j].id);
-				}
-				this.closeModal(id);
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 //				router.push({name:"modifyDraft",params:{id:id}});
 			},
 			toReturn(id){
@@ -205,29 +289,30 @@
 				Modal.makeText($("."+validReturn));
 				Modal.makeText($("."+unvalidReturn));
 			},
-			cfmReturn(id){
-				for(var i=0;i<this.applicationInfo.length;i++){
-					if(id==this.applicationInfo[i].id){
-						this.applicationInfo.splice(i,1);
+			cfmReturn(pkid,status){
+				var url = MyAjax.urlsy +"/demandappinfo/update/";
+				var that=this;
+				var data = {
+					"pkid": pkid,
+					"status":status
+				}
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal(pkid)
 					}
-				}
-				//删除后重新push模态框类名的数组
-				this.confirmWithdraw.valid=[];
-				this.confirmWithdraw.unvalid=[];
-				this.confirmReturn.valid = [];
-				this.confirmReturn.unvalid = [];
-				for(let i=0;i<this.applicationInfo.length;i++){
-					console.log(this.applicationInfo[i].id)
-					
-					this.confirmWithdraw.valid.push("validConfirmWithdraw"+this.applicationInfo[i].id);
-					this.confirmReturn.valid.push("validConfirmReturn"+this.applicationInfo[i].id);
-				}
-				for(let j=0;j<this.applicationInfo.length;j++){
-					
-					this.confirmWithdraw.unvalid.push("unvalidConfirmWithdraw"+this.applicationInfo[j].id);
-					this.confirmReturn.unvalid.push("unvalidConfirmReturn"+this.applicationInfo[j].id);
-				}
-				this.closeModal(id);
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 			},
 			closeModal(id){
 				var validWithdraw = "validConfirmWithdraw"+id;

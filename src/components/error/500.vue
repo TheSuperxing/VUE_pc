@@ -3,7 +3,7 @@
       <h1>杯具啊！</h1>
       <ul>
           <li>HTTP 500……<br>无法响应这个请求</li>
-          <li><button type="button" onclick="window.location.href='#/index'">回首页</button></li>
+          <li><button type="button" onclick="window.location.href='/indexcontent'">回首页</button></li>
       </ul>
       <div class="error_500_pic">
           <img src="https://static.segmentfault.com/v-5a30f5dc/global/img/404.svg" alt="杯具啊">

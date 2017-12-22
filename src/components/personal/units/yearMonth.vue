@@ -73,7 +73,7 @@ export default {
   props: {
     language: {default: 'ch'},
     min: {default: '1970.02'},
-    max: {default: '3016.01'},
+    max: {default: new Date().getFullYear()+"."+(new Date().getMonth()+1)},
     value: {
       type: String,
       default: ""

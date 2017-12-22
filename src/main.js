@@ -17,8 +17,6 @@ import "./assets/js/units/imageviewer/viewer.css"
 import "./assets/js/units/imageviewer/viewer.js"
 /*pagination分页*/
 import "./assets/js/units/pagination/pagination.css"
-import "./assets/js/units/pagination/jquery.pagination.js"
-
 /*corpbox*/
 
 import {cookieTool} from "./assets/js/cookieTool.js"
@@ -39,6 +37,7 @@ import qq from "fine-uploader"
 /*webuploader*/
 //import "./assets/js/units/webuploader/webuploader.css"
 //import "./assets/js/units/webuploader/webuploader.js"
+
 
 Vue.config.productionTip = false
 

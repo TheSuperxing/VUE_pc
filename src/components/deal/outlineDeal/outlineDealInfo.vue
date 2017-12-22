@@ -46,27 +46,27 @@
         <button v-bind:class="{unfold:!reveal.dealContentUnfold.state}" @click="dealContentUnfold" v-cloak>{{reveal.dealContentUnfold.text}}</button>
       </div>
       <transition name="unfold-fade">
-        <ul v-if="reveal.dealContentUnfold.state" class="dealContentContainer">
-          <li>
+        <ul v-if="reveal.dealContentUnfold.state" class="dealContentContainer clear">
+          <li class="clear">
             <h4>
               甲方
               <span></span>
             </h4>
             <p>{{this.dealInfo[this.$route.query.id].content.firstParty.name}}</p>
           </li>
-          <li>
+          <li class="clear">
             <h4>
               乙方
               <span></span>
             </h4>
             <p>{{this.dealInfo[this.$route.query.id].content.secondParty.name}}</p>
           </li>
-          <li>
+          <li class="clear">
             <h4>协议内容</h4>
             <p>{{this.dealInfo[this.$route.query.id].content.partyContent}}</p>
           </li>
           <!--阶段任务开始-->
-          <li class="stageTask">
+          <li class="stageTask clear">
             <h4>阶段内容</h4>
             <ul v-for="(item,index) in this.dealInfo[this.$route.query.id].content.stageTask">
               <li v-for="$item in item" v-if="($item!='支付前'&&$item!='支付中'&&$item!='已支付')">
@@ -80,15 +80,15 @@
             </ul>
           </li>
           <!--阶段任务结束-->
-          <li>
+          <li class="clear">
             <h4>付款总额</h4>
             <p>{{this.dealInfo[this.$route.query.id].content.cost}}</p>
           </li>
-          <li>
+          <li class="clear">
             <h4>付款方式</h4>
             <p>{{this.dealInfo[this.$route.query.id].content.modeOfPayment}}</p>
           </li>
-          <li>
+          <li class="clear">
             <h4>备注信息</h4>
             <p>{{this.dealInfo[this.$route.query.id].content.remarksInfo}}</p>
           </li>

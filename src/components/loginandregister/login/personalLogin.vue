@@ -11,8 +11,11 @@
         <span v-if="reveal.error">图片验证码错误</span>
       </li>
       <li>
-        <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入密码" @blur="msgConfirm($event)" @keydown="keydown($event)"
-        	v-bind:html="personalLoginInput.messageConfirm"></div>
+        <!-- <div :class="{focus:reveal.focus}" class="input" contenteditable placeholder="请输入密码"  @keydown="keydown($event)"
+        	v-bind:html="personalLoginInput.messageConfirm"></div> -->
+          <div>
+            <input type="password" placeholder="请输入密码" v-model="personalLoginInput.messageConfirm" @blur="msgConfirm($event)" maxlength="14">
+          </div>
         <!-- <button :disabled="reveal.buttonDisabled" @click="getMessageConfirm" v-cloak>{{messageConfirm.confirmText}}</button> 从新获取短信验证码-->
       </li>
       
@@ -181,7 +184,6 @@
         
       },
       msgConfirm(event){
-        this.personalLoginInput.messageConfirm=event.currentTarget.innerText
       	if(this.personalLoginInput.messageConfirm.trim().length==0){
       		this.showAlert = true;
           this.alertText  = "请输入密码";
@@ -263,17 +265,6 @@
       } 
 
 		 },
-     keydown(event){
-       this.personalLoginInput.messageConfirm=event.currentTarget.innerText
-       console.log(this.personalLoginInput.messageConfirm)
-       Vue.set(this.reveal,"focus",true)
-       var event = event || window.event;  
-       
-       if(event.keyCode==8&&(this.personalLoginInput.messageConfirm.trim().length==1||this.personalLoginInput.messageConfirm.trim().length==0)){
-         Vue.set(this.reveal,"focus",false)
-       }
-     },
-   
     },
     destroyed(){
     	Vue.set(this.user,'userState',0)
@@ -295,9 +286,6 @@
       color: rgb(169, 169, 169);  
       cursor: text;
   }  
-  .focus{
-    color: rgb(53, 53, 53);  
-  }
   .input:empty::before {  
       content: attr(placeholder);  
   }  

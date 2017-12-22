@@ -97,8 +97,8 @@
     },
     props: {
       language: {default: 'ch'},
-      min: {default: '1970-01-01'},
-      max: {default: '3016-01-01'},
+      min: {default: '1970.01.01'},
+      max: {default: new Date().getFullYear()+"."+(new Date().getMonth()+1)+"."+new Date().getDate()},
       value: {
         type: [String, Array],
         default: ''
@@ -184,7 +184,7 @@
             this.year = this.tmpYear
             this.month = this.tmpMonth
             this.date = date.value
-            let value = `${this.tmpYear}-${('0' + (this.month + 1)).slice(-2)}-${('0' + this.date).slice(-2)}`
+            let value = `${this.tmpYear}.${('0' + (this.month + 1)).slice(-2)}.${('0' + this.date).slice(-2)}`
             this.$emit('input', value)
             this.panelState = false
           }else if(this.range && !this.rangeStart){
@@ -211,8 +211,8 @@
               this.tmpStartMonth = tmpM
               this.tmpStartDate = tmpD
             }
-            let RangeStart = `${this.tmpStartYear}-${('0' + (this.tmpStartMonth + 1)).slice(-2)}-${('0' + this.tmpStartDate).slice(-2)}`
-            let RangeEnd = `${this.tmpEndYear}-${('0' + (this.tmpEndMonth + 1)).slice(-2)}-${('0' + this.tmpEndDate).slice(-2)}`
+            let RangeStart = `${this.tmpStartYear}.${('0' + (this.tmpStartMonth + 1)).slice(-2)}.${('0' + this.tmpStartDate).slice(-2)}`
+            let RangeEnd = `${this.tmpEndYear}.${('0' + (this.tmpEndMonth + 1)).slice(-2)}.${('0' + this.tmpEndDate).slice(-2)}`
             let value = [RangeStart, RangeEnd]
             this.$emit('input', value)
             this.rangeStart = false
@@ -255,13 +255,13 @@
     },
     watch: {
       min (v) {
-        let minArr = v.split('-')
+        let minArr = v.split('.')
         this.minYear = Number(minArr[0])
         this.minMonth = Number(minArr[1])
         this.minDate = Number(minArr[2])
       },
       max (v) {
-        let maxArr = v.split('-')
+        let maxArr = v.split('.')
         this.maxYear = Number(maxArr[0])
         this.maxMonth = Number(maxArr[1])
         this.maxDate = Number(maxArr[2])
@@ -332,11 +332,11 @@
         }else{
           this.coordinates = {left: '0', top: `${window.getComputedStyle(this.$el.children[0]).offsetHeight + 4}px`}
         }
-        let minArr = this.min.split('-')
+        let minArr = this.min.split('.')
         this.minYear = Number(minArr[0])
         this.minMonth = Number(minArr[1])
         this.minDate = Number(minArr[2])
-        let maxArr = this.max.split('-')
+        let maxArr = this.max.split('.')
         this.maxYear = Number(maxArr[0])
         this.maxMonth = Number(maxArr[1])
         this.maxDate = Number(maxArr[2])
@@ -345,8 +345,8 @@
             throw new Error('Binding value must be an array in range mode.')
           }
           if(this.value.length){
-            let rangeStart = this.value[0].split('-')
-            let rangeEnd = this.value[1].split('-')
+            let rangeStart = this.value[0].split('.')
+            let rangeEnd = this.value[1].split('.')
             this.tmpStartYear = Number(rangeStart[0])
             this.tmpStartMonth = Number(rangeStart[1]) - 1
             this.tmpStartDate = Number(rangeStart[2])

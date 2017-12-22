@@ -103,7 +103,7 @@
     <div class="dealContentTitle">
       <h3>协议内容</h3>
     </div>
-    <dl class="editDealInfo">
+    <dl class="editDealInfo clear">
       <dt>带*号的选项为必填项</dt>
       <dd>
         <h4>
@@ -115,8 +115,8 @@
       </dd>
 
       <transition name="unfold-fade"><!--可以折叠的部分-->
-        <dl v-if="reveal.dealContentUnfold.state">
-          <dd>
+        <dl v-if="reveal.dealContentUnfold.state" class="clear">
+          <dd class="clear">
             <h4>
               <i>*</i>
               甲 方
@@ -137,7 +137,7 @@
               </ul>
             </div>
           </dd>
-          <dd>
+          <dd class="clear">
             <h4>
               <i>*</i>
               乙方
@@ -153,7 +153,7 @@
               </ul>
             </div>
           </dd>
-          <dd>
+          <dd class="clear">
             <h4>
               <i>*</i>
               协议内容
@@ -161,7 +161,7 @@
             </h4>
             <textarea v-model="localDealInfo.content.partyContent"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
           </dd>
-          <dd class="stageTask">
+          <dd class="stageTask clear">
             <h4>
               <i>*</i>
               阶段内容
@@ -179,7 +179,7 @@
               <span @click="addStageTask" class="add">添加</span>
             </div>
           </dd>
-          <dd>
+          <dd class="clear">
             <h4>
               <i>*</i>
               付款方式
@@ -187,7 +187,7 @@
             </h4>
             <input v-model="localDealInfo.content.modeOfPayment"  type="text" placeholder="请输入付款方式">
           </dd>
-          <dd>
+          <dd class="clear">
             <h4>
               <i>*</i>
               协议总额
@@ -195,7 +195,7 @@
             </h4>
             <input v-model="localDealInfo.content.cost"  type="text" placeholder="请输入协议总额">
           </dd>
-          <dd class="remarksInfo">
+          <dd class="remarksInfo clear">
             <h4>
               <i>*</i>
               备注信息
@@ -203,7 +203,7 @@
             </h4>
             <textarea v-model="localDealInfo.content.remarksInfo"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
           </dd>
-          <dd>
+          <dd class="clear">
             <h4>
               <i>*</i>
               协议附件

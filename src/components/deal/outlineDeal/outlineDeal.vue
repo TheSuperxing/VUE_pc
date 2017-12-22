@@ -23,16 +23,16 @@
 
     <!--终止/编辑提示-->
     <ul class="sendDealContainer">
-      <li v-for="(item,index) in dealInfo">
+      <li v-for="(item,index) in delList">
         <ul class="sendDealTitle">
           <li>
             <h2 v-cloak>
-              <router-link :to="{path:'/yhzx/deal/outlineDealIndex/outlineDealInfo',query:{id:index}}">
-                {{item.mainInfo.name}}
+              <router-link :to="{path:'/yhzx/deal/outlineDealIndex/outlineDealInfo',query:{id:item.pkid}}">
+                {{item.dealName}}
               </router-link>
             </h2>
           </li>
-          <li v-cloak>{{item.mainInfo.dealState}}</li>
+          <li v-cloak>{{item.dealState}}</li>
           <li class="titleButton">
             <div @click="deleteDeal(index)" class="cancel">
               删除
@@ -43,7 +43,7 @@
 
           </li>
         </ul>
-        <p v-cloak>创建时间：{{item.mainInfo.time}}</p>
+        <p v-cloak>创建时间：{{item.publishTime}}</p>
       </li>
     </ul>
   </div>
@@ -52,6 +52,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import ModalOpp from "../../../assets/js/modalOpp"
+  import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"sendDeal",
     data(){
@@ -60,16 +61,43 @@
           //dealState:[],//不同的协议状态对应不同的按钮
           index:"",
         },
-        routerLinkPath:{//发送的协议和接受的协议对应的不同跳转
-          path:""
-        },
+        // routerLinkPath:{//发送的协议和接受的协议对应的不同跳转
+        //   path:""
+        // },
+        delList:[{
+          dealName:"",
+          publishTime:"",
+          dealState:"",
+        }]
       }
     },
-    computed:mapState({
-      dealInfo:state=>state.myDeal.dealInfo,
-      /*获取数据*/
-    }),
+    // computed:mapState({
+    //   dealInfo:state=>state.myDeal.dealInfo,
+    //   /*获取数据*/
+    // }),
+    mounted(){
+      this.gitDelList();
+      console.log(this.delList)
+    },
     methods:{
+      gitDelList(){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/listDrafts";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.delList = data.msg;
+					}else{
+						console.log("错误返回");
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
       editPrompt(index){//协议编辑的提示信息
         var modal= new ModalOpp("#modal-overlay");
         modal.makeText();

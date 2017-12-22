@@ -79,39 +79,7 @@
 			</router-link>
 		</p>
 	</ul>
-<<<<<<< HEAD
-	<ul class="person-wrap" v-if="state==2">
-		<li>
-			<input type="text"  placeholder="请输入手机号" v-model="personalRegInput.tel" @blur="personTelCfm"/>
-		</li>
-		<li>
-			
-			<input v-model="personalRegInput.picConfirm" @blur="picConfirm" type="text" placeholder="图形验证码">
-		    <img class="picConfirm" :src="picSrc" alt="" @click="changePic"/>
-		    <span v-if="reveal.error">图片验证码错误</span>
-		</li>
-		<li>
-			<input type="text" placeholder="请确认短信验证码" v-model="personalRegInput.messageConfirm" @blur="personalMsgCfm"/>
-			<button @click="settime" class="msgConfirm" :disabled="!show">
-			     <span v-if="show">获取验证码</span>
-			     <span v-if="!show" class="count">{{count}} s</span>
-			</button>
-		</li>
-		<alertTip v-if="personalRegInput.showAlert" :showHide="personalRegInput.showAlert" @closeTip="closeTip" :alertText="personalRegInput.alertText"></alertTip>
-		<div class="regBtn" @click="goRegisterDonePer">
-			注册
-		</div>
-		<p class="notice">
-			<span v-bind:class="{'selected':agree[2]}" @click="agreeDeal" class="agreeBtn"></span>
-			您已阅读并同意
-			<router-link to="">
-				[buildingshop用户协议]
-			</router-link>
-		</p>
-	</ul>
-=======
 	
->>>>>>> 5b6e26e00938fdea7ede2844cff783ba90cffebb
 	
 </div>
 </template>

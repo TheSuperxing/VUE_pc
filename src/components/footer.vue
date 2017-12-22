@@ -1,5 +1,5 @@
 <template>
-  <div class="footer">
+  <div class="foot">
     <h3>BuildingShop</h3>
    	<p>
    		<span>联系手机：<em>150-8888-9999</em></span>
@@ -13,7 +13,7 @@
 
 <script>
   export default {
-    name: 'footer',
+    name: 'foot',
     data:function() {
     	return{
         mContact:"联系手机:150-8888-9999",
@@ -25,7 +25,7 @@
 </script>
 <style scoped lang="scss">
  $themeColor:#ff7403; 
-  .footer{
+  .foot{
     width:100%;
     min-width: 1200px;
     height: 232px;

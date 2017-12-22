@@ -78,27 +78,27 @@
         <button v-bind:class="{unfold:!reveal.dealContentUnfold.state}" @click="dealContentUnfold" v-cloak>{{reveal.dealContentUnfold.text}}</button>
       </div>
       <transition name="unfold-fade">
-        <ul v-if="reveal.dealContentUnfold.state" class="dealContentContainer">
-          <li>
+        <ul v-if="reveal.dealContentUnfold.state" class="dealContentContainer clear">
+          <li class="clear">
             <h4>
               甲方
               <span></span>
             </h4>
             <p>{{this.dealInfo[this.$route.query.id].content.firstParty.name}}</p>
           </li>
-          <li>
+          <li class="clear">
             <h4>
               乙方
               <span></span>
             </h4>
             <p>{{this.dealInfo[this.$route.query.id].content.secondParty.name}}</p>
           </li>
-          <li>
+          <li class="clear">
             <h4>协议内容</h4>
             <p>{{this.dealInfo[this.$route.query.id].content.partyContent}}</p>
           </li>
           <!--阶段任务开始-->
-          <li class="stageTask">
+          <li class="stageTask clear">
             <h4>阶段内容</h4>
             <ul v-for="(item,index) in this.dealInfo[this.$route.query.id].content.stageTask">
               <li v-for="$item in item" v-if="($item!='支付前'&&$item!='支付中'&&$item!='已支付')">
@@ -117,19 +117,19 @@
             </ul>
           </li>
           <!--阶段任务结束-->
-          <li>
+          <li class="clear">
             <h4>付款总额</h4>
             <p>{{this.dealInfo[this.$route.query.id].content.cost}}</p>
           </li>
-          <li>
+          <li class="clear">
             <h4>付款方式</h4>
             <p>{{this.dealInfo[this.$route.query.id].content.modeOfPayment}}</p>
           </li>
-          <li>
+          <li class="clear">
             <h4>备注信息</h4>
             <p>{{this.dealInfo[this.$route.query.id].content.remarksInfo}}</p>
           </li>
-          <li class="fileDownload">
+          <li class="fileDownload clear">
             <h4>备注信息</h4>
             <p>
               <a v-bind:href="this.dealInfo[this.$route.query.id].content.accessory.fileAddress">{{this.dealInfo[this.$route.query.id].content.accessory.showText}}</a>
@@ -157,25 +157,25 @@
       <div class="dealContentTitle">
         <h3>协议甲方</h3>
       </div>
-      <dl class="firstPartyList">
-        <dt>
+      <dl class="firstPartyList clear">
+        <dt class="clear">
           <p>{{this.dealInfo[this.$route.query.id].content.firstParty.name}}</p>
           <p class="comment" @click="editFirstPartyComment" v-if="!reveal.firstPartyComment.edit&&this.dealInfo[this.$route.query.id].mainInfo.myRole!='甲方'&&this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'">编辑评论</p>
         </dt>
 
-        <dd v-if="!reveal.firstPartyComment.edit">
-          <ul v-if="this.dealInfo[this.$route.query.id].content.firstParty.comment.start.length">
+        <dd class="clear" v-if="!reveal.firstPartyComment.edit">
+          <ul class="clear" v-if="this.dealInfo[this.$route.query.id].content.firstParty.comment.start.length">
             <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.firstPartyComment.startSelected[index]}"></li>
           </ul>
           <p v-if="this.dealInfo[this.$route.query.id].content.firstParty.comment.text.length" v-cloak>{{this.dealInfo[this.$route.query.id].content.firstParty.comment.text}}</p>
         </dd>
         <!--甲方对应的评价-->
-        <dd v-if="reveal.firstPartyComment.edit">
-          <ul>
+        <dd class="clear" v-if="reveal.firstPartyComment.edit">
+          <ul class="clear">
             <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentFirstParty(index)" :class="{selected:reveal.firstPartyComment.startSelected[index]}"></li>
           </ul>
           <textarea v-model="localFirstPartyComment.text"  cols="63" rows="5" placeholder="你的评论"></textarea>
-          <div>
+          <div class="clear">
             <button @click="keepFirstPartyComment">保存</button>
             <button @click="cancelFirstPartyComment">取消</button>
           </div>
@@ -190,23 +190,23 @@
       <div class="dealContentTitle">
         <h3>协议乙方</h3>
       </div>
-      <div class="secondPartyList">
+      <div class="secondPartyList clear">
 
-        <dl class="secondPartyTitle">
-          <dt>
+        <dl class="secondPartyTitle  clear">
+          <dt class="clear">
             <p v-cloak>{{this.dealInfo[this.$route.query.id].content.secondParty.name}}</p>
             <p class="editComment" v-if="this.dealInfo[this.$route.query.id].mainInfo.myRole!='乙方'&&!reveal.secondPartyComment.edit&&this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'" @click="editSecondPartyComment">编辑评论</p>
           </dt>
 
-          <dd v-if="!reveal.secondPartyComment.edit&&this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'">
-            <ul v-if="this.dealInfo[this.$route.query.id].content.secondParty.comment.start.length">
+          <dd class="clear" v-if="!reveal.secondPartyComment.edit&&this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'">
+            <ul class="clear" v-if="this.dealInfo[this.$route.query.id].content.secondParty.comment.start.length">
               <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.secondPartyComment.teamComment.startSelected[index]}"></li>
             </ul>
             <p v-if="this.dealInfo[this.$route.query.id].content.secondParty.comment.text.length" v-cloak>{{this.dealInfo[this.$route.query.id].content.secondParty.comment.text}}</p>
           </dd>
           <!--对于团队的整体评价-->
-          <dd v-if="reveal.secondPartyComment.edit">
-            <ul>
+          <dd class="clear" v-if="reveal.secondPartyComment.edit">
+            <ul class="clear">
               <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyTeam(index)" :class="{selected:reveal.secondPartyComment.teamComment.startSelected[index]}"></li>
             </ul>
 
@@ -216,10 +216,10 @@
         </dl>
         <!--编辑乙方成员开始-->
 
-        <ul class="secondPartyMember" v-if="this.dealInfo[this.$route.query.id].mainInfo.dealState=='履行中'">
-          <li v-for="(item,index) in this.dealInfo[this.$route.query.id].content.secondParty.member">
-            <dl>
-              <dt>
+        <ul class="secondPartyMember clear" v-if="this.dealInfo[this.$route.query.id].mainInfo.dealState=='履行中'">
+          <li class="clear" v-for="(item,index) in this.dealInfo[this.$route.query.id].content.secondParty.member">
+            <dl class="clear">
+              <dt class="clear">
                 <i></i>
                 <!--<div class="memberInfo">
                   <p v-for="$item in item">{{$item}}</p>
@@ -227,21 +227,21 @@
                 <div v-cloak class="avatar">
                   <img v-bind:src="item.avatar" alt="">
                 </div>
-                <div class="memberInfo">
+                <div class="memberInfo clear">
                   <div v-cloak>{{item.name}}</div>
 
-                  <dl v-if="reveal.editMemberInfo[index]">
+                  <dl class="clear" v-if="reveal.editMemberInfo[index]">
                     <dt>项目职责：</dt>
                     <dd v-cloak>
                       {{item.responsibilities}}
                     </dd>
                   </dl>
 
-                  <dl v-if="!reveal.editMemberInfo[index]" class="editMemberResponse">
-                    <dt>
+                  <dl v-if="!reveal.editMemberInfo[index]" class="editMemberResponse clear">
+                    <dt class="clear">
                       <input v-model="item.responsibilities" type="text">
                     </dt>
-                    <dd>
+                    <dd class="clear">
                       <button @click="keepEditMemberInfo(index)">保存</button>
                     </dd>
                   </dl>
@@ -259,10 +259,10 @@
         <!--编辑乙方成员结束-->
 
         <!--评论乙方成员开始-->
-        <ul class="secondPartyMember" v-if="this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'">
-          <li v-for="(item,index) in this.dealInfo[this.$route.query.id].content.secondParty.member">
-            <dl>
-              <dt>
+        <ul class="secondPartyMember clear" v-if="this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'">
+          <li class="clear" v-for="(item,index) in this.dealInfo[this.$route.query.id].content.secondParty.member">
+            <dl class="clear">
+              <dt class="clear">
                 <i></i>
                 <!--<div class="memberInfo">
                   <p v-for="$item in item">{{$item}}</p>
@@ -270,24 +270,24 @@
                 <div v-cloak class="avatar">
                   <img v-bind:src="item.avatar" alt="">
                 </div>
-                <div class="memberInfo">
+                <div class="memberInfo clear">
                   <div v-cloak>{{item.name}}</div>
-                  <dl>
+                  <dl class="clear">
                     <dt>项目职责：</dt>
                     <dd v-cloak>{{item.responsibilities}}</dd>
                   </dl>
                 </div>
               </dt>
 
-              <dd v-if="!reveal.secondPartyComment.edit&&dealInfo[$route.query.id].mainInfo.dealState!='履行中'">
-                <ul v-if="dealInfo[$route.query.id].content.secondParty.member[index].comment.start.length">
+              <dd class="clear" v-if="!reveal.secondPartyComment.edit&&dealInfo[$route.query.id].mainInfo.dealState!='履行中'">
+                <ul class="clear" v-if="dealInfo[$route.query.id].content.secondParty.member[index].comment.start.length">
                   <li v-for="(item,$index) in [1,2,3,4,5]" :class="{selected:reveal.secondPartyComment.memberComment.startSelected[index][$index]}"></li>
                 </ul>
                 <p v-if="dealInfo[$route.query.id].content.secondParty.member[index].comment.text.length" v-cloak>{{dealInfo[$route.query.id].content.secondParty.member[index].comment.text}}</p>
               </dd>
               <!--以上是乙方成员评价部分-->
-              <dd v-if="reveal.secondPartyComment.edit">
-                <ul>
+              <dd class="clear" v-if="reveal.secondPartyComment.edit">
+                <ul class="clear">
                   <li v-for="(item,$index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyMember(index,$index)" :class="{selected:reveal.secondPartyComment.memberComment.startSelected[index][$index]}"></li>
                 </ul>
                 <textarea v-model="localSecondPartyComment.memberComment.text[index]"  cols="63" rows="5" placeholder="你的评论"></textarea>
@@ -300,7 +300,7 @@
           <!--用来遮挡人员树多出来的部分-->
         </ul>
         <!--评论乙方成员结束-->
-        <div class="keepOrCancel" v-if="reveal.secondPartyComment.edit">
+        <div class="keepOrCancel clear" v-if="reveal.secondPartyComment.edit">
           <button @click="keepSecondPartyMemberComment">保存</button>
           <button @click="cancelSecondPartyMemberComment">取消</button>
         </div>

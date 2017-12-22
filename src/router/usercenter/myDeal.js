@@ -19,7 +19,7 @@ import editSendDeal from "../../components/deal/sendDeal/editSendDeal.vue"
 import acceptDealIndex from "../../components/deal/acceptDeal/acceptDealIndex.vue"
 import acceptDeal from "../../components/deal/acceptDeal/acceptDeal.vue"
 import acceptDealInfo from "../../components/deal/acceptDeal/acceptDealInfo.vue"
-import editAcceptDeal from "../../components/deal/acceptDeal/editAcceptDeal.vue"
+//import editAcceptDeal from "../../components/deal/acceptDeal/editAcceptDeal.vue"
 /*以上是我接受的协议*/
 import draftingDealIndex from "../../components/deal/draftingDeal/draftingDealIndex.vue"
 import draftingDeal from "../../components/deal/draftingDeal/draftingDeal.vue"
@@ -79,7 +79,7 @@ var dealRouterChildren=[
         children:[
           {path:"/yhzx/deal/acceptDealIndex/acceptDeal",name:"acceptDeal",component:acceptDeal,},
           {path:"/yhzx/deal/acceptDealIndex/acceptDealInfo",name:"acceptDealInfo",component:acceptDealInfo,},
-          {path:"/yhzx/deal/acceptDealIndex/editAcceptDeal",name:"editAcceptDeal",component:editAcceptDeal,}
+          // {path:"/yhzx/deal/acceptDealIndex/editAcceptDeal",name:"editAcceptDeal",component:editAcceptDeal,}
         ]
       },
       {

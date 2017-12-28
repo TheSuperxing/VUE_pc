@@ -83,7 +83,7 @@
 //			this.$route.query.page = 1;
 //			this.current_page=this.$route.query.page;
 			this.$route.query.page = this.searchText;
-			this.searchAll()
+			this.searchAll(this.current_page)
 			
 		},
         mounted() {
@@ -136,6 +136,7 @@
     	},
     	methods: {
     		jumpPage(current_page){
+    			console.log(current_page)
     			var that = this;
     			if(that.searchText.trim().length!=0){
     				that.haveCollect=[];
@@ -172,7 +173,7 @@
 						console.log(err)
 					})
     			}else{
-    				that.searchAll()
+    				that.searchAll(current_page)
     			}
 				
 			},
@@ -215,7 +216,7 @@
 			searchAll(current_page){
     			this.haveCollect=[];
 				var that = this;
-				var url = MyAjax.urlsy+"/tradeHall/findDemands/" + that.current_page
+				var url = MyAjax.urlsy+"/tradeHall/findDemands/" + current_page
 				MyAjax.ajax({
 					type: "GET",
 					url:url,

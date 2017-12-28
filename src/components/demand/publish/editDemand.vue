@@ -124,7 +124,6 @@
 				    "remark": "",
 				    "reword": "",
 				    "type": 0,
-				    "watchTimes": 0
 				  },
 				  "demandobjs": [
 				    

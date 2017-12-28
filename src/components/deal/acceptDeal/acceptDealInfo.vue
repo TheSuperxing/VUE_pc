@@ -221,7 +221,7 @@
       </div>
       <ul class="relatedNeedsList">
        <li > <!-- v-for="item in this.dealInfo[this.$route.query.id].relatedNeeds" -->
-          <router-link to="/yhzx/deal/acceptDealIndex/acceptDeal" v-cloak>{{this.data.dealInfo.demandbasicinfo.demandName}}</router-link>
+          <router-link target="_blank" :to="'/trading/detail?id='+data.dealInfo.demandbasicinfo.pkid" v-cloak>{{this.data.dealInfo.demandbasicinfo.demandName}}</router-link>
         </li>
       </ul>
     </div>

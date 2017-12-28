@@ -174,9 +174,12 @@ function pdManualUploader(option){
             //$('#trigger-upload').show()
             },
             onComplete: function (id, fileName, responseJSON, maybeXhr) {
+            console.log(responseJSON)
             if(responseJSON.success==true){
                 option.newFileId.push(responseJSON.msg.fileId)
                 option.accessory.push({fileName:responseJSON.msg.fileName,fileAddress:responseJSON.msg.fileAddress})
+            }else{
+                alert("文件上传失败,请检查网络后从新上传")
             }
         },
         }

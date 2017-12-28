@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import IndexContent from "../components/index/index_content.vue"
 import Index from "../components/index/index.vue"
+import searchAll from "../components/index/search_all.vue"
 import SearchPersonal from "../components/index/search_personal.vue"
 import SearchTeam from "../components/index/search_team.vue"
 import SearchCompany from "../components/index/search_company.vue"
@@ -70,14 +71,20 @@ export default new Router({
     		{
     			path:'/indexcontent/index', name:'Index',component:Index,
     		},{
-    			path:'/indexcontent/serachperson', name:'SearchPersonal',component:SearchPersonal,
-    		},{
-    			path:'/indexcontent/serachteam', name:'SearchTeam',component:SearchTeam,
-    		},{
-    			path:'/indexcontent/serachcompany', name:'SearchCompany',component:SearchCompany,
-    		},{
-    			path:'/indexcontent/serachproject', name:'SearchProject',component:SearchProject,
+    			path:'/indexcontent/search',name:'search',component:searchAll,redirect:'/indexcontent/search/per',
+    			children:[
+    				{
+		    			path:'/indexcontent/search/per', name:'SearchPersonal',component:SearchPersonal,
+		    		},{
+		    			path:'/indexcontent/search/team', name:'SearchTeam',component:SearchTeam,
+		    		},{
+		    			path:'/indexcontent/search/com', name:'SearchCompany',component:SearchCompany,
+		    		},{
+		    			path:'/indexcontent/search/proj', name:'SearchProject',component:SearchProject,
+		    		},
+    			]
     		},
+    		
     	]
     },{
     	path:"/trading",name:"Trading",component:Trading,redirect:"/trading/index",

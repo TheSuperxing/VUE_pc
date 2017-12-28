@@ -13,14 +13,14 @@
 					</div>  
 					<div class="swiper-container gallery-thumbs swiper-container-horizontal">  
 					<div class="swiper-wrapper">  
-					    <div v-for="value in lbt" class="swiper-slide swiper-slide-next" style="margin-right: 10px;" v-bind:style="{backgroundImage: 'url(' + value.imgs + ')'}"></div>  
+					  <div v-for="value in lbt" class="swiper-slide swiper-slide-next" style="margin-right: 10px;" v-bind:style="{backgroundImage: 'url(' + value.imgs + ')'}"></div>  
 					</div>  
 				</div>  
 			</div>
 			<div class="search-board">
 				<ul>
 					<li>
-						<router-link to="/indexcontent/serachperson">
+						<router-link to="/indexcontent/search/per">
 							<h1>找个人</h1>
 							<p>找个人？找同事？</p>
 							<p>即可进入搜索页，找到他们</p>
@@ -28,7 +28,7 @@
 						
 					</li>
 					<li>
-						<router-link to="/indexcontent/serachteam">
+						<router-link to="/indexcontent/search/team">
 							<h1>找团队</h1>
 							<p>找个人？找同事？</p>
 							<p>即可进入搜索页，找到他们</p>
@@ -36,7 +36,7 @@
 						
 					</li>
 					<li>
-						<router-link to="/indexcontent/serachcompany">
+						<router-link to="/indexcontent/search/com">
 							<h1>找公司</h1>
 							<p>找个人？找同事？</p>
 							<p>即可进入搜索页，找到他们</p>
@@ -44,12 +44,11 @@
 						
 					</li>
 					<li>
-						<router-link to="/indexcontent/serachproject">
+						<router-link to="/indexcontent/search/proj">
 							<h1>找项目</h1>
 							<p>找个人？找同事？</p>
 							<p>即可进入搜索页，找到他们</p>
 						</router-link>
-						
 					</li>
 				</ul>
 			</div>

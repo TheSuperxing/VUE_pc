@@ -3,6 +3,9 @@
 		<div class="search-wrap">
 			<input type="text" placeholder="请搜索公司" />
 		</div>
+		<div class="hotWordsWrap">
+			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
+		</div>
 		<div class="result-wrap">
 			<div class="stateNone">
 				在月球也没找到~
@@ -51,8 +54,89 @@
 						},
 			    	],
 			    	
-			    ]
+			    ],
+			    searchText:"",
+			    hotWords:["李彦宏","马化腾","马云","优秀"],
+			    resultList:[],
+			    current_page: 1, //当前页
+		        pages: "5", //总页数
+		        changePage:'1',//跳转页
 			}
+		},
+		computed: {
+    		show: function() {
+    			return this.pages && this.pages != 1
+    		},
+    		pstart: function() {
+    			return this.current_page == 1;
+    		},
+    		pend: function() {
+    			return this.current_page == this.pages;
+    		}, 	 	
+    		efont: function() {
+    			if(this.pages <= 7) return false;
+    			return this.current_page > 5
+    		},
+    		ebehind: function() {
+    			if(this.pages <= 7) return false;
+    			var nowAy = this.indexs;
+    			return nowAy[nowAy.length - 1] != this.pages;
+    		},
+    		indexs: function() {
+
+    			var left = 1,
+    				right = this.pages,
+    				ar = [];
+    			if(this.pages >= 7) {
+    				if(this.current_page > 5 && this.current_page < this.pages - 4) {
+    					left = Number(this.current_page) - 3;
+    					right = Number(this.current_page) + 3;
+    				} else {
+    					if(this.current_page <= 5) {
+    						left = 1;
+    						right = 7;
+    					} else {
+    						right = this.pages;
+
+    						left = this.pages - 6;
+    					}
+    				}
+    			}
+    			while(left <= right) {
+    				ar.push(left);
+    				left++;
+    			}
+    			return ar;
+    		},
+    	},
+		methods:{
+			jumpPage(num){
+    			
+    			var that = this;
+				var url = "http://datainfo.duapp.com/shopdata/getGoods.php"
+	//			MyAjax.fetchJsonp(url, function(data){
+	//				console.log(data)
+	////				data = data.replace("callback(","");
+	////				Vue.set(this,"dataInfo",data);
+	////				console.log(this.dataInfo);
+	//				
+	//			},function(err){
+	//				console.log(err)
+	//			})
+				this.current_page = num;
+//				
+    		},
+    		pagePlus() {
+    			this.current_page++;
+//  			return this.current_page;
+    		},
+    		pageMinus() {
+    			this.current_page--;
+//  			return this.current_page;
+    		},
+			choseHot(index){
+    			this.searchText = this.hotWords[index]
+    		}
 		}
 	}
 </script>
@@ -65,7 +149,7 @@
 			height: 50px;
 			border-radius: 25px;
 			box-shadow: 0 0 15px rgba(179,179,179,.5);
-			padding: 0 40px;
+			padding: 0 20px;
 			margin: 120px auto 0;
 			background: url(../../assets/img/header/1717.png) no-repeat right center;
 			background-color: #FFFFFF;
@@ -77,6 +161,24 @@
         		font-size: 16px;
         	}
 		}
+		.hotWordsWrap{
+			width: 700px;
+			margin: 10px auto;
+    		height: 20px;
+    		p{
+    			display: inline-block;
+    			padding-right: 10px;
+    			margin-left: 12px;
+    			font-size: 14px;
+    			height: 14px;
+    			line-height: 14px;
+    			border-right: 2px solid #353535;
+    			cursor: pointer;
+    		}
+    		p:last-child{
+    			border-right: none;
+    		}
+        }
 		.result-wrap{
 			min-height: 300px;
 			.stateNone{

@@ -73,7 +73,8 @@
 		        </ul>
         	</li>
         </ul>
-        <div class="search-wrap">
+        <div class="searchBox">
+        	<span class="searchButton" ><router-link to="/indexcontent/search"></router-link></span>
         	<input type="text" placeholder="搜索个人、团队、公司" />
         </div>
         <div class="wrap-right">
@@ -218,7 +219,7 @@
   .header{
     width:100%;
     min-width: 1200px;
-    height: 109px;
+    height: 70px;
     position: fixed;
     top: 0;
     left:0;
@@ -497,7 +498,7 @@
             }
           }
         }
-        .search-wrap{
+        .searchBox{
         	width: 300px;
         	height: 36px;
         	box-shadow: 0 0 15px rgba(179,179,179,.5);
@@ -505,12 +506,26 @@
         	float: left;
         	margin-left: 97px;
         	margin-top: 15px;
-        	padding: 0 40px;
-        	background: url(../assets/img/header/002.png) no-repeat left center;
+        	padding: 0 8px;
+        	
         	background-position: 16px;
-        	input{
-        		width: 100%;
+        	.searchButton{
+        		width: 10%;
         		height: 100%;
+        		float: left;
+        		background: url(../assets/img/header/002.png) no-repeat center;
+        		cursor: pointer;
+        		
+        		a{
+        			display: block;
+        			width: 100%;
+        			height: 100%;
+        		}
+        	}
+        	input{
+        		width: 85%;
+        		height: 100%;
+        		margin-left: 5px;
         	}
         }
 

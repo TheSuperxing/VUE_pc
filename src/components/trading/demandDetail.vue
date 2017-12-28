@@ -179,22 +179,25 @@
 				<h5 class="A-title">关联协议</h5>
 				<ul class="content-relatedDeal">
 					<li class="noDeal" v-if="!haveDeal">暂无关联协议</p>
-					<li v-for="(item,index) in detailInfo.relatedDeal">
-						与{{item.name}}签订的协议
-						<span class="cancleDeal" @click="cancelDeal(index)">取消协议</span>
-						<span class="dealState" v-bind:class="{valid:item.valid,unvalid:!item.valid}">{{dealValid[index]}}</span>
+					<li v-for="(item,index) in detailInfo.deals">
+						与{{item.dealName}}签订的协议
+						<span class="cancleDeal" @click="cancelDeal(item.dealID)" v-if="isMine">取消协议</span>
+						<span class="dealState valid" v-if="item.valid">已生效</span>
+						<span class="dealState unvalid" v-if="!item.valid">未生效</span>
 					</li>
-					<p class="stateNone" v-bind:class="{disabled:!canOffline}"  @click="addDeal">添加关联协议</p>
+					<p class="stateNone" v-bind:class="{disabled:!canOffline}"  @click="addDeal" v-if="isMine">添加关联协议</p>
 					<div id="modal-overlay" class="addDealModal">
 						<div class="modal-wrap">
 							<h5>添加关联协议</h5>
 							<span class="modalChaBtn" @click="closeModal"></span>
 							<div class="selectBox">
 								<p>请选择关联协议</p>
-								<select></select>
+								<select v-on:change="selectThisDeal($event)"  v-model="seletedDealName">
+									<option v-for="item in relatedDeals"  v-bind:value="item.dealID" @click="">{{item.dealName}}</option>
+								</select>
 							</div>
 							
-							<div class="confirmBtn" @click="closeModal">
+							<div class="confirmBtn" @click="comfirmInsertDeal">
 								确定
 							</div>
 						</div>
@@ -234,10 +237,13 @@
 				intentionTxt:[],//我发布的需求，针对申请者 有无合作意向之后的文字信息
 				auditStatusShow:false,//需求审核状态的提示显隐 为auditStatus='0'表示在审核中，'1'表示审核完成可以编辑,"2"表示需求下线
 				auditStatusTxt:"",//需求审核状态的文字
-				dealValid:[],//关联协议的状态内容
 				haveValue:{describe:false,complateTime:false,demandObj:false,objRequire:false,reword:false,remark:false},//判断各行有没有信息显示
-				operate:[],//我的申请 对方也达成合作意向后“第二个span”的显隐；
-				myOperate:"",
+				relatedDeals:[],
+				seletedDealName:"",
+				selectedDeal:{
+					demandID:"",
+					dealID:"",
+				}
 			}
 		},
 //		computed:mapState({
@@ -254,112 +260,7 @@
 			this.getData()
 		},
 		mounted(){
-			//判断是否是我发布的需求；
-//			if(this.detailInfo.pubID == this.userID){
-//				this.isMine = true;//是我发布的需求
-//				//继而判断已经达成合作意向，来控制退回意向按钮的显隐
-//				for(var i=0;i<this.detailInfo.applicant.length;i++){
-//					if(this.detailInfo.applicant[i].coIntention=="1"){
-//						this.myIntention = true;
-//						this.intentionTxt.push("退回合作意向")
-//					}else if(this.detailInfo.applicant[i].coIntention=="0"){
-//						this.myIntention = true;
-//						this.intentionTxt.push( "同意合作申请");
-//					}else{
-//						this.myIntention = false;
-//					}
-//				}
-//				
-//			}else if(this.detailInfo.pubID != this.userID){
-//				this.isMine = false;//不是我发布的需求
-//				//继而判断我有没有达成合作意向，来控制提交申请的显隐
-//				for(var i=0;i<this.detailInfo.applicant.length;i++){
-//					if(this.detailInfo.applicant[i].id==this.userID){
-//						if(this.detailInfo.applicant[i].coIntention=="1"){
-//							this.myIntention = true;
-//							this.myIntentionTxt = "退回合作意向"
-//							break;
-//						}else if(this.detailInfo.applicant[i].coIntention=="0"){
-//							this.myIntention = true;
-//							this.myIntentionTxt = "撤回申请"
-//						}else{
-//							this.myIntention = false;
-//						}
-//						console.log(this.myIntention)
-//							
-//					}else{
-//							this.myIntention = false;
-//					}
-//				}
-//				
-//			}
-//			console.log(this.detailInfo)
-
 			
-			
-//			if(this.detailInfo.applicant.length!=0){
-//				Vue.set(this,'haveCooper',true)
-//			}else{
-//				Vue.set(this,'haveCooper',false)
-//			}
-//			//判断有没有关联协议
-//			if(this.detailInfo.relatedDeal.length!=0){
-//				Vue.set(this,'haveDeal',true)
-//			}else{
-//				Vue.set(this,'haveDeal',false)
-//			}
-//			//判断该需求草稿的来源，即判断有没有被发布过，来判定申请者及以后模块的有无。
-//			if(this.detailInfo.havePublished==false){
-//				Vue.set(this,"havePublished",false)//有没有被发布过
-//				
-//			}else{
-//				Vue.set(this,"havePublished",true)
-//			}
-			//判断有没有在线（在需求中心）
-			
-			
-//			for(var i=0;i<this.detailInfo.applicant.length;i++){
-//				
-//				
-//				if(this.detailInfo.applicant[i].coIntention!="1"){
-//					this.intentionTxt.push("发送合作意向") ;
-////					Vue.set(this,'intentionTxt',"发送合作意向")
-////					console.log(this.intentionTxt)
-//				}else{
-//					this.intentionTxt.push("已达成合作意向") ;
-////					Vue.set(this,'intentionTxt',"已达成合作意向")
-//				}
-//				
-//			}
-//			console.log(this.detailInfo.auditStatus)
-			//需求审核状态的显隐，有无编辑下线操作按钮
-//			if(this.detailInfo.auditStatus==="0"){
-//				Vue.set(this,'auditStatusShow',true);
-//				Vue.set(this,'auditStatusTxt',"需求审核中");	
-//				
-//			}else if(this.detailInfo.auditStatus==="1"){
-//				Vue.set(this,'auditStatusShow',false);//需求审核通过的情况
-//				Vue.set(this,'auditStatusTxt',"");
-//				Vue.set(this,"haveOffLine",true)
-//			}else if(this.detailInfo.auditStatus==="2"){
-//				Vue.set(this,'auditStatusShow',false);
-//				Vue.set(this,'auditStatusTxt',"需求已下线");//需求下线的情况
-//				Vue.set(this,"haveOffLine",false)
-//			}else{
-//				Vue.set(this,'auditStatusShow',false);
-//				Vue.set(this,'auditStatusTxt',"");//需求还未上线的情况
-//			}
-			
-			//协议的状态
-//			for(var j=0;j < this.detailInfo.relatedDeal.length;j++){
-//				if(this.detailInfo.relatedDeal[j].valid != false){
-////					console.log(this.detailInfo.relatedDeal)
-//					this.dealValid.push("已生效");
-//				}else{
-//					this.dealValid.push("待生效");
-//				}
-//			}
-//			console.log(this.dealValid)
 			
 		},
 		methods:{
@@ -415,6 +316,7 @@
 				}else{
 					Vue.set(that,"haveCollect",false)
 				}
+				
 				// 判断各项有无数据
 				if(that.detailInfo.demandreviewinfo.describe!=""){
 					that.haveValue.describe=true;
@@ -432,7 +334,12 @@
 					that.haveValue.remark=true;
 				}
 				
-				
+				//判断有无关联协议
+				if(that.detailInfo.deals.length!=0){
+					Vue.set(that,"haveDeal",true)
+				}else{
+					Vue.set(that,"haveDeal",false)
+				}
 				//判断有没有合作方
 				
 				for(let i=0;i<that.detailInfo.demandappinfos.length;i++){
@@ -492,6 +399,7 @@
 				if(that.detailInfo.demandreviewinfo.applyStatus=="5"||that.detailInfo.demandreviewinfo.applyStatus=="6"){
 					Vue.set(that,'auditStatusTxt',"需求已下线");//需求下线的情况
 				}
+				//需求有没有上线过
 				if(Math.floor(that.detailInfo.demandreviewinfo.applyStatus)>=3){
 					Vue.set(that,"havePublished",true)
 				}else{
@@ -511,6 +419,9 @@
 					async: false,
 				},function(data){
 					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"haveCollect",false)
+					}
 				},function(err){
 					console.log(err)
 				})//更新到服务器
@@ -529,6 +440,9 @@
 					async: false,
 				},function(data){
 					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"haveCollect",true)
+					}
 				},function(err){
 					console.log(err)
 				})//更新到服务器
@@ -651,21 +565,7 @@
 				},function(err){
 					console.log(err)
 				})//更新到服务器
-//				this.haveCollect = true;
-//				//提交申请后我的意向为true
 //				
-//				this.myIntentionTxt = "撤回申请";
-//				
-//				$('.submitApp').css("display","none");
-//				$('.notyetSent').show();
-//				var myApplyInfo = {
-//					id:this.userID,
-//					name:"CCDI",
-//					coIntention:"0",
-//				}
-//				console.log(myApplyInfo);
-//				this.detailInfo.applicant.push(myApplyInfo)
-//				console.log(this.detailInfo.applicant);
 			},
 			callReturnModal(){//不是我发布的需求的情况下，我申请或者达成合作后撤回意向的模态框
 				if(this.myIntentionTxt == "撤回申请"){
@@ -681,7 +581,8 @@
 				var that=this;
 				var data = {
 					"pkid": pkid,
-					"status":status
+					"status":status,
+					"demandID":that.$route.query.id,
 				}
 				$.ajaxSetup({ contentType : 'application/json' });
 				MyAjax.ajax({
@@ -708,7 +609,8 @@
 				var that=this;
 				var data = {
 					"pkid": pkid,
-					"status":status
+					"status":status,
+					"demandID":that.$route.query.id,
 				}
 				$.ajaxSetup({ contentType : 'application/json' });
 				MyAjax.ajax({
@@ -730,25 +632,90 @@
 					console.log(err)
 				})//更新到服务器
 			},
-			cancelDeal(index){
-				this.detailInfo.relatedDeal.splice(index,1)
-				if(this.detailInfo.relatedDeal.length!=0){
-					Vue.set(this,'haveDeal',true)
-				}else{
-					Vue.set(this,'haveDeal',false)
-				}
+			cancelDeal(id){
+				var that = this;
+				var url = MyAjax.urlsy +"/demanddealrela/cancelDeal";
+				var data = {
+					pkid:id
+				};
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal()
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 			},
 			addDeal(){
-				if(this.canOffline!=false){
+				var that = this;
+				if(that.canOffline!=false){
 					Modal.makeText($(".addDealModal"))
 				}
+				var url = MyAjax.urlhw+"/demanddealrela/findByMySelf";
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"relatedDeals",data.msg)
+					}
+					
+				},function(err){
+					console.log(err)
+				})
+				
+				
+			},
+			selectThisDeal(e){
+				console.log(e.target.value)
+				this.selectedDeal = {
+					demandID : this.$route.query.id,
+					dealID : e.target.value
+				}
+				
+			},
+			comfirmInsertDeal(){
+				var that = this;
+				var url = MyAjax.urlsy +"/demanddealrela/insert";
+				var data = that.selectedDeal;
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal()
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 			},
 			sentIntention(pkid,status){
 				var url = MyAjax.urlsy +"/demandappinfo/update/";
 				var that=this;
 				var data = {
 					"pkid": pkid,
-					"status":status
+					"status":status,
+					"demandID":that.$route.query.id,
 				}
 				$.ajaxSetup({ contentType : 'application/json' });
 				MyAjax.ajax({
@@ -1186,7 +1153,7 @@ $activeColor:#546686;
 			
 			.relatedDeal-wrap{
 				
-				margin-top: 40px;
+				margin-top: 20px;
 				.A-title{
 					height: 42px;
 					line-height: 42px;
@@ -1231,6 +1198,7 @@ $activeColor:#546686;
 						cursor: pointer;
 						margin-top: 20px;
 						display: inline-block;
+						float: left;
 					}
 					.disabled{
 						padding-left: 28px;

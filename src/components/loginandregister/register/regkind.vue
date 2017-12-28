@@ -11,7 +11,9 @@
 		    <span v-if="reveal.error">图片验证码错误</span>
 		</li>
 		<li>
-			<input type="text" placeholder="请确认短信验证码" v-model="personalRegInput.messageConfirm" @blur="personalMsgCfm" class="msg"/>
+			<div>
+				<input type="text" placeholder="请确认短信验证码" v-model="personalRegInput.messageConfirm" @blur="personalMsgCfm" class="msg"/>
+			</div>
 			<button @click="settime" class="msgConfirm" :disabled="!show">
 			     <span v-if="show">获取验证码</span>
 			     <span v-if="!show" class="count">{{count}} s</span>
@@ -165,7 +167,7 @@
 				
 				
 				var that = this;
-				var url = MyAjax.urlhw + "/accountmanainfo/registorMobileCode/" + that.personalRegInput.tel;
+				var url = MyAjax.urlsy + "/accountmanainfo/registorMobileCode/" + that.personalRegInput.tel;
 		        MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -203,7 +205,7 @@
 				})
 			},
 			changePic(){
-				this.picSrc = MyAjax.urlhw+"/captcha.jpg?random="+Math.random()
+				this.picSrc = MyAjax.urlsy+"/captcha.jpg?random="+Math.random()
 //		    	this.picSrc = MyAjax.urlhw+"/captcha.jpg"
 		    	$(".picConfirm").attr("src",this.picSrc)
 		    	
@@ -230,7 +232,7 @@
 			},
 			goRegisterDonePer(){
 				var that = this;
-				var url = MyAjax.urlhw+"/accountmanainfo/register";
+				var url = MyAjax.urlsy+"/accountmanainfo/register";
 				if(that.personalRegInput.tel.trim().length!=0&&that.personalRegInput.picConfirm.trim().length!=0&&that.personalRegInput.messageConfirm.trim().length!=0){
 					MyAjax.ajax({
 						type: "POST",
@@ -559,9 +561,15 @@
 					  }
 				}
 				&:nth-child(3){
-					
+					position:relative;
 					background: url(../../../assets/img/register/icon_confirmcode.png) no-repeat left center;
+					div{
+						&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+						
+					}
 					.msgConfirm{
+						position: absolute;
+						right: 0; top: 12px;
 						color: rgb(242,117,25);
 						cursor: pointer;
 						display: inline-block;
@@ -569,7 +577,7 @@
 						width: 80px;
 						height: 20px;
 						background: none;
-						margin-top: 12px;
+						
 					}
 					.count{
 						color:rgb(242,117,25);

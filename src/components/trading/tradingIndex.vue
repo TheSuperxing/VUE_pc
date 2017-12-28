@@ -1,7 +1,10 @@
 <template>
 	<div class="tradingIndex">
 		
-		<div class="google">高级搜索</div>
+		<div class="google" @keydown="keySearch($event)">
+			<input type="text" placeholder="搜索需求" v-model="searchText"/>
+			<span class="searchButton" @click="jumpPage(current_page)"></span>
+		</div>
 		<div class="result-table">
 			<ul class="table-head">
 				<li>名称</li>
@@ -11,29 +14,14 @@
 				<li>需求对象</li>
 			</ul>
 			<ul class="result-list">
-				<!-- <li class="list-wrap">
-					<div><router-link :to="{name:'DemandDetail',query:{id:'000'}}">一个需求</router-link></div>
-					<div>2017.10.26</div>
-					<div>8000</div>
-					<div>10/10</div>
-					<div class="obj-wrap"><span class="demandObj">个人<i>;</i></span><span class="demandObj">团队<i>;</i></span></div>
-					<div class="collect">
-						<span class="cancelBtn" @click="cancelCollect()" v-if="haveCollect">
-							取消收藏
-						</span>
-						<span class="collectBtn" v-if="!haveCollect" @click="collectThis()">
-							<img src="../../assets/img/demand/icon002.png"/>
-							收藏
-						</span>
-					</div>
-				</li> -->
+				<li class="stateNone" v-if="!haveResult">没有查到相关需求~</li>
 				<li v-for="(item,index) in dataInfo" class="list-wrap">
 					<div><router-link :to="{name:'DemandDetail',query:{id:item.demandID,watchTimes:item.watchTimes}}">{{item.demandName}}</router-link></div>
 					<div>{{item.publishTime}}</div>
 					<div>{{item.reword}}</div>
 					<div>{{item.appTimes}}/{{item.watchTimes}}</div>
 					<div class="obj-wrap">
-						<span class="demandObj" v-for="demand in item.demandobjs">{{demand.demandObj}}<i>;</i></span>
+						<span class="demandObj" v-for="demand in item.demandobjs">{{demand}}<i>;</i></span>
 						<!-- <span class="demandObj">{{item.className}}<i>;</i></span> -->
 					</div>
 					<div class="collect">
@@ -85,15 +73,21 @@
 		        goodsTArr:[],
 		        dataInfo:[],
 				haveCollect:[],//有没有在收藏里
+				searchText:"",
+			    hotWords:["李彦宏","马化腾","马云","优秀"],
+			    resultList:[],
+			    haveResult:false,
 		    }
 		},
 		created(){
-			this.$route.query.page = 1;
-			this.current_page=this.$route.query.page;
+//			this.$route.query.page = 1;
+//			this.current_page=this.$route.query.page;
+			this.$route.query.page = this.searchText;
+			this.searchAll()
 			
 		},
         mounted() {
-			this.jumpPage(this.current_page);
+//			this.jumpPage(this.current_page);
         },
     	computed: {
     		show: function() {
@@ -142,33 +136,45 @@
     	},
     	methods: {
     		jumpPage(current_page){
-				this.haveCollect=[];
-				var url = MyAjax.urlsy+"/tradeHall/findDemands/"+current_page
-				var that = this;
-				MyAjax.ajax({
-					type: "GET",
-					url:url,
-					dataType:"json",
-					async: false,
-					contentType:"application/json;charset=utf-8",
-				}, function(data){
-					console.log(data)
-					if(data.code==0){
-						that.dataInfo = data.msg.records;//取出当前获取的所有需求
-						that.current_page=data.msg.current;//设置当前页
-						that.pages=data.msg.pages;//设置最大页数
-						for(let i=0;i<that.dataInfo.length;i++){
-							that.dataInfo[i].status=="1"?that.haveCollect.push(true):that.haveCollect.push(false);
-							
+    			var that = this;
+    			if(that.searchText.trim().length!=0){
+    				that.haveCollect=[];
+					var url = MyAjax.urlsy+"/tradeHall/findDemand/"+ that.searchText +"/"+current_page
+					MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType:"json",
+						async: false,
+	//					contentType:"application/json;charset=utf-8",
+					}, function(data){
+//						console.log(data)
+						if(data.code==0){
+							that.dataInfo = data.msg.records;//取出当前获取的所有需求
+							that.current_page=data.msg.current;//设置当前页
+							that.pages=data.msg.pages;//设置最大页数
+							if(that.dataInfo.length!=0){
+								that.haveResult = true;
+							}else{
+								that.haveResult = false;
+							}
+							for(let i=0;i<that.dataInfo.length;i++){
+								that.dataInfo[i].demandobjs= that.dataInfo[i].demandObjCode.split(",")
+								console.log(that.dataInfo[i].demandobjs)
+								that.dataInfo[i].status=="1"?that.haveCollect.push(true):that.haveCollect.push(false);
+								
+							}
+						}else{
+	//						router.push("/error/500")
+	//						console.log("错误返回")
 						}
-					}else{
-//						router.push("/error/500")
-//						console.log("错误返回")
-					}
-				},function(err){
-					router.push("/error/404")
-					console.log(err)
-				})
+					},function(err){
+	//					router.push("/error/404")
+						console.log(err)
+					})
+    			}else{
+    				that.searchAll()
+    			}
+				
 			},
 			tradeColl(id,status){
 				var url = MyAjax.urlsy +"/tradeHall/collect/"+id+"/"+status
@@ -206,11 +212,76 @@
 //				this.dataInfo[index].status="1"
 				this.tradeColl(id,"1");
 			},
+			searchAll(current_page){
+    			this.haveCollect=[];
+				var that = this;
+				var url = MyAjax.urlsy+"/tradeHall/findDemands/" + that.current_page
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType:"json",
+					async: false,
+					contentType:"application/json;charset=utf-8",
+				}, function(data){
+					console.log(data)
+					if(data.code==0){
+						that.dataInfo = data.msg.records;//取出当前获取的所有需求
+						that.current_page=data.msg.current;//设置当前页
+						that.pages=data.msg.pages;//设置最大页数
+						if(that.dataInfo.length!=0){
+							that.haveResult = true;
+						}else{
+							that.haveResult = false;
+						}
+						for(let i=0;i<that.dataInfo.length;i++){
+							that.dataInfo[i].demandobjs= that.dataInfo[i].demandObjCode.split(",")
+							for(let j=0;j<that.dataInfo[i].demandobjs.length;j++){
+								switch (that.dataInfo[i].demandobjs[j]){
+									case "1001":
+										Vue.set(that.dataInfo[i].demandobjs,[j],"个人")
+										break;
+									case "1002":
+										Vue.set(that.dataInfo[i].demandobjs,[j],"公司")
+										break;
+									case "1003":
+										Vue.set(that.dataInfo[i].demandobjs,[j],"团队")
+										break;
+									default:
+										break;
+								}
+							}
+							console.log(that.dataInfo[i].demandobjs)
+							that.dataInfo[i].status=="1"?that.haveCollect.push(true):that.haveCollect.push(false);
+							
+						}
+						
+					}else{
+	//						router.push("/error/500")
+	//						console.log("错误返回")
+					}
+				},function(err){
+	//					router.push("/error/404")
+					console.log(err)
+				})
+    		},
+    		keySearch($event){//enter键登录事件
+		      	var event = $event || window.event;  
+				 	if(event.keyCode==13){ 
+				     this.jumpPage(this.current_page);
+			         event.returnValue = false;    
+			         event.cancelBubble=true;
+			         event.preventDefault();
+			         //event.stopProgagation();
+			         return false;
+			      	} 
+		
+			},
     	},
     	watch:{
     		current_page:function(){
-				location.hash=location.hash.split("=")[0]+"="+this.current_page
+//				location.hash=location.hash.split("=")[0]+"="+this.current_page
 				this.jumpPage(this.current_page);
+				
     		}
     	}
 	}
@@ -223,14 +294,31 @@ $bfColor : #ffffff;
 	width: 1200px;
 	min-height: 500px;
 	background: $bfColor;
+	padding-top: 1px;
+	border-radius: 10px;
+	padding-bottom: 50px;
+	position: relative;
 	.google{
-		width: 1200px;
-		min-height: 50px;
-		line-height: 50px;
-		text-align: center;
-		background: papayawhip;
-		margin-bottom: 30px;
-		box-shadow: 6px 5px 5px #999999;
+		width: 700px;
+		height: 50px;
+		border-radius: 25px;
+		box-shadow: 0 0 15px rgba(179,179,179,.5);
+		padding: 0 20px ;
+		margin: 50px auto;
+		background-color: #FFFFFF;
+		input{
+    		width: 95%;
+    		height: 100%;
+    		background: none;
+    		font-size: 16px;
+    	}
+    	.searchButton{
+    		width: 5%;
+    		height: 100%;
+    		float: right;
+    		background: url(../../assets/img/header/1717.png) no-repeat center;
+    		cursor: pointer;
+    	}
 	}
 	.result-table{
 		width: 1200px;
@@ -267,6 +355,13 @@ $bfColor : #ffffff;
 		}
 		.result-list{
 			padding:5px 20px;
+			min-height:250px;
+			.stateNone{
+				height: 100px;
+				line-height: 100px;
+				text-align: center;
+				color: #808080;
+			}
 			.list-wrap{
 				height: 50px;
 				line-height: 50px;
@@ -384,8 +479,10 @@ $bfColor : #ffffff;
 			/*min-width: 900px;*/
 			text-align: center;
 			color: #888888;
-			
-			 /*transform:translateX(-50%);
+			/*position: absolute;
+			bottom: 0;
+			left: 50%;
+			 transform:translateX(-50%);
 			 -webkit-transform:translateX(-50%);
 			-moz-transform:translateX(-50%);
 			-ms-transform:translateX(-50%);

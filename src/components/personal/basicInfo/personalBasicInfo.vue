@@ -55,7 +55,13 @@
         <li class="clear">
         	<h5>微信账号 :</h5>
         	<p>{{baseInfo.wechatAccount}}</p>
-          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[5]}" v-on:click="openOrPrivacy(5)"></strong>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[5]}" v-on:click="openOrPrivacy(6)"></strong>
+          <p v-if="noBaseInfo">（暂无信息）</p>
+        </li>
+        <li class="clear">
+        	<h5>自我介绍 :</h5>
+        	<p>{{baseInfo.selfIntroduction}}</p>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[6]}" v-on:click="openOrPrivacy(7)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
       </ul>
@@ -119,6 +125,10 @@
         	<h5>微信账号：</h5>
         	<p><input type="text" v-model="localBaseInfo.wechatAccount"/></p>
         	
+        </li>
+        <li class="clear">
+        	<h5>自我介绍：</h5>
+        	<p><textarea v-model="localBaseInfo.selfIntroduction"></textarea></p>
         </li>
         <li class="cancelSubmit clear">
           <button class="submitEdit" v-on:click="submitEdit" v-bind:class="{submitBgColor:reveal.submitBgColor}">保存</button>
@@ -202,8 +212,6 @@
 				    </script>
 				    <div id="fine-uploader-manual-trigger"></div>
         		</li>
-        		
-        		
         		<p  v-if="localBaseInfo.ifRNA">您已通过实名认证</p>
             <p  v-if="localBaseInfo.ifRNA">您可点击“添加”继续上传，不会影响您已上传的实名认证文件</p>
         	</ul>
@@ -268,6 +276,8 @@
           psnMailVisable:1,
           ifRNA:0,
           psnID:"",
+          selfIntroduction:"",
+          selfIntroductionVisable:1
         },
       }
 
@@ -338,7 +348,7 @@
     },
     methods:{
     	updateData(){
-        var that = this;
+            var that = this;
 	    	var url = MyAjax.urlsy+"/personalbasicinfo/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
@@ -350,7 +360,7 @@
 				},function(data){
 					console.log(data)
 					if(data.code==0){
-            that.baseInfo = data.msg;
+                     that.baseInfo = data.msg;
 						//判断用户的全部信息为空值
 			    	if(that.baseInfo.sex=="0"){
 			    		that.baseInfo.sex = "男"
@@ -369,15 +379,15 @@
 					  if(that.baseInfo.ifRNA){
 					    that.reveal.throughRealName=true;
 					  }
-					  that.baseInfo.nickName=emptyText(that.baseInfo.nickName);
-			      that.baseInfo.psnName=emptyText(that.baseInfo.psnName);
-			      that.baseInfo.sex=emptyText(that.baseInfo.sex);
-			      that.baseInfo.dateOfBirth=emptyText(that.baseInfo.dateOfBirth);
-			      that.baseInfo.psnMail=emptyText(that.baseInfo.psnMail);
+					that.baseInfo.nickName=emptyText(that.baseInfo.nickName);
+			        that.baseInfo.psnName=emptyText(that.baseInfo.psnName);
+			        that.baseInfo.sex=emptyText(that.baseInfo.sex);
+			        that.baseInfo.dateOfBirth=emptyText(that.baseInfo.dateOfBirth);
+			        that.baseInfo.psnMail=emptyText(that.baseInfo.psnMail);
 			      that.baseInfo.phoneNumber=emptyText(that.baseInfo.phoneNumber);
 			      that.baseInfo.alipayAccount=emptyText(that.baseInfo.alipayAccount);
 			      that.baseInfo.wechatAccount=emptyText(that.baseInfo.wechatAccount);
-			      
+			      that.baseInfo.selfIntroduction=emptyText(that.baseInfo.selfIntroduction);
 			      
 			      
 			      //如果得到的数据为空，进行暂没有消息处理
@@ -390,7 +400,7 @@
 			      that.reveal.openOrPrivacy.push(that.baseInfo.psnMailVisable)
 			      that.reveal.openOrPrivacy.push(that.baseInfo.alipayAccountVisable)
 			      that.reveal.openOrPrivacy.push(that.baseInfo.wechatAccountVisable)
-			      
+			      that.reveal.openOrPrivacy.push(that.baseInfo.selfIntroductionVisable)
 			      
 			      /*初始化openOrPrivacy*/
 						
@@ -426,13 +436,13 @@
     	},
       editBasicInfo(){//编辑进入编辑状态
 //    	console.log(this.localBaseInfo)
-				function emptyText(text) {
+			function emptyText(text) {
 			    if(text== "（暂无信息）"){
 			      return "";
 			    }else {
 			      return text;
 			    }
-			  }
+			}
 				this.localBaseInfo.nickName=emptyText(this.localBaseInfo.nickName);
 	      this.localBaseInfo.psnName=emptyText(this.localBaseInfo.psnName);
 	      this.localBaseInfo.sex=emptyText(this.localBaseInfo.sex);
@@ -440,6 +450,7 @@
 	      this.localBaseInfo.phoneNumber=emptyText(this.localBaseInfo.phoneNumber);
 	      this.localBaseInfo.alipayAccount=emptyText(this.localBaseInfo.alipayAccount);
 	      this.localBaseInfo.wechatAccount=emptyText(this.localBaseInfo.wechatAccount);
+	      this.localBaseInfo.selfIntroduction=emptyText(this.localBaseInfo.selfIntroduction);
 				var d = new Date();
 //				console.log(d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate())
 				if(this.localBaseInfo.dateOfBirth == "（暂无信息）"){
@@ -526,7 +537,8 @@
 	    	this.localBaseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.localBaseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
 	    	this.localBaseInfo.alipayAccountVisable = this.reveal.openOrPrivacy[5];//支付宝账号
-	    	this.localBaseInfo.wechatAccountVisable = this.reveal.openOrPrivacy[5];//支付宝账号
+	    	this.localBaseInfo.wechatAccountVisable = this.reveal.openOrPrivacy[6];//weixin账号
+	    	this.localBaseInfo.selfIntroductionVisable = this.reveal.openOrPrivacy[7];//weixin账号
 	    	
 	    	if(this.localBaseInfo.sex=='男'){
 	    		this.localBaseInfo.sex = "0";
@@ -574,7 +586,7 @@
 					})
 		    	that.updateData();
 		    	if(this.localBaseInfo.nickName.trim().length!=0&&this.localBaseInfo.psnName.trim().length!=0){
-          Vue.set(this.reveal,"edit",true)
+          	Vue.set(this.reveal,"edit",true)
 	          /*只有当昵称，和名字不为空的时候，保存按钮才可用*/
 	        }else {
 	          Vue.set(this.reveal,"edit",false)
@@ -597,22 +609,40 @@
       },
       /*0-name 1-sex 2-age 3-phone 4-mail*/
      	openOrPrivacy(index){
-        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
-        console.log(this.reveal.openOrPrivacy[index])
+            Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
      		for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
-        	if(this.reveal.openOrPrivacy[i]===false){
-        		this.reveal.openOrPrivacy[i] = 0;
-        	}else{
-        		this.reveal.openOrPrivacy[i] = 1;
-        	}
-        }
+	        	if(this.reveal.openOrPrivacy[i]===false){
+	        		this.reveal.openOrPrivacy[i] = 0;
+	        	}else{
+	        		this.reveal.openOrPrivacy[i] = 1;
+	        	}
+	        }
+     		console.log(this.reveal.openOrPrivacy)
+     		function emptyText(text) {
+			    if(text== "（暂无信息）"){
+			      return "";
+			    }else {
+			      return text;
+			    }
+			}
+			this.baseInfo.nickName=emptyText(this.baseInfo.nickName);
+		    this.baseInfo.psnName=emptyText(this.baseInfo.psnName);
+		    this.baseInfo.sex=emptyText(this.baseInfo.sex);
+		    this.baseInfo.dateOfBirth=emptyText(this.baseInfo.dateOfBirth);
+		    this.baseInfo.psnMail=emptyText(this.baseInfo.psnMail);
+		    this.baseInfo.phoneNumber=emptyText(this.baseInfo.phoneNumber);
+		    this.baseInfo.alipayAccount=emptyText(this.baseInfo.alipayAccount);
+		    this.baseInfo.wechatAccount=emptyText(this.baseInfo.wechatAccount);
+		    this.baseInfo.selfIntroduction=emptyText(this.baseInfo.selfIntroduction);
      		
      		this.baseInfo.psnNameVisable = this.reveal.openOrPrivacy[0];
 	    	this.baseInfo.sexVisable = this.reveal.openOrPrivacy[1];
 	    	this.baseInfo.ageVisable = this.reveal.openOrPrivacy[2];
 	    	this.baseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[3];
 	    	this.baseInfo.psnMailVisable = this.reveal.openOrPrivacy[4];
-	    	this.baseInfo.phoneNumberVisable = this.reveal.openOrPrivacy[5];//zhifubao
+	    	this.baseInfo.alipayAccountVisable = this.reveal.openOrPrivacy[5];//zhifubao
+	    	this.baseInfo.wechatAccountVisable = this.reveal.openOrPrivacy[6];//weixin账号
+	    	this.baseInfo.selfIntroductionVisable = this.reveal.openOrPrivacy[7];//
 	    	console.log(this.baseInfo)
 	    	var that = this;
 	    	var url = MyAjax.urlsy+"/personalbasicinfo/update";
@@ -896,6 +926,23 @@
            input{
           	width: 385px;
           }
+         
+        }
+        li:nth-child(9){
+        	position: relative;
+	            h5{
+	            	background: url("../../../assets/img/personal/basicInfo/icon_mail.png") left center no-repeat;
+	            }
+	            p{
+	          	    height: 100px;
+	            }
+	            textarea{
+	          	    width: 385px;
+	          	    border:1px solid $borderColor;
+	          	    border-radius: 5px;
+	          	    text-indent: 12px;
+	          	    
+	            }
          
         }
         .cancelSubmit{

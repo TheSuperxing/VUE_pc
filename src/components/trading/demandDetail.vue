@@ -305,7 +305,7 @@
 				}
 				console.log(that.detailInfo.demandobjs)
 				//判断是否为我发布的需求
-				if(that.detailInfo.basic_isMine==true){
+				if(that.detailInfo.demandbasicinfo.basic_isMine==true){
 					Vue.set(that,"isMine",true)
 				}else{
 					Vue.set(that,"isMine",false)

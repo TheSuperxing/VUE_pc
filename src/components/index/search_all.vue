@@ -2,18 +2,25 @@
 	<div class="search_all">
 		<div class="menu">
 			<ul>
-				<li v-for="(item,index) in tab">
-					<router-link :to='{name:item.rout}'>{{item.text}}</router-link>
+				<li v-for="(item,$index) in tab" @click="tabChange($index)">
+					<router-link :to='{name:item.rout,query:{kw:"all"}}'>{{item.text}}</router-link>
 				</li>
 				
 			</ul>
-			
+			<div v-for="(item,index) in tab" class="search-wrap" v-if="index==indexActive">
+				<input type="text" :placeholder="item.text" v-model="searchText"/>
+				<span class="searchButton" @click="search(searchText,item.rout)"></span>
+			</div>
+			<div class="hotWordsWrap">
+				<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
+			</div>
 		</div>
 		<router-view></router-view>
 	</div>
 </template>
 
 <script>
+	import Vue from "vue"
 	import router from "../../router"
 	export default{
 		name:"search_all",
@@ -35,12 +42,45 @@
 					},
 					
 				],
-				indexActive:""
+				indexActive:"",
+				searchText:"",
+			    hotWords:["李彦宏","马化腾","马云","优秀"],
 			}
 		},
+		mounted(){
+			console.log(this.$router.history.current.name)
+			console.log(this.$route.query)
+			
+			switch (this.$router.history.current.name){
+				case "SearchPersonal":
+					Vue.set(this,"indexActive",0)
+					break;
+				case "SearchTeam":
+					Vue.set(this,"indexActive",1)
+					break;
+				case "SearchCompany":
+					Vue.set(this,"indexActive",2)
+					break;
+				case "SearchProject":
+					Vue.set(this,"indexActive",3)
+					break;
+				default:
+					break;
+			}
+			console.log(this.indexActive)
+			
+		},
 		methods:{
-			tabChange(urlname){
-				router.push({name:urlname})
+			tabChange(index){
+				
+				Vue.set(this,"indexActive",index)
+				
+			},
+			choseHot(index){
+    			this.searchText = this.hotWords[index]
+    		},
+			search(txt,rout){
+				router.push({name:rout,query:{kw:txt}})
 			}
 		}
 	}
@@ -85,6 +125,48 @@
 				}
 			}
 		}
+		.search-wrap{
+			width: 700px;
+			height: 50px;
+			border-radius: 25px;
+			box-shadow: 0 0 15px rgba(179,179,179,.5);
+			padding: 0 20px ;
+			margin: 0px auto 0;
+			background-color: #FFFFFF;
+			margin-top: 40px;
+			input{
+        		width: 95%;
+        		height: 100%;
+        		background: none;
+        		font-size: 16px;
+        	}
+        	.searchButton{
+        		width: 5%;
+        		height: 100%;
+        		float: right;
+        		background: url(../../assets/img/header/1717.png) no-repeat center;
+        		cursor: pointer;
+        	}
+        	
+		}
+		.hotWordsWrap{
+			width: 700px;
+			margin: 10px auto;
+    		height: 20px;
+    		p{
+    			display: inline-block;
+    			padding-right: 10px;
+    			margin-left: 12px;
+    			font-size: 14px;
+    			height: 14px;
+    			line-height: 14px;
+    			border-right: 2px solid #353535;
+    			cursor: pointer;
+    		}
+    		p:last-child{
+    			border-right: none;
+    		}
+        }
 	}
 }
 </style>

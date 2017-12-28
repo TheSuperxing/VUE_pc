@@ -167,7 +167,7 @@
 					type: "GET",
 					url:url,
 					dataType: "json",
-					async: false,
+					async: true,
 				},function(data){
 					console.log(data)
 					//给获取的数据分组

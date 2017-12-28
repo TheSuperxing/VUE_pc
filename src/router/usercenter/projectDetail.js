@@ -1,5 +1,5 @@
 
-import ProjectDetail from "../../components/company/projectDetail.vue"
+import ProjectDetail from "../../components/details/projectDetail.vue"
 
 var projectDetail = [
 	{

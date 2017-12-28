@@ -167,7 +167,7 @@
 					type: "GET",
 					url:url,
 					dataType: "json",
-					async: false,
+					async: true,
 				},function(data){
 					console.log(data)
 					//给获取的数据分组
@@ -211,7 +211,7 @@
 	.index_demand{
 		width: 1230px;
 		/*height: 740px;*/
-		margin: 130px auto 30px;
+		margin: 50px auto 30px;
 		
 		h1{
 			height: 30px;

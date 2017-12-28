@@ -17,6 +17,7 @@
     }),
     created() {
       Vue.set(this.state, "dealInfo", ajaxData())
+      
     }
   }
 </script>

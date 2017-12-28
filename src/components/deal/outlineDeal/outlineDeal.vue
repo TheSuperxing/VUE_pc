@@ -34,7 +34,7 @@
           </li>
           <li v-cloak>{{item.dealState}}</li>
           <li class="titleButton">
-            <div @click="deleteDeal(index)" class="cancel">
+            <div @click="deleteDealList(index)" class="cancel">
               删除
             </div>
             <div @click="editPrompt(index)" class="edit">
@@ -64,11 +64,7 @@
         // routerLinkPath:{//发送的协议和接受的协议对应的不同跳转
         //   path:""
         // },
-        delList:[{
-          dealName:"",
-          publishTime:"",
-          dealState:"",
-        }]
+        delList:[]
       }
     },
     // computed:mapState({
@@ -91,8 +87,29 @@
 				},function(data){
 					if(data.code==0){
             that.delList = data.msg;
+            console.log(that.delList)
 					}else{
-						console.log("错误返回");
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      deleteDeal(index,pkid){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/del/"+pkid;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.delList.splice(index,1)
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
 					}
 				},function(err){
 					console.log(err)
@@ -112,9 +129,9 @@
       confirmEdit(){
         var modal= new ModalOpp("#modal-overlay");
         modal.closeModal();
-        location.hash="/yhzx/deal/outlineDealIndex/editOutlineDeal?id="+this.reveal.index;
+        location.hash="/yhzx/deal/outlineDealIndex/editOutlineDeal?id="+this.delList[this.reveal.index].pkid;
       },
-      deleteDeal(index){//删除协议
+      deleteDealList(index){//删除协议
         var modal= new ModalOpp("#modal-overlay2");
         modal.makeText();
         Vue.set(this.reveal,"index",index)
@@ -122,7 +139,7 @@
       confirmStopDeal(){//确认删除协议
         var modal2= new ModalOpp("#modal-overlay2");
         modal2.closeModal();
-        this.dealInfo.splice(this.reveal.index,1)
+        this.deleteDeal(this.reveal.index,this.delList[this.reveal.index].pkid)
 
       },
     }

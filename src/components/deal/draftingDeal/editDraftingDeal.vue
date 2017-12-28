@@ -118,7 +118,7 @@
       </dd>
 
       <transition name="unfold-fade"><!--可以折叠的部分-->
-        <dl v-if="reveal.dealContentUnfold.state" class="clear">
+        <dl v-show="reveal.dealContentUnfold.state" class="clear">
           <dd class="clear">
             <h4>
               <i>*</i>
@@ -176,9 +176,9 @@
                     <input v-model="item.taskName"  type="text" placeholder="请输入阶段名称">
                   </div>
                   <div>
-                    <datepicker class="datePicker" v-model="item.reqCompDateS"></datepicker>
+                    <datepicker class="datePicker" v-model="item.reqCompDateStart"></datepicker>
                     <span>——</span>
-                    <datepicker class="datePicker" v-model="item.reqCompDateE" :min="item.reqCompDateS"></datepicker>
+                    <datepicker class="datePicker" v-model="item.reqCompDateEnd" :min="item.reqCompDateStart"></datepicker>
                   </div>
                   <div>
                     <input v-model="item.taskDetail"  type="text" placeholder="请输入工作内容">
@@ -330,14 +330,15 @@
   import qq from "fine-uploader" 
   import MyAjax from "../../../assets/js/MyAjax.js"
   import Datepicker from "../../units/Datepicker.vue"
-  /*document.onclick=function (e) {
-    if(e.target.parentNode.parentNode.getAttribute("class")=="dropDown"||e.target.parentNode.getAttribute("class")=="dropDown"){
+  import {pdManualUploader} from "../../../assets/js/manualUploader"
+  // document.onclick=function (e) {
+  //   if(e.target.parentNode.parentNode.getAttribute("class")=="dropDown"||e.target.parentNode.getAttribute("class")=="dropDown"){
+  //     $(".dropDown").children("ul").css("display","block")
+  //   }else{
+  //     $(".dropDown").children("ul").css("display","none")
 
-    }else{
-      $(".dropDown").children("ul").css("display","none")
-
-    }
-  };*/
+  //   }
+  // };
   export default {
     name:"editSendDeal",
     data(){
@@ -383,7 +384,7 @@
           secondParty:"",
         },
         chineseNumber:[],//阶段任务的编号
-        accessory:[],
+        accessory:[],//存新上传文件的文件名和地址
         localDealInfo:{
           dealName:"",
           firstPartyID:"",
@@ -391,8 +392,8 @@
           partyContent:"",
           dealstageinfos:[{
             taskName:"",
-            reqCompDateS:"",
-            reqCompDateE:"",
+            reqCompDateStart:"",
+            reqCompDateEnd:"",
             taskDetail:"",
             price:""
           }],
@@ -411,6 +412,7 @@
       //dealInfo:state=>state.myDeal.dealInfo,
     }),
     created(){
+      this.getCurUser()
       var active=this.reveal.agreementMembers.active;
         for(let i=0;i<active.length;i++){
           Vue.set(active,[i],false)
@@ -430,43 +432,13 @@
       }else{
         Vue.set(this.reveal.accessory,"state",true)
       }
+
       var that=this;
-      //上传文件
-			var manualUploader = new qq.FineUploader({
-	        element: document.getElementById('fine-uploader-manual-trigger'),
-	        template: 'qq-template-manual-trigger',
-	        request: {
-	            endpoint: MyAjax.urlsy+'/dealbasicinfo/upload'
-	        },
-	        thumbnails: {
-	//	                placeholders: {
-	//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-	//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-	//	                }
-	        },
-	        validation: {
-	            allowedExtensions: ['pdf', 'doc', 'docx'],
-	            itemLimit: 2,
-	            sizeLimit: 2400*2400
-	        },
-	        autoUpload: true,
-	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
-              //$('#trigger-upload').show()
-            },
-	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	            if(responseJSON.success==true){
-                that.localDealInfo.newFileId.push(responseJSON.msg.fileId)
-                that.accessory.push({fileName:responseJSON.msg.fileName,fileAddress:responseJSON.msg.fileAddress})
-                console.log(that.fileList)
-              }
-	      	},
-	    	}
-	    });
-	    
-			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	        manualUploader.uploadStoredFiles();
-	    });
+      pdManualUploader({
+        url:MyAjax.urlsy+'/dealbasicinfo/upload',
+        newFileId:that.localDealInfo.newFileId,
+        accessory:that.accessory
+      })
     },
     beforeUpdate(){
       if(this.accessory.length==0){//协议部分上传文件还是删除已有文件
@@ -488,9 +460,10 @@
 				},function(data){
 					
 					if(data.code==0){
-            console.log(data.msg)
-            Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.psnName)
+            data.msg.psnName?Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.psnName):Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.nickName)
+            //Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.psnName)
             Vue.set(that.reveal.agreementMembers.selectMembers[0],"accountID",data.msg.accountID)
+
 					}else{
 						console.log("错误返回")	
 					}
@@ -498,14 +471,38 @@
 					console.log(err)
 				})
       },
+      getCurUser(){
+          var that=this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/getCurUser";
+          MyAjax.ajax({
+            type: "GET",
+            url:url,
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+            async:false,
+          },function(data){
+            if(data.code==0){
+              if(data.msg.psnName){
+                that.reveal.partyOption.firstParty.text[0]=data.msg.psnName
+                that.reveal.partyOption.secondParty.text[0]=data.msg.psnName
+              }else{
+                that.reveal.partyOption.firstParty.text[0]=data.msg.nickName
+                that.reveal.partyOption.secondParty.text[0]=data.msg.nickName
+              }
+            }else{
+              console.log("错误返回")	
+            }
+          },function(err){
+            console.log(err)
+          })
+      },
       dealContentUnfold(){
         Vue.set(this.reveal.dealContentUnfold,"state",!this.reveal.dealContentUnfold.state)
         if(!this.reveal.dealContentUnfold.state){
           Vue.set(this.reveal.dealContentUnfold,"text","展开")
         }else {
           Vue.set(this.reveal.dealContentUnfold,"text","收起")
-        }
-        //console.log(this.reveal.unfold.state)
+        }  
       },
       protocolMemberTypeTog(index){//甲方乙方成员弹框的，不同类型搜索的样式控制
 
@@ -540,10 +537,9 @@
         }
         Vue.set(this.reveal.agreementMembers.classSelected,[index],true)
         /*以上是搜索结果选中状态样式控制*/
-        console.log(item)
       },
       confirmFirstPartyMember(){
-        if(this.reveal.agreementMembers.selectedMember!=String){
+        if(this.reveal.agreementMembers.selectedMember.text!=""){
           Vue.set(this.localDealInfo,"firstPartyID",this.reveal.agreementMembers.selectedMember.id)
           Vue.set(this.reveal,"firstParty",this.reveal.agreementMembers.selectedMember.text)
 
@@ -556,7 +552,9 @@
           }
         }
 
-        Vue.set(this.reveal.agreementMembers,"selectedMember",String)//恢复储存甲方或乙方选中的储存容器
+        Vue.set(this.reveal.agreementMembers.selectedMember,"id","")
+        Vue.set(this.reveal.agreementMembers.selectedMember,"text","")
+        //恢复储存甲方或乙方选中的储存容器
         var selectMembers = this.reveal.agreementMembers.selectMembers
         for(let i=0;i<selectMembers.length;i++){
           Vue.set(this.reveal.agreementMembers.classSelected,[i],false)
@@ -577,7 +575,9 @@
             Vue.set(this.reveal.agreementMembers.option,[i],false)//切换不同用户选择时，把之前的搜索结果清除
           }
         }
-        Vue.set(this.reveal.agreementMembers,"selectedMember",String)//恢复储存甲方或乙方选中的储存容器
+        Vue.set(this.reveal.agreementMembers.selectedMember,"id","")
+        Vue.set(this.reveal.agreementMembers.selectedMember,"id","")
+        //恢复储存甲方或乙方选中的储存容器
         var selectMembers = this.reveal.agreementMembers.selectMembers
         for(let i=0;i<selectMembers.length;i++){
           Vue.set(this.reveal.agreementMembers.classSelected,[i],false)
@@ -590,7 +590,7 @@
       },
       firstPartySelect(item){
         if(item=="切换其它用户"){
-          if(this.localDealInfo.secondPartyID==""){
+          if(this.localDealInfo.secondPartyID!=""){//
             var modal3=new ModalOpp("#modal-overlay3");
             modal3.makeText();
             /*以上是打开搜索弹框*/
@@ -599,7 +599,7 @@
             alert("乙方已经确定为其它人，你必须是甲方！")
           }
         }else {
-          if(this.localDealInfo.secondPartyID!=null||this.reveal.secondParty!=""){
+          if(this.localDealInfo.secondPartyID==""){
             Vue.set(this.localDealInfo,"firstPartyID",null)
             Vue.set(this.reveal,"firstParty",item)
           }else{
@@ -621,22 +621,15 @@
       },
       secondPartySelect(item){
         if(item=="切换其它用户"){
-          if(this.localDealInfo.firstPartyID==""){
-            var modal3=new ModalOpp("#modal-overlay3");
-            modal3.makeText();
-            Vue.set(this.reveal,"distinguish",false)//设置弹框确定为乙方确定
-          }else{
-            alert("甲方已经确定为其它人，你必须是乙方！")
-          }
-          
+          var modal3=new ModalOpp("#modal-overlay3");
+          modal3.makeText();
+          Vue.set(this.reveal,"distinguish",false)//设置弹框确定为乙方确定
         }else {
-          if(this.reveal.firstParty!=""||this.localDealInfo.firstPartyID!=null){
-             Vue.set(this.localDealInfo,"secondPartyID",null)
-             Vue.set(this.reveal,"secondParty",item)
-          }else{
-            alert("你不能同时为甲乙两方！")
-          }
+          Vue.set(this.localDealInfo,"secondPartyID",null)
+          Vue.set(this.reveal,"secondParty",item)
+          
         }
+
         Vue.set(this.reveal.partyOption.secondParty,"option",false)
       },
       secondSelectTog(index){
@@ -648,7 +641,7 @@
       },
       addStageTask(){//阶段任务的添加
         console.log(this.localDealInfo.dealstageinfos)
-        this.localDealInfo.dealstageinfos.push({price:'',taskDetail:'',taskName:'',reqCompDateS:'',reqCompDateS:''})
+        this.localDealInfo.dealstageinfos.push({price:'',taskDetail:'',taskName:'',reqCompDateStart:'',reqCompDateEnd:''})
         var chineseNumber = new ChineseNumber(this.localDealInfo.dealstageinfos.length);
         Vue.set(this.chineseNumber,[this.localDealInfo.dealstageinfos.length-1],chineseNumber.getChineseNumber())
       },
@@ -659,10 +652,14 @@
         // Vue.set(this.accessory,"fileAddress","");
       },
       submit(){//单击提交按钮后会有弹框提示
+        if(!(this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)||(this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)){
+          alert("你不能同时为甲乙两方")
+          return;
+        }
         var modal= new ModalOpp("#modal-overlay");
         modal.makeText();
       },
-      cancelEdit(){//单击取消按钮后会有弹框提示
+      cancelEdit(){//保存到协议草稿箱
           var that = this;
           var url = MyAjax.urlsy+"/dealbasicinfo/saveDraft";
           MyAjax.ajax({
@@ -697,7 +694,8 @@
             Vue.set(this.reveal.agreementMembers.searchResults,[i],false)//有搜索结果和没有搜索结果的条件下，第一项距离顶部的距离进行初始化
             Vue.set(this.reveal.agreementMembers.option,[i],false)//切换不同用户选择时，把之前的搜索结果清除
           }
-          Vue.set(this.reveal.agreementMembers,"selectedMember",String)//恢复储存甲方或乙方选中的储存容器
+          Vue.set(this.reveal.agreementMembers.selectedMember,"id","")
+        Vue.set(this.reveal.agreementMembers.selectedMember,"id","")//恢复储存甲方或乙方选中的储存容器
           var selectMembers = this.reveal.agreementMembers.selectMembers
           for(let i=0;i<selectMembers.length;i++){
             Vue.set(this.reveal.agreementMembers.classSelected,[i],false)
@@ -708,10 +706,7 @@
       confirmSubmit(){//看到提示按钮后的确认提交按钮
         var modal= new ModalOpp("#modal-overlay");
         modal.closeModal();
-
         var verify = this.localDealInfo.dealName.length!=0
-                    &&this.reveal.firstParty!=""
-                    &&this.reveal.secondParty!=""
                     &&this.localDealInfo.partyContent.length!=0
                     &&this.localDealInfo.modeOfPayment.length!=0
                     &&this.localDealInfo.cost.length!=0
@@ -720,13 +715,12 @@
         var stageTask = this.localDealInfo.dealstageinfos;
         for(let i=0;i<stageTask.length;i++){//阶段任务的每一项不能为空
           verify=verify
-          &&stageTask[i].price.length
-          &&stageTask[i].taskDetail.length
-          &&stageTask[i].taskName.length
-          &&stageTask[i].reqCompDateS.length
-          &&stageTask[i].reqCompDateE.length
+          &&stageTask[i].price.length!=0
+          &&stageTask[i].taskDetail.length!=0
+          &&stageTask[i].taskName.length!=0
+          &&stageTask[i].reqCompDateStart.length!=0
+          &&stageTask[i].reqCompDateEnd.length!=0
         }
-        console.log(this.localDealInfo)
         if(verify){
           //location.hash="#/yhzx/deal/draftingDealIndex/draftingDeal";
           //this.dealInfo[this.$route.query.id]=this.localDealInfo;

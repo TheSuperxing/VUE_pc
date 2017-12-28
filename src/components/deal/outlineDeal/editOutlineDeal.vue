@@ -26,33 +26,33 @@
         <ul class="protocolMemberType">
           <li v-for="(item,index) in protocolMemberType" :class="{active:reveal.agreementMembers.active[index]}" @click="protocolMemberTypeTog(index)" v-cloak>{{item}}</li>
         </ul>
-        <ul class="typeContainer">
-          <li v-if="reveal.agreementMembers.active[0]">
-            <ul  :class="reveal.agreementMembers.searchResults[0] ? 'searchMember' : 'beforeSearchMember'">
-              <li>
+        <ul class="typeContainer clear">
+          <li class="clear" v-if="reveal.agreementMembers.active[0]">
+            <ul class="clear"  :class="reveal.agreementMembers.searchResults[0] ? 'searchMember' : 'beforeSearchMember'">
+              <li class="clear">
                 <h4>个人用户手机号</h4>
                 <div class="search">
-                  <input  type="text" placeholder="请输入员工手机号">
+                  <div><input v-model="searchValue[0]" type="text" placeholder="请输入员工手机号"></div>
                   <button @click="selectAgreementMember(0)">
                     <p>搜索</p>
                   </button>
                 </div>
               </li>
-              <li v-if="reveal.agreementMembers.option[0]">
+              <li class="clear" v-if="reveal.agreementMembers.option[0]">
                 <h4>搜索结果</h4>
                 <div class="selectMember">
-                  <p v-for="(item,index) in reveal.agreementMembers.selectMembers" @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item}}</p>
+                  <p v-for="(item,index) in reveal.agreementMembers.selectMembers" @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item.psnName}}</p>
                 </div>
               </li>
-              <li v-if="reveal.agreementMembers.option[0]">
+              <li class="clear" v-if="reveal.agreementMembers.option[0]">
                 <button v-if="reveal.distinguish" class="confirm" @click="confirmFirstPartyMember">确认</button>
                 <button v-if="!reveal.distinguish" class="confirm" @click="confirmSecondPartyMember">确认</button>
               </li>
             </ul>
           </li>
-          <li v-if="reveal.agreementMembers.active[1]">
-            <ul  :class="reveal.agreementMembers.searchResults[1] ? 'searchMember' : 'beforeSearchMember'">
-              <li>
+          <li class="clear" v-if="reveal.agreementMembers.active[1]">
+            <ul class="clear"  :class="reveal.agreementMembers.searchResults[1] ? 'searchMember' : 'beforeSearchMember'">
+              <li class="clear">
                 <h4>团队名称</h4>
                 <div class="search">
                   <input  type="text" placeholder="请输团队名称">
@@ -61,21 +61,21 @@
                   </button>
                 </div>
               </li>
-              <li v-if="reveal.agreementMembers.option[1]">
+              <li class="clear" v-if="reveal.agreementMembers.option[1]">
                 <h4>搜索结果</h4>
                 <div class="selectMember">
                   <p v-for="(item,index) in reveal.agreementMembers.selectMembers" @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item}}</p>
                 </div>
               </li>
-              <li v-if="reveal.agreementMembers.option[1]">
+              <li class="clear" v-if="reveal.agreementMembers.option[1]">
                 <button v-if="reveal.distinguish" class="confirm" @click="confirmFirstPartyMember">确认</button>
                 <button v-if="!reveal.distinguish" class="confirm" @click="confirmSecondPartyMember">确认</button>
               </li>
             </ul>
           </li>
-          <li v-if="reveal.agreementMembers.active[2]">
+          <li class="clear" v-if="reveal.agreementMembers.active[2]">
             <ul :class="reveal.agreementMembers.searchResults[2] ? 'searchMember' : 'beforeSearchMember'">
-              <li>
+              <li class="clear">
                 <h4>公司名称</h4>
                 <div class="search">
                   <input  type="text" placeholder="请输公司名称">
@@ -84,13 +84,13 @@
                   </button>
                 </div>
               </li>
-              <li v-if="reveal.agreementMembers.option[2]">
+              <li class="clear" v-if="reveal.agreementMembers.option[2]">
                 <h4>搜索结果</h4>
                 <div class="selectMember">
                   <p v-for="(item,index) in reveal.agreementMembers.selectMembers"  @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item}}</p>
                 </div>
               </li>
-              <li v-if="reveal.agreementMembers.option[2]">
+              <li class="clear" v-if="reveal.agreementMembers.option[2]">
                 <button v-if="reveal.distinguish" class="confirm" @click="confirmFirstPartyMember">确认</button>
                 <button v-if="!reveal.distinguish" class="confirm" @click="confirmSecondPartyMember">确认</button>
               </li>
@@ -110,7 +110,7 @@
           <i>*</i>
           协议名称
         </h4>
-        <input v-model="localDealInfo.mainInfo.name"  type="text" placeholder="请输入需求名称">
+        <input v-model="localDealInfo.dealName"  type="text" placeholder="请输入需求名称">
         <button v-bind:class="{unfold:reveal.dealContentUnfold.state}" @click="dealContentUnfold" v-cloak>{{reveal.dealContentUnfold.text}}</button>
       </dd>
 
@@ -130,7 +130,7 @@
             </h4>
             <!--<input v-model="localDealInfo.content.firstParty.name" :value="localDealInfo.content.firstParty.name" type="text" placeholder="甲方">-->
             <div class="dropDown">
-              <input v-model="localDealInfo.content.firstParty.name"  type="text" placeholder="甲方">
+              <input v-model="localDealInfo.firstPartyName" @click="firstPartyOption" type="text" placeholder="甲方" readonly>
               <span @click="firstPartyOption"></span>
               <ul v-if="reveal.partyOption.firstParty.option">
                 <li v-for="(item,index) in reveal.partyOption.firstParty.text" :class="{selected:reveal.partyOption.firstParty.select[index]}" @mouseenter="firstSelectTog(index)" @click="firstPartySelect(item)" v-cloak>{{item}}</li>
@@ -145,7 +145,7 @@
             </h4>
             <!--<input v-model="localDealInfo.content.secondParty.name" :value="localDealInfo.content.secondParty.name" type="text" placeholder="乙方">-->
             <div class="dropDown">
-              <input v-model="localDealInfo.content.secondParty.name"  type="text" placeholder="乙方">
+              <input v-model="localDealInfo.secondPartyName" @click="secondPartyOption" type="text" placeholder="乙方" readonly>
               <span @click="secondPartyOption"></span>
               <ul v-if="reveal.partyOption.secondParty.option">
 
@@ -159,7 +159,7 @@
               协议内容
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.content.partyContent"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.partyContent"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
           </dd>
           <dd class="stageTask clear">
             <h4>
@@ -167,13 +167,23 @@
               阶段内容
             </h4>
             <div>
-              <ul v-for="(item,index) in localDealInfo.content.stageTask">
+              <ul v-for="(item,index) in localDealInfo.dealstageinfos">
                 <h5>{{chineseNumber[index]}}、</h5>
                 <li>
-                  <input v-model="item.taskState"  type="text" placeholder="请输入阶段名称">
-                  <input v-model="item.time"  type="text" placeholder="请输入要求时间">
-                  <input v-model="item.taskDetail"  type="text" placeholder="请输入工作内容">
-                  <input v-model="item.price"  type="text" placeholder="请输入薪酬">
+                  <div>
+                    <input v-model="item.taskName"  type="text" placeholder="请输入阶段名称">
+                  </div>
+                  <div>
+                    <datepicker class="datePicker" v-model="item.reqCompDateStart"></datepicker>
+                    <span>——</span>
+                    <datepicker class="datePicker" v-model="item.reqCompDateEnd" :min="item.reqCompDateStart"></datepicker>
+                  </div>
+                  <div>
+                    <input v-model="item.taskDetail"  type="text" placeholder="请输入工作内容">
+                  </div>
+                  <div>
+                    <input v-model="item.price"  type="number" placeholder="请输入薪酬">
+                  </div>
                 </li>
               </ul>
               <span @click="addStageTask" class="add">添加</span>
@@ -185,7 +195,7 @@
               付款方式
               <span></span>
             </h4>
-            <input v-model="localDealInfo.content.modeOfPayment"  type="text" placeholder="请输入付款方式">
+            <input v-model="localDealInfo.modeOfPayment"  type="text" placeholder="请输入付款方式">
           </dd>
           <dd class="clear">
             <h4>
@@ -193,7 +203,7 @@
               协议总额
               <span></span>
             </h4>
-            <input v-model="localDealInfo.content.cost"  type="text" placeholder="请输入协议总额">
+            <input v-model="localDealInfo.cost"  type="text" placeholder="请输入协议总额">
           </dd>
           <dd class="remarksInfo clear">
             <h4>
@@ -201,7 +211,7 @@
               备注信息
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.content.remarksInfo"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.remarksInfo"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
           </dd>
           <dd class="clear">
             <h4>
@@ -209,24 +219,95 @@
               协议附件
               <span></span>
             </h4>
+            <div class="fileUp clear" >
+              <div v-if="reveal.accessory.state" class="deleteAccessory">
+                <div v-for="(item,index) in localDealInfo.dealfileinfos" class="clear">
+                  <a :href="item.fileAddress">{{item.fileName}}</a>
+                  <span @click="deleteAccessory(index,'oldFile')" v-cloak>删除</span>
+                </div>
+                <div v-for="(item,index) in accessory" class="clear">
+                  <a :href="item.fileAddress">{{item.fileName}}</a>
+                  <span @click="deleteAccessory(index,'newFile')" v-cloak>删除</span>
+                </div>
+              </div>
 
-            <div v-if="reveal.accessory.state" class="deleteAccessory">
-              <a :href="localDealInfo.content.accessory.fileAddress">{{this.localDealInfo.content.accessory.showText}}</a>
-              <span @click="deleteAccessory" v-cloak>删除</span>
-            </div>
+              <div class="addAccessory">
+            
+                  <script type="text/template" id="qq-template-manual-trigger">
+                      <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
+                          <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
+                              <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
+                          </div>-->
+                          <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
+                              <span class="qq-upload-drop-area-text-selector"></span>
+                          </div>
+                          <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals" style="display:none">
+                              <li class="list">
+                              </li>
+                          </ul>
+                          <div class="buttons">
+                              <div class="qq-upload-button-selector qq-upload-button" style="width: 120px;
+            height:40px;
+            position: absolute;
+            top:0px;
+            left:0;
+            cursor: pointer;
+            background: #000;
+            olor: #ffffff;
+            text-align: center;
+            line-height: 40px;">
 
-            <dl v-if="!reveal.accessory.state" class="addAccessory">
-              <dt>
+                                  <span style="color: #ffffff;
+              padding-left:21px;
+              padding-top:0;
+              position: absolute;
+              top:0;
+              left:0;
+              height:40px;
+              background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RTFDN0Q5NDA5OTE1MTFFNzgwQUJBREMxMTg1NEEzMzYiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RTFDN0Q5NDE5OTE1MTFFNzgwQUJBREMxMTg1NEEzMzYiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpFMUM3RDkzRTk5MTUxMUU3ODBBQkFEQzExODU0QTMzNiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpFMUM3RDkzRjk5MTUxMUU3ODBBQkFEQzExODU0QTMzNiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PtuMsGcAAACmSURBVHjatNE9CgJBDIbhrL+g2LiCa6lYeQ0P4828gwfwFmJnZaNg4R/GNxBhioy4hYGHHUi+3SUjqiqBEhvMon5D4upjiUHUzIWeOOBRJ/S1cqETXjhHzRZKdKEo/FmhjbmHxXtW98K2xGGRNNVfNsbRhpKA/dnOQlMOPR/+hCywxsqGkpDVTTL31MEeVZ17GqGJ4d9Xbl+Z+AZ/Dl2xxSVqvgUYABIjbfPWWa9dAAAAAElFTkSuQmCC') 21px center no-repeat;">上传文件</span>
+                              </div>
+                              <button type="button"  class="btn btn-primary" id="trigger-upload">
+                                                    提交
+                              </button>
+                          </div>
+                          <span class="qq-drop-processing-selector qq-drop-processing">
+                              <span>正在上传...</span>
+                              <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
+                          </span>
+
+
+                          <dialog class="qq-alert-dialog-selector">
+                              <div class="qq-dialog-message-selector"></div>
+                              <div class="qq-dialog-buttons">
+                                  <button type="button" class="qq-cancel-button-selector">关闭</button>
+                              </div>
+                          </dialog>
+
+                          <dialog class="qq-confirm-dialog-selector">
+                              <div class="qq-dialog-message-selector"></div>
+                              <div class="qq-dialog-buttons">
+                                  <button type="button" class="qq-cancel-button-selector">No</button>
+                                  <button type="button" class="qq-ok-button-selector">Yes</button>
+                              </div>
+                          </dialog>
+
+                          <dialog class="qq-prompt-dialog-selector">
+                              <div class="qq-dialog-message-selector"></div>
+                              <input type="text">
+                              <div class="qq-dialog-buttons">
+                                  <button type="button" class="qq-cancel-button-selector">Cancel</button>
+                                  <button type="button" class="qq-ok-button-selector">Ok</button>
+                              </div>
+                          </dialog>
+                      </div>
+                  </script>
+                  <div id="fine-uploader-manual-trigger"></div>
+                
                 <p>
-                  <span>上传文件</span>
+                  附件格式为Word或PDF，大小不超过2M
                 </p>
-                <input type="file">
-              </dt>
-              <dd>
-                附件格式为Word或PDF，大小不超过2M
-              </dd>
-            </dl>
-
+              </div>
+            </div>
           </dd>
         </dl>
       </transition>
@@ -249,18 +330,26 @@
   import {mapState} from "vuex"
   import ChineseNumber from "../../../assets/js/units/chineseNumber"
   import ModalOpp from "../../../assets/js/modalOpp"
+  import MyAjax from "../../../assets/js/MyAjax.js"
+  import Datepicker from "../../units/Datepicker.vue"
+  import qq from "fine-uploader"
+  import {pdManualUploader} from "../../../assets/js/manualUploader"
   export default {
     name:"editSendDeal",
     data(){
       return{
         protocolMemberType:["搜索个人","搜索团队","搜索公司"],//添加甲(乙)方的弹框，成员分类搜索
+        searchValue:["","",""],
         reveal:{
           distinguish:Boolean,//区分保存按钮是保存甲方还是乙方选项
           agreementMembers:{//协议甲方和协议乙方的搜索弹框
             searchResults:[false,false,false],//有搜索结果和没有搜索结果的条件下，第一项距离顶部的距离
             active:[true,false,false],//搜索个人，搜索团队，搜索公司选中状态下的不同样式
             option:[false,false,false],//搜索结果是否显示
-            selectMembers:["张三","李四"],//搜索结果展示
+            selectMembers:[{
+              psnName:"",
+              accountID:""
+            }],//搜索结果展示
             selectedMember:String,//用来存放选中的结果
             classSelected:[false,false],//对类名selected的控制
           },
@@ -288,39 +377,137 @@
             state:true,
           }
         },
-        localDealInfo:'',
+        accessory:[],//存新上传文件的文件名和地址
+        localDealInfo:{},
         chineseNumber:[],//阶段任务的编号
       }
     },
+    components:{
+	    Datepicker,
+	  },
     computed:mapState({
-      dealInfo:state=>state.myDeal.dealInfo,
+      //dealInfo:state=>state.myDeal.dealInfo,
     }),
     created(){
-      var a = JSON.stringify(this.dealInfo[this.$route.query.id]);
-      this.localDealInfo=JSON.parse(a);
-
+      this.gitdealDetail()
+      this.localDealInfo.newFileId=[]//用来存放新上传的文件
+      this.getCurUser();
+      // var a = JSON.stringify(this.dealInfo[this.$route.query.id]);
+      // this.localDealInfo=JSON.parse(a);
     },
     mounted(){
-      //console.log(this.$route.query.id)
-      console.log(this.localDealInfo)
-      for(var i=0;i<this.localDealInfo.content.stageTask.length;i++){//阶段任务中文数字编号
+      for(var i=0;i<this.localDealInfo.dealstageinfos.length;i++){//阶段任务中文数字编号
         var chineseNumber = new ChineseNumber(i+1);
         Vue.set(this.chineseNumber,[i],chineseNumber.getChineseNumber())
       }
-      if(this.localDealInfo.content.accessory.showText.length==0){//协议部分上传文件还是删除已有文件
+      if(this.localDealInfo.dealfileinfos.length==0){//协议部分上传文件还是删除已有文件
         Vue.set(this.reveal.accessory,"state",false)
       }else{
         Vue.set(this.reveal.accessory,"state",true)
       }
+
+      var that=this;
+      pdManualUploader({
+        url:MyAjax.urlsy+'/dealbasicinfo/upload',
+        newFileId:that.localDealInfo.newFileId,
+        accessory:that.accessory
+      })
     },
     beforeUpdate(){
-      if(this.localDealInfo.content.accessory.showText.length==0){//协议部分上传文件还是删除已有文件
+      if(this.localDealInfo.dealfileinfos.length==0&&this.accessory.length==0){//协议部分上传文件还是删除已有文件
         Vue.set(this.reveal.accessory,"state",false)
       }else{
         Vue.set(this.reveal.accessory,"state",true)
       }
     },
     methods:{
+      gitdealDetail(){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/dealDetail/"+this.$route.query.id;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.localDealInfo=data.msg;
+            console.log(data.msg)
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      getCurUser(){
+          var that=this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/getCurUser";
+          MyAjax.ajax({
+            type: "GET",
+            url:url,
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+            async:false,
+          },function(data){
+            if(data.code==0){
+              if(data.msg.psnName){
+                that.reveal.partyOption.firstParty.text[0]=data.msg.psnName
+                that.reveal.partyOption.secondParty.text[0]=data.msg.psnName
+              }else{
+                that.reveal.partyOption.firstParty.text[0]=data.msg.nickName
+                that.reveal.partyOption.secondParty.text[0]=data.msg.nickName
+              }
+            }else{
+              console.log("错误返回")	
+            }
+          },function(err){
+            console.log(err)
+          })
+      },
+      getSearchResults(tel){
+        var that=this;
+        var url = MyAjax.urlsy+"/dealbasicinfo/searchPerson/"+tel;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async:false,
+				},function(data){
+					
+					if(data.code==0){
+            console.log(data.msg)
+            Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.psnName)
+            Vue.set(that.reveal.agreementMembers.selectMembers[0],"accountID",data.msg.accountID)
+					}else{
+						console.log("错误返回")	
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      delFile(index,fileId){
+        var that=this;
+        var url = MyAjax.urlsy+"/dealbasicinfo/delDealFile/"+fileId;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async:false,
+				},function(data){
+					if(data.code==0){
+            console.log(data.msg)
+            that.localDealInfo.dealfileinfos.splice(index,1)
+					}else{
+						console.log("错误返回")	
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
       dealContentUnfold(){
         Vue.set(this.reveal.dealContentUnfold,"state",!this.reveal.dealContentUnfold.state)
         if(!this.reveal.dealContentUnfold.state){
@@ -360,6 +547,7 @@
         Vue.set(this.reveal.agreementMembers.option,[index],true)
 
         Vue.set(this.reveal.agreementMembers.searchResults,[index],true)//有搜索结果和没有搜索结果的条件下，第一项距离顶部的距离
+        this.getSearchResults(this.searchValue[index]);
       },
       selectMember(index,item){//单击搜索结果选项
         Vue.set(this.reveal.agreementMembers,"selectedMember",item)//把选中的结果储存起来
@@ -372,8 +560,10 @@
         /*以上是搜索结果选中状态样式控制*/
       },
       confirmFirstPartyMember(){
-        if(this.reveal.agreementMembers.selectedMember!=String){
-          Vue.set(this.localDealInfo.content.firstParty,"name",this.reveal.agreementMembers.selectedMember)
+        if(this.reveal.agreementMembers.selectedMember.psnName.length!=0){
+          Vue.set(this.localDealInfo,"firstPartyName",this.reveal.agreementMembers.selectedMember.psnName)
+          Vue.set(this.localDealInfo,"firstPartyID",this.reveal.agreementMembers.selectedMember.accountID)
+          this.localDealInfo.myRole=="乙方"//设定当前用户角色
 
           var modal3= new ModalOpp("#modal-overlay3");
           modal3.closeModal();
@@ -384,7 +574,8 @@
           }
         }
 
-        Vue.set(this.reveal.agreementMembers,"selectedMember",String)//恢复储存甲方或乙方选中的储存容器
+        Vue.set(this.reveal.agreementMembers.selectedMember,"psnName","")
+        Vue.set(this.reveal.agreementMembers.selectedMember,"accountID","")//恢复储存甲方或乙方选中的储存容器
         var selectMembers = this.reveal.agreementMembers.selectMembers
         for(let i=0;i<selectMembers.length;i++){
           Vue.set(this.reveal.agreementMembers.classSelected,[i],false)
@@ -393,8 +584,10 @@
       },
       confirmSecondPartyMember(){
 
-        if(this.reveal.agreementMembers.selectedMember!=String){
-          Vue.set(this.localDealInfo.content.secondParty,"name",this.reveal.agreementMembers.selectedMember)
+        if(this.reveal.agreementMembers.selectedMember.psnName.length!=0){
+          Vue.set(this.localDealInfo,"secondPartyName",this.reveal.agreementMembers.selectedMember.psnName)
+          Vue.set(this.localDealInfo,"secondPartyID",this.reveal.agreementMembers.selectedMember.accountID)
+          this.localDealInfo.myRole=="甲方"//设定当前用户的角色
 
           var modal3= new ModalOpp("#modal-overlay3");
           modal3.closeModal();
@@ -404,7 +597,8 @@
             Vue.set(this.reveal.agreementMembers.option,[i],false)//切换不同用户选择时，把之前的搜索结果清除
           }
         }
-        Vue.set(this.reveal.agreementMembers,"selectedMember",String)//恢复储存甲方或乙方选中的储存容器
+        Vue.set(this.reveal.agreementMembers.selectedMember,"psnName","")
+        Vue.set(this.reveal.agreementMembers.selectedMember,"accountID","")//恢复储存甲方或乙方选中的储存容器
         var selectMembers = this.reveal.agreementMembers.selectMembers
         for(let i=0;i<selectMembers.length;i++){
           Vue.set(this.reveal.agreementMembers.classSelected,[i],false)
@@ -422,9 +616,11 @@
           /*以上是打开搜索弹框*/
           Vue.set(this.reveal,"distinguish",true)//设置弹框确定为甲方确定
         }else {
-          Vue.set(this.localDealInfo.content.firstParty,"name",item)
+          Vue.set(this.localDealInfo,"firstPartyName",item)
+          Vue.set(this.localDealInfo,"firstPartyID","")
+            
         }
-        Vue.set(this.reveal.partyOption.firstParty,"option",false)
+        Vue.set(this.reveal.partyOption.firstParty,"option",false)//协议放下拉选项隐藏
       },
       firstSelectTog(index){
         var select=this.reveal.partyOption.firstParty.select;
@@ -443,9 +639,10 @@
           modal3.makeText();
           Vue.set(this.reveal,"distinguish",false)//设置弹框确定为乙方确定
         }else {
-          Vue.set(this.localDealInfo.content.secondParty,"name",item)
+          Vue.set(this.localDealInfo,"secondPartyName",item)
+          Vue.set(this.localDealInfo,"secondPartyID","")
         }
-        Vue.set(this.reveal.partyOption.secondParty,"option",false)
+        Vue.set(this.reveal.partyOption.secondParty,"option",false)//协议放下拉选项隐藏
       },
       secondSelectTog(index){
         var select=this.reveal.partyOption.secondParty.select;
@@ -455,16 +652,27 @@
         Vue.set(select,[index],true)
       },
       addStageTask(){//阶段任务的添加
-        console.log(this.localDealInfo.content.stageTask)
-        this.localDealInfo.content.stageTask.push({price:'',taskDetail:'',taskState:'',time:''})
-        var chineseNumber = new ChineseNumber(this.localDealInfo.content.stageTask.length);
-        Vue.set(this.chineseNumber,[this.localDealInfo.content.stageTask.length-1],chineseNumber.getChineseNumber())
+        console.log(this.localDealInfo.dealstageinfos)
+        this.localDealInfo.dealstageinfos.push({price:'',taskDetail:'',taskName:'',reqCompDateStart:'',reqCompDateEnd:''})
+        var chineseNumber = new ChineseNumber(this.localDealInfo.dealstageinfos.length);
+        Vue.set(this.chineseNumber,[this.localDealInfo.dealstageinfos.length-1],chineseNumber.getChineseNumber())
       },
-      deleteAccessory(){//附件删除
-        Vue.set(this.localDealInfo.content.accessory,"showText","");
-        Vue.set(this.localDealInfo.content.accessory,"fileAddress","");
+      deleteAccessory(index,types){//附件删除
+        // Vue.set(this.localDealInfo.dealfileinfos,"fileName","");
+        // Vue.set(this.localDealInfo.dealfileinfos,"fileAddress","");
+        if(types=="newFile"){
+          this.accessory.splice(index,1)
+          this.localDealInfo.newFileId.splice(index,1)
+        }else{
+          this.delFile(index,this.localDealInfo.dealfileinfos[index].pkid)
+        }
+        
       },
       submit(){//单击提交按钮后会有弹框提示
+        if(!(this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)||(this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)){
+          alert("你不能同时为甲乙两方")
+          return;
+        }
         var modal= new ModalOpp("#modal-overlay");
         modal.makeText();
       },
@@ -494,26 +702,72 @@
           /*以上是搜索结果选中状态样式控制的恢复初始化*/
         }
       },
-      confirmSubmit(){//看到提示按钮后的确认提交按钮
+      confirmSubmit(){//看到提示按钮后的确认提交按钮,提交审核
         var modal= new ModalOpp("#modal-overlay");
         modal.closeModal();
 
-        var verify = this.localDealInfo.mainInfo.name.length!=0&&this.localDealInfo.content.firstParty.length!=0&&this.localDealInfo.content.secondParty.length!=0&&this.localDealInfo.content.partyContent.length!=0&&this.localDealInfo.content.modeOfPayment.length!=0&&this.localDealInfo.content.cost.length!=0&&this.localDealInfo.content.accessory.showText.length!=0
+        var verify = this.localDealInfo.dealName.length!=0
+        &&this.localDealInfo.content.partyContent.length!=0
+        &&this.localDealInfo.content.modeOfPayment.length!=0
+        &&this.localDealInfo.content.cost.length!=0
+        &&this.localDealInfo.dealfileinfos.fileName.length!=0
 
-        var stageTask = this.localDealInfo.content.stageTask;
-        for(let i=0;i<stageTask.length;i++){//阶段任务的每一项不能为空
-          verify=verify&&stageTask[i].price.length&&stageTask[i].taskDetail.length&&stageTask[i].taskState.length&&stageTask[i].time.length
+        var dealstageinfos = this.localDealInfo.dealstageinfos;
+        for(let i=0;i<dealstageinfos.length;i++){//阶段任务的每一项不能为空
+          verify=verify&&dealstageinfos[i].price.length!=0
+          &&dealstageinfos[i].taskDetail.length!=0
+          &&dealstageinfos[i].taskName.length!=0
+          &&dealstageinfos[i].reqCompDateStart.length!=0
+          &&dealstageinfos[i].reqCompDateEnd.length!=0
         }
         if(verify){
-          location.hash="/yhzx/deal/outlineDealIndex/outlineDealInfo?id="+this.$route.query.id;
-          this.dealInfo[this.$route.query.id]=this.localDealInfo;
-        }
-        console.log(this.dealInfo[this.$route.query.id])
+          
+          var that = this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/commitReview";
+          MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localDealInfo),
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+						async:false,
+					}, function(data){
+						if(data.code==0){
+              console.log("成功")
+              location.hash="/yhzx/deal/outlineDealIndex/outlineDealInfo?id="+that.$route.query.id;
+						}else if(data.code==-1){
+							console.log("失败")
+						}
+					},function(err){
+            console.log("error")
+          })
+        }else(
+          alert("必填项都要填写")
+        )
       },
-      confirmCancelEdit(){//看到取消提示后的确定取消
+      confirmCancelEdit(){//看到取消提示后的确定取消，保存
         var modal2= new ModalOpp("#modal-overlay2");
         modal2.closeModal();
-        location.hash="/yhzx/deal/outlineDealIndex/outlineDealInfo?id="+this.$route.query.id;
+        
+          var that = this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/saveDraft";
+          MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localDealInfo),
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+						async:false,
+					}, function(data){
+						if(data.code==0){
+              console.log("成功")
+              location.hash="/yhzx/deal/outlineDealIndex/outlineDealInfo?id="+that.$route.query.id;
+						}else if(data.code==-1){
+							console.log("失败")
+						}
+					},function(err){
+            console.log("error")
+          })
       }
     }
   }
@@ -868,14 +1122,22 @@
             li{
               width:480px;
               float: left;
-              input{
+              div{
+                float: left;
                 margin:5px 0;
+                .date-picker{
+                  width:140px;
+                  float: left;
+                  margin-top: 0px;
+                  font-size: 14px;
+                }
+                span{
+                  float: left;
+                  margin: 5px 10px;
+                }
               }
-              input:nth-child(1){
+              div:first-child{
                 margin-top:0px;
-              }
-              input:nth-last-child(1){
-                margin-bottom:0px;
               }
             }
           }
@@ -901,6 +1163,10 @@
         }
       }
       dd:nth-last-child(1){
+        .fileUp{
+          float: left;
+          width:480px;
+        }
         .deleteAccessory{
           width:480px;
           padding-left:14px;

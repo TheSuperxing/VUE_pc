@@ -156,4 +156,34 @@ function moreManualUploader(option){
         console.log(window[option.nameList])
     });
 }
-export {singleManualUploader,moreManualUploader}
+function pdManualUploader(option){
+    var manualUploader = new qq.FineUploader({
+        element: document.getElementById('fine-uploader-manual-trigger'),
+        template: 'qq-template-manual-trigger',
+        request: {
+            endpoint: option.url
+        },
+        validation: {
+            allowedExtensions: ['pdf', 'doc', 'docx'],
+            itemLimit: 2,
+            sizeLimit: 2400*2400
+        },
+        autoUpload: true,
+        callbacks:{
+            onSubmit:  function(id,  fileName)  {
+            //$('#trigger-upload').show()
+            },
+            onComplete: function (id, fileName, responseJSON, maybeXhr) {
+            if(responseJSON.success==true){
+                option.newFileId.push(responseJSON.msg.fileId)
+                option.accessory.push({fileName:responseJSON.msg.fileName,fileAddress:responseJSON.msg.fileAddress})
+            }
+        },
+        }
+    });
+
+    qq(document.getElementById("trigger-upload")).attach("click", function() {
+        manualUploader.uploadStoredFiles();
+    });
+}
+export {singleManualUploader,moreManualUploader,pdManualUploader}

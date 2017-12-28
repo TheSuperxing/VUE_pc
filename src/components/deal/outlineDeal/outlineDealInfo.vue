@@ -23,8 +23,8 @@
 
     <div class="sendDealInfoTitle">
       <div class="titleLeft">
-        <h2 v-cloak>{{this.dealInfo[this.$route.query.id].mainInfo.name}}</h2>
-        <p v-cloak>发布时间：{{this.dealInfo[this.$route.query.id].mainInfo.time}}</p>
+        <h2 v-cloak>{{this.dealInfo.dealName}}</h2>
+        <p v-cloak>发布时间：{{this.dealInfo.publishTime}}</p>
       </div>
       <ul class="titleRight">
         <li @click="deleteDeal" class="cancel">
@@ -35,7 +35,7 @@
           编辑
           <!--<router-link :to="{path:'/yhzx/deal/sendDealIndex/editSendDeal',query:{id:this.$route.query.id}}"></router-link>-->
         </li>
-        <li class="dealState" v-cloak>{{this.dealInfo[this.$route.query.id].mainInfo.dealState}}</li>
+        <li class="dealState" v-cloak>{{this.dealInfo.dealState}}</li>
       </ul>
     </div>
     <!--以上是协议的骨干信息-->
@@ -52,45 +52,67 @@
               甲方
               <span></span>
             </h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.firstParty.name}}</p>
+            <p>{{this.dealInfo.firstPartyName}}</p>
           </li>
           <li class="clear">
             <h4>
               乙方
               <span></span>
             </h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.secondParty.name}}</p>
+            <p>{{this.dealInfo.secondPartyName}}</p>
           </li>
           <li class="clear">
             <h4>协议内容</h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.partyContent}}</p>
+            <p>{{this.dealInfo.partyContent}}</p>
           </li>
           <!--阶段任务开始-->
           <li class="stageTask clear">
             <h4>阶段内容</h4>
-            <ul v-for="(item,index) in this.dealInfo[this.$route.query.id].content.stageTask">
-              <li v-for="$item in item" v-if="($item!='支付前'&&$item!='支付中'&&$item!='已支付')">
+            <ul v-for="(item,index) in this.dealInfo.dealstageinfos">
+              <li class="clear">
                 <!--隐藏支付状态-->
                 <p>
                   <span>{{index+1}}.</span>
-                  <span>{{$item}}</span>
+                  <span>{{item.taskName}}</span>
                 </p>
               </li>
-
+              <li class="clear">
+                <p>
+                  <span>{{item.reqCompDateStart}}</span>
+                  <i>——</i>
+                  <span>{{item.reqCompDateEnd}}</span>
+                </p>
+              </li>
+              <li class="clear">
+                <p>
+                  <span>{{item.taskDetail}}</span>
+                </p>
+              </li>
+              <li class="clear">
+                <p>
+                  <span>{{item.price}}</span>
+                </p>
+              </li>
             </ul>
           </li>
           <!--阶段任务结束-->
           <li class="clear">
             <h4>付款总额</h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.cost}}</p>
+            <p>{{this.dealInfo.cost}}</p>
           </li>
           <li class="clear">
             <h4>付款方式</h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.modeOfPayment}}</p>
+            <p>{{this.dealInfo.modeOfPayment}}</p>
           </li>
           <li class="clear">
             <h4>备注信息</h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.remarksInfo}}</p>
+            <p>{{this.dealInfo.remarksInfo}}</p>
+          </li>
+          <li class="fileDownload clear">
+            <h4>协议附件</h4>
+            <div v-for="(item,index) in this.dealInfo.dealfileinfos" class="clear">
+              <a :href="item.fileAddress">{{item.fileName}}</a>
+            </div>
           </li>
         </ul>
       </transition>
@@ -103,6 +125,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import ModalOpp from "../../../assets/js/modalOpp"
+  import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"sendDealInfo",
     data(){
@@ -113,13 +136,39 @@
             text:"收起"
           },
         },
+        dealInfo:{
+
+        },
       }
     },
     computed:mapState({
-      dealInfo:state=>state.myDeal.dealInfo,
+      //dealInfo:state=>state.myDeal.dealInfo,
       /*获取数据*/
     }),
+    mounted(){
+      this.gitdealDetail()
+    },
     methods:{
+      gitdealDetail(){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/dealDetail/"+this.$route.query.id;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.dealInfo=data.msg;
+            console.log(data.msg)
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
       editPrompt(){//协议编辑的提示信息
         var modal= new ModalOpp("#modal-overlay");
         modal.makeText();
@@ -403,8 +452,8 @@
                 span{
                   float: left;
                 }
-                span:nth-child(1){
-                  display: none;
+                i{
+                  float: left;
                 }
               }
             }
@@ -441,7 +490,9 @@
         }
         /*阶段内容的编号*/
         .fileDownload{
-          p{
+          div{
+            float: right;
+            width: 830px;
             a{
               color: $themeColor;
               text-decoration: underline;

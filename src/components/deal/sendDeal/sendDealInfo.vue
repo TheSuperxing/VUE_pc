@@ -16,15 +16,15 @@
       <div class="alert">
         <p>是否终止协议？</p>
         <button class="close" v-on:click="closeAlert"></button>
-        <button class="confirm" v-on:click="confirmStopDeal">确认退出</button>
+        <button class="confirm" v-on:click="confirmStopDeal">确认</button>
       </div>
     </div>
 
     <div id="modal-overlay3">
       <div class="alert">
-        <p>已向协议关联方发送终止通知</p>
+        <p>已向协议关联方发送终止提醒</p>
         <button class="close" v-on:click="closeAlert"></button>
-        <button class="confirm" v-on:click="closeStopDealAlert">确认退出</button>
+        <button class="confirm" v-on:click="closeStopDealAlert">确认</button>
       </div>
     </div>
     <!--终止/编辑提示-->
@@ -58,10 +58,10 @@
         <h4>支付提示</h4>
         <button class="close" v-on:click="closeAlert(4)"></button>
         <ul>
-          <li v-cloak>您将向{{123}}团队支付{{123}}元</li>
-          <li>请在确认阶段任务完成后进行该操作</li>
+          <li v-if="payAccount.alipay" v-cloak>对方支付宝账号：{{payAccount.alipay}}</li>
+          <li v-if="payAccount.wechat" v-cloak>对方微信账号：{{payAccount.wechat}}</li>
         </ul>
-        <button class="confirm" v-on:click="confirmPayOper">确认支付</button>
+        <button class="confirm" v-on:click="confirmPayOper">去支付</button>
       </div>
     </div>
 
@@ -70,19 +70,21 @@
         <h4>支付提示</h4>
         <button class="close" v-on:click="closeAlert(4)"></button>
         <dl>
-          <dt v-cloak>请输入支付密码</dt>
-          <dd>
+          <dt v-cloak>是否支付成功？</dt>
+          <!-- <dd>
             <input v-model="payPsw.password[0]" type="password" maxlength="1" autofocus>
             <input v-model="payPsw.password[1]" type="password" maxlength="1" autofocus>
             <input v-model="payPsw.password[2]" type="password" maxlength="1" autofocus>
             <input v-model="payPsw.password[3]" type="password" maxlength="1" autofocus>
             <input v-model="payPsw.password[4]" type="password" maxlength="1" autofocus>
             <input v-model="payPsw.password[5]" type="password" maxlength="1" autofocus>
-          </dd>
+          </dd> -->
         </dl>
-        <button class="confirm" v-on:click="pay">确认支付</button>
+        <button v-on:click="payNotSuccess">未成功支付</button>
+        <button class="confirm" v-on:click="paySuccess">成功支付</button> 
       </div>
     </div>
+
     <div id="modal-overlay7">
       <div class="alert">
         <h4>支付提示</h4>
@@ -103,19 +105,19 @@
     <!--弹窗支付-->
     <div class="sendDealInfoTitle">
       <div class="titleLeft">
-        <h2 v-cloak>{{this.dealInfo[this.$route.query.id].mainInfo.name}}</h2>
-        <p v-cloak>发布时间：{{this.dealInfo[this.$route.query.id].mainInfo.time}}</p>
+        <h2 v-cloak>{{this.data.dealInfo.dealName}}</h2>
+        <p v-cloak>发布时间：{{this.data.dealInfo.publishTime}}</p>
       </div>
       <ul class="titleRight">
-        <li @click="stopDeal" v-if="reveal.dealState[this.$route.query.id][1]" class="cancel">
+        <li @click="stopDeal" v-if="reveal.dealState[1]" class="cancel">
           终止
           <!--<router-link :to="{path:'/yhzx/deal/sendDealIndex/editSendDeal',query:{id:this.$route.query.id}}"></router-link>-->
         </li>
-        <li  @click="editPrompt" v-if="reveal.dealState[this.$route.query.id][0]" class="edit">
+        <li  @click="editPrompt" v-if="reveal.dealState[0]" class="edit">
           编辑
           <!--<router-link :to="{path:'/yhzx/deal/sendDealIndex/editSendDeal',query:{id:this.$route.query.id}}"></router-link>-->
         </li>
-        <li class="dealState" v-cloak>{{this.dealInfo[this.$route.query.id].mainInfo.dealState}}</li>
+        <li class="dealState" v-cloak>{{this.data.dealInfo.dealState}}</li>
       </ul>
     </div>
     <!--以上是协议的骨干信息-->
@@ -132,34 +134,58 @@
               甲方
               <span></span>
             </h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.firstParty.name}}</p>
+            <p>{{this.data.dealInfo.firstPartyName}}</p>
           </li>
           <li class="clear">
             <h4>
               乙方
               <span></span>
             </h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.secondParty.name}}</p>
+            <p>{{this.data.dealInfo.secondPartyName}}</p>
           </li>
           <li class="clear">
             <h4>协议内容</h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.partyContent}}</p>
+            <p>{{this.data.dealInfo.partyContent}}</p>
           </li>
           <!--阶段任务开始-->
           <li class="stageTask clear">
             <h4>阶段内容</h4>
-            <ul v-for="(item,index) in this.dealInfo[this.$route.query.id].content.stageTask">
-              <li v-for="$item in item" v-if="($item!='支付前'&&$item!='支付中'&&$item!='已支付')">
-                <!--隐藏支付状态-->
+            <ul class="clear" v-for="(item,index) in data.dealInfo.dealstageinfos">
+              <li class="clear">
                 <p>
-                  <span>{{index+1}}.</span>
-                  <span>{{$item}}</span>
+                  <span v-cloak>{{index+1}}.</span>
+                  <span v-cloak>{{item.taskName}}</span>
                 </p>
               </li>
+              <li class="clear">
+                <p>
+                  <span v-cloak>{{item.reqCompDateStart}}</span>
+                  <i>——</i>
+                  <span v-cloak>{{index.reqCompDateEnd}}</span>
+                  
+                </p>
+              </li>       
+              <li class="clear">
+                <p>
+                  <span v-cloak>{{index.taskDetail}}</span>
+                  
+                </p>
+              </li>       
+              <li class="clear">
+                <p>
+                  <span v-cloak>{{index.price}}</span>
+                  
+                </p>
+              </li>       
+              
+              <li  v-if="!(data.dealInfo.dealState=='签订中'||data.dealInfo.dealState=='审核中')&&data.dealInfo.myRole=='甲方'" class="stageTaskButton">
+                <p v-if="!(data.dealInfo.dealState=='履行中'&&(data.dealInfo.dealstageinfos[index].taskType!='2'))">阶段内容已完成</p>
+                <button v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType!='2'" @click="stagePayment(index,item)" v-cloak>{{stageTask.text[index]}}</button>
+              </li>
 
-              <li v-if="!(dealInfo[$route.query.id].mainInfo.dealState=='签订中'||dealInfo[$route.query.id].mainInfo.dealState=='审核中')" class="stageTaskButton">
-                <p v-if="!(dealInfo[$route.query.id].mainInfo.dealState=='履行中'&&dealInfo[$route.query.id].content.stageTask[index].section!='已支付')">阶段内容已完成</p>
-                <button v-if="dealInfo[$route.query.id].mainInfo.dealState=='履行中'&&dealInfo[$route.query.id].content.stageTask[index].section!='已支付'"  @click="stagePayment(index,item)" v-cloak>{{stageTask.text[index]}}</button>
+              <li  v-if="!(data.dealInfo.dealState=='签订中'||data.dealInfo.dealState=='审核中')&&data.dealInfo.myRole=='乙方'" class="stageTaskButton">
+                <p v-if="!(data.dealInfo.dealState=='履行中'&&(data.dealInfo.dealstageinfos[index].taskType!='4'))">阶段内容已完成</p>
+                <button v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType!='4'" @click="stagePayment(index,item)" v-cloak>{{stageTask.text[index]}}</button>
               </li>
               <!--以上是阶段任务状态按钮-->
             </ul>
@@ -167,20 +193,20 @@
           <!--阶段任务结束-->
           <li class="clear">
             <h4>付款总额</h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.cost}}</p>
+            <p>{{this.data.dealInfo.cost}}</p>
           </li>
           <li class="clear">
             <h4>付款方式</h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.modeOfPayment}}</p>
+            <p>{{this.data.dealInfo.modeOfPayment}}</p>
           </li>
           <li class="clear">
             <h4>备注信息</h4>
-            <p>{{this.dealInfo[this.$route.query.id].content.remarksInfo}}</p>
+            <p>{{this.data.dealInfo.remarksInfo}}</p>
           </li>
           <li class="fileDownload clear">
-            <h4>备注信息</h4>
-            <p>
-              <a v-bind:href="this.dealInfo[this.$route.query.id].content.accessory.fileAddress">{{this.dealInfo[this.$route.query.id].content.accessory.showText}}</a>
+            <h4>协议附件</h4>
+            <p v-for="(item,index) in data.dealInfo.dealfileinfos">
+              <a v-bind:href="item.fileAddress">{{item.fileName}}</a>
             </p>
           </li>
         </ul>
@@ -188,42 +214,42 @@
     </div>
     <!--协议内容结束-->
     <!--协议关联的需求开始-->
-    <div class="relatedNeeds" v-if="this.dealInfo[this.$route.query.id].relatedNeeds.length">
+    <div class="relatedNeeds" v-if="this.data.dealInfo.demandbasicinfo">
       <div class="dealContentTitle">
         <h3>关联需求</h3>
       </div>
       <ul class="relatedNeedsList">
-        <li v-for="item in this.dealInfo[this.$route.query.id].relatedNeeds">
-          <a :href="item.viewThePath" v-cloak>{{item.dealName}}</a>
+         <li ><!-- v-for="item in this.dealInfo[this.$route.query.id].relatedNeeds"-->
+          <router-link to="/yhzx/deal/sendDealIndex/sendDeal" v-cloak>{{this.data.dealInfo.demandbasicinfo.demandName}}</router-link>
         </li>
       </ul>
     </div>
     <!--协议关联的需求结束-->
 
     <!--协议评价甲方开始-->
-    <div class="firstParty" v-if="!((this.dealInfo[this.$route.query.id].mainInfo.dealState=='签订中')||(this.dealInfo[this.$route.query.id].mainInfo.dealState=='审核中'))">
+    <div class="firstParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfodealState=='审核中'))">
       <div class="dealContentTitle">
         <h3>协议甲方</h3>
       </div>
-      <dl class="firstPartyList clear">
+       <dl class="firstPartyList clear">
         <dt class="clear">
-          <p>{{this.dealInfo[this.$route.query.id].content.firstParty.name}}</p>
-          <p class="comment" @click="editFirstPartyComment" v-if="!reveal.firstPartyComment.edit&&this.dealInfo[this.$route.query.id].mainInfo.myRole!='甲方'&&this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'">编辑评论</p>
+          <p>{{this.data.dealInfo.firstPartyName}}</p>
+          <p class="comment" @click="editFirstPartyComment" v-if="!reveal.firstPartyComment.edit&&this.data.dealInfo.myRole!='甲方'&&this.data.dealInfo.dealState!='履行中'">编辑评论</p>
         </dt>
 
         <dd class="clear" v-if="!reveal.firstPartyComment.edit">
-          <ul class="clear"  v-if="this.dealInfo[this.$route.query.id].content.firstParty.comment.start.length">
-            <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.firstPartyComment.startSelected[index]}"></li>
+          <ul class="clear" v-if="this.data.dealInfo.dealevainfoFirst.star!=0">
+            <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.firstPartyComment.starSelected[index]}"></li>
           </ul>
-          <p v-if="this.dealInfo[this.$route.query.id].content.firstParty.comment.text.length" v-cloak>{{this.dealInfo[this.$route.query.id].content.firstParty.comment.text}}</p>
+          <p v-if="data.dealInfo.dealevainfoFirst.comment!=''" v-cloak>{{data.dealInfo.dealevainfoFirst.comment}}</p>
         </dd>
         <!--甲方对应的评价-->
         <dd class="clear" v-if="reveal.firstPartyComment.edit">
           <ul class="clear">
-            <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentFirstParty(index)" :class="{selected:reveal.firstPartyComment.startSelected[index]}"></li>
+            <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentFirstParty(index)" :class="{selected:reveal.firstPartyComment.starSelected[index]}"></li>
           </ul>
           <textarea v-model="localFirstPartyComment.text"  cols="63" rows="5" placeholder="你的评论"></textarea>
-          <div>
+          <div class="clear">
             <button @click="keepFirstPartyComment">保存</button>
             <button @click="cancelFirstPartyComment">取消</button>
           </div>
@@ -234,28 +260,28 @@
     <!--协议评价甲方结束-->
 
     <!--协议评价乙方开始-->
-    <div class="secondParty" v-if="!((this.dealInfo[this.$route.query.id].mainInfo.dealState=='签订中')||(this.dealInfo[this.$route.query.id].mainInfo.dealState=='审核中'))">
+    <div class="secondParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中'))">
       <div class="dealContentTitle">
         <h3>协议乙方</h3>
       </div>
       <div class="secondPartyList clear">
 
-        <dl class="secondPartyTitle clear">
+        <dl class="secondPartyTitle  clear">
           <dt class="clear">
-            <p v-cloak>{{this.dealInfo[this.$route.query.id].content.secondParty.name}}</p>
-            <p class="editComment" v-if="this.dealInfo[this.$route.query.id].mainInfo.myRole!='乙方'&&!reveal.secondPartyComment.edit&&this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'" @click="editSecondPartyComment">编辑评论</p>
+            <p v-cloak>{{this.data.dealInfo.secondPartyName}}</p>
+            <p class="editComment" v-if="this.data.dealInfo.myRole!='乙方'&&!reveal.secondPartyComment.edit&&this.data.dealInfo.dealState!='履行中'" @click="editSecondPartyComment">编辑评论</p>
           </dt>
 
-          <dd v-if="!reveal.secondPartyComment.edit&&this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'" class="clear">
-            <ul class="clear" v-if="this.dealInfo[this.$route.query.id].content.secondParty.comment.start.length">
-              <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.secondPartyComment.teamComment.startSelected[index]}"></li>
+          <dd class="clear" v-if="!reveal.secondPartyComment.edit&&this.data.dealInfo.dealState!='履行中'">
+            <ul class="clear" v-if="this.data.dealInfo.dealevainfoSecond.star!=0">
+              <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.secondPartyComment.teamComment.starSelected[index]}"></li>
             </ul>
-            <p v-if="this.dealInfo[this.$route.query.id].content.secondParty.comment.text.length" v-cloak>{{this.dealInfo[this.$route.query.id].content.secondParty.comment.text}}</p>
+            <p v-if="this.data.dealInfo.dealevainfoSecond.comment!=''" v-cloak>{{this.data.dealInfo.dealevainfoSecond.comment}}</p>
           </dd>
           <!--对于团队的整体评价-->
-          <dd v-if="reveal.secondPartyComment.edit" class="clear">
+          <dd class="clear" v-if="reveal.secondPartyComment.edit">
             <ul class="clear">
-              <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyTeam(index)" :class="{selected:reveal.secondPartyComment.teamComment.startSelected[index]}"></li>
+              <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyTeam(index)" :class="{selected:reveal.secondPartyComment.teamComment.starSelected[index]}"></li>
             </ul>
 
             <textarea v-model="localSecondPartyComment.teamComment.text"  cols="63" rows="5" placeholder="你的评论"></textarea>
@@ -264,21 +290,21 @@
         </dl>
         <!--编辑乙方成员开始-->
 
-        <ul class="secondPartyMember clear" v-if="this.dealInfo[this.$route.query.id].mainInfo.dealState=='履行中'">
-          <li class="clear" v-for="(item,index) in this.localSecondPartyMember.member">
+        <!-- <ul class="secondPartyMember clear" v-if="this.dealInfo[this.$route.query.id].mainInfo.dealState=='履行中'">
+          <li class="clear" v-for="(item,index) in this.dealInfo[this.$route.query.id].content.secondParty.member">
             <dl class="clear">
               <dt class="clear">
-                <i></i>
+                <i></i> -->
                 <!--<div class="memberInfo">
                   <p v-for="$item in item">{{$item}}</p>
                 </div>-->
-                <div v-cloak class="avatar">
+                <!-- <div v-cloak class="avatar">
                   <img v-bind:src="item.avatar" alt="">
                 </div>
                 <div class="memberInfo clear">
                   <div v-cloak>{{item.name}}</div>
 
-                  <dl v-if="reveal.editMemberInfo[index]">
+                  <dl class="clear" v-if="reveal.editMemberInfo[index]">
                     <dt>项目职责：</dt>
                     <dd v-cloak>
                       {{item.responsibilities}}
@@ -287,7 +313,7 @@
 
                   <dl v-if="!reveal.editMemberInfo[index]" class="editMemberResponse clear">
                     <dt class="clear">
-                      <input v-model="item.responsibilities"  type="text">
+                      <input v-model="item.responsibilities" type="text">
                     </dt>
                     <dd class="clear">
                       <button @click="keepEditMemberInfo(index)">保存</button>
@@ -303,23 +329,19 @@
             <p @click="addMember">添加组织成员</p>
           </li>
           <div class="borderWhite" :style="{height:borderWhite.height}"></div>
-        </ul>
-        <div class="confirmAddMember clear" v-if="this.reveal.confirmAddMember">
-          <button @click="confirmAddMember">保存</button>
-          <button @click="cancelAddMember">取消</button>
-        </div>
+        </ul> -->
         <!--编辑乙方成员结束-->
 
         <!--评论乙方成员开始-->
-        <ul class="secondPartyMember clear" v-if="this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'">
+        <!-- <ul class="secondPartyMember clear" v-if="this.dealInfo[this.$route.query.id].mainInfo.dealState!='履行中'">
           <li class="clear" v-for="(item,index) in this.dealInfo[this.$route.query.id].content.secondParty.member">
             <dl class="clear">
               <dt class="clear">
-                <i></i>
+                <i></i> -->
                 <!--<div class="memberInfo">
                   <p v-for="$item in item">{{$item}}</p>
                 </div>-->
-                <div v-cloak class="avatar">
+                <!-- <div v-cloak class="avatar">
                   <img v-bind:src="item.avatar" alt="">
                 </div>
                 <div class="memberInfo clear">
@@ -332,25 +354,25 @@
               </dt>
 
               <dd class="clear" v-if="!reveal.secondPartyComment.edit&&dealInfo[$route.query.id].mainInfo.dealState!='履行中'">
-                <ul class="clear" v-if="dealInfo[$route.query.id].content.secondParty.member[index].comment.start.length">
-                  <li v-for="(item,$index) in [1,2,3,4,5]" :class="{selected:reveal.secondPartyComment.memberComment.startSelected[index][$index]}"></li>
+                <ul class="clear" v-if="dealInfo[$route.query.id].content.secondParty.member[index].comment.star.length">
+                  <li v-for="(item,$index) in [1,2,3,4,5]" :class="{selected:reveal.secondPartyComment.memberComment.starSelected[index][$index]}"></li>
                 </ul>
                 <p v-if="dealInfo[$route.query.id].content.secondParty.member[index].comment.text.length" v-cloak>{{dealInfo[$route.query.id].content.secondParty.member[index].comment.text}}</p>
-              </dd>
+              </dd> -->
               <!--以上是乙方成员评价部分-->
-              <dd v-if="reveal.secondPartyComment.edit">
+              <!-- <dd class="clear" v-if="reveal.secondPartyComment.edit">
                 <ul class="clear">
-                  <li v-for="(item,$index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyMember(index,$index)" :class="{selected:reveal.secondPartyComment.memberComment.startSelected[index][$index]}"></li>
+                  <li v-for="(item,$index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyMember(index,$index)" :class="{selected:reveal.secondPartyComment.memberComment.starSelected[index][$index]}"></li>
                 </ul>
                 <textarea v-model="localSecondPartyComment.memberComment.text[index]"  cols="63" rows="5" placeholder="你的评论"></textarea>
-              </dd>
+              </dd> -->
               <!--以上是编辑乙方成员评价部分-->
-            </dl>
+            <!-- </dl>
 
           </li>
-          <div class="borderWhite" :style="{height:borderWhite.height}"></div>
+          <div class="borderWhite" :style="{height:borderWhite.height}"></div> -->
           <!--用来遮挡人员树多出来的部分-->
-        </ul>
+        <!-- </ul> -->
         <!--评论乙方成员结束-->
         <div class="keepOrCancel clear" v-if="reveal.secondPartyComment.edit">
           <button @click="keepSecondPartyMemberComment">保存</button>
@@ -362,7 +384,7 @@
     <!--协议评价乙方结束-->
 
     <!--协议关联方意见开始-->
-    <div class="agreement" v-if="this.dealInfo[this.$route.query.id].agreement.length">
+    <div class="agreement" v-if="this.data.dealInfo.agreement">
       <div class="dealContentTitle">
         <h3>协议关联方意见</h3>
         <button v-cloak @click="agreementUnfold" :class="{unfold:reveal.agreementUnfold.state}">{{reveal.agreementUnfold.text}}</button>
@@ -370,7 +392,7 @@
       <transition name="agreement-unfold-fade">
         <ul class="agreementList" v-if="reveal.agreementUnfold.state">
           <li v-cloak >
-            {{this.dealInfo[this.$route.query.id].agreement}}
+            {{this.data.dealInfo.agreement}}
           </li>
         </ul>
       </transition>
@@ -382,6 +404,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import ModalOpp from "../../../assets/js/modalOpp"
+  import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"sendDealInfo",
     data(){
@@ -398,6 +421,10 @@
         stageTask:{//阶段任务按钮的文本
           text:[]
         },
+        payAccount:{
+          alipay:"",
+          wechat:"",
+        },
         payPsw:{
           password:["","","","","",""],
           end:true
@@ -407,6 +434,7 @@
         },
         reveal:{
           dealState:[],//不同的协议状态对应不同的按钮
+          index:"",//当前点击阶段任务的index
           dealContentUnfold:{//协议内容的收起或者展开
             state:true,
             text:"收起"
@@ -419,126 +447,113 @@
           confirmAddMember:false,
           firstPartyComment:{
             edit:false,
-            startSelected:[false,false,false,false,false],
+            starSelected:[false,false,false,false,false],
           },
           secondPartyComment:{
             edit:false,
             teamComment:{
-              startSelected:[false,false,false,false,false],
+              starSelected:[false,false,false,false,false],
             },
             memberComment:{
-              startSelected:[],
+              starSelected:[],
             }
           }
         },
         localFirstPartyComment:{
-          start:"",
+          star:"",
           text:""
         },
         localSecondPartyComment:{
           teamComment:{
-            start:"",
+            star:"",
             text:"",
           },
           memberComment:{
-            start:[],
+            star:[],
             text:[],
           }
         },
         localSecondPartyMember:{
           member:[]
+        },
+        data:{
+          dealInfo:{}
         }
       }
     },
     computed:mapState({
-      dealInfo:state=>state.myDeal.dealInfo,
+      //dealInfo:state=>state.myDeal.dealInfo[0],
       /*获取数据*/
     }),
     created(){
+      this.gitdealDetail(this.$route.query.id)
+      this.getAnother(this.data.dealInfo.secondPartyID)
+      if(!this.data.dealInfo.dealevainfoSecond.star){
+        this.data.dealInfo.dealevainfoSecond.star=0
+      }
+      if(!this.data.dealInfo.dealevainfoSecond.comment){
+        this.data.dealInfo.dealevainfoSecond.comment=""
+      }
+      if(!this.data.dealInfo.dealevainfoFirst.star){
+        this.data.dealInfo.dealevainfoFirst.star=0
+      }
+      if(!this.data.dealInfo.dealevainfoFirst.comment){
+        this.data.dealInfo.dealevainfoFirst.comment=""
+      }
       //通过query传递的对象，通过this.$route.query获取
       //console.log(this.dealInfo[this.$route.query.id])
-      for(let i=0;i<this.dealInfo.length;i++){
-        this.reveal.dealState.push([])
-        switch (this.dealInfo[i].mainInfo.dealState){
+      //for(let i=0;i<this.dealInfo.length;i++){
+        //this.reveal.dealState.push([])
+        switch (this.data.dealInfo.dealState){
           case "签订中":
-            this.reveal.dealState[i].push(true)
-            this.reveal.dealState[i].push(true)
+            this.reveal.dealState.push(true)
+            this.reveal.dealState.push(true)
             break;
           case "履行中":
-            this.reveal.dealState[i].push(true)
-            this.reveal.dealState[i].push(true)
+            this.reveal.dealState.push(true)
+            this.reveal.dealState.push(true)
             break;
           case "协议完成":
-            this.reveal.dealState[i].push(false)//协议完成时，可以编辑
-            this.reveal.dealState[i].push(false)//协议完成时不能终止
+            this.reveal.dealState.push(false)//协议完成时，可以编辑
+            this.reveal.dealState.push(false)//协议完成时不能终止
             break;
           case "评价完成":
-            this.reveal.dealState[i].push(false)
-            this.reveal.dealState[i].push(false)
+            this.reveal.dealState.push(false)
+            this.reveal.dealState.push(false)
             break;
           case "审核中":
-            this.reveal.dealState[i].push(false)
-            this.reveal.dealState[i].push(false)
+            this.reveal.dealState.push(false)
+            this.reveal.dealState.push(false)
             break;
         }
-      }
-      let secondPartMember=this.dealInfo[this.$route.query.id].content.secondParty.member;
-      this.localSecondPartyMember.member=JSON.parse(JSON.stringify(secondPartMember))
+      //}
+      // let secondPartMember=this.dealInfo[this.$route.query.id].content.secondParty.member;
+      // this.localSecondPartyMember.member=JSON.parse(JSON.stringify(secondPartMember))
       /*以上是同步到本地乙方成员数据*/
-      let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
-      for(let i=0;i<memberNum.length;i++){
-        Vue.set(this.reveal.secondPartyComment.memberComment.startSelected,[i],[false,false,false,false,false])
-        for(let j=0;j<parseInt(memberNum[i].comment.start);j++){
-          Vue.set(this.reveal.secondPartyComment.memberComment.startSelected[i],[j],true)
-        }
-      }
+      // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
+      // for(let i=0;i<memberNum.length;i++){
+      //   Vue.set(this.reveal.secondPartyComment.memberComment.starSelected,[i],[false,false,false,false,false])
+      //   for(let j=0;j<parseInt(memberNum[i].comment.star);j++){
+      //     Vue.set(this.reveal.secondPartyComment.memberComment.starSelected[i],[j],true)
+      //   }
+      // }
       /*以上是团队成员评价（初始的时候没有数据，不能再mounted中进行初始）*/
 
-      for(let i=0;i<memberNum.length;i++){//是否编辑成员职责信息初始化，不能再mounted中初始化，因为在editMemberInfo的初始值为空，mounted的时候元素已经计算好了，此时获取元素是隐藏元素的高度，应给在元素计算完成之前进行初始化
-        Vue.set(this.reveal.editMemberInfo,[i],true)
-      }
+      // for(let i=0;i<memberNum.length;i++){//是否编辑成员职责信息初始化，不能再mounted中初始化，因为在editMemberInfo的初始值为空，mounted的时候元素已经计算好了，此时获取元素是隐藏元素的高度，应给在元素计算完成之前进行初始化
+      //   Vue.set(this.reveal.editMemberInfo,[i],true)
+      // }
     },
     mounted(){
-        var stageTask=this.dealInfo[this.$route.query.id].content.stageTask
-        var myRole=this.dealInfo[this.$route.query.id].mainInfo.myRole
-        for(let i=0;i<stageTask.length;i++){
-          if(myRole=="甲方"){
-            switch (stageTask[i].section){
-              case "支付前":
-                Vue.set(this.stageTask.text,[i],"收到成果");
-                break;
-              case "支付中":
-                Vue.set(this.stageTask.text,[i],"支付");
-                break;
-              case "已支付":
-                Vue.set(this.stageTask.text,[i],"");
-                break;
-            }
-          }
-          if(myRole=="乙方"){
-            switch (stageTask[i].section){
-              case "支付前":
-                Vue.set(this.stageTask.text,[i],"成果已发送");
-                break;
-              case "支付中":
-                Vue.set(this.stageTask.text,[i],"已收到付款");
-                break;
-              case "已支付":
-                Vue.set(this.stageTask.text,[i],"");
-                break;
-            }
-          }
-        }
-
+      
       /*评论部分开始*/
-      let firstPartyStart=parseInt(this.dealInfo[this.$route.query.id].content.firstParty.comment.start);
-      for(let i=0;i<firstPartyStart;i++){
-       Vue.set(this.reveal.firstPartyComment.startSelected,[i],true)
+      let firstPartyStar=parseInt(this.data.dealInfo.dealevainfoFirst.star);
+      for(let i=0;i<firstPartyStar;i++){
+        Vue.set(this.reveal.firstPartyComment.starSelected,[i],true)
       }
       /*以上是甲方评价星级*/
-      let secondPartyStartTeam=parseInt(this.dealInfo[this.$route.query.id].content.secondParty.comment.start)
-      for(let i=0;i<secondPartyStartTeam;i++){
-        Vue.set(this.reveal.secondPartyComment.teamComment.startSelected,[i],true)
+      let secondPartyStartTeam=parseInt(this.data.dealInfo.dealevainfoSecond.star)
+      for(let i=0;i<secondPartyStartTeam;i++){ 
+        Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],true)
       }
       /*以上是乙方团队整体评价星级*/
 
@@ -554,6 +569,204 @@
       /*设置遮挡div的高度*/
     },
     methods:{
+      gitdealDetail(pkid){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/dealDetail/"+pkid;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            Vue.set(that.data,"dealInfo",data.msg)
+            console.log(data.msg)
+            var dealstageinfos=that.data.dealInfo.dealstageinfos
+            var myRole=that.data.dealInfo.myRole
+            for(let i=0;i<dealstageinfos.length;i++){
+              if(myRole=="甲方"){
+                switch (dealstageinfos[i].taskType){
+                  case null:
+                    Vue.set(that.stageTask.text,[i],"收到成果");
+                    break;
+                  case 1:
+                    Vue.set(that.stageTask.text,[i],"支付");
+                    break;
+                  case 2:
+                    Vue.set(that.stageTask.text,[i],"");
+                    break;
+                }
+              }
+              if(myRole=="乙方"){
+                switch (dealstageinfos[i].taskType){
+                  case null:
+                    Vue.set(that.stageTask.text,[i],"成果已发送");
+                    break;
+                  case 3:
+                    Vue.set(that.stageTask.text,[i],"已收到付款");
+                    break;
+                  case 4:
+                    Vue.set(that.stageTask.text,[i],"");
+                    break;
+                }
+              }
+            }
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      setComment(){
+          var that = this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/comment";
+          MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.data.dealInfo),
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+						async:false,
+					}, function(data){
+						if(data.code==0){
+              console.log("成功")
+						}else if(data.code==-1){
+							console.log("失败")
+						}
+					},function(err){
+            console.log("error")
+          })
+      },
+      setStopDeal(pkid){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/stop/"+pkid;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.gitdealDetail(that.$route.query.id);
+            that.reveal.dealState[0]=false;
+            that.reveal.dealState[1]=false;
+            var modal3= new ModalOpp("#modal-overlay3");
+            modal3.makeText();
+            console.log("终止提醒发送成功")
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      setPay(pkid){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/pay/"+pkid;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.gitdealDetail(that.$route.query.id)
+            var modal6=new ModalOpp("#modal-overlay6");
+            modal6.closeModal();
+            console.log("支付成功")
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      getAnother(accountId){//通过accountID获取用户数据
+          var that=this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/getAnother/"+accountId;
+          MyAjax.ajax({
+            type: "GET",
+            url:url,
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+            async:false,
+          },function(data){
+            if(data.code==0){
+              if(data.msg.wechat){
+                Vue.set(that.payAccount,"wechat",data.msg.wechat)
+              }
+              if(data.msg.alipay){
+                Vue.set(that.payAccount,"alipay",data.msg.alipay)
+              }
+              console.log(that.payAccount)
+            }else{
+              console.log("错误返回")	
+            }
+          },function(err){
+            console.log(err)
+          })
+      },
+      getResult(index,pkid){//收到成果的按钮事件
+        var that=this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/getResult/"+pkid;
+          MyAjax.ajax({
+            type: "GET",
+            url:url,
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+            async:false,
+          },function(data){
+            if(data.code==0){
+              Vue.set(that.data.dealInfo.dealstageinfos[index],"taskType",1)
+            }else{
+              console.log("错误返回")	
+            }
+          },function(err){
+            console.log(err)
+          })
+      },
+      getResultSended(index,pkid){//成果已发送
+        var that=this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/resultSended/"+pkid;
+          MyAjax.ajax({
+            type: "GET",
+            url:url,
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+            async:false,
+          },function(data){
+            if(data.code==0){
+              Vue.set(that.data.dealInfo.dealstageinfos[index],"taskType",3)
+            }else{
+              console.log("错误返回")	
+            }
+          },function(err){
+            console.log(err)
+          })
+      },
+      getMoneyReceived(index,pkid){//收到货款
+        var that=this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/moneyReceived/"+pkid;
+          MyAjax.ajax({
+            type: "GET",
+            url:url,
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+            async:false,
+          },function(data){
+            if(data.code==0){
+              Vue.set(that.data.dealInfo.dealstageinfos[index],"taskType",4)
+            }else{
+              console.log("错误返回")	
+            }
+          },function(err){
+            console.log(err)
+          })
+      },
       editPrompt(){//协议编辑的提示信息
         var modal= new ModalOpp("#modal-overlay");
         modal.makeText();
@@ -592,8 +805,7 @@
       confirmStopDeal(){//确认终止协议,向协议方发送通知
         var modal2= new ModalOpp("#modal-overlay2");
         modal2.closeModal();
-        var modal3= new ModalOpp("#modal-overlay3");
-        modal3.makeText();
+        this.setStopDeal(this.$route.query.id)
       },
       closeStopDealAlert(){//关闭通知
         var modal3= new ModalOpp("#modal-overlay3");
@@ -617,70 +829,93 @@
         }
       },
       stagePayment(index,item){//阶段支付的单击事件
-        var stageTask=this.dealInfo[this.$route.query.id].content.stageTask//[index].section
-        var myRole=this.dealInfo[this.$route.query.id].mainInfo.myRole
-
-        switch (stageTask[index].section){
-          case "支付前":
-            //Vue.set(this.stageTask.text,[index],"收到成果");
-            Vue.set(stageTask[index],"section","支付中")
-
-            break;
-          case "支付中":
-            //Vue.set(this.stageTask.text,[index],"支付");
-            //Vue.set(stageTask[index],"section","已支付")
-            var modal5=new ModalOpp("#modal-overlay5");
-            modal5.makeText();
-            break;
+        var dealstageinfos=this.data.dealInfo.dealstageinfos
+        var myRole=this.data.dealInfo.myRole
+        if(myRole=="甲方"){
+          switch (dealstageinfos[index].taskType){
+            case null:
+              //Vue.set(this.stageTask.text,[index],"收到成果");
+              Vue.set(dealstageinfos[index],"taskType",1)
+              this.getResult(index,dealstageinfos[index].pkid)
+              break;
+            case 1:
+              //Vue.set(this.stageTask.text,[index],"支付");
+              //Vue.set(stageTask[index],"section","已支付")
+              var modal5=new ModalOpp("#modal-overlay5");
+              modal5.makeText();
+              break;
+          }
+        }
+        if(myRole=="乙方"){
+          switch (dealstageinfos[index].taskType){
+            case null:
+              //Vue.set(this.stageTask.text,[index],"收到成果");
+              Vue.set(dealstageinfos[index],"taskType",3)
+              this.getResultSended(index,dealstageinfos[index].pkid)
+              break;
+            case 3:
+              //Vue.set(this.stageTask.text,[index],"支付");
+              //Vue.set(stageTask[index],"section","已支付")
+              //var modal5=new ModalOpp("#modal-overlay5");
+              //modal5.makeText();
+              //this.price=dealstageinfos[index].price
+              this.getMoneyReceived(index,dealstageinfos[index].pkid)
+              break;
+          }
         }
         /*支付状态的顺序改变*/
         if(myRole=="甲方"){
-          switch (stageTask[index].section){
-            case "支付前":
+          switch (dealstageinfos[index].taskType){
+            case null:
               Vue.set(this.stageTask.text,[index],"收到成果");
               break;
-            case "支付中":
+            case 1:
               Vue.set(this.stageTask.text,[index],"支付");
               break;
-            case "已支付":
+            case 2:
               Vue.set(this.stageTask.text,[index],"");
               break;
           }
         }
         if(myRole=="乙方"){
-          switch (stageTask[index].section){
-            case "支付前":
+          switch (dealstageinfos[index].taskType){
+            case null:
               Vue.set(this.stageTask.text,[index],"成果已发送");
               break;
-            case "支付中":
+            case 3:
               Vue.set(this.stageTask.text,[index],"已收到付款");
               break;
-            case "已支付":
+            case 4:
               Vue.set(this.stageTask.text,[index],"");
               break;
           }
         }
         /*在页面没有刷新的添加下改变相应文本*/
+        this.reveal.index=index;
       },
       confirmPayOper(){//支付提示，是否进行后续的支付操作
         var modal5=new ModalOpp("#modal-overlay5");
         modal5.closeModal();
-
-        var modal6=new ModalOpp("#modal-overlay6");
-        modal6.makeText();
+        
+         var modal6=new ModalOpp("#modal-overlay6");
+         modal6.makeText();
       },
-      pay(){//输入支付密码后确认支付
+      payNotSuccess(){//输入支付密码后确认支付
         var modal6=new ModalOpp("#modal-overlay6");
         modal6.closeModal();
 
-        var modal7=new ModalOpp("#modal-overlay7");
-        modal7.makeText();
-        //console.log(this.payPsw.password)
-        if(this.payPsw.password=="11111"){
-          Vue.set(this.payPsw,"end",true)
-        }else {
-          Vue.set(this.payPsw,"end",false)
-        }
+        // var modal7=new ModalOpp("#modal-overlay7");
+        // modal7.makeText();
+        // //console.log(this.payPsw.password)
+        // if(this.payPsw.password=="11111"){
+        //   Vue.set(this.payPsw,"end",true)
+        // }else {
+        //   Vue.set(this.payPsw,"end",false)
+        // }
+      },
+      paySuccess(){
+        var that=this;
+        this.setPay(that.data.dealInfo.dealstageinfos[that.reveal.index].pkid)
       },
       payEnd(){
 
@@ -689,32 +924,32 @@
       editFirstPartyComment(){//编辑甲方评价按钮单击事件
         Vue.set(this.reveal.firstPartyComment,"edit",true);
 
-        Vue.set(this.localFirstPartyComment,"start",this.dealInfo[this.$route.query.id].content.firstParty.comment.start)
-        Vue.set(this.localFirstPartyComment,"text",this.dealInfo[this.$route.query.id].content.firstParty.comment.text)
+        Vue.set(this.localFirstPartyComment,"star",this.data.dealInfo.dealevainfoFirst.star)
+        Vue.set(this.localFirstPartyComment,"text",this.data.dealInfo.dealevainfoFirst.comment)
         /*同步星级和评论文本用于编辑*/
       },
       commentFirstParty(index){//甲方评价
         for(let i=0;i<5;i++){
-          Vue.set(this.reveal.firstPartyComment.startSelected,[i],false)
+          Vue.set(this.reveal.firstPartyComment.starSelected,[i],false)
         }
         for(let i=0;i<index+1;i++){
-          Vue.set(this.reveal.firstPartyComment.startSelected,[i],true)
+          Vue.set(this.reveal.firstPartyComment.starSelected,[i],true)
         }
-        Vue.set(this.localFirstPartyComment,"start",index+1+"");
+        Vue.set(this.localFirstPartyComment,"star",index+1+"");
       },
       keepFirstPartyComment(){//保存甲方评价修改后的数据
-        Vue.set(this.dealInfo[this.$route.query.id].content.firstParty.comment,"start",this.localFirstPartyComment.start)
-        Vue.set(this.dealInfo[this.$route.query.id].content.firstParty.comment,"text",this.localFirstPartyComment.text)
+        Vue.set(this.data.dealInfo.dealevainfoFirst,"star",this.localFirstPartyComment.star)
+        Vue.set(this.data.dealInfo.dealevainfoFirst,"comment",this.localFirstPartyComment.text)
         Vue.set(this.reveal.firstPartyComment,"edit",false)
-        console.log(typeof this.dealInfo[this.$route.query.id].content.firstParty.comment.text)
+        this.setComment();
       },
       cancelFirstPartyComment(){//取消保存保存甲方评价修改后的数据
-        let start=parseInt(this.dealInfo[this.$route.query.id].content.firstParty.comment.start);
+        let star=this.data.dealInfo.dealevainfoFirst.star;
         for(let i=0;i<5;i++){
-          Vue.set(this.reveal.firstPartyComment.startSelected,[i],false)
+          Vue.set(this.reveal.firstPartyComment.starSelected,[i],false)
         }
-        for(let i=0;i<start;i++){
-          Vue.set(this.reveal.firstPartyComment.startSelected,[i],true)
+        for(let i=0;i<star;i++){
+          Vue.set(this.reveal.firstPartyComment.starSelected,[i],true)
         }
         Vue.set(this.reveal.firstPartyComment,"edit",false)
       },
@@ -739,7 +974,7 @@
           avatar:require("../../../assets/img/deal/sendDeal/avatar.png"),
           responsibilities:"",
           comment:{
-            start:"",
+            star:"",
             text:"",
           }
         })
@@ -768,81 +1003,89 @@
         Vue.set(this.reveal.secondPartyComment,"edit",true)//编辑和可视切换
 
 
-        Vue.set(this.localSecondPartyComment.teamComment,"start",this.dealInfo[this.$route.query.id].content.secondParty.comment.start)
-        Vue.set(this.localSecondPartyComment.teamComment,"text",this.dealInfo[this.$route.query.id].content.secondParty.comment.text)
+        Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfoSecond.star)
+        Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfoSecond.comment)
         /*Vue的数据同步到本地一份,用于数据的修改后的保存或者提交（团队整体评价）*/
-        let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
-        for(let i=0;i<memberNum.length;i++){
-          Vue.set(this.localSecondPartyComment.memberComment.start,[i],memberNum[i].comment.start)
-          Vue.set(this.localSecondPartyComment.memberComment.text,[i],memberNum[i].comment.text)
-        }
+        // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
+        // for(let i=0;i<memberNum.length;i++){
+        //   Vue.set(this.localSecondPartyComment.memberComment.star,[i],memberNum[i].comment.star)
+        //   Vue.set(this.localSecondPartyComment.memberComment.text,[i],memberNum[i].comment.text)
+        // }
         /*Vue的数据同步到本地一份,用于数据的修改后的保存或者提交（团队成员评价）*/
 
 
-        let $this=this
-        setTimeout(function () {//通过1ms延时，在单击编辑后，获取最后一个元素的高度，从新设置遮挡高度
-          Vue.set($this.borderWhite,"height",parseInt($('.secondPartyMember').children("li:last").css("height"))-45+"px")
-        },1)
+        // let $this=this
+        // setTimeout(function () {//通过1ms延时，在单击编辑后，获取最后一个元素的高度，从新设置遮挡高度
+        //   Vue.set($this.borderWhite,"height",parseInt($('.secondPartyMember').children("li:last").css("height"))-45+"px")
+        // },1)
 
       },
       commentSecondPartyTeam(index){//鼠标滑过后，乙方总体评价不同的星级的选定
         for(let i=0;i<5;i++){
-          Vue.set(this.reveal.secondPartyComment.teamComment.startSelected,[i],false)
+          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],false)
         }
         for(let i=0;i<index+1;i++){
-          Vue.set(this.reveal.secondPartyComment.teamComment.startSelected,[i],true)
+          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],true)
         }
-        Vue.set(this.localSecondPartyComment.teamComment,"start",index+1+"");
+        Vue.set(this.localSecondPartyComment.teamComment,"star",index+1+"");
       },
       commentSecondPartyMember(index,$index){//鼠标滑过后，乙方成员的不同星级选定
         for(let i=0;i<5;i++){
-          Vue.set(this.reveal.secondPartyComment.memberComment.startSelected[index],[i],false)
+          Vue.set(this.reveal.secondPartyComment.memberComment.starSelected[index],[i],false)
         }
         for(let i=0;i<$index+1;i++){
-          Vue.set(this.reveal.secondPartyComment.memberComment.startSelected[index],[i],true)
+          Vue.set(this.reveal.secondPartyComment.memberComment.starSelected[index],[i],true)
         }
-        Vue.set(this.localSecondPartyComment.memberComment.start,[index],$index+1+"");
-       // console.log(this.reveal.secondPartyComment.memberComment.startSelected[index])
+        Vue.set(this.localSecondPartyComment.memberComment.star,[index],$index+1+"");
+       // console.log(this.reveal.secondPartyComment.memberComment.starSelected[index])
       },
       keepSecondPartyMemberComment(){//保存乙方评价
-        Vue.set(this.dealInfo[this.$route.query.id].content.secondParty.comment,"start",this.localSecondPartyComment.teamComment.start)
-        Vue.set(this.dealInfo[this.$route.query.id].content.secondParty.comment,"text",this.localSecondPartyComment.teamComment.text)
+        Vue.set(this.data.dealInfo.dealevainfoSecond,"star",this.localSecondPartyComment.teamComment.star)
+        Vue.set(this.data.dealInfo.dealevainfoSecond,"comment",this.localSecondPartyComment.teamComment.text)
 
-        let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
-        for(let i=0;i<memberNum.length;i++){
-          Vue.set(memberNum[i].comment,"start",this.localSecondPartyComment.memberComment.start[i])
-          Vue.set(memberNum[i].comment,"text",this.localSecondPartyComment.memberComment.text[i])
-        }
+        // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
+        // for(let i=0;i<memberNum.length;i++){
+        //   Vue.set(memberNum[i].comment,"star",this.localSecondPartyComment.memberComment.star[i])
+        //   Vue.set(memberNum[i].comment,"text",this.localSecondPartyComment.memberComment.text[i])
+        // }
 
         Vue.set(this.reveal.secondPartyComment,"edit",false)
-
-        let $this=this
-        setTimeout(function () {//通过1ms延时，在单击编辑后，获取最后一个元素的高度，从新设置遮挡高度
-          Vue.set($this.borderWhite,"height",parseInt($('.secondPartyMember').children("li:last").css("height"))-45+"px")
-        },1)
+        this.setComment();
+        // let $this=this
+        // setTimeout(function () {//通过1ms延时，在单击编辑后，获取最后一个元素的高度，从新设置遮挡高度
+        //   Vue.set($this.borderWhite,"height",parseInt($('.secondPartyMember').children("li:last").css("height"))-45+"px")
+        // },1)
       },
       cancelSecondPartyMemberComment(){//取消保存乙方评价
 
-        Vue.set(this.localSecondPartyComment.teamComment,"start",this.dealInfo[this.$route.query.id].content.secondParty.comment.start)
-        Vue.set(this.localSecondPartyComment.teamComment,"text",this.dealInfo[this.$route.query.id].content.secondParty.comment.text)
+        Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfoSecond.star)
+        Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfoSecond.comment)
 
-        let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
-        for(let i=0;i<memberNum.length;i++){
-          Vue.set(this.reveal.secondPartyComment.memberComment.startSelected,[i],[false,false,false,false,false])
-          for(let j=0;j<parseInt(memberNum[i].comment.start);j++){
-            Vue.set(this.reveal.secondPartyComment.memberComment.startSelected[i],[j],true)
-          }
-        }
-        for(let i=0;i<memberNum.length;i++){
-          Vue.set(this.localSecondPartyComment.memberComment.start,[i],memberNum[i].comment.start)
-          Vue.set(this.localSecondPartyComment.memberComment.text,[i],memberNum[i].comment.text)
-        }
+        // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
+        // for(let i=0;i<memberNum.length;i++){
+        //   Vue.set(this.reveal.secondPartyComment.memberComment.starSelected,[i],[false,false,false,false,false])
+        //   for(let j=0;j<parseInt(memberNum[i].comment.star);j++){
+        //     Vue.set(this.reveal.secondPartyComment.memberComment.starSelected[i],[j],true)
+        //   }
+        // }
+        // for(let i=0;i<memberNum.length;i++){
+        //   Vue.set(this.localSecondPartyComment.memberComment.star,[i],memberNum[i].comment.star)
+        //   Vue.set(this.localSecondPartyComment.memberComment.text,[i],memberNum[i].comment.text)
+        // }
         /*保证数据没有更改*/
+        let secondPartyStartTeam=parseInt(this.data.dealInfo.dealevainfoSecond.star)
+        for(let i=0;i<5;i++){
+          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],false)
+        }
+        for(let i=0;i<secondPartyStartTeam;i++){
+          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],true)
+        }
         Vue.set(this.reveal.secondPartyComment,"edit",false)
-        let $this=this
-        setTimeout(function () {//通过1ms延时，在单击编辑后，获取最后一个元素的高度，从新设置遮挡高度
-          Vue.set($this.borderWhite,"height",parseInt($('.secondPartyMember').children("li:last").css("height"))-45+"px")
-        },1)
+        
+        // let $this=this
+        // setTimeout(function () {//通过1ms延时，在单击编辑后，获取最后一个元素的高度，从新设置遮挡高度
+        //   Vue.set($this.borderWhite,"height",parseInt($('.secondPartyMember').children("li:last").css("height"))-45+"px")
+        // },1)
       }
     }
   }
@@ -1121,7 +1364,9 @@
           cursor: pointer;
         }
         ul{
-          margin-top:54px;
+          li:first-child{
+            margin-top: 30px;
+          }
         }
         .confirm{
           width: 160px;
@@ -1171,10 +1416,11 @@
         dl{
           float: left;
           margin-top:50px;
-          margin-left:55px;
           dt{
             float: left;
             margin-right: 20px;
+            width: 509px;
+            text-align: center;
           }
           dd{
             float: left;
@@ -1187,6 +1433,14 @@
             }
           }
         }
+        button{
+         width: 160px;
+          height:42px; 
+          border:0;
+          background: #ffffff;
+          border-radius: 5px;
+          border: 1px solid $themeColor;
+        }
         .confirm{
           width: 160px;
           height:42px;
@@ -1196,6 +1450,7 @@
           color: #ffffff;
           margin-bottom:50px;
           cursor: pointer;
+          margin-left: 50px;
         }
       }
     }

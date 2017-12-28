@@ -30,16 +30,16 @@
     </div>
     <!--终止/编辑提示-->
     <ul class="sendDealContainer">
-      <li v-for="(item,index) in dealInfo">
+      <li v-for="(item,index) in data.dealInfo">
         <ul class="sendDealTitle">
           <li>
             <h2 v-cloak>
-              <router-link :to="{path:'/yhzx/deal/sendDealIndex/sendDealInfo',query:{id:index}}">
-                {{item.mainInfo.name}}
+              <router-link :to="{path:'/yhzx/deal/sendDealIndex/sendDealInfo',query:{id:item.pkid}}">
+                {{item.dealName}}
               </router-link>
             </h2>
           </li>
-          <li v-cloak>{{item.mainInfo.dealState}}</li>
+          <li v-cloak>{{item.dealState}}</li>
           <li class="titleButton">
             <div @click="stopDeal(index)" v-if="reveal.dealState[index][1]" class="cancel">
               终止
@@ -53,7 +53,7 @@
 
           </li>
         </ul>
-        <p v-cloak>创建时间：{{item.mainInfo.time}}</p>
+        <p v-cloak>创建时间：{{item.publishTime}}</p>
       </li>
     </ul>
   </div>
@@ -62,7 +62,7 @@
   import Vue from "vue"
   import {mapState} from "vuex"
   import ModalOpp from "../../../assets/js/modalOpp"
-
+  import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"sendDeal",
     data(){
@@ -74,17 +74,21 @@
         routerLinkPath:{//发送的协议和接受的协议对应的不同跳转
           path:""
         },
+        data:{
+          dealInfo:{}
+        }
       }
     },
     computed:mapState({
-      dealInfo:state=>state.myDeal.dealInfo,
+      //dealInfo:state=>state.myDeal.dealInfo,
       /*获取数据*/
     }),
     created(){
+      this.gitDelList();
 
-      for(let i=0;i<this.dealInfo.length;i++){
+      for(let i=0;i<this.data.dealInfo.length;i++){
         this.reveal.dealState.push([])
-        switch (this.dealInfo[i].mainInfo.dealState){
+        switch (this.data.dealInfo[i].dealState){
           case "签订中":
             this.reveal.dealState[i].push(true)
             this.reveal.dealState[i].push(true)
@@ -110,6 +114,50 @@
 
     },
     methods:{
+      gitDelList(){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/mySendedDeals";
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            Vue.set(that.data,"dealInfo",data.msg)
+            console.log(data.msg)
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      setStopDeal(index,pkid){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/stop/"+pkid;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.gitDelList();
+            that.reveal.dealState[index][1]=false;
+            that.reveal.dealState[index][0]=false;
+            var modal3= new ModalOpp("#modal-overlay3");
+            modal3.makeText();
+            console.log("终止提醒发送成功")
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
       editPrompt(index){//协议编辑的提示信息
         var modal= new ModalOpp("#modal-overlay");
         modal.makeText();
@@ -126,7 +174,8 @@
       confirmEdit(){
         var modal= new ModalOpp("#modal-overlay");
         modal.closeModal();
-        location.hash="/yhzx/deal/sendDealIndex/editSendDeal?id="+this.reveal.index;
+        //this.data.dealInfo[this.reveal.index].pkid
+        location.hash="/yhzx/deal/sendDealIndex/editSendDeal?id="+this.data.dealInfo[this.reveal.index].pkid;
       },
       stopDeal(index){//终止协议
         var modal= new ModalOpp("#modal-overlay2");
@@ -136,9 +185,7 @@
       confirmStopDeal(){//确认终止协议，向协议方发送通知
         var modal2= new ModalOpp("#modal-overlay2");
         modal2.closeModal();
-        var modal3= new ModalOpp("#modal-overlay3");
-        modal3.makeText();
-        console.log(this.reveal.index)
+        this.setStopDeal(this.reveal.index,this.data.dealInfo[this.reveal.index].pkid)
       },
       closeStopDealAlert(){//关闭通知
         var modal3= new ModalOpp("#modal-overlay3");

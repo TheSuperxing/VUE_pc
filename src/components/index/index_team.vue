@@ -11,9 +11,9 @@
 								<img :src="item.img" alt=""/>
 							</dd>
 							<dt>
-								<h3>名字名字名字名字名字名字名字名字名字名字名字名字名字名字名字名字</h3>
+								<h3>{{item.teamName}}</h3>
 								<p>认证员工<em>12</em></p>
-								<p>介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍</p>
+								<p>{{item.com}}</p>
 								<div class="more">
 									<router-link to="">
 										MORE>>
@@ -45,86 +45,158 @@
         perMsg:[
         	[
         		{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/1.jpg"),
+        			"teamName":"鼎城建筑",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/2.jpg"),
+        			"teamName":"建宸设计",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/3.jpg"),
+        			"teamName":"辰耀招标",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/4.jpg"),
+        			"teamName":"天保中天建筑",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/5.jpg"),
+        			"teamName":"建科测绘",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/6.jpg"),
+        			"teamName":"筑梦宝地",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/7.jpg"),
+        			"teamName":"CCDI-EDI",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/8.jpg"),
+        			"teamName":"天咨拓维",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/9.jpg"),
+        			"teamName":"聚星材料",
+        			"com":"鼎城建筑设计公司"
         		},
         	],
         	[
         		{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/1.jpg"),
+        			"teamName":"鼎城建筑",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/2.jpg"),
+        			"teamName":"建宸设计",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/3.jpg"),
+        			"teamName":"辰耀招标",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/4.jpg"),
+        			"teamName":"天保中天建筑",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/5.jpg"),
+        			"teamName":"建科测绘",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/6.jpg"),
+        			"teamName":"筑梦宝地",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/7.jpg"),
+        			"teamName":"CCDI-EDI",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/8.jpg"),
+        			"teamName":"天咨拓维",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/9.jpg"),
+        			"teamName":"聚星材料",
+        			"com":"鼎城建筑设计公司"
         		},
         	],
         	[
         		{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/1.jpg"),
+        			"teamName":"鼎城建筑",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/2.jpg"),
+        			"teamName":"建宸设计",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/3.jpg"),
+        			"teamName":"辰耀招标",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/4.jpg"),
+        			"teamName":"天保中天建筑",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/5.jpg"),
+        			"teamName":"建科测绘",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/6.jpg"),
+        			"teamName":"筑梦宝地",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/7.jpg"),
+        			"teamName":"CCDI-EDI",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/8.jpg"),
+        			"teamName":"天咨拓维",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/9.jpg"),
+        			"teamName":"聚星材料",
+        			"com":"鼎城建筑设计公司"
         		},
         	],
         	[
         		{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/1.jpg"),
+        			"teamName":"鼎城建筑",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/2.jpg"),
+        			"teamName":"建宸设计",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/3.jpg"),
+        			"teamName":"辰耀招标",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/4.jpg"),
+        			"teamName":"天保中天建筑",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/5.jpg"),
+        			"teamName":"建科测绘",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/6.jpg"),
+        			"teamName":"筑梦宝地",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/7.jpg"),
+        			"teamName":"CCDI-EDI",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/8.jpg"),
+        			"teamName":"天咨拓维",
+        			"com":"鼎城建筑设计公司"
         		},{
-        			"img":require("../../assets/img/header/图层108.png"),
+        			"img":require("../../assets/img/images/9.jpg"),
+        			"teamName":"聚星材料",
+        			"com":"鼎城建筑设计公司"
         		},
         	],
         ]
@@ -142,8 +214,7 @@
 //				    nextEl: '.swiper-button-next',
 //				    prevEl: '.swiper-button-prev',
 //				  }, 
-	        spaceBetween: 0,  
-	        grabCursor: true,  
+	        spaceBetween: 15,  
 	        initialSlide: 0,  
 	        slideToClickedSlide: true,
 	        preventLinksPropagation : false,
@@ -171,6 +242,7 @@
 		width: 100%;
 		/*height: 740px;*/
 		background: #FFFFFF;
+		padding: 20px 0;
 		h1{
 			height: 30px;
 			line-height: 30px;
@@ -188,9 +260,10 @@
 			color: #808080;
 		}
 		.gallery-team{
-			width: 1200px;
+			width: 1230px;
 			margin: 40px auto 0px;
 			padding-bottom: 40px;
+			padding-left: 15px;
 			.swiper-wrapper{
 				width: 1200px;
 				.swiper-slide{
@@ -202,7 +275,7 @@
 						height: 140px;
 						margin-right: 30px;
 						margin-bottom: 30px;
-						background: #ffffff;
+						background: #f7f7f7;
 						border-radius: 5px;
 						overflow: hidden;
 						&:hover{
@@ -256,11 +329,11 @@
 							h3{
 								line-height:24px;
 								height: 48px;
-								text-align: center;
+								text-align: left;
 								color: #333333;
 								font-size: 18px;
 								font-weight: bold;
-								margin-bottom: 18px;
+								/*margin-bottom: 18px;*/
 								overflow : hidden;
 								flex-wrap: wrap;
 								text-overflow: ellipsis;
@@ -271,8 +344,8 @@
 							}
 							p{
 								color: #333333;
-								line-height: 18px;
-								height: 18px;
+								line-height: 20px;
+								height: 20px;
 								font-size: 14px;
 								overflow : hidden;
 								text-overflow: ellipsis;
@@ -293,7 +366,7 @@
 								line-height: 55px;
 								text-align: center;
 								background: #333333;
-								
+								display: none;/*//暂时不给看*/
 								a{
 									color: #FFFFFF;
 									font-size: 18px;

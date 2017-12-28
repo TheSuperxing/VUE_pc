@@ -78,9 +78,28 @@
 	      }
 	    },
 	    mounted(){
+	    	this.getData();
 	    	this.lunbo()
 	    },
 	    methods:{
+	    	getData(){
+	    		var url = MyAjax.urlsy + "/ediHomePage/findProjs";
+	    		MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType: "json",
+						async: false,
+					},function(data){
+						console.log(data)
+						//给获取的数据分组
+//					for(var i=0,len=data.msg.length;i<len;i+=3){
+//					   that.perMsg.push(data.msg.slice(i,i+3));
+//					}
+//					console.log(that.perMsg)
+					},function(err){
+						console.log(err)
+					})
+	    	},
 	    	lunbo(){
 	    		galleryProject = new Swiper('#index_project .gallery-project', {
 				watchSlidesProgress: true,

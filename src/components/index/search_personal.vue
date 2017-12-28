@@ -1,7 +1,11 @@
 <template>
 	<div class="search_personal">
 		<div class="search-wrap">
-			<input type="text" placeholder="请搜索个人" />
+			<input type="text" placeholder="请搜索个人" v-model="searchText"/>
+			<span class="searchButton" @click="search"></span>
+		</div>
+		<div class="hotWordsWrap">
+			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
 		</div>
 		<div class="result-wrap">
 			<div class="stateNone">
@@ -9,7 +13,20 @@
 			</div>
 			<div class="list-wrap">
 				<ul>
-					<li></li>
+					<li v-for="item in resultList">
+						<dl>
+							<dd><img :src="item.psnAvatar"/></dd>
+							<dt>
+								<h6 v-bind:class="{perconfirm:false,unperconfirm:true}">
+									{{item.nickName}}
+									<img src="../../assets/img/header/2020.png" v-if="item.rnastatus=='0'"/>
+									<img src="../../assets/img/header/2121.png" v-if="item.rnastatus=='1'"/>
+								</h6>
+								<p class="comName" v-bind:class="{comConfirm:false,uncomConfirm:true}"><!--{{item.companyName}}-->和水果撒娇咖啡和水果撒娇咖啡机机</p>
+								<p class="ocupada"><!--{{item.occupy}}-->执行总裁</p>
+							</dt>
+						</dl>
+					</li>
 				</ul>
 				<div class="page">
 				    <div class="pagelist">
@@ -24,7 +41,7 @@
 				     <!-- <span class="gobtn" >GO</span>-->
 				      <span :class="{disabled:pend}" class="next" @click="pagePlus"></span>
 				    </div>
-				  </div>
+				</div>
 			</div>
 			
 		</div>
@@ -43,7 +60,7 @@
 					</dl>
 					<div class="more">
 						<router-link to="">
-							<img src="../../assets/img/header/more.png" />
+							<img src="../../assets/img/header/more.png"/>
 						</router-link>
 					</div>
 				</li>
@@ -77,14 +94,13 @@
 			    	],
 			    	
 			    ],
+			    searchText:"",
+			    hotWords:["李彦宏","马化腾","马云","优秀"],
+			    resultList:[],
 			    current_page: 1, //当前页
 		        pages: "5", //总页数
 		        changePage:'1',//跳转页
-		        nowIndex: 0,
-		        goodsIArr:[],
-		        goodsTArr:[],
-		        dataInfo:[],
-				haveCollect:[],//有没有在收藏里
+		        
 			    
 			}
 		},
@@ -149,22 +165,7 @@
 	//				console.log(err)
 	//			})
 				this.current_page = num;
-//				$.ajax({
-//					type: "POST",
-//					url:url,
-//					data: {classID:this.current_page},
-//					success:function(data){
-//						data = data.replace("callback(","").slice(0,-1);
-//		//				data = data.slice(0,-1);
-//						data = JSON.parse(data);
-////						console.log(data)
-//						that.dataInfo = data
-////						console.log(that.dataInfo)
-//					},
-//					error:function(err){
-//						console.log(err)
-//					}
-//				})
+//				
     		},
     		pagePlus() {
     			this.current_page++;
@@ -174,6 +175,26 @@
     			this.current_page--;
 //  			return this.current_page;
     		},
+    		choseHot(index){
+    			this.searchText = this.hotWords[index]
+    		},
+    		search(){
+    			var that =this ;
+    			var url = MyAjax.urlsy + "/ediHomePage/searchPerson/" + that.searchText ;
+    			MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.resultList = data.msg
+					}
+				},function(err){
+					console.log(err)
+				})
+    		}
 		},
 		watch:{
 			current_page:function(){
@@ -191,18 +212,42 @@
 			height: 50px;
 			border-radius: 25px;
 			box-shadow: 0 0 15px rgba(179,179,179,.5);
-			padding: 0 40px;
-			margin: 120px auto 0;
-			background: url(../../assets/img/header/1717.png) no-repeat right center;
+			padding: 0 20px ;
+			margin: 0px auto 0;
 			background-color: #FFFFFF;
-			background-position: 650px;
 			input{
-        		width: 100%;
+        		width: 95%;
         		height: 100%;
         		background: none;
         		font-size: 16px;
         	}
+        	.searchButton{
+        		width: 5%;
+        		height: 100%;
+        		float: right;
+        		background: url(../../assets/img/header/1717.png) no-repeat center;
+        		cursor: pointer;
+        	}
+        	
 		}
+		.hotWordsWrap{
+			width: 700px;
+			margin: 10px auto;
+    		height: 20px;
+    		p{
+    			display: inline-block;
+    			padding-right: 10px;
+    			margin-left: 12px;
+    			font-size: 14px;
+    			height: 14px;
+    			line-height: 14px;
+    			border-right: 2px solid #353535;
+    			cursor: pointer;
+    		}
+    		p:last-child{
+    			border-right: none;
+    		}
+        }
 		.result-wrap{
 			min-height: 300px;
 			.stateNone{
@@ -216,6 +261,60 @@
 				display: none;
 			}
 			.list-wrap{
+				width: 1200px;
+				margin: 20px auto;
+				>ul{
+					&::after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+					>li{
+						float: left;
+						background:#FFFFFF;
+						margin-right: 20px;
+						margin-bottom: 20px;
+						&:nth-child(4n){
+							margin-right: 0;
+						}
+						dl{
+							width: 285px;
+							height: 140px;
+							padding: 15px 20px;
+							dd{
+								float: left;
+								width: 80px;
+								height: 105px;
+								line-height: 105px;
+								img{
+									width: 80px;
+									height: 80px;
+									border-radius: 50%;
+									
+								}
+							}
+							dt{
+								float: left;
+								width: 150px;
+								margin-left: 15px;
+								h6{
+									font-size: 16px;
+									color: #FF7403;
+									height: 30px;
+									line-height: 24px;
+								}
+								.comName{
+									font-size: 14px;
+									color: #333333;
+									line-height: 20px;
+									flex-wrap: wrap;
+								}
+								
+								.ocupada{
+									font-size: 14px;
+									color: #808080;
+									line-height: 30px;
+								}
+							}
+						}
+					}
+				}
 				.page {
 					/*min-width: 900px;*/
 					text-align: center;

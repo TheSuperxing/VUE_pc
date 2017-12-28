@@ -263,26 +263,23 @@
 				Modal.makeText($("."+unvalidModify));
 			},
 			cfmModify(id){
-//				for(var i=0;i<this.demandInfo.length;i++){
-//					if(id==this.demandInfo[i].id){
-//						this.demandInfo[i].auditStatus = "2";//有效需求下线进入需求草稿。
-//						console.log(this.draftInfo)
-//						this.draftInfo.push(this.demandInfo[i])
-//						this.demandInfo.splice(i,1);
-//						break;
-//					}
-//				}
-//				console.log(this.demandInfo)
-//				for(var i=0;i<this.unvalidInfo.length;i++){
-//					if(id==this.unvalidInfo[i].id){
-//						this.unvalidInfo[i].auditStatus = "2";//无效需求进入需求草稿。
-//						this.draftInfo.push(this.unvalidInfo[i])
-//						this.unvalidInfo.splice(i,1);
-//						break;
-//					}
-//				}
-				this.closeModal(id);
-				router.push({name:"modifyDraft",query:{id:id}});
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/invalid/" + id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.closeModal(id);
+						router.push({name:"modifyDraft",query:{id:id}});
+					}
+				},function(err){
+					console.log(err)
+				})
+				
 			},
 			toDelete(id){
 				var validDelete = "validConfirmDelete"+id;

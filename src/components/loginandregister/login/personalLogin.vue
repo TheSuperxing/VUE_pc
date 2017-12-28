@@ -90,7 +90,7 @@
 //      that.personTelCfm();
 //      that.picConfirm();
 //      that.msgConfirm(event);
-      	var url = MyAjax.urlhw+"/accountmanainfo/login";
+      	var url = MyAjax.urlsy+"/accountmanainfo/login";
       	console.log(JSON.stringify({tel:that.personalLoginInput.tel,pwd:that.personalLoginInput.messageConfirm,verifyCode:that.personalLoginInput.picConfirm}))
       	if(that.personalLoginInput.tel.trim().length!=0&&that.personalLoginInput.messageConfirm.trim().length!=0
       	&&that.personalLoginInput.picConfirm.trim().length!=0){
@@ -169,7 +169,7 @@
      		}
 	    },
 	    changePic(){
-	    	this.picSrc = MyAjax.urlhw+"/captcha.jpg?random="+Math.random()
+	    	this.picSrc = MyAjax.urlsy+"/captcha.jpg?random="+Math.random()
 	    	$(".picConfirm").attr("src",this.picSrc)
 	    },
       picConfirm(){

@@ -36,7 +36,7 @@
   	</div>
   	<!--搜索项目模态框-->
     <h3 class="c-title"><span>{{title}}</span></h3>
-    <div class="stateNull" v-if="stateNone">暂无项目经历信息</div>
+    <div class="stateNull" v-if="stateNone">（您尚未添加项目经历信息）</div>
     <div class="projectTable" v-for="(item,$index) in proInfo">
     	<router-link :to="{name:'ProjectDetail',query:{id:item.id}}" class="tableTitle" >{{item.projectName}}</router-link>
     	<div class="toolsBox">
@@ -591,9 +591,10 @@ $activeColor: rgb(242,117,25);
 		.stateNull{
 			height: 50px;
 			line-height: 50px;
-			font-size: 18px;
-			color: #7C7C7C;
+			font-size: 16px;
+			color: #999999;
 			text-align: center;
+			margin-top: 30px;
 		}
 		.projectTable{
 			padding: 30px 20px;

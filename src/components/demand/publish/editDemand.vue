@@ -40,7 +40,7 @@
 			</li>
 			<li>
 				<p class="wrap-left">*需求酬劳</p>
-				<input type="text" placeholder="请输入需求酬劳（为若干位数字）..." v-model="newDemandInfo.demandbasicinfo.reword"/>
+				<input type="text" placeholder="请输入需求酬劳（保留两位小数点）..." v-model="newDemandInfo.demandbasicinfo.reword"/>
 				<alertTip v-if="showAlert.reword" :showHide="showAlert.reword" @closeTip="closeTip" :alertText="alertText.reword"></alertTip>
 				
 			</li>
@@ -122,7 +122,7 @@
 				    "pubName": "",
 				    "publishTime": "",
 				    "remark": "",
-				    "reword": 0,
+				    "reword": "",
 				    "type": 0,
 				    "watchTimes": 0
 				  },
@@ -227,8 +227,10 @@
 					this.showAlert.complateTime = false;
 //					
 				};//判断项目名称不能为空
-				for(var i=0;i<this.newDemandInfo.demandbasicinfo.demandObj.length;i++){
-					if(this.newDemandInfo.demandObj[i]!=""){
+				
+				console.log(this.newDemandInfo.demandobjs)
+				for(var i=0;i<this.newDemandInfo.demandobjs.length;i++){
+					if(this.newDemandInfo.demandobjs.length==0){
 						this.showAlert.demandObj = true;
 						this.alertText.demandObj = "需求对象为必填项"
 					}else{
@@ -243,9 +245,10 @@
 					this.showAlert.objRequire = false;
 //					
 				};//判断对象需求不能为空
-				if(this.newDemandInfo.demandbasicinfo.reword.trim().length==0){
+				if(this.newDemandInfo.demandbasicinfo.reword.trim().length==0||
+				/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/gi.test(this.newDemandInfo.demandbasicinfo.reword)!=true){
 					this.showAlert.reword = true;
-					this.alertText.reword = "需求酬劳为必填项";
+					this.alertText.reword = "请输入金额（保留两位小数）";
 				}else{
 					this.showAlert.reword = false;
 //					
@@ -253,9 +256,11 @@
 			},
 			commitDemand(){
 				
-				console.log(this.newDemandInfo)
+				console.log(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/gi.test(this.newDemandInfo.demandbasicinfo.reword))
 				if(this.newDemandInfo.demandbasicinfo.demandName.trim().length!=0&&this.newDemandInfo.demandbasicinfo.describe.trim().length!=0&&this.newDemandInfo.demandbasicinfo.complateTime.trim().length!=0
-				&&this.newDemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.newDemandInfo.demandbasicinfo.reword.trim().length!=0
+				&&this.newDemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.newDemandInfo.demandobjs.length!=0
+				&&this.newDemandInfo.demandbasicinfo.reword.trim().length!=0
+				&&/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/gi.test(this.newDemandInfo.demandbasicinfo.reword)==true
 				){
 					Modal.makeText($('.confirmCommit'));
 					this.showAlert.demandObj = false;
@@ -267,12 +272,6 @@
 			},
 			cfmCommit(){
 				console.log(this.showAlert)
-				
-				for(var item in this.showAlert){
-					if(this.showAlert[item]!=false){
-						return false;
-					}
-				}
 				var that = this;
 				var url = MyAjax.urlhw+"/demandbasicinfo/insertOrUpdate/" + 'valid' 
 		    	
@@ -299,17 +298,15 @@
 				},function(err){
 					console.log(err)
 				})
-//				Vue.set(that.newDemandInfo,"havePublished",true)//设置已经发布过的标志
-//				Vue.set(that.newDemandInfo,"haveOffLine",true)//设置（暂且把提交的新需求看为审核通过在线了）
-//				that.demandInfo.push(that.newDemandInfo);
-//				console.log(that.demandInfo)
+
 				
 			},
 			saveToDraft(){
-				
-				console.log(this.newDemandInfo)	
+				console.log(/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/gi.test(this.newDemandInfo.demandbasicinfo.reword))	
 				if(this.newDemandInfo.demandbasicinfo.demandName.trim().length!=0&&this.newDemandInfo.demandbasicinfo.describe.trim().length!=0&&this.newDemandInfo.demandbasicinfo.complateTime.trim().length!=0
-				&&this.newDemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.newDemandInfo.demandbasicinfo.reword.trim().length!=0){
+				&&this.newDemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.newDemandInfo.demandobjs.length!=0
+				&&this.newDemandInfo.demandbasicinfo.reword.trim().length!=0
+				&&/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/gi.test(this.newDemandInfo.demandbasicinfo.reword)==true){
 					var that = this;
 					var url = MyAjax.urlhw+"/demandbasicinfo/insertOrUpdate/" + 'draft' 
 			    	
@@ -330,28 +327,12 @@
 						if(data.code == 0){
 							router.go(-1);
 //							router.push("/yhzx/demand/publish/index")
-
 							that.closeModal();
 						}
-						
 					},function(err){
 						console.log(err)
 					})
-//					for(var i=0;i<this.newDemandInfo.demandObj.length;i++){
-//						if(this.newDemandInfo.demandObj[i]!=""){
-//							Vue.set(this.newDemandInfo,"auditStatus","")//没有需求审核状态
-//							Vue.set(this.newDemandInfo,"havePublished",false)//设置未发布过的标志
-//							Vue.set(this.newDemandInfo,"haveOffLine",false)//设置有没有在线
-//							this.draftInfo.push(this.newDemandInfo)//上传到需求草稿里
-//							router.push("/yhzx/demand/publish/index");
-//							this.closeModal();
-//							break;
-//						}else{
-//							this.showAlert.demandObj = false;
-//		//					
-//						};//判断项目名称不能为空
-//						
-//					}
+////					
 					
 				}else{
 					this.mustConfirm();

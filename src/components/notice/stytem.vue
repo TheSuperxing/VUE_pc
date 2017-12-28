@@ -3,10 +3,11 @@
     <div class="title clear">
         <div class="text clear">
             <h2 v-cloak>通知</h2>
-            <span>（5）</span>
+            <span>({{noticeNum}})</span>
         </div>
     </div>
     <ul class="notContain">
+    	
         <li class="clear">
             <span></span>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
@@ -24,9 +25,52 @@
 </template>
 
 <script>
+	import Vue from "vue"
+	import MyAjax from "../../assets/js/MyAjax.js"
   export default {
     name: 'stytem',
+    data:function(){
+    	return{
+    		notice:[
+    			
+    		],
+    		noticeNum:"4"
+    	}
+    },
+    mounted(){
+    	this.getData();
+    },
+    methods:{
+    	getData(){
+    		var that = this;
+    		var url = MyAjax.urlhw +"/businessmessageaccountrela/findByMySelf";
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					for(let i=0;i<data.msg.length;i++){
+						let useful = data.msg[i].mesContent.match(/##(\S*)##/)[1];
+						useful = useful.split(";");
+						let obj = {
+							mes:"",
+							urlName:"",
+							id:""
+						}
+						obj.mes =data.msg[i].mesContent.split(/##(\S*)##/);
+						obj.mes[1] = useful[0];
+						obj.urlName = useful[1]; 
+						obj.id = useful[2];
+						that.notice.push(obj);
+					}
+					console.log(that.notice)
+				},function(err){
+					console.log(err)
+				})
+    		}
   }
+ }
 </script>
 <style scoped lang="scss">
     $themeColor:#f27519;

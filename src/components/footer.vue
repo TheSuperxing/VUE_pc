@@ -5,7 +5,7 @@
    		<span>联系手机：<em>150-8888-9999</em></span>
    		<span>办公室电话：<em>020-666-8888&nbsp;&nbsp;&nbsp;&nbsp;020-8888-666</em></span>
    	</p>
-   	<p>联系地址：<em>上海市杨浦区1758号奚地国际</em></p>
+   	<p>联系地址：<em>上海市杨浦区1758号悉地国际</em></p>
     <p>Copyring &copy;2014CCDI&nbsp;&nbsp;All&nbsp;&nbsp;right&nbsp;&nbsp;reserved&nbsp;&nbsp;沪ICP备16030624号-2</p>
   </div>
 </template>

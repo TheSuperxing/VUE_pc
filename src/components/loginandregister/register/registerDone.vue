@@ -1,6 +1,6 @@
 <template>
 	<div id="modal-overlay" class="registerDone" >
-		<div class="content-wrap" v-bind:class='[{"com-wrap":state==0},{"team-wrap":state==1},{"person-wrap":state==2}]'>
+		<div class="content-wrap" v-bind:class='[{"com-wrap":state==1},{"team-wrap":state==2},{"person-wrap":state==0}]'>
 			<p class="congraduation">恭喜您注册成功！</p>
 			<p class="mail-wrap">
 				邮件已经发送至<router-link to="">xing@163.com</router-link>

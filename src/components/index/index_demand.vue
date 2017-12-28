@@ -157,17 +157,35 @@
     },
     mounted(){
     	var that = this;
+    	that.getData();
     	that.lunbo()  
     },
     methods:{
+    	getData(){
+    		var url = MyAjax.urlsy + "/ediHomePage/findDemands";
+    		MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					console.log(data)
+					//给获取的数据分组
+//					for(var i=0,len=data.msg.length;i<len;i+=3){
+//					   that.perMsg.push(data.msg.slice(i,i+3));
+//					}
+//					console.log(that.perMsg)
+				},function(err){
+					console.log(err)
+				})
+    	},
 			lunbo () {  
 	      galleryDemand = new Swiper('.gallery-demand', {  
 //	        navigation: {
 //				    nextEl: '.swiper-button-next',
 //				    prevEl: '.swiper-button-prev',
 //				  }, 
-	        spaceBetween: 0,  
-	        grabCursor: true,  
+	        spaceBetween: 15,  
 	        initialSlide: 0,  
 	        slideToClickedSlide: true,
 	        preventLinksPropagation : false,
@@ -191,7 +209,7 @@
 <style scoped lang="scss">
   $themeColor:#ff7403; 
 	.index_demand{
-		width: 1200px;
+		width: 1230px;
 		/*height: 740px;*/
 		margin: 130px auto 30px;
 		
@@ -214,6 +232,7 @@
 		.gallery-demand{
 			margin: 40px auto 0px;
 			padding-bottom: 40px;
+			padding-left: 15px;
 			.swiper-wrapper{
 				width: 1200px;
 				.swiper-slide{

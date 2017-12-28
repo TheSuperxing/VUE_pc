@@ -73,30 +73,49 @@
 			<h5 class="A-title">申请方</h5>
 			<div class="content-applicant">
 				<p class="stateNone" v-if="!haveCooper">( 暂无申请方 )</p>
-				<dl v-for="(item,index) in DemandInfo.applicant">
-					<dd><img src="../../../assets/img/demand/icon003.png"/></dd>
+				<dl v-for="(item,index) in DemandInfo.demandappinfos">
+					<dd><img :src="item.psnAvatar"/></dd>
 					<dt>
-						<span>{{item.name}}</span>
-						<span v-if="item.coIntention=='1'" class="alreadySent">
-							已达成合作意向
+						<p class="comName">{{item.nickName}}</p>
+						<span class="alreadySent">
+							{{intentionTxt[index]}}
 						</span>
-						<span v-if="item.coIntention=='0'" v-bind:class="['notyetSent',{disabled:!haveOffLine}]" @click="sentIntention(index)">同意合作申请</span>
+						<span v-if="item.status=='1'" class="disabled">同意合作申请</span>
 					</dt>
 				</dl>
+				
 			</div>
 			
 		</div>
 		
 		<div class="relatedDeal-wrap" v-if="havePublished">
 			<h5 class="A-title">关联协议</h5>
+			
 			<ul class="content-relatedDeal">
 				<li class="noDeal" v-if="!haveDeal">暂无关联协议</p>
-				<li v-for="(item,index) in DemandInfo.relatedDeal" v-if="haveDeal">
-					与{{item.name}}签订的协议
-					<span class="cancleDeal" @click="cancelDeal(index)">取消协议</span>
-					<span class="dealState" v-bind:class="{valid:item.valid,unvalid:!item.valid}">{{dealValid[index]}}</span>
+				<li v-for="(item,index) in DemandInfo.deals">
+					与{{item.dealName}}签订的协议
+					<span class="cancleDeal" @click="cancelDeal(item.dealID)" >取消协议</span>
+					<span class="dealState valid" v-if="item.valid">已生效</span>
+					<span class="dealState unvalid" v-if="!item.valid">未生效</span>
 				</li>
-				<p class="stateNone" v-bind:class="{disabled:!haveOffLine}" @click="addDeal">添加关联协议</p>
+				<p class="stateNone"  @click="addDeal">添加关联协议</p>
+				<div id="modal-overlay" class="addDealModal">
+					<div class="modal-wrap">
+						<h5>添加关联协议</h5>
+						<span class="modalChaBtn" @click="closeModal"></span>
+						<div class="selectBox">
+							<p>请选择关联协议</p>
+							<select v-on:change="selectThisDeal($event)" v-model="seletedDealName">
+								<option value="0">请选择</option>
+								<option v-for="item in relatedDeals" v-bind:value="item.dealID" @click="">{{item.dealName}}</option>
+							</select>
+						</div>
+						<div class="confirmBtn" @click="comfirmInsertDeal">
+							确定
+						</div>
+					</div>
+				</div>
 			</ul>
 		</div>
 	</div>
@@ -136,13 +155,19 @@
 				havePublished:false,//有没有被发布过
 				haveCooper:true,//有无申请方
 				haveDeal:true,//有无关联协议
-				haveOffLine:false,//有没有在线
+				canOffline:false,//可以进行下线操作（已经通过3）
 				intentionTxt:[],//有无合作意向之后的文字信息
 				auditStatusShow:false,//需求审核状态的提示显隐 为auditStatus='0'表示在审核中，'1'表示审核完成可以编辑
 				auditStatusTxt:"",//需求审核状态的文字
 				showAlert:{name:false,describe:false,complateTime:false,demandObj:false,objRequire:false,reword:false},//提示框显隐
 	        	alertText:{name:null,describe:null,complateTime:null,demandObj:null,objRequire:null,reword:false},
 				dealValid:[],//关联协议的状态内容
+				relatedDeals:[],
+				seletedDealName:"",
+				selectedDeal:{
+					demandID:"",
+					dealID:"",
+				}
 			}
 		},
 		components:{
@@ -156,92 +181,83 @@
 //		}),
 		created(){
 			
-			this.id = this.$route.query.id;
-			console.log(this.id);
-			var that = this;
-			var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.id
-	    	MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-				async:false,
-			},function(data){
-				console.log(data)
-				if(data.code==0){
-					console.log(data.msg)
-					Vue.set(that,"DemandInfo",data.msg)
-				}
-				
-				console.log(that.DemandInfo)
-			},function(err){
-				console.log(err)
-			})
-//			for(var i=0;i<this.demandInfo.length;i++){
-//				if(this.demandInfo[i].id==this.id){
-//					this.DemandInfo = JSON.parse(JSON.stringify(this.demandInfo[i]));
-//				}
-//			}
-//			for(var i=0;i<this.unvalidInfo.length;i++){
-//				if(this.unvalidInfo[i].id==this.id){
-//					this.DemandInfo = JSON.parse(JSON.stringify(this.unvalidInfo[i]));
-//				}
-//			}
-//			for(var i=0;i<this.draftInfo.length;i++){
-//				if(this.draftInfo[i].id==this.id){
-//					this.DemandInfo = JSON.parse(JSON.stringify(this.draftInfo[i]));
-//				}
-//			}
-//			
-			that.DemandInfo.demandobjs = that.DemandInfo.demandobjs[0].split(",")
-			console.log(that.DemandInfo.demandobjs)
-			for(var i=0;i<that.DemandInfo.demandobjs.length;i++){//需求对象的单选按钮
-				switch (that.DemandInfo.demandobjs[i]){
-					case '1001':
-						Vue.set(that.selectedStyle,[0],true)
-						break;
-					case '1002':
-						Vue.set(that.selectedStyle,[1],true)
-						break;
-					case '1003':
-						Vue.set(that.selectedStyle,[2],true)
-						break;
-				}
-			}
-			console.log(this.selectedStyle)
-//			if(this.DemandInfo.applicant.length!=0){
-//				Vue.set(this,'haveCooper',true)
-//			}else{
-//				Vue.set(this,'haveCooper',false)
-//			}
-//			
-//			if(this.DemandInfo.relatedDeal.length!=0){
-//				Vue.set(this,'haveDeal',true)
-//			}else{
-//				Vue.set(this,'haveDeal',false)
-//			}
-//			//判断该需求草稿的来源，即判断有没有被发布过，来判定申请者及以后模块的有无。
-//			if(this.DemandInfo.havePublished==false){
-//				Vue.set(this,"havePublished",false)
-//			}else{
-//				Vue.set(this,"havePublished",true)
-//			}
-//			
-//			
-//			//申请者合作意向的判定
-//			for(var i=0;i<this.DemandInfo.applicant.length;i++){
-//				
-//				if(this.DemandInfo.applicant[i].coIntention!=true){
-//					this.intentionTxt.push("发送合作意向") ;
-////					Vue.set(this,'intentionTxt',"发送合作意向")
-////					console.log(this.intentionTxt)
-//				}else{
-//					this.intentionTxt.push("已达成合作意向") ;
-////					Vue.set(this,'intentionTxt',"已达成合作意向")
-//				}
-//			}
+			this.getData();
 			
 		},
 		methods:{
+			getData(){
+				this.id = this.$route.query.id;
+				console.log(this.id);
+				var that = this;
+				var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"DemandInfo",data.msg)
+					}
+					
+					console.log(that.DemandInfo)
+				},function(err){
+					console.log(err)
+				})
+				that.DemandInfo.demandobjs = that.DemandInfo.demandobjs[0].split(",")
+				console.log(that.DemandInfo.demandobjs)
+				for(var i=0;i<that.DemandInfo.demandobjs.length;i++){//需求对象的单选按钮
+					switch (that.DemandInfo.demandobjs[i]){
+						case '1001':
+							Vue.set(that.selectedStyle,[0],true)
+							break;
+						case '1002':
+							Vue.set(that.selectedStyle,[1],true)
+							break;
+						case '1003':
+							Vue.set(that.selectedStyle,[2],true)
+							break;
+					}
+				}
+				console.log(this.selectedStyle)
+				
+				
+				
+				//判断有无关联协议
+				if(that.DemandInfo.deals.length!=0){
+					Vue.set(that,"haveDeal",true)
+				}else{
+					Vue.set(that,"haveDeal",false)
+				}
+				
+				
+				//判断有没有合作方
+				for(let i=0;i<that.DemandInfo.demandappinfos.length;i++){
+					if(that.DemandInfo.demandappinfos[0].pkid==null){
+						that.haveCooper = false ;
+						that.DemandInfo.demandappinfos = []
+					}else{
+						that.haveCooper = true ;
+					}
+				}
+				//申请方各自的状态
+				that.intentionTxt = [];
+				for(let i=0;i<that.DemandInfo.demandappinfos.length;i++){
+					if(that.DemandInfo.demandappinfos[i].status=="1"){
+						that.intentionTxt.push("未达成合作意向")
+					}else if(that.DemandInfo.demandappinfos[i].status=="3"){
+						that.intentionTxt.push("已达成合作意向")
+					}
+				}
+				//需求有没有上线过
+				if(Math.floor(that.DemandInfo.demandreviewinfo.applyStatus)>=3){
+					Vue.set(that,"havePublished",true)
+				}else{
+					Vue.set(that,"havePublished",false)
+				}
+			},
 			selectObj(index){
 				for(var i=0;i<this.demandObj.length;i++){
 					
@@ -337,9 +353,10 @@
 					this.showAlert.objRequire = false;
 //					
 				};//判断对象需求不能为空
-				if(this.DemandInfo.demandbasicinfo.reword.trim().length==0){
+				if(this.DemandInfo.demandbasicinfo.reword.trim().length==0||
+				/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/gi.test(this.DemandInfo.demandbasicinfo.reword)!=true){
 					this.showAlert.reword = true;
-					this.alertText.reword = "需求酬劳为必填项";
+					this.alertText.reword = "请输入金额（保留两位小数）";
 				}else{
 					this.showAlert.reword = false;
 //					
@@ -349,7 +366,8 @@
 				
 				if(this.DemandInfo.demandbasicinfo.demandName.trim().length!=0&&this.DemandInfo.demandbasicinfo.describe.trim().length!=0
 				&&this.DemandInfo.demandbasicinfo.complateTime.trim().length!=0&&this.DemandInfo.demandobjs.length!=0
-				&&this.DemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.DemandInfo.demandbasicinfo.reword.toString().trim().length!=0){
+				&&this.DemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.DemandInfo.demandbasicinfo.reword.toString().trim().length!=0
+				&&/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/gi.test(this.DemandInfo.demandbasicinfo.reword)!=false){
 					Modal.makeText($('.confirmCommit'));
 					this.showAlert.demandObj = false;
 				}else{
@@ -360,11 +378,6 @@
 			},
 			cfmCommit(){
 				
-				for(var item in this.showAlert){
-					if(this.showAlert[item]!=false){
-						return false;
-					}
-				}
 //				this.DemandInfo.auditStatus = "0";//需求进入审核状态。
 				var that = this;
 				var url = MyAjax.urlhw+"/demandbasicinfo/insertOrUpdate/" + 'valid' 
@@ -399,7 +412,8 @@
 				console.log(this.DemandInfo)	
 				if(this.DemandInfo.demandbasicinfo.demandName.trim().length!=0&&this.DemandInfo.demandbasicinfo.describe.trim().length!=0
 				&&this.DemandInfo.demandbasicinfo.complateTime.trim().length!=0&&this.DemandInfo.demandobjs.length!=0
-				&&this.DemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.DemandInfo.demandbasicinfo.reword.toString().trim().length!=0){
+				&&this.DemandInfo.demandbasicinfo.objRequire.trim().length!=0&&this.DemandInfo.demandbasicinfo.reword.toString().trim().length!=0
+				&&/^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/gi.test(this.DemandInfo.demandbasicinfo.reword)!=false){
 					var that = this;
 					var url = MyAjax.urlhw+"/demandbasicinfo/insertOrUpdate/" + 'draft' 
 			    	
@@ -416,19 +430,14 @@
 						async:false,
 					},function(data){
 						console.log(data)
-						
 						if(data.code == 0){
 							router.go(-1);
 //							router.push("/yhzx/demand/draft/index");
-
 							that.closeModal();
 						}
-						
 					},function(err){
 						console.log(err)
 					})
-					
-					
 				}else{
 					this.mustConfirm();
 				}
@@ -436,28 +445,82 @@
 			},
 			closeModal(){
 				Modal.closeModal($('.confirmCommit'))
+				Modal.closeModal($(".addDealModal"))
 			},
-			cancelDeal(index){
-//				this.DemandInfo.relatedDeal.splice(index,1)
-//				if(this.DemandInfo.relatedDeal.length!=0){
-//					Vue.set(this,'haveDeal',true)
-//				}else{
-//					Vue.set(this,'haveDeal',false)
-//				}
+			cancelDeal(id){
+				var that = this;
+				var url = MyAjax.urlhw +"/demanddealrela/cancelDeal";
+				var data = {
+					pkid:id
+				};
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal()
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
 			},
 			addDeal(){
-				
-			},																							
-			sentIntention(index){
-				for(var i=0;i<this.DemandInfo.applicant.length;i++){
-					if(i==index){
-						this.DemandInfo.applicant[index].coIntention = true;
-//						Vue.set(this,"detailInfo.applicant[index].coIntention",true)
-						this.intentionTxt[index] = "已达成合作意向"
+				Modal.makeText($(".addDealModal"))
+				var that = this;
+				var url = MyAjax.urlhw+"/demanddealrela/findByMySelf";
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"relatedDeals",data.msg)
 					}
+					
+				},function(err){
+					console.log(err)
+				})
+			},	
+			selectThisDeal(e){
+				console.log(e.target.value)
+				this.selectedDeal = {
+					demandID : this.$route.query.id,
+					dealID : e.target.value
 				}
 				
 			},
+			comfirmInsertDeal(){
+				var that = this;
+				var url = MyAjax.urlhw +"/demanddealrela/insert";
+				var data = that.selectedDeal;
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(data),
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData();
+						that.closeModal()
+					}
+				},function(err){
+					console.log(err)
+				})//更新到服务器
+			},
+			
 		},
 		updated(){
 			this.describeCont = this.DemandInfo.demandbasicinfo.describe.length;
@@ -649,55 +712,65 @@ $bfColor:#ffffff;
 					color: #8C8C8C;
 				}
 				dl{
-					height: 160px;
+					height: 200px;
 					float: left;
 					margin-right: 30px;
 					margin-top: 10px;
 					dd{
-						
+						margin-bottom: 10px;
 						text-align: center;
+						width: 80px;
+						height: 80px;
+						border-radius: 50%;
+						margin: 0 auto;
+						overflow: hidden;
+						img{
+							width: 100%;
+						}
 					}
 					dt{
 						/*height: 40px;*/
 						/*line-height: 40px;*/
 						text-align: center;
 						margin-top: 5px;
+						
+						width: 112px;
 						/*overflow: hidden;*/
 						&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
 						position: relative;
+						>p{
+							float: left;
+							min-width: 112px;
+							/*height: 30px;*/
+							color: $activeColor;
+						}
 						span{
 							float: left;
 							/*width: 100%;*/
 							min-width: 112px;
 							height: 30px;
 							line-height: 30px;
-							&:last-child{
-								margin-top: 15px;
-								cursor: pointer;
-								position:absolute;left:50%; bottom: -50px;
-								transform:translate(-50%,-50%);
-								-webkit-transform:translate(-50%,-50%);
-								-moz-transform:translate(-50%,-50%);
-								-ms-transform:translate(-50%,-50%);
-								-o-transform:translate(-50%,-50%);
-							}
 							
+							
+							
+						}
+						.disabled{
+							color: #FFFFFF !important;
+							background: #828282 !important;
 						}
 						.alreadySent{
 							background: none;
 							color: #f76c0f;
 						}
 						.notyetSent{
+							margin-top: 10px;
 							background: #353535;
 							color: #FFFFFF;
 							border-radius: 3px;
+							cursor: pointer;
 							&:hover{
 								background: $activeColor;
 							}
-						}
-						.disabled{
-							color: #FFFFFF !important;
-							background: #828282 !important;
 						}
 					}
 				}
@@ -706,7 +779,7 @@ $bfColor:#ffffff;
 		}
 		.relatedDeal-wrap{
 			
-			margin-top: 40px;
+			margin-top: 20px;
 			.A-title{
 				height: 42px;
 				line-height: 42px;
@@ -750,6 +823,8 @@ $bfColor:#ffffff;
 				padding-left: 28px;
 				background: url(../../../assets/img/demand/icon53.png) no-repeat left center;
 				cursor: pointer;
+				margin-top: 10px;
+				float: left;
 			}
 			.disabled{
 				padding-left: 28px;
@@ -758,6 +833,70 @@ $bfColor:#ffffff;
 				cursor: pointer;
 				border: none;
 				color: #828282;
+			}
+			.addDealModal{
+				position: relative;
+				.modal-wrap{
+					min-width: 480px;
+					padding: 0px 20px 80px;
+					background: #FFFFFF;
+					border-radius: 10px;
+					position:absolute;top:50%;left:50%; 
+					transform:translate(-50%,-50%);
+					-webkit-transform:translate(-50%,-50%);
+					-moz-transform:translate(-50%,-50%);
+					-ms-transform:translate(-50%,-50%);
+					-o-transform:translate(-50%,-50%);
+					h5{
+						height: 50px;
+						line-height: 50px;
+						text-align: left;
+						font-size: 18px;
+						/*padding-left: 20px;*/
+						color: $activeColor;
+					}
+					.selectBox{
+						margin-top: 30px;
+						&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+						p{
+							font-size: 16px;
+							height: 30px;
+							line-height: 30px;
+							text-align: center;
+							float: left;
+							margin-left: 50px;
+						}
+						select{
+							height: 30px;
+							line-height: 30px;
+							border-radius: 3px;
+							float: left;
+							margin-left: 20px;
+							width: 180px;
+						}
+					}
+					
+					.modalChaBtn{
+						width: 20px;
+					    height: 20px;
+					     background: url(../../../assets/img/demand/icon004.png) no-repeat center;
+					     position: absolute;
+					     top: 20px;
+					     right: 30px;
+					     cursor: pointer;
+					}
+					.confirmBtn{
+						
+						width: 160px;
+						height: 42px;
+						line-height: 42px;
+						text-align: center;
+						background: url(../../../assets/img/demand/bg21.png) no-repeat;
+						margin: 30px auto 10px;
+						color: $bfColor;
+						cursor:pointer;
+					}
+				}
 			}
 		}
 	

@@ -511,7 +511,8 @@
           dataType: "json",
           async:false,
         },function(data){
-          if(data.code==0){
+        	console.log(data)
+          if(data.code==0&&data.msg.personalbasicinfo!=null){
             that.psnMsg=data.msg;
             //Vue.set(that,"psnMsg",data.msg);
           }

@@ -7,12 +7,10 @@
         </div>
     </div>
     <ul class="notContain">
-    		<li v-for="item in notice" class="clear">
-    			<span></span>
-    			<p>{{item.mes[0]}}<router-link :to='{name:item.urlName,query:{id:item.id}}'>{{item.mes[1]}}</router-link>{{item.mes[2]}}</p>
-    		</li>
-        
-        
+		<li v-for="(item,index) in notice" class="clear" @click="read(item.pkid)" v-bind:class="{read:!mesState[index],unread:mesState[index]}">
+			<span></span>
+			<p>{{item.mes[0]}}<router-link :to='{name:item.urlName,query:{id:item.id}}'>{{item.mes[1]}}</router-link>{{item.mes[2]}}</p>
+		</li>
     </ul>
   </div>
 </template>
@@ -27,7 +25,8 @@
     		notice:[
     			
     		],
-    		noticeNum:"4"
+    		noticeNum:"0",
+    		mesState:[],
     	}
     },
     mounted(){
@@ -43,24 +42,70 @@
 					dataType: "json",
 					async: false,
 				},function(data){
+					console.log(data)
+					that.notice = [];
+					that.mesState = [];
+					that.noticeNum = data.msg.length;	
 					for(let i=0;i<data.msg.length;i++){
-						let useful = data.msg[i].mesContent.match(/##(\S*)##/)[1];
-						useful = useful.split(";");
-						let obj = {
-							mes:"",
-							urlName:"",
-							id:""
+						if(data.msg[i].mesType==1){
+							that.mesState.push(true) //未读
+						}else{
+							that.mesState.push(false) //已读
 						}
-						obj.mes =data.msg[i].mesContent.split(/##(\S*)##/);
-						obj.mes[1] = useful[0];
-						obj.urlName = useful[1]; 
-						obj.id = useful[2];
-						that.notice.push(obj);
+						if(data.msg[i].mesContent.match(/##(\S*)##/)!=null){
+							let useful = data.msg[i].mesContent.match(/##(\S*)##/)[1];
+							useful = useful.split(";");
+							let obj = {
+								mes:[],
+								urlName:"",
+								id:"",
+								pkid:""
+							}
+							obj.mes =data.msg[i].mesContent.split(/##(\S*)##/);
+							obj.mes[1] = useful[0];
+							obj.urlName = useful[1]; 
+							obj.id = useful[2];
+							obj.pkid = data.msg[i].pkid;
+							that.notice.push(obj);
+						}else{
+							let obj = {
+								mes:[],
+								urlName:"",
+								id:"",
+								pkid:""
+							}
+							obj.mes[0] =data.msg[i].mesContent;
+							obj.pkid = data.msg[i].pkid;
+							that.notice.push(obj);
+						}
 					}
 					console.log(that.notice)
 				},function(err){
 					console.log(err)
 				})
+    	},
+    	read(id){
+    		console.log(id)
+    		var that = this;
+    		var url = MyAjax.urlhw +"/businessmessageaccountrela/update";
+    		var data = {
+    			id:id
+    		}
+    		MyAjax.ajax({
+				type: "POST",
+				url:url,
+				dataType: "json",
+				data:data,
+				async: false,
+			},function(data){
+				console.log(data)
+				if(data.code==0){
+					that.getData()
+				}
+			},function(err){
+				console.log(err)
+			})
+    		
     	}
     }
   }
@@ -114,8 +159,15 @@
                     float: left;
                 }
             }
-            li:nth-child(2){
-                background: #ebebeb;
+            .read{
+            	background: #f2f2f2;
+                
+                span{
+                	background: #666666;
+                }
+            }
+            .unread{
+            	background: #ebebeb;
             }
         }
     }

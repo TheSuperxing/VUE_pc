@@ -1,11 +1,11 @@
 <template>
 	<div class="search_company">
-		<div class="search-wrap">
+		<!--<div class="search-wrap">
 			<input type="text" placeholder="请搜索公司" />
 		</div>
 		<div class="hotWordsWrap">
 			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
-		</div>
+		</div>-->
 		<div class="result-wrap">
 			<div class="stateNone">
 				在月球也没找到~

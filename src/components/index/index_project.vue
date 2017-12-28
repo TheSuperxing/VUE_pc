@@ -88,7 +88,7 @@
 						type: "GET",
 						url:url,
 						dataType: "json",
-						async: false,
+						async: true,
 					},function(data){
 						console.log(data)
 						//给获取的数据分组
@@ -163,7 +163,7 @@
   $themeColor:#ff7403; 
 #index_project{
 	background: #FFFFFF;
-	padding-bottom: 35px;
+	padding: 35px 0;
 	h1{
 		width: 320px;
 		height: 30px;
@@ -174,7 +174,7 @@
 		color: $themeColor;
 		background: url(../../assets/img/header/矩形17副本.png) no-repeat top center;
 		background-size: 100%;
-		margin: 20px auto;
+		margin: 0px auto;
 	}
 	h2{
 		height: 30px;
@@ -185,7 +185,7 @@
 		
 	}
 	.gallery-project{
-		margin-top: 30px;
+		margin-top: 50px;
 		.swiper-slide{
 			padding: 10px;
 			img{

@@ -6,7 +6,7 @@ import overview from "../../components/company/overview.vue"
 
 import Company from "../../components/company/company.vue"
 import companyIndex from "../../components/company/companyIndex.vue"
-import ProjectDetail from "../../components/company/projectDetail.vue"
+import ProjectDetail from "../../components/details/projectDetail.vue"
 
 /*|*公司账号信息*|*/
 

@@ -51,35 +51,35 @@
         		},{
         			"img":require("../../assets/img/images/2.jpg"),
         			"teamName":"建宸设计",
-        			"com":"鼎城建筑设计公司"
+        			"com":"建宸设计上海分公司"
         		},{
         			"img":require("../../assets/img/images/3.jpg"),
         			"teamName":"辰耀招标",
-        			"com":"鼎城建筑设计公司"
+        			"com":"辰耀集团"
         		},{
         			"img":require("../../assets/img/images/4.jpg"),
         			"teamName":"天保中天建筑",
-        			"com":"鼎城建筑设计公司"
+        			"com":"天保中天科技有限公司"
         		},{
         			"img":require("../../assets/img/images/5.jpg"),
         			"teamName":"建科测绘",
-        			"com":"鼎城建筑设计公司"
+        			"com":"建科建筑研究院"
         		},{
         			"img":require("../../assets/img/images/6.jpg"),
         			"teamName":"筑梦宝地",
-        			"com":"鼎城建筑设计公司"
+        			"com":"筑梦地产有限公司"
         		},{
         			"img":require("../../assets/img/images/7.jpg"),
         			"teamName":"CCDI-EDI",
-        			"com":"鼎城建筑设计公司"
+        			"com":"悉地国际CCDI"
         		},{
         			"img":require("../../assets/img/images/8.jpg"),
         			"teamName":"天咨拓维",
-        			"com":"鼎城建筑设计公司"
+        			"com":"天津一建"
         		},{
         			"img":require("../../assets/img/images/9.jpg"),
         			"teamName":"聚星材料",
-        			"com":"鼎城建筑设计公司"
+        			"com":"悉地国际CCDI"
         		},
         	],
         	[
@@ -90,35 +90,35 @@
         		},{
         			"img":require("../../assets/img/images/2.jpg"),
         			"teamName":"建宸设计",
-        			"com":"鼎城建筑设计公司"
+        			"com":"建宸设计上海分公司"
         		},{
         			"img":require("../../assets/img/images/3.jpg"),
         			"teamName":"辰耀招标",
-        			"com":"鼎城建筑设计公司"
+        			"com":"辰耀集团"
         		},{
         			"img":require("../../assets/img/images/4.jpg"),
         			"teamName":"天保中天建筑",
-        			"com":"鼎城建筑设计公司"
+        			"com":"天保中天科技有限公司"
         		},{
         			"img":require("../../assets/img/images/5.jpg"),
         			"teamName":"建科测绘",
-        			"com":"鼎城建筑设计公司"
+        			"com":"建科建筑研究院"
         		},{
         			"img":require("../../assets/img/images/6.jpg"),
         			"teamName":"筑梦宝地",
-        			"com":"鼎城建筑设计公司"
+        			"com":"筑梦地产有限公司"
         		},{
         			"img":require("../../assets/img/images/7.jpg"),
         			"teamName":"CCDI-EDI",
-        			"com":"鼎城建筑设计公司"
+        			"com":"悉地国际CCDI"
         		},{
         			"img":require("../../assets/img/images/8.jpg"),
         			"teamName":"天咨拓维",
-        			"com":"鼎城建筑设计公司"
+        			"com":"天津一建"
         		},{
         			"img":require("../../assets/img/images/9.jpg"),
         			"teamName":"聚星材料",
-        			"com":"鼎城建筑设计公司"
+        			"com":"悉地国际CCDI"
         		},
         	],
         	[
@@ -129,35 +129,35 @@
         		},{
         			"img":require("../../assets/img/images/2.jpg"),
         			"teamName":"建宸设计",
-        			"com":"鼎城建筑设计公司"
+        			"com":"建宸设计上海分公司"
         		},{
         			"img":require("../../assets/img/images/3.jpg"),
         			"teamName":"辰耀招标",
-        			"com":"鼎城建筑设计公司"
+        			"com":"辰耀集团"
         		},{
         			"img":require("../../assets/img/images/4.jpg"),
         			"teamName":"天保中天建筑",
-        			"com":"鼎城建筑设计公司"
+        			"com":"天保中天科技有限公司"
         		},{
         			"img":require("../../assets/img/images/5.jpg"),
         			"teamName":"建科测绘",
-        			"com":"鼎城建筑设计公司"
+        			"com":"建科建筑研究院"
         		},{
         			"img":require("../../assets/img/images/6.jpg"),
         			"teamName":"筑梦宝地",
-        			"com":"鼎城建筑设计公司"
+        			"com":"筑梦地产有限公司"
         		},{
         			"img":require("../../assets/img/images/7.jpg"),
         			"teamName":"CCDI-EDI",
-        			"com":"鼎城建筑设计公司"
+        			"com":"悉地国际CCDI"
         		},{
         			"img":require("../../assets/img/images/8.jpg"),
         			"teamName":"天咨拓维",
-        			"com":"鼎城建筑设计公司"
+        			"com":"天津一建"
         		},{
         			"img":require("../../assets/img/images/9.jpg"),
         			"teamName":"聚星材料",
-        			"com":"鼎城建筑设计公司"
+        			"com":"悉地国际CCDI"
         		},
         	],
         	[
@@ -168,35 +168,35 @@
         		},{
         			"img":require("../../assets/img/images/2.jpg"),
         			"teamName":"建宸设计",
-        			"com":"鼎城建筑设计公司"
+        			"com":"建宸设计上海分公司"
         		},{
         			"img":require("../../assets/img/images/3.jpg"),
         			"teamName":"辰耀招标",
-        			"com":"鼎城建筑设计公司"
+        			"com":"辰耀集团"
         		},{
         			"img":require("../../assets/img/images/4.jpg"),
         			"teamName":"天保中天建筑",
-        			"com":"鼎城建筑设计公司"
+        			"com":"天保中天科技有限公司"
         		},{
         			"img":require("../../assets/img/images/5.jpg"),
         			"teamName":"建科测绘",
-        			"com":"鼎城建筑设计公司"
+        			"com":"建科建筑研究院"
         		},{
         			"img":require("../../assets/img/images/6.jpg"),
         			"teamName":"筑梦宝地",
-        			"com":"鼎城建筑设计公司"
+        			"com":"筑梦地产有限公司"
         		},{
         			"img":require("../../assets/img/images/7.jpg"),
         			"teamName":"CCDI-EDI",
-        			"com":"鼎城建筑设计公司"
+        			"com":"悉地国际CCDI"
         		},{
         			"img":require("../../assets/img/images/8.jpg"),
         			"teamName":"天咨拓维",
-        			"com":"鼎城建筑设计公司"
+        			"com":"天津一建"
         		},{
         			"img":require("../../assets/img/images/9.jpg"),
         			"teamName":"聚星材料",
-        			"com":"鼎城建筑设计公司"
+        			"com":"悉地国际CCDI"
         		},
         	],
         ]
@@ -242,7 +242,7 @@
 		width: 100%;
 		/*height: 740px;*/
 		background: #FFFFFF;
-		padding: 20px 0;
+		padding: 50px 0;
 		h1{
 			height: 30px;
 			line-height: 30px;

@@ -1,12 +1,12 @@
 <template>
 	<div class="search_personal">
-		<div class="search-wrap">
+		<!--<div class="search-wrap">
 			<input type="text" placeholder="请搜索个人" v-model="searchText"/>
 			<span class="searchButton" @click="search"></span>
-		</div>
-		<div class="hotWordsWrap">
+		</div>-->
+		<!--<div class="hotWordsWrap">
 			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
-		</div>
+		</div>-->
 		<div class="result-wrap">
 			<div class="stateNone">
 				在月球也没找到~
@@ -149,6 +149,9 @@
     			}
     			return ar;
     		},
+    	},
+    	created(){
+    		console.log(this.$route.query)
     	},
 		methods:{
 			jumpPage(num){
@@ -427,7 +430,7 @@
 						}
 						.disabled {
 							pointer-events: none;
-							background: #F7F7F7;
+							background: #FFFFFF;
 						}
 					}
 				}

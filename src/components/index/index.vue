@@ -20,7 +20,7 @@
 			<div class="search-board">
 				<ul>
 					<li>
-						<router-link to="/indexcontent/search/per">
+						<router-link :to='{name:"SearchPersonal",query:{kw:"all"}}'>
 							<h1>找个人</h1>
 							<p>找个人？找同事？</p>
 							<p>即可进入搜索页，找到他们</p>
@@ -28,7 +28,7 @@
 						
 					</li>
 					<li>
-						<router-link to="/indexcontent/search/team">
+						<router-link :to='{name:"SearchTeam",query:{kw:"all"}}'>
 							<h1>找团队</h1>
 							<p>找个人？找同事？</p>
 							<p>即可进入搜索页，找到他们</p>
@@ -36,7 +36,7 @@
 						
 					</li>
 					<li>
-						<router-link to="/indexcontent/search/com">
+						<router-link :to='{name:"SearchCompany",query:{kw:"all"}}'>
 							<h1>找公司</h1>
 							<p>找个人？找同事？</p>
 							<p>即可进入搜索页，找到他们</p>
@@ -44,7 +44,7 @@
 						
 					</li>
 					<li>
-						<router-link to="/indexcontent/search/proj">
+						<router-link :to='{name:"SearchProject",query:{kw:"all"}}'>
 							<h1>找项目</h1>
 							<p>找个人？找同事？</p>
 							<p>即可进入搜索页，找到他们</p>
@@ -78,7 +78,6 @@
 					</li>
     		</ul>
 			</div>
-			
 		</div>
 		<!--<footer-nav></footer-nav>-->
   </div>
@@ -113,11 +112,11 @@
 	        {  
 	          'imgs': require('../../assets/img/header/banner.png')
 	        }, {  
-	          'imgs': require('../../assets/img/header/banner.png') 
+	          'imgs': require('../../assets/img/header/banner1.jpg') 
 	        }, {  
-	          'imgs': require('../../assets/img/header/banner.png') 
+	          'imgs': require('../../assets/img/header/banner2.jpeg') 
 	        },{  
-	          'imgs': require('../../assets/img/header/banner.png') 
+	          'imgs': require('../../assets/img/header/banner4.jpeg') 
 	        },
 	      ]  
       }
@@ -150,11 +149,11 @@
 				    prevEl: '.swiper-button-prev',
 				  },   
 	        spaceBetween: 0,  
-	        grabCursor: true,  
 	        initialSlide: 0,  
 	        autoplayDisableOnInteraction: false ,
 	        pagination: {
 			      el: '.swiper-pagination',
+			      clickable:true,
 			    },
 	      })  
 	      galleryThumbs = new Swiper('.gallery-thumbs', {  
@@ -201,6 +200,9 @@
  			.swiper-button-next,.swiper-button-prev{
  				display: block;
  			}
+ 		}
+ 		.swiper-slide{
+ 			background-size: 100%;
  		}
  		.swiper-button-next,.swiper-button-prev{
  				display: none;
@@ -299,7 +301,7 @@
  		width: 100%;
  		height: 218px;
  		background: url(../../assets/img/header/中间banner.png) no-repeat;
- 		background-size: 100%;
+ 		background-size: 100% 100%;
  	}
  	.aboutUs{
  		h1{

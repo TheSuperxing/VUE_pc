@@ -7,19 +7,10 @@
         </div>
     </div>
     <ul class="notContain">
-    	
-        <li class="clear">
-            <span></span>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
-        </li>
-        <li class="clear">
-            <span></span>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aliquam in odit totam itaque dolorem dolore modi nisi, veniam repellendus iusto ad, ullam perspiciatis necessitatibus temporibus voluptatibus? Aspernatur, molestias maiores?</p>
-        </li>
-        <li class="clear">
-            <span></span>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aliquam in odit totam itaque dolorem dolore modi nisi, veniam repellendus iusto ad, ullam perspiciatis necessitatibus temporibus voluptatibus? Aspernatur, molestias maiores?Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aliquam in odit totam itaque dolorem dolore modi nisi, veniam repellendus iusto ad, ullam perspiciatis necessitatibus temporibus voluptatibus? Aspernatur, molestias maiores?</p>
-        </li>
+    	<li v-for="(item,index) in notice" class="clear" @click="read(item.pkid)" v-bind:class="{read:!mesState[index],unread:mesState[index]}">
+			<span></span>
+			<p>{{item.mes[0]}}<router-link :to='{name:item.urlName,query:{id:item.id}}'>{{item.mes[1]}}</router-link>{{item.mes[2]}}</p>
+		</li>
     </ul>
   </div>
 </template>
@@ -34,7 +25,8 @@
     		notice:[
     			
     		],
-    		noticeNum:"4"
+    		noticeNum:"0",
+    		mesState:[],
     	}
     },
     mounted(){
@@ -43,32 +35,78 @@
     methods:{
     	getData(){
     		var that = this;
-    		var url = MyAjax.urlhw +"/businessmessageaccountrela/findByMySelf";
-				MyAjax.ajax({
-					type: "GET",
-					url:url,
-					dataType: "json",
-					async: false,
-				},function(data){
-					for(let i=0;i<data.msg.length;i++){
+    		var url = MyAjax.urlhw +"/sysmessageaccountrela/findByMySelf";
+			MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				async: false,
+			},function(data){
+				console.log(data)
+				that.notice = [];
+				that.mesState = [];
+				that.noticeNum=data.msg.length;
+				for(let i=0;i<data.msg.length;i++){
+					if(data.msg[i].mesType==1){
+						that.mesState.push(true) //未读
+					}else{
+						that.mesState.push(false) //已读
+					}
+					if(data.msg[i].mesContent.match(/##(\S*)##/)!=null){
 						let useful = data.msg[i].mesContent.match(/##(\S*)##/)[1];
 						useful = useful.split(";");
 						let obj = {
 							mes:"",
 							urlName:"",
-							id:""
+							id:"",
+							pkid:""
 						}
 						obj.mes =data.msg[i].mesContent.split(/##(\S*)##/);
 						obj.mes[1] = useful[0];
 						obj.urlName = useful[1]; 
 						obj.id = useful[2];
+						obj.pkid = data.msg[i].pkid;
+						that.notice.push(obj);
+					}else{
+						let obj = {
+							mes:[],
+							urlName:"",
+							id:"",
+							pkid:""
+						}
+						obj.mes[0] =data.msg[i].mesContent;
+						obj.pkid = data.msg[i].pkid;
 						that.notice.push(obj);
 					}
-					console.log(that.notice)
-				},function(err){
-					console.log(err)
-				})
-    		}
+					
+				}
+				console.log(that.notice)
+			},function(err){
+				console.log(err)
+			})
+   		},
+    	read(id){
+			console.log(id)
+			var that = this;
+			var url = MyAjax.urlhw +"/sysmessageaccountrela/update";
+			var data = {
+				id:id
+			}
+			MyAjax.ajax({
+				type: "POST",
+				url:url,
+				dataType: "json",
+				data:data,
+				async: false,
+			},function(data){
+				console.log(data)
+				if(data.code==0){
+					that.getData()
+				}
+			},function(err){
+				console.log(err)
+			})
+		}
   }
  }
 </script>
@@ -121,8 +159,15 @@
                     float: left;
                 }
             }
-            li:nth-child(2){
-                background: #ebebeb;
+            .read{
+            	background: #f2f2f2;
+              
+                span{
+                	background: #666666;
+                }
+            }
+            .unread{
+            	background: #ebebeb;
             }
         }
     }

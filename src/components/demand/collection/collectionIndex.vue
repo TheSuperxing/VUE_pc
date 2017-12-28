@@ -4,7 +4,7 @@
 			<li class="stateNone" v-if="!haveValue">暂无数据</li>
 			<li v-for="(item,index) in collections">
 				<h3>
-					<router-link :to="{name:'colletionDetail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.name}}</router-link>
+					<router-link :to="{name:'colletionDetail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.demandName}}</router-link>
 					<span @click="cancelCollect(item.demandbasicinfo.pkid)">取消收藏</span>
 				</h3>
 				<p>创建时间：{{item.demandbasicinfo.creTime}}</p>

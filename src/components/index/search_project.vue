@@ -1,11 +1,11 @@
 <template>
 	<div class="search_project">
-		<div class="search-wrap">
+		<!--<div class="search-wrap">
 			<input type="text" placeholder="请搜索项目" />
 		</div>
 		<div class="hotWordsWrap">
 			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
-		</div>
+		</div>-->
 		<div class="result-wrap">
 			<ul class="">
 				<li v-for="pro in proMsg">

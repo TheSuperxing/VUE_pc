@@ -9,7 +9,7 @@
     <ul class="notContain">
 		<li v-for="(item,index) in notice" class="clear"  v-bind:class="{read:!mesState[index],unread:mesState[index]}">
 			<span></span>
-			<p>{{item.mes[0]}}<em @click="read(item.id,item.pkid,item.urlName)">{{item.mes[1]}}</em>{{item.mes[2]}}<a>hsdhas</a></p>
+			<p>{{item.mes[0]}}<em @click="read(item.id,item.pkid,item.urlName)">{{item.mes[1]}}</em>{{item.mes[2]}}</p>
 		</li>
     </ul>
   </div>

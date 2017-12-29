@@ -114,7 +114,7 @@
               <p v-cloak>项目责任：{{item.takeOffice}}</p>
               <p v-cloak>责任描述：{{item.detailDes}}
               </p>
-              <p>查看更多>></p>
+              <router-link :to="{name:'ProjectDetail',query:{id:item.pkid}}" target="_blank">查看更多>></router-link>
             </div>
           </div>
         </div>
@@ -761,9 +761,11 @@
               padding-right:0px;
               width:820px;
             }
-            p:last-child{
+            a{
+            	float: left;
               color: $themeColor;
               cursor: pointer;
+              margin-bottom: 20px;
 
             }
           }

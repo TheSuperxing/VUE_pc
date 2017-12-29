@@ -17,7 +17,7 @@
 								<p>需求酬劳：<em>{{item.reword}}</em></p>
 							</div>
 							<div class="more">
-								<router-link :to="{name:'demandDetail',query:{id:item.demandID,watchTimes:item.watchTimes}}">
+								<router-link :to="{name:'demandDetail',query:{id:item.demandID,watchTimes:item.watchTimes}}" target="_blank">
 									查看需求详情>>
 								</router-link>
 							</div>
@@ -28,15 +28,15 @@
 			<div class="swiper-pagination swiper-pagination-personal"></div>
 			</div>  
 			<div class="search">
-				<router-link to="">更多需求等你发现>></router-link>
+				<router-link to="/trading">更多需求等你发现>></router-link>
 			</div>
   </div>
 </template>
 
 <script>
 	import Swiper from "../../assets/js/lib/swiper/swiper.js"
-  import MyAjax from "../../assets/js/MyAjax.js"
-  import Vue from "vue"
+    import MyAjax from "../../assets/js/MyAjax.js"
+    import Vue from "vue"
 	let galleryDemand
   export default {
     name: 'index_demand',

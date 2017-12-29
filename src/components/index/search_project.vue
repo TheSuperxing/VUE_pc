@@ -9,15 +9,29 @@
 		</div>
 		<div class="result-wrap">
 			<ul class="">
-				<li v-for="pro in proMsg">
-					<img :src="pro.img" />
+				<li v-for="pro in resultList">
+					<img :src="pro.pic" />
 					<div class="projectDetail">
 						<h3>{{pro.projectName}}</h3>
-						<p>国家游泳馆，又叫水立方，国家游泳中心，是北京市委市政府指定的唯一一个由港澳台侨同胞捐资建设的标志性奥运场馆。国家游泳中心位于北京市奥林匹克公园中心区的南部，规划用地6.95公顷，主体建筑紧邻城市中轴线，并与国家体育场相对于中轴线均衡布置。国家游泳中心赛时建筑面积近8万平方米，标准坐席17000个，其中永久坐席6000个，临时坐席约11000个（赛后拆除）。2008年北京奥运会期间，承担游泳、跳水、花样游泳等比赛，产生42枚金牌。</p>
-						<span></span>
+						<p>{{pro.projectDescription}}</p>
+						<router-link :to="{name:'projectDetail',query:{id:pro.pkid}}" class="more" target="_blank"></router-link>
 					</div>
 				</li>
 			</ul>
+			<div class="page" v-if="haveResult">
+			    <div class="pagelist">
+			      <span class="pre" :class="{disabled:pstart}"  @click="pageMinus"></span>
+			      <span v-show="current_page>5" class="jump" @click="jumpPage(1)">1</span>
+			      <span class="ellipsis"  v-show="efont">...</span>
+			      <span class="jump" v-for="num in indexs" :class="{bgprimary:current_page==num}" @click="jumpPage(num)">{{num}}</span>
+			      <span class="ellipsis"  v-show="ebehind">...</span>
+			      <span v-show="current_page<pages-4" class="jump" @click="jumpPage(pages)">{{pages}}</span>
+			      <!--<span class="jumppoint">跳转到：</span>-->
+			      <span class="jumpinp"><input type="text" v-model="changePage"><em @click="jumpPage(changePage)"></em></span>
+			     <!-- <span class="gobtn" >GO</span>-->
+			      <span :class="{disabled:pend}" class="next" @click="pagePlus"></span>
+			    </div>
+			</div>
 			<div class="stateNone">
 				在月球也没找到~
 			</div>
@@ -36,6 +50,8 @@
 </template>
 
 <script>
+	import MyAjax from "../../assets/js/MyAjax.js"
+	import Vue from "vue"
 	export default{
 		name:"SearchProject",
 		data:function(){
@@ -50,14 +66,19 @@
 	        		},{
 	        			"img":require("../../assets/img/images/12.jpg"),
 	        			"projectName":"上海中心",
+	        		},{
+	        			"img":require("../../assets/img/images/12.jpg"),
+	        			"projectName":"上海中心",
 	        		},
+	        		
 			    ],
 			    searchText:"",
 			    hotWords:["李彦宏","马化腾","马云","优秀"],
 			    resultList:[],
 			    current_page: 1, //当前页
-		        pages: "5", //总页数
-		        changePage:'1',//跳转页
+	        pages: "", //总页数
+	        changePage:'1',//跳转页
+	        haveResult:false,
 			}
 		},
 		computed: {
@@ -84,7 +105,7 @@
     			var left = 1,
     				right = this.pages,
     				ar = [];
-    			if(this.pages >= 7) {
+    			if(this.pages > 7) {
     				if(this.current_page > 5 && this.current_page < this.pages - 4) {
     					left = Number(this.current_page) - 3;
     					right = Number(this.current_page) + 3;
@@ -106,29 +127,45 @@
     			return ar;
     		},
     	},
+    	created(){
+    		console.log(this.$route.query)
+//  		Vue.set(this,"searchText",this.$route.query.kw)
+//  		if(this.$route.query.kw=="all"){
+//  			Vue.set(this,"searchText","")
+//  		}else{
+//  			Vue.set(this,"searchText",this.$route.query.kw)
+//  		}
+    		this.search(this.current_page);
+    	},
 		methods:{
-			jumpPage(num){
+			jumpPage(current_page){
     			
     			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
     			var that = this;
     			if(that.searchText.trim().length!=0){
-    				var url = MyAjax.urlsy+"/ediHomePage/searchPersonByKeyWords/"+ current_page +"/"+that.searchText
-					MyAjax.ajax({
-						type: "GET",
-						url:url,
-						dataType:"json",
-						async: false,
-	//					contentType:"application/json;charset=utf-8",
-					}, function(data){
-						console.log(data)
-						if(data.code==0){
-							that.resultList = data.msg.records
-							that.pages = data.msg.pages
-						}
-					},function(err){
-	//					router.push("/error/404")
-						console.log(err)
-					})
+    				var url = MyAjax.urlsy+"/ediHomePage/searchProjsByKeyWords/"+ current_page +"/"+that.searchText
+						MyAjax.ajax({
+							type: "GET",
+							url:url,
+							dataType:"json",
+							async: false,
+		//					contentType:"application/json;charset=utf-8",
+						}, function(data){
+							console.log(data)
+							if(data.code==0){
+								Vue.set(that,"resultList",data.msg.records)
+								Vue.set(that,"pages",data.msg.pages)
+								Vue.set(that,"current_page",data.msg.current)
+								if(that.resultList.length!=0){
+									that.haveResult = true;
+								}else{
+									that.haveResult = false;
+								}
+							}
+						},function(err){
+		//					router.push("/error/404")
+							console.log(err)
+						})
     			}else{
     				that.search(current_page)
     			}
@@ -143,14 +180,14 @@
     			this.current_page--;
 //  			return this.current_page;
     		},
-			choseHot(index){
+				choseHot(index){
     			this.searchText = this.hotWords[index]
     		},
     		search(current_page){
-    			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
+//  			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
     			
     			var that =this ;
-    			var url = MyAjax.urlsy + "/ediHomePage/searchPerson/"+ current_page ;
+    			var url = MyAjax.urlsy + "/ediHomePage/searchProjs/"+ current_page ;
     			MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -159,8 +196,15 @@
 				},function(data){
 					console.log(data)
 					if(data.code==0){
-						that.resultList = data.msg.records
-						that.pages = data.msg.pages
+						Vue.set(that,"resultList",data.msg.records)
+						Vue.set(that,"pages",data.msg.pages)
+						Vue.set(that,"current_page",data.msg.current)
+						
+						if(that.resultList.length!=0){
+								that.haveResult = true;
+							}else{
+								that.haveResult = false;
+							}
 					}
 				},function(err){
 					console.log(err)
@@ -178,6 +222,13 @@
 		      	} 
 		
 			},
+		},
+		watch:{
+			current_page:function(){
+	//				location.hash=location.hash.split("=")[0]+"="+this.current_page
+				this.jumpPage(this.current_page);
+				
+			}
 		}
 	}
 </script>
@@ -222,6 +273,7 @@ $themeColor:#ff7403;
         }
 		.result-wrap{
 			min-height: 300px;
+			margin-top: 30px;
 			.stateNone{
 				width: 100%;
 				min-height: 200px;
@@ -275,6 +327,7 @@ $themeColor:#ff7403;
 							font-size: 14px;
 							color: #FFFFFF;
 							line-height: 24px;
+							min-height: 180px;
 							overflow : hidden;
 							text-overflow: ellipsis;
 							display: -webkit-box;
@@ -283,7 +336,7 @@ $themeColor:#ff7403;
 							margin-bottom: 5px;
 							margin-top: 20px;
 						}
-						span{
+						.more{
 							float:right;
 							width: 102px;
 							height: 34px;
@@ -303,6 +356,122 @@ $themeColor:#ff7403;
 					}
 				}
 			}
+			.page {
+					/*min-width: 900px;*/
+					text-align: center;
+					color: #888888;
+					
+					 /*transform:translateX(-50%);
+					 -webkit-transform:translateX(-50%);
+					-moz-transform:translateX(-50%);
+					-ms-transform:translateX(-50%);
+					-o-transform:translateX(-50%);*/
+					 display: table;
+		   			 margin: 30px auto 80px;
+					
+					.pagelist {
+						font-size: 0;
+						height: 34px;
+						/*line-height: 50px;*/
+						span {
+							font-size: 14px;
+							float: left;
+							width: 28px;
+							height: 28px;
+							line-height: 28px;
+							margin-right: 14px;
+							
+						}
+						.jump {
+							border: 1px solid $themeColor;
+							width: 28px;
+							height: 28px;
+							line-height: 26px;
+							text-align: center;
+							-webkit-border-radius: 14px;
+							-moz-border-radius: 14px;
+							border-radius: 14px;
+							cursor: pointer;
+							margin-top: 3px;
+							
+							
+						}
+						.pre,.next{
+							width: 34px;
+							height: 34px;
+							border: none;
+							-webkit-border-radius: 17px;
+							-moz-border-radius: 17px;
+							border-radius: 17px;
+							background: url(../../assets/img/header/2525.png) no-repeat;
+						}
+						.pre{
+							margin-right: 50px;
+							transform: rotateY(180deg);
+							-webkit-transform: rotateY(180deg);    /* for Chrome || Safari */
+		           			-moz-transform: rotateY(180deg);       /* for Firefox */
+		           			-ms-transform: rotateY(180deg);        /* for IE */
+			                -o-transform: rotateY(180deg);         /* for Opera */
+						}
+						.next{
+							margin-left: 50px;
+						}
+						.bgprimary {
+							cursor: default;
+							line-height: 23px;
+							/*color: #fff;*/
+							/*background: #337ab7;*/
+							border: 3px solid $themeColor;
+							
+						}
+						.jumpinp{
+							margin-top: 3px;
+							height:28px;
+							width: 79px;
+							border: 1px solid $themeColor;
+							
+							-webkit-border-radius: 14px;
+							-moz-border-radius: 14px;
+							border-radius: 14px;
+							padding-left: 10px;
+							/*background: url(../../assets/img/demand/icon010.png) no-repeat center;*/
+							overflow: hidden;
+							input{
+								width: 40px;
+								height: 24px;
+								font-size: 13px;
+								text-align: center;
+								margin-top: 2px;
+								float: left;
+								background: none;
+							}
+							em{
+								width: 24px;
+								height: 24px;
+								float: right;
+								margin-top: 1px;
+								margin-right: 2px;
+								background: url(../../assets/img/demand/icon001.png) no-repeat right center;
+							}
+						}
+						
+						
+						.ellipsis {
+							padding: 0px 8px;
+						}
+						
+						.jumppoint {
+							margin-left: 30px;
+						}
+						.gobtn {
+							font-size: 12px;
+						}
+						.disabled {
+							pointer-events: none;
+							background: #FFFFFF;
+						}
+					}
+				}
 		}
 		.hot-list{
 			width: 1200px;

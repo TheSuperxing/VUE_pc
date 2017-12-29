@@ -1,8 +1,8 @@
 <template>
 	<div class="overview">
 		<div class="header-wrap">
-			<img src="../../assets/img/company/icon_staff.png" />
-			<span class="userName">{{personalMessage.baseInfo.petName}}</span>
+			<img :src="personalMessage.personalbasicinfo.pic" />
+			<span class="userName">{{personalMessage.personalbasicinfo.nickName}}</span>
 		</div>
 		<div class="info-content">
 			<div class="workExpInfo">
@@ -11,7 +11,7 @@
 				</h3>
 				<ul class="info-wrap">
 					<li class="stateNone" v-if="stateNone.workExperience">暂无信息</li>
-					<li v-for="item in personalMessage.workExperience">
+					<li v-for="item in personalMessage.psnWorkExperiences">
 						<h5 class="">{{item.companyName}}</h5>
 						<div class="t-p-wrap">
 							<span>{{item.info.timeStart}}——{{item.info.timeEnd}}</span>
@@ -19,7 +19,7 @@
 						</div>
 						<div class="introduce">{{item.info.introduce}}</div>
 					</li>
-				</ul>
+				</ul> 
 			</div>
 			<div class="proInfo">
 				<h3 class="info-title">
@@ -27,7 +27,7 @@
 				</h3>
 				<ul class="info-wrap">
 					<li class="stateNone" v-if="stateNone.projectExperience">暂无信息</li>
-					<li v-for="item in personalMessage.projectExperience">
+					<li v-for="item in personalMessage.psnProjExpes">
 						<h5 class="">{{item.projectName}}</h5>
 						<div class="t-p-wrap">
 							<span>{{item.info.timeStart}}——{{item.info.timeEnd}}</span>
@@ -43,8 +43,8 @@
 					<span>团队经历</span>
 				</h3>
 				<ul class="info-wrap">
-					<li class="stateNone" v-if="stateNone.teamExperience">暂无信息</li>
-					<li v-for="item in personalMessage.teamExperience">
+					<p class="stateNone" v-if="stateNone.teamExperience">暂无信息</p>
+					<li v-for="item in personalMessage.teamOrgaInfos">
 						<h5 class="">{{item.teamName}}</h5>
 						
 					</li>
@@ -56,7 +56,7 @@
 				</h3>
 				<ul class="info-wrap">
 					<li class="stateNone" v-if="stateNone.certificate">暂无信息</li>
-					<li v-for="item in personalMessage.certificate">
+					<li v-for="item in personalMessage.psnQualifications">
 						<h5 class="">{{item.certificateName}}</h5>
 						<div class="introduce">{{item.info.profession}}</div>
 						<div class="t-p-wrap">{{item.info.introduce}}</div>
@@ -69,7 +69,16 @@
 				</h3>
 				<ul class="info-wrap">
 					<li class="stateNone" v-if="stateNone.demandInfo">暂无信息</li>
-					
+					<li v-for="item in personalMessage.demandbasicinfos">
+						<h5>
+							<router-link :to="{name:'DemandDetail',query:{id:item.demandbasicinfo.pkid}}" target="_blank">
+								{{item.demandbasicinfo.demandName}}
+							</router-link>
+							
+						</h5>
+						<!--<div class="introduce">{{item.demandbasicinfo.describe}}</div>
+						<div class="t-p-wrap">{{item.demandbasicinfo.reword}}</div>-->
+					</li>
 				</ul>
 			</div>
 			<div class="dealInfo">
@@ -78,7 +87,11 @@
 				</h3>
 				<ul class="info-wrap">
 					<li class="stateNone" v-if="stateNone.dealInfo">暂无信息</li>
-					
+					<li v-for="item in personalMessage.dealbasicinfos">
+						<h5>{{item.dealName}}</h5>
+						<!--<div class="introduce">{{item.demandbasicinfo.describe}}</div>
+						<div class="t-p-wrap">{{item.demandbasicinfo.reword}}</div>-->
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -88,41 +101,66 @@
 <script>
 	import Vue from "vue"
 	import {mapState} from "vuex"
-//	import Myajax from "../../assets/js/Myajax.js"
+	import MyAjax from "../../assets/js/MyAjax.js"
 	export default{
 		name:"overview",
 		data:function(){
 			return{
 				overviewInfo:"",
-				stateNone:{workExperience:false,projectExperience:false,teamExperience:false,certificate:false,demandInfo:true,dealInfo:true},
-//				personalMessage:"",
+				stateNone:{workExperience:false,projectExperience:false,teamExperience:false,certificate:false,demandInfo:false,dealInfo:false},
+				personalMessage:"",
 			}
 		},
-		computed:mapState({
-		  personalMessage:state=>state.personal.personalMessage,
-		  /*获取数据*/
-		}),
+//		computed:mapState({
+//		  personalMessage:state=>state.personal.personalMessage,
+//		  /*获取数据*/
+//		}),
+		created(){
+			this.getData()
+		},
 		mounted(){
-			if(this.personalMessage.workExperience.length==0){
+			if(this.personalMessage.psnWorkExperiences.length==0){
 				this.stateNone.workExperience=true;
 			}
-			if(this.personalMessage.projectExperience.length==0){
+			if(this.personalMessage.psnProjExpes.length==0){
 				this.stateNone.projectExperience=true;
 			}
-			if(this.personalMessage.teamExperience.length==0){
-				this.stateNone.projectExperience=true;
+			if(this.personalMessage.teamOrgaInfos.length==0){
+				this.stateNone.teamExperience=true;
 			}
-			if(this.personalMessage.certificate.length==0){
-				this.stateNone.projectExperience=true;
+			if(this.personalMessage.psnQualifications.length==0){
+				this.stateNone.certificate=true;
 			}
-//			if(this.personalMessage.teamExperience.length==0){
-//				this.stateNone.projectExperience=true;
-//			}
-//			if(this.personalMessage.teamExperience.length==0){
-//				this.stateNone.projectExperience=true;
-//			}
+			if(this.personalMessage.demandbasicinfos.length==0){
+				this.stateNone.demandInfo=true;
+			}
+			if(this.personalMessage.dealbasicinfos.length==0){
+				this.stateNone.dealInfo=true;
+			}
 			//console.log(this.stateNone)
+	},
+	methods:{
+		getData(){
+			console.log(this.$route.query.id)
+				var that = this;
+				var url = MyAjax.urlhw+"/ediHomePage/personDetail/" + that.$route.query.id
+		    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						console.log(data.msg)
+						Vue.set(that,"personalMessage",data.msg)
+					}
+					console.log(that.personalMessage)
+				},function(err){
+					console.log(err)
+				})
 		}
+	}
 		
 	}
 </script>
@@ -140,7 +178,9 @@
 		border-bottom:1px solid #E0E0E0;
 		
 		img{
+			width: 150px; height: 150px;
 			margin-right: 20px;
+			border-radius: 50%;
 		}
 		.userName{
 			font-size: 24px;
@@ -215,7 +255,7 @@
 			
 			.info-wrap{
 				padding: 20px;
-				li{
+				>li{
 					height: 50px;
 					line-height: 50px;
 					text-align: left;
@@ -223,6 +263,29 @@
 					font-size: 18px;
 					&:last-child{
 						border: none;
+					}
+				}
+			}
+		}
+		.demandInfo,.dealInfo{
+			.info-wrap{
+				padding: 20px;
+				>li{
+					height: 50px;
+					line-height: 50px;
+					text-align: left;
+					border-bottom:1px dotted #E0E0E0 ;
+					font-size: 18px;
+					&:last-child{
+						border: none;
+					}
+					h5{
+						a{
+							color: #333333;
+						}
+						a:hover{
+							color: #FF7403;
+						}
 					}
 				}
 			}

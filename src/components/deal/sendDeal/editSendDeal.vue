@@ -24,7 +24,7 @@
       <div class="alert">
         <button class="close" v-on:click="closeAlert(3)"></button>
         <ul class="protocolMemberType clear">
-          <li class="clear" v-for="(item,index) in protocolMemberType" :class="{active:reveal.agreementMembers.active[index]}" @click="protocolMemberTypeTog(index)" v-cloak>{{item}}</li>
+          <li v-for="(item,index) in protocolMemberType" :class="{active:reveal.agreementMembers.active[index]}" @click="protocolMemberTypeTog(index)" v-cloak>{{item}}</li>
         </ul>
         <ul class="typeContainer clear">
           <li class="clear" v-if="reveal.agreementMembers.active[0]">
@@ -32,16 +32,19 @@
               <li class="clear">
                 <h4>个人用户手机号</h4>
                 <div class="search">
-                  <input v-model="searchValue[0]" type="text" placeholder="请输入员工手机号">
+                  <div>
+                    <input v-model="searchValue[0]" type="text" placeholder="请输入员工手机号">
+                  </div>
                   <button @click="selectAgreementMember(0)">
                     <p>搜索</p>
                   </button>
                 </div>
               </li>
               <li class="clear" v-if="reveal.agreementMembers.option[0]">
-                <h4>搜索结果</h4>
+                <h5>搜索结果</h5>
                 <div class="selectMember">
-                  <p v-for="(item,index) in reveal.agreementMembers.selectMembers" @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item.psnName}}</p>
+                  <div v-if="reveal.agreementMembers.selectMembers.length==0">没有找到对应用户</div>
+                  <p v-if="reveal.agreementMembers.selectMembers" v-for="(item,index) in reveal.agreementMembers.selectMembers" @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item.psnName}}</p>
                 </div>
               </li>
               <li class="clear" v-if="reveal.agreementMembers.option[0]">
@@ -55,16 +58,17 @@
               <li class="clear">
                 <h4>团队名称</h4>
                 <div class="search">
-                  <input  type="text" placeholder="请输团队名称">
+                  <div><input  type="text" placeholder="请输团队名称"></div>
                   <button @click="selectAgreementMember(1)">
                     <p>搜索</p>
                   </button>
                 </div>
               </li>
-              <li class="clear" v-if="reveal.agreementMembers.option[1]">
-                <h4>搜索结果</h4>
+              <li  class="clear" v-if="reveal.agreementMembers.option[1]">
+                <h5>搜索结果</h5>
                 <div class="selectMember">
-                  <p v-for="(item,index) in reveal.agreementMembers.selectMembers" @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item}}</p>
+                  <div v-if="reveal.agreementMembers.selectMembers.length==0">没有找到对应用户</div>
+                  <p v-if="reveal.agreementMembers.selectMembers" v-for="(item,index) in reveal.agreementMembers.selectMembers" @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item}}</p>
                 </div>
               </li>
               <li class="clear" v-if="reveal.agreementMembers.option[1]">
@@ -77,17 +81,18 @@
             <ul class="clear" :class="reveal.agreementMembers.searchResults[2] ? 'searchMember' : 'beforeSearchMember'">
               <li class="clear">
                 <h4>公司名称</h4>
-                <div class="search">
-                  <input  type="text" placeholder="请输公司名称">
+                <div class="search clear">
+                  <div><input  type="text" placeholder="请输公司名称"></div>
                   <button @click="selectAgreementMember(2)">
                     <p>搜索</p>
                   </button>
                 </div>
               </li>
               <li class="clear" v-if="reveal.agreementMembers.option[2]">
-                <h4>搜索结果</h4>
-                <div class="selectMember">
-                  <p v-for="(item,index) in reveal.agreementMembers.selectMembers"  @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item}}</p>
+                <h5>搜索结果</h5>
+                <div class="selectMember clear">
+                  <div v-if="reveal.agreementMembers.selectMembers.length==0">没有找到对应用户</div>
+                  <p v-if="reveal.agreementMembers.selectMembers" v-for="(item,index) in reveal.agreementMembers.selectMembers"  @click="selectMember(index,item)" :class="{selected:reveal.agreementMembers.classSelected[index]}" v-cloak>{{item}}</p>
                 </div>
               </li>
               <li class="clear" v-if="reveal.agreementMembers.option[2]">
@@ -174,9 +179,9 @@
                     <input v-model="item.taskName"  type="text" placeholder="请输入阶段名称">
                   </div>
                   <div>
-                    <datepicker class="datePicker" v-model="item.reqCompDateStart"></datepicker>
+                    <datepicker class="datePicker" v-model="item.reqCompDateStart" :max="maxYear"></datepicker>
                     <span>——</span>
-                    <datepicker class="datePicker" v-model="item.reqCompDateEnd" :min="item.reqCompDateStart"></datepicker>
+                    <datepicker class="datePicker" v-model="item.reqCompDateEnd" :min="item.reqCompDateStart" :max="maxYear"></datepicker>
                   </div>
                   <div>
                     <input v-model="item.taskDetail"  type="text" placeholder="请输入工作内容">
@@ -349,16 +354,14 @@
       return{
         protocolMemberType:["搜索个人","搜索团队","搜索公司"],//添加甲(乙)方的弹框，成员分类搜索
         searchValue:["","",""],
+        maxYear:(new Date().getFullYear()+10)+'.'+(new Date().getMonth()+1)+'.'+new Date().getDate(),
         reveal:{
           distinguish:Boolean,//区分保存按钮是保存甲方还是乙方选项
           agreementMembers:{//协议甲方和协议乙方的搜索弹框
             searchResults:[false,false,false],//有搜索结果和没有搜索结果的条件下，第一项距离顶部的距离
             active:[true,false,false],//搜索个人，搜索团队，搜索公司选中状态下的不同样式
             option:[false,false,false],//搜索结果是否显示
-            selectMembers:[{
-              psnName:"",
-              accountID:""
-            }],//搜索结果展示
+            selectMembers:[],//搜索结果展示
             selectedMember:{
               text:"",
               id:""
@@ -427,6 +430,7 @@
         newFileId:that.localDealInfo.newFileId,
         accessory:that.accessory
       })
+      //文件上传
     },
     beforeUpdate(){
       if(this.accessory.length==0){//协议部分上传文件还是删除已有文件
@@ -488,10 +492,14 @@
 					contentType:"application/json;charset=utf-8",
 					async:false,
 				},function(data){
-					
+					that.reveal.agreementMembers.selectMembers=[];
 					if(data.code==0){
-            console.log(data.msg)
-            Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.psnName)
+           that.reveal.agreementMembers.selectMembers.push({
+              psnName:"",
+              accountID:""
+            })
+            data.msg.psnName?Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.psnName):Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.nickName)
+            //Vue.set(that.reveal.agreementMembers.selectMembers[0],"psnName",data.msg.psnName)
             Vue.set(that.reveal.agreementMembers.selectMembers[0],"accountID",data.msg.accountID)
 					}else{
             console.log("错误返回")	
@@ -525,7 +533,7 @@
             console.log(err)
           })
       },
-      
+
       dealContentUnfold(){
         Vue.set(this.reveal.dealContentUnfold,"state",!this.reveal.dealContentUnfold.state)
         if(!this.reveal.dealContentUnfold.state){
@@ -565,7 +573,9 @@
         Vue.set(this.reveal.agreementMembers.option,[index],true)
 
         Vue.set(this.reveal.agreementMembers.searchResults,[index],true)//有搜索结果和没有搜索结果的条件下，第一项距离顶部的距离
-        this.getSearchResults(this.searchValue[index]);
+        if(index==0){
+          this.getSearchResults(this.searchValue[index]);
+        }
       },
       selectMember(index,item){//单击搜索结果选项
         Vue.set(this.reveal.agreementMembers,"selectedMember",item)//把选中的结果储存起来
@@ -578,7 +588,7 @@
         /*以上是搜索结果选中状态样式控制*/
       },
       confirmFirstPartyMember(){
-       if(this.reveal.agreementMembers.selectedMember.psnName.length!=0){
+       if(this.reveal.agreementMembers.selectedMember.psnName.length!=0||this.reveal.agreementMembers.selectMembers.length==0){
           Vue.set(this.localDealInfo,"firstPartyName",this.reveal.agreementMembers.selectedMember.psnName)
           Vue.set(this.localDealInfo,"firstPartyID",this.reveal.agreementMembers.selectedMember.accountID)
 
@@ -678,12 +688,37 @@
         Vue.set(this.localDealInfo.content.accessory,"fileAddress","");
       },
       submit(){//单击提交按钮后会有弹框提示
-      if(!(this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)||(this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)){
-        alert("你不能同时为甲乙两方")
-        return;
-      }
-        var modal= new ModalOpp("#modal-overlay");
-        modal.makeText();
+        var verify = this.localDealInfo.dealName.length!=0
+                    &&this.localDealInfo.partyContent.length!=0
+                    &&this.localDealInfo.modeOfPayment.length!=0
+                    &&this.localDealInfo.cost.length!=0
+                    &&(this.localDealInfo.dealfileinfos.length!=0||this.localDealInfo.newFileId.length!=0)
+
+        var stageTask = this.localDealInfo.dealstageinfos;
+        for(let i=0;i<stageTask.length;i++){//阶段任务的每一项不能为空
+          verify=verify
+          &&stageTask[i].price.length!=0
+          &&stageTask[i].taskDetail.length!=0
+          &&stageTask[i].taskName.length!=0
+          &&stageTask[i].reqCompDateStart.length!=0
+          &&stageTask[i].reqCompDateEnd.length!=0
+        }
+        if(verify){
+          if(!(this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)||(this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)){
+            alert("请重新确定协议甲方和协议乙方")
+            return;
+          }else{
+            if((this.localDealInfo.firstPartyID||!this.localDealInfo.secondPartyID)||(!this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)){
+              var modal= new ModalOpp("#modal-overlay");
+              modal.makeText();
+            }else{
+              alert("请完善必填项")  
+            }
+          }
+          
+        }else{
+          alert("请完善必填项")
+        }
       },
       cancelEdit(){//单击取消按钮后会有弹框提示
         var modal2= new ModalOpp("#modal-overlay2");
@@ -715,27 +750,22 @@
         var modal= new ModalOpp("#modal-overlay");
         modal.closeModal();
 
-        var verify = 
-        this.localDealInfo.dealName
-        &&this.localDealInfo.partyContent
-        &&this.localDealInfo.modeOfPayment
-        &&this.localDealInfo.cost
-        &&this.localDealInfo.newFileId
+        // var verify = this.localDealInfo.dealName.length!=0
+        //             &&this.localDealInfo.partyContent.length!=0
+        //             &&this.localDealInfo.modeOfPayment.length!=0
+        //             &&this.localDealInfo.cost.length!=0
+        //             &&this.localDealInfo.newFileId.length!=0
 
-        var stageTask = this.localDealInfo.dealstageinfos;
-        for(let i=0;i<stageTask.length;i++){//阶段任务的每一项不能为空
-          verify=verify
-          &&stageTask[i].price
-          &&stageTask[i].taskDetail
-          &&stageTask[i].taskName
-          &&stageTask[i].reqCompDateStart
-          &&stageTask[i].reqCompDateEnd
-        }
-        if(verify){
-          this.setCommitReview()
-        }else{
-          alert("必填项不能为空")
-        }
+        // var stageTask = this.localDealInfo.dealstageinfos;
+        // for(let i=0;i<stageTask.length;i++){//阶段任务的每一项不能为空
+        //   verify=verify
+        //   &&stageTask[i].price.length!=0
+        //   &&stageTask[i].taskDetail.length!=0
+        //   &&stageTask[i].taskName.length!=0
+        //   &&stageTask[i].reqCompDateStart.length!=0
+        //   &&stageTask[i].reqCompDateEnd.length!=0
+        // }
+        this.setCommitReview()
       },
       confirmCancelEdit(){//看到取消提示后的确定取消
         var modal2= new ModalOpp("#modal-overlay2");

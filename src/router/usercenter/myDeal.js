@@ -10,6 +10,7 @@ import withdraw from "../../components/deal/wallet/withdraw.vue"
 import payment from "../../components/deal/wallet/payment.vue"
 import paymentPwd from "../../components/deal/wallet/paymentPwd.vue"
 import payDone from "../../components/deal/wallet/payDone.vue"
+import TradingRecord from "../../components/deal/wallet/tradingRecord.vue"
 /*以上是钱包*/
 import sendDealIndex from "../../components/deal/sendDeal/sendDealIndex.vue"
 import sendDeal from "../../components/deal/sendDeal/sendDeal.vue"
@@ -34,7 +35,7 @@ var dealRouterChildren=[
     path:"/yhzx/deal",name:"deal",component:deal,redirect:"/yhzx/deal/sendDealIndex",
     children:[
       {
-				path:"/yhzx/deal/wallet",component:Wallet,redirect:"/yhzx/deal/wallet/mywallet",
+				path:"/yhzx/deal/wallet",component:Wallet,redirect:"/yhzx/deal/wallet/tradingRecord",
 				children:[
 					{
 						path:"/yhzx/deal/wallet/mywallet",component:MyWallet,redirect:"/yhzx/deal/wallet/mywallet/index",
@@ -62,7 +63,9 @@ var dealRouterChildren=[
 						path:"/yhzx/deal/wallet/paymentPwd",component:paymentPwd,
 					},{
 						path:"/yhzx/deal/wallet/payDone",component:payDone,
-					},
+					},{
+						path:"/yhzx/deal/wallet/tradingRecord",component:TradingRecord,
+					}
 				]
 			},
       /*以上是钱包*/

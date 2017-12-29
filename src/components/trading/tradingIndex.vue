@@ -16,7 +16,7 @@
 			<ul class="result-list">
 				<li class="stateNone" v-if="!haveResult">没有查到相关需求~</li>
 				<li v-for="(item,index) in dataInfo" class="list-wrap">
-					<div><router-link :to="{name:'DemandDetail',query:{id:item.demandID,watchTimes:item.watchTimes}}">{{item.demandName}}</router-link></div>
+					<div><router-link :to="{name:'DemandDetail',query:{id:item.demandID}}">{{item.demandName}}</router-link></div>
 					<div>{{item.publishTime}}</div>
 					<div>{{item.reword}}</div>
 					<div>{{item.appTimes}}/{{item.watchTimes}}</div>

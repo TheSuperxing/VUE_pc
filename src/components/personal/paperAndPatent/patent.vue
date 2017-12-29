@@ -383,7 +383,7 @@
     methods:{
       getData(){//用于每次信息更新后从新获取数据
         var that=this;
-        var url = MyAjax.urlsy+"/psnPaperPatent/findByMySelfPatent/"+"string";
+        var url = MyAjax.urlsy+"/psnPaperPatent/findByMySelfPatent";
         MyAjax.ajax({
           type: "GET",
           url:url,
@@ -629,9 +629,9 @@
         this.localPatent[index].validityTermE=this.patent[index].validityTermE;
        
         /*如果是取消编辑，从新从Vuex中得到数据*/
-       	setTimeout(()=>(
-   				$("#"+this.fineUploaderId[index]).html("")
-     		),1)
+       	 setTimeout(()=>(
+	   			$("#"+this.fineUploaderId[index]).html("")
+	      ),1)
       },
       paperEditDel(index){//编辑状态，删除按钮
         var aa = "deleteModalClass"+index;
@@ -647,10 +647,12 @@
         MyAjax.delete(url);
         that.getData();
         that.closeModal(index);
+        $("#"+that.fineUploaderId[index]).html("");
       },
       cancleDele(index){
     		//取消删除该项目
     		this.closeModal(index);
+    		$("#"+that.fineUploaderId[index]).html("");
     	},
       addPatent(){//添加信息按钮，添加信息的视图切换
         Vue.set(this.reveal,"addPatent",false);
@@ -721,7 +723,7 @@
         Vue.set(this.newPatent,"time","");
         /*清除数据，保证下次输入时输入框为空*/
        	setTimeout(()=>(
-					$("#fine-uploader-manual-trigger-paper").html("")
+					$("#fine-uploader-manual-trigger-patent").html("")
 	    	),1)
        	this.getData()
       }

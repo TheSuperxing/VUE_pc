@@ -1,11 +1,12 @@
 <template>
 	<div class="search_project">
-		<!--<div class="search-wrap">
-			<input type="text" placeholder="请搜索项目" />
+		<div class="search-wrap" @keydown="keySearch($event)">
+			<input type="text" placeholder="请搜索项目" v-model="searchText"/>
+			<span class="searchButton" @click="jumpPage(current_page)"></span>
 		</div>
 		<div class="hotWordsWrap">
 			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
-		</div>-->
+		</div>
 		<div class="result-wrap">
 			<ul class="">
 				<li v-for="pro in proMsg">
@@ -108,19 +109,31 @@
 		methods:{
 			jumpPage(num){
     			
+    			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
     			var that = this;
-				var url = "http://datainfo.duapp.com/shopdata/getGoods.php"
-	//			MyAjax.fetchJsonp(url, function(data){
-	//				console.log(data)
-	////				data = data.replace("callback(","");
-	////				Vue.set(this,"dataInfo",data);
-	////				console.log(this.dataInfo);
-	//				
-	//			},function(err){
-	//				console.log(err)
-	//			})
-				this.current_page = num;
-//				
+    			if(that.searchText.trim().length!=0){
+    				var url = MyAjax.urlsy+"/ediHomePage/searchPersonByKeyWords/"+ current_page +"/"+that.searchText
+					MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType:"json",
+						async: false,
+	//					contentType:"application/json;charset=utf-8",
+					}, function(data){
+						console.log(data)
+						if(data.code==0){
+							that.resultList = data.msg.records
+							that.pages = data.msg.pages
+						}
+					},function(err){
+	//					router.push("/error/404")
+						console.log(err)
+					})
+    			}else{
+    				that.search(current_page)
+    			}
+    			
+				
     		},
     		pagePlus() {
     			this.current_page++;
@@ -132,7 +145,39 @@
     		},
 			choseHot(index){
     			this.searchText = this.hotWords[index]
-    		}
+    		},
+    		search(current_page){
+    			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
+    			
+    			var that =this ;
+    			var url = MyAjax.urlsy + "/ediHomePage/searchPerson/"+ current_page ;
+    			MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.resultList = data.msg.records
+						that.pages = data.msg.pages
+					}
+				},function(err){
+					console.log(err)
+				})
+    		},
+    		keySearch($event){//enter
+		      	var event = $event || window.event;  
+			 	if(event.keyCode==13){ 
+			     this.jumpPage(this.current_page);
+		         event.returnValue = false;    
+		         event.cancelBubble=true;
+		         event.preventDefault();
+		         //event.stopProgagation();
+		         return false;
+		      	} 
+		
+			},
 		}
 	}
 </script>
@@ -146,7 +191,7 @@ $themeColor:#ff7403;
 			border-radius: 25px;
 			box-shadow: 0 0 15px rgba(179,179,179,.5);
 			padding: 0 20px;
-			margin: 120px auto 0;
+			margin: 0px auto 0;
 			background: url(../../assets/img/header/1717.png) no-repeat right center;
 			background-color: #FFFFFF;
 			background-position: 650px;

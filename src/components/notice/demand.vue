@@ -7,9 +7,9 @@
         </div>
     </div>
     <ul class="notContain">
-		<li v-for="(item,index) in notice" class="clear" @click="read(item.pkid)" v-bind:class="{read:!mesState[index],unread:mesState[index]}">
+		<li v-for="(item,index) in notice" class="clear"  v-bind:class="{read:!mesState[index],unread:mesState[index]}">
 			<span></span>
-			<p>{{item.mes[0]}}<router-link :to='{name:item.urlName,query:{id:item.id}}'>{{item.mes[1]}}</router-link>{{item.mes[2]}}</p>
+			<p>{{item.mes[0]}}<em @click="read(item.id,item.pkid,item.urlName)">{{item.mes[1]}}</em>{{item.mes[2]}}<a>hsdhas</a></p>
 		</li>
     </ul>
   </div>
@@ -18,6 +18,7 @@
 <script>
 	import Vue from "vue"
 	import MyAjax from "../../assets/js/MyAjax.js"
+	import router from "../../router"
   export default {
     name: 'demand',
     data:function(){
@@ -84,12 +85,13 @@
 					console.log(err)
 				})
     	},
-    	read(id){
+    	read(id,pkid,urlName){
+    		console.log(id,pkid,urlName)
     		console.log(id)
     		var that = this;
     		var url = MyAjax.urlhw +"/businessmessageaccountrela/update";
     		var data = {
-    			id:id
+    			id:pkid
     		}
     		MyAjax.ajax({
 				type: "POST",
@@ -105,7 +107,7 @@
 			},function(err){
 				console.log(err)
 			})
-    		
+    		router.push({name:urlName,query:{id:id}})
     	}
     }
   }
@@ -157,6 +159,10 @@
                 }
                 p{
                     float: left;
+                    em{
+                    	color: #00afc7;
+                    	cursor: pointer;
+                    }
                 }
             }
             .read{

@@ -273,7 +273,7 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = MyAjax.urlsy+"/psnWorkExperience/findByMySelf/"+"string";//暂时先写成这样
+	    	var url = MyAjax.urlsy+"/psnWorkExperience/findByMySelf";//暂时先写成这样
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,

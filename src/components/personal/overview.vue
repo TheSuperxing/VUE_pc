@@ -36,7 +36,8 @@
 						<div class="introduce">{{
 							item.info.introduce
 						}}</div>
-						<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">查看更多>></router-link>
+						<router-link :to="{name:'ProjectDetail',query:{id:'1'}}" target="_blank">查看更多>></router-link>
+						<!--<div class="more" @click="lookMore">查看更多>></div>-->
 					</li>
 				</ul>
 			</div>
@@ -123,6 +124,11 @@
 //				this.stateNone.projectExperience=true;
 //			}
 			//console.log(this.stateNone)
+		},
+		methods:{
+			lookMore(){
+				window.open()
+			}
 		}
 		
 	}
@@ -203,6 +209,11 @@
 						color: #666666;
 					}
 					a{
+						display: block;
+						color: $themeColor;
+						margin-top: 20px;
+					}
+					.more{
 						display: block;
 						color: $themeColor;
 						margin-top: 20px;

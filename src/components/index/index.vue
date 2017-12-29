@@ -114,9 +114,9 @@
 	        }, {  
 	          'imgs': require('../../assets/img/header/banner1.jpg') 
 	        }, {  
-	          'imgs': require('../../assets/img/header/banner2.jpeg') 
+	          'imgs': require('../../assets/img/header/banner6.jpg') 
 	        },{  
-	          'imgs': require('../../assets/img/header/banner4.jpeg') 
+	          'imgs': require('../../assets/img/header/banner5.jpg') 
 	        },
 	      ]  
       }
@@ -202,7 +202,7 @@
  			}
  		}
  		.swiper-slide{
- 			background-size: 100%;
+ 			background-size: 100% 100%;
  		}
  		.swiper-button-next,.swiper-button-prev{
  				display: none;

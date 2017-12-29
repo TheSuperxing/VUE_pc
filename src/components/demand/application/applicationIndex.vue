@@ -53,13 +53,13 @@
         	</ul>
         	<ul v-if="tab.aa[1]">
         		<li class="stateNone" v-if="!have.value[1]">此处暂无数据</li>
-        		<li v-for="(item,$index) in invalidDemand	" v-if="have.value[1]">
+        		<li v-for="(item,$index) in invalidDemand" v-if="have.value[1]">
         			<h3 class="unvalidName">
         				<router-link :to="{name:'ApplicationDetail',query:{id:item.demandbasicinfo.pkid}}">{{item.demandbasicinfo.demandName}}</router-link>
 					<span @click="toWithdraw(item.demandappinfos[0].pkid)" v-if="item.demandappinfos[0].status==1">
 						<img src="../../../assets/img/demand/icon54.png" />
 						<img src="../../../assets/img/demand/icon55.png" />
-						撤回申请ba
+						撤回申请
 					</span>
 					<span @click="toReturn(item.demandappinfos[0].pkid)" v-if="item.demandappinfos[0].status==3">
 						<img src="../../../assets/img/demand/icon56.png" />

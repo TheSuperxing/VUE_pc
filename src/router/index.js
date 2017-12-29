@@ -10,7 +10,9 @@ import SearchProject from "../components/index/search_project.vue"
 import Trading from "../components/trading/trading.vue"
 import TradingIndex from "../components/trading/tradingIndex.vue"
 import DemandDetail from "../components/trading/demandDetail.vue"
-
+import PersonDetail from "../components/details/personDetail.vue"
+import ProjectDetail from "../components/details/projectDetail.vue"
+import demandDetail from "../components/details/demandDetail.vue"
 import Users from "../components/users.vue"
 import Register from "../components/loginandregister/register/Register.vue"
 import Login from "../components/loginandregister/login/loginIndex.vue"
@@ -83,7 +85,13 @@ export default new Router({
 		    			path:'/indexcontent/search/proj', name:'SearchProject',component:SearchProject,
 		    		},
     			]
-    		},
+    		},{
+    			path:'/indexcontent/personDetail',name:'personDetail',component:PersonDetail
+    		},{
+    			path:'/indexcontent/projectDetail',name:'projectDetail',component:ProjectDetail
+    		},{
+    			path:'/indexcontent/demandDetail',name:'demandDetail',component:demandDetail
+    		}
     		
     	]
     },{

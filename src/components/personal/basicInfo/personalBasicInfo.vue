@@ -55,13 +55,13 @@
         <li class="clear">
         	<h5>微信账号 :</h5>
         	<p>{{baseInfo.wechatAccount}}</p>
-          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[5]}" v-on:click="openOrPrivacy(6)"></strong>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[6]}" v-on:click="openOrPrivacy(6)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
         <li class="clear">
         	<h5>自我介绍 :</h5>
         	<p>{{baseInfo.selfIntroduction}}</p>
-          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[6]}" v-on:click="openOrPrivacy(7)"></strong>
+          <strong v-bind:class="{openOrPrivacy:!reveal.openOrPrivacy[7]}" v-on:click="openOrPrivacy(7)"></strong>
           <p v-if="noBaseInfo">（暂无信息）</p>
         </li>
       </ul>
@@ -903,7 +903,7 @@
         li:nth-child(7){
         	position: relative;
           h5{
-            background: url("../../../assets/img/personal/basicInfo/icon_mail.png") left center no-repeat;
+            background: url(../../../assets/img/personal/basicInfo/alipay.png) left center no-repeat;
           }
            input{
           	width: 365px;
@@ -922,7 +922,7 @@
         li:nth-child(8){
         	position: relative;
           h5{
-            background: url("../../../assets/img/personal/basicInfo/icon_mail.png") left center no-repeat;
+            background: url(../../../assets/img/personal/basicInfo/weixin.png) left center no-repeat;
           }
            input{
           	width: 385px;
@@ -932,7 +932,7 @@
         li:nth-child(9){
         	position: relative;
 	            h5{
-	            	background: url("../../../assets/img/personal/basicInfo/icon_mail.png") left center no-repeat;
+	            	background: url(../../../assets/img/personal/basicInfo/selfintro.png) left center no-repeat;
 	            }
 	            p{
 	          	    height: 100px;

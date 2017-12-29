@@ -34,6 +34,10 @@ var MyAjax = {
 		$.ajax({
 			type: "GET",
 			url: url, 
+			beforeSend:function(request){
+				request.setRequestHeader("token",cookieTool.getCookie("token"));
+//				request.withCredentials = true;
+			},
 			async: false, // 使用同步方式  
 			success: function(data) {	
 				console.log("ok")

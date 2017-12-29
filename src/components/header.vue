@@ -21,7 +21,7 @@
       </ul>
     </div>-->
 
-    <div class="headerNavBg" v-if="user.userState==1">
+    <!--<div class="headerNavBg" v-if="user.userState==1">
       <div class="headerNav">
         <h1>LOGO</h1>
         <ul class="navlist" v-bind:class="{'comStyle':user.userState==1}">
@@ -54,7 +54,7 @@
         	</li>
         </ul>
       </div>
-    </div>
+    </div>-->
 
     <!--个人状态的导航-->
     <div class="headerNavBg"  v-if="user.userState==0">
@@ -183,13 +183,13 @@
 					router.push("/login")
 				}
 				switch (this.user.userState){
-					case '0':
+					case '1':
 						router.push("/yhzx/company/overview")
 						break;
-					case '1':
+					case '2':
 						router.push("/yhzx/team/overview")
 						break;
-					case '2':
+					case '0':
 						router.push("/yhzx/personal/overview")
 						break;
 					default:

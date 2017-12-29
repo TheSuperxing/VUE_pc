@@ -364,7 +364,7 @@
     methods:{
       getData(){//用于每次信息更新后从新获取数据
         var that=this;
-        var url = MyAjax.urlsy+"/psnAwards/findByMySelf/"+"string";
+        var url = MyAjax.urlsy+"/psnAwards/findByMySelf";
             MyAjax.ajax({
               type: "GET",
               url:url,

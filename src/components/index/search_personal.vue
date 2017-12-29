@@ -1,14 +1,14 @@
 <template>
 	<div class="search_personal">
-		<!--<div class="search-wrap">
-			<input type="text" placeholder="请搜索个人" v-model="searchText"/>
-			<span class="searchButton" @click="search"></span>
-		</div>-->
-		<!--<div class="hotWordsWrap">
+		<div class="search-wrap" @keydown="keySearch($event)">
+			<input type="text" placeholder="搜索个人" v-model="searchText"/>
+			<span class="searchButton" @click="jumpPage(current_page)"></span>
+		</div>
+		<div class="hotWordsWrap">
 			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
-		</div>-->
+		</div>
 		<div class="result-wrap">
-			<div class="stateNone">
+			<div class="stateNone" v-if="!haveResult">
 				在月球也没找到~
 			</div>
 			<div class="list-wrap">
@@ -28,7 +28,7 @@
 						</dl>
 					</li>
 				</ul>
-				<div class="page">
+				<div class="page" v-if="haveResult">
 				    <div class="pagelist">
 				      <span class="pre" :class="{disabled:pstart}"  @click="pageMinus"></span>
 				      <span v-show="current_page>5" class="jump" @click="jumpPage(1)">1</span>
@@ -72,6 +72,7 @@
 
 <script>
 	import MyAjax from "../../assets/js/MyAjax.js"
+	import Vue from "vue"
 	export default{
 		name:"SearchPersonal",
 		data:function(){
@@ -79,17 +80,17 @@
 				perMsg:[
 			    	[
 			    		{
-			    			"img":require("../../assets/img/header/图层97.png"),
+			    			"img":require("../../assets/img/header/avator.png"),
 			    		},{
-			    			"img":require("../../assets/img/header/图层97.png"),
+			    			"img":require("../../assets/img/header/avator.png"),
 			    		},{
-			    			"img":require("../../assets/img/header/图层97.png"),
+			    			"img":require("../../assets/img/header/avator.png"),
 			    		},{
-			    			"img":require("../../assets/img/header/图层97.png"),
+			    			"img":require("../../assets/img/header/avator.png"),
 			    		},{
-			    			"img":require("../../assets/img/header/图层97.png"),
+			    			"img":require("../../assets/img/header/avator.png"),
 			    		},{
-			    			"img":require("../../assets/img/header/图层97.png"),
+			    			"img":require("../../assets/img/header/avator.png"),
 			    		},
 			    	],
 			    	
@@ -100,7 +101,7 @@
 			    current_page: 1, //当前页
 		        pages: "5", //总页数
 		        changePage:'1',//跳转页
-		        
+		        haveResult:false,
 			    
 			}
 		},
@@ -152,23 +153,50 @@
     	},
     	created(){
     		console.log(this.$route.query)
+//  		Vue.set(this,"searchText",this.$route.query.kw)
+//  		if(this.$route.query.kw=="all"){
+//  			Vue.set(this,"searchText","")
+//  		}else{
+//  			Vue.set(this,"searchText",this.$route.query.kw)
+//  		}
+    		this.search(this.current_page);
     	},
 		methods:{
-			jumpPage(num){
-    			
+			jumpPage(current_page){
+    			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
     			var that = this;
-				var url = "http://datainfo.duapp.com/shopdata/getGoods.php"
-	//			MyAjax.fetchJsonp(url, function(data){
-	//				console.log(data)
-	////				data = data.replace("callback(","");
-	////				Vue.set(this,"dataInfo",data);
-	////				console.log(this.dataInfo);
-	//				
-	//			},function(err){
-	//				console.log(err)
-	//			})
-				this.current_page = num;
-//				
+    			if(that.searchText.trim().length!=0){
+    				var url = MyAjax.urlsy+"/ediHomePage/searchPersonByKeyWords/"+ current_page +"/"+that.searchText
+					MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType:"json",
+						async: false,
+	//					contentType:"application/json;charset=utf-8",
+					}, function(data){
+						console.log(data)
+						if(data.code==0){
+							that.resultList = data.msg.records;
+							if(that.resultList.length!=0){
+								that.haveResult = true;
+							}else{
+								that.haveResult = false;
+							}
+							that.pages = data.msg.pages
+						}else{
+							that.haveResult = false;
+						}
+						console.log(that.haveResult)
+					},function(err){
+	//					router.push("/error/404")
+						console.log(err)
+					})
+    			}else{
+    				that.search(current_page)
+    			}
+    			
+				
+				
     		},
     		pagePlus() {
     			this.current_page++;
@@ -181,9 +209,11 @@
     		choseHot(index){
     			this.searchText = this.hotWords[index]
     		},
-    		search(){
+    		search(current_page){
+    			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
+    			
     			var that =this ;
-    			var url = MyAjax.urlsy + "/ediHomePage/searchPerson/" + that.searchText ;
+    			var url = MyAjax.urlsy + "/ediHomePage/searchPerson/"+ current_page ;
     			MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -192,17 +222,40 @@
 				},function(data){
 					console.log(data)
 					if(data.code==0){
-						that.resultList = data.msg
+						that.resultList = data.msg.records
+						that.pages = data.msg.pages
+						if(that.resultList.length!=0){
+							that.haveResult = true;
+						}else{
+							that.haveResult = false;
+						}
+					}else{
+						that.haveResult = false;
 					}
 				},function(err){
 					console.log(err)
 				})
-    		}
+    		},
+    		keySearch($event){//enter
+		      	var event = $event || window.event;  
+			 	if(event.keyCode==13){ 
+			     this.jumpPage(this.current_page);
+		         event.returnValue = false;    
+		         event.cancelBubble=true;
+		         event.preventDefault();
+		         //event.stopProgagation();
+		         return false;
+		      	} 
+		
+			},
 		},
 		watch:{
 			current_page:function(){
 				this.jumpPage(this.current_page);
-			}
+			},
+//			$route.query.kw:function(){
+//				console.log(this.$route.query)
+//			}
 		}
 	}
 </script>
@@ -252,7 +305,7 @@
     		}
         }
 		.result-wrap{
-			min-height: 300px;
+			min-height: 200px;
 			.stateNone{
 				width: 100%;
 				min-height: 200px;
@@ -261,7 +314,6 @@
 				font-size: 16px;
 				color: #808080;
 				background: url(../../assets/img/header/图层109.png) no-repeat center;
-				display: none;
 			}
 			.list-wrap{
 				width: 1200px;
@@ -270,9 +322,10 @@
 					&::after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
 					>li{
 						float: left;
-						background:#FFFFFF;
+						background:#f7f7f7;
 						margin-right: 20px;
 						margin-bottom: 20px;
+						border-radius: 10px;
 						&:nth-child(4n){
 							margin-right: 0;
 						}
@@ -280,6 +333,7 @@
 							width: 285px;
 							height: 140px;
 							padding: 15px 20px;
+							
 							dd{
 								float: left;
 								width: 80px;
@@ -299,7 +353,7 @@
 								h6{
 									font-size: 16px;
 									color: #FF7403;
-									height: 30px;
+									min-height: 30px;
 									line-height: 24px;
 								}
 								.comName{
@@ -307,12 +361,22 @@
 									color: #333333;
 									line-height: 20px;
 									flex-wrap: wrap;
+									overflow : hidden;
+									text-overflow: ellipsis;
+									display: -webkit-box;
+									-webkit-line-clamp: 2;
+									-webkit-box-orient: vertical;
 								}
 								
 								.ocupada{
 									font-size: 14px;
 									color: #808080;
 									line-height: 30px;
+									overflow : hidden;
+									text-overflow: ellipsis;
+									display: -webkit-box;
+									-webkit-line-clamp:1;
+									-webkit-box-orient: vertical;
 								}
 							}
 						}
@@ -463,7 +527,7 @@
 					height: 200px;
 					margin-right: 20px;
 					margin-bottom: 20px;
-					background: #ffffff;
+					background: #F7F7F7;
 					border-radius: 5px;
 					padding: 24px 10px;
 					overflow: hidden;
@@ -499,6 +563,11 @@
 						text-align: center;
 						border-radius:50% ;
 						overflow: hidden;
+						img{
+							width: 60px;
+							height: 60px;
+							border-radius: 50%;
+						}
 					}
 					dt{
 						h3{
@@ -531,7 +600,7 @@
 						height: 73px;
 						line-height: 73px;
 						text-align: center;
-						background: #F7F7F7;
+						background: #FFFFFF;
 
 					}
 					
@@ -543,7 +612,7 @@
 				text-align: center;
 				font-size: 14px;
 				color: $themeColor;
-				margin-bottom: 50px;
+				padding-bottom: 50px;
 			}
 		}
 	}

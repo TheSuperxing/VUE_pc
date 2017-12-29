@@ -447,7 +447,7 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = MyAjax.urlsy+"/psnQualification/findByMySelf/"+"string";
+	    	var url = MyAjax.urlsy+"/psnQualification/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,

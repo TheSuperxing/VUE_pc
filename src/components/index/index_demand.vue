@@ -7,17 +7,17 @@
 				<ul v-for="ul in perMsg" class="swiper-slide swiper-slide-next">
 					<li v-for="item in ul">
 							<div class="name-wrap">
-								<img :src="item.img" alt=""/>
+								<img :src="item.pic" alt=""/>
 								<em>用户15653245463</em>
 							</div>
 							<div class="detail-wrap">
-								<h3>我有一个需求建造一幢大楼然后炸掉再建一幢再炸掉再建一幢再炸掉再建一幢再炸掉</h3>
-								<p>发布时间：<em>2017.12.06</em></p>
-								<p>需求对象：<em>团队</em></p>
-								<p>需求酬劳：<em>150W-200W</em></p>
+								<h3>{{item.demandName}}</h3>
+								<p>发布时间：<em>{{item.creTime}}</em></p>
+								<p class="deamandObj">需求对象：<em v-for="obj in item.demandobjs">{{obj}}<i>、</i></em></p>
+								<p>需求酬劳：<em>{{item.reword}}</em></p>
 							</div>
 							<div class="more">
-								<router-link :to="{name:'DemandDetail',query:{id:item.demandID,watchTimes:item.watchTimes}}">
+								<router-link :to="{name:'demandDetail',query:{id:item.demandID,watchTimes:item.watchTimes}}">
 									查看需求详情>>
 								</router-link>
 							</div>
@@ -36,122 +36,13 @@
 <script>
 	import Swiper from "../../assets/js/lib/swiper/swiper.js"
   import MyAjax from "../../assets/js/MyAjax.js"
+  import Vue from "vue"
 	let galleryDemand
   export default {
     name: 'index_demand',
     data:function(){
       return {
-        perMsg:[
-        	[
-        		{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},
-        		
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},
-        	],
-        ]
+        perMsg:[],
         
       }
     },
@@ -162,6 +53,7 @@
     },
     methods:{
     	getData(){
+    		var that = this;
     		var url = MyAjax.urlsy + "/ediHomePage/findDemands";
     		MyAjax.ajax({
 					type: "GET",
@@ -171,10 +63,33 @@
 				},function(data){
 					console.log(data)
 					//给获取的数据分组
-//					for(var i=0,len=data.msg.length;i<len;i+=3){
-//					   that.perMsg.push(data.msg.slice(i,i+3));
-//					}
-//					console.log(that.perMsg)
+					that.perMsg = [];
+					for(var i=0,len=data.msg.records.length;i<len;i+=12){
+					   that.perMsg.push(data.msg.records.slice(i,i+12));
+					}
+					console.log(that.perMsg.length)
+					for(let i=0;i<that.perMsg.length;i++){
+						for(let k=0;k<that.perMsg[i].length;k++){
+							that.perMsg[i][k].demandobjs= that.perMsg[i][k].demandObjCode.split(",")
+							for(let j=0;j<that.perMsg[i][k].demandobjs.length;j++){
+								switch (that.perMsg[i][k].demandobjs[j]){
+									case "1001":
+										Vue.set(that.perMsg[i][k].demandobjs,[j],"个人")
+										break;
+									case "1002":
+										Vue.set(that.perMsg[i][k].demandobjs,[j],"公司")
+										break;
+									case "1003":
+										Vue.set(that.perMsg[i][k].demandobjs,[j],"团队")
+										break;
+									default:
+										break;
+								}
+							}
+						}
+						
+					}
+					console.log(that.perMsg)
 				},function(err){
 					console.log(err)
 				})
@@ -304,7 +219,7 @@
 						.detail-wrap{
 							padding: 12px 15px;
 							h3{
-								height: 50px;
+								min-height: 24px;
 								line-height: 24px;
 								font-size: 16px;
 								font-weight: bold;
@@ -318,10 +233,19 @@
 							}
 							p{
 								color: #808080;
-								line-height: 18px;
+								line-height: 20px;
 								font-size: 14px;
 								
-								
+							}
+							.deamandObj{
+								em{
+									&:last-of-type{
+										margin-right:0;
+										i{
+											display: none;
+										}
+									}
+								}
 							}
 						}
 						.more{

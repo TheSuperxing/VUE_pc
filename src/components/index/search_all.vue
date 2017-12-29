@@ -7,13 +7,13 @@
 				</li>
 				
 			</ul>
-			<div v-for="(item,index) in tab" class="search-wrap" v-if="index==indexActive">
+			<!--<div v-for="(item,index) in tab" class="search-wrap" v-if="index==indexActive">
 				<input type="text" :placeholder="item.text" v-model="searchText"/>
 				<span class="searchButton" @click="search(searchText,item.rout)"></span>
 			</div>
 			<div class="hotWordsWrap">
 				<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
-			</div>
+			</div>-->
 		</div>
 		<router-view></router-view>
 	</div>
@@ -79,9 +79,14 @@
 			choseHot(index){
     			this.searchText = this.hotWords[index]
     		},
-			search(txt,rout){
-				router.push({name:rout,query:{kw:txt}})
-			}
+//			search(txt,rout){
+//				console.log(txt)
+//				if(this.searchText==""){
+//					txt = "all"
+//				}
+//				router.push({name:rout,query:{kw:txt}})
+//				console.log(999)
+//			}
 		}
 	}
 </script>

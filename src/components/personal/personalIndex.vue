@@ -25,6 +25,7 @@
 				    <input type="button" id="btnZoomIn" class="Btnsty_peyton" value="+">
 				    <input type="button" id="btnZoomOut" class="Btnsty_peyton" value="-">
 				  </div>
+				  <div class="cha" @click="croperClose"></div>
 				  <!--<div class="cropped"></div>-->
 				</div>
       </div>
@@ -321,19 +322,20 @@
 				Modal.closeModal($('.corpbox'))
 				var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
 				console.log(that.personal.personalPicture)
-				$.ajax({
+//				
+				MyAjax.ajax({
 						type: "POST",
 						url:url,
 						data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
 						dataType: "json",
-			//				content-type: "text/plain;charset=UTF-8",
-						success:function(data){
+//						contentType:"application/json;charset=utf-8",//
+						async:false,
+					}, function(data){
+						that.dataInfo = data
+						console.log(that.dataInfo)
 						console.log(data)
-			//					that.dataInfo = data
-			//					console.log(that.dataInfo)
-						},error:function(err){
-							console.log(err)
-						}
+					},function(err){
+						console.log(err)
 					})
 				
 			})
@@ -492,6 +494,7 @@
           dataType: "json",
           async:true,
         },function(data){
+        	console.log(data)
           if(data.code==0){
             that.personal.personalPicture = data.msg.pic
           }else if(data.code==-1){
@@ -526,6 +529,9 @@
     	croperShow(){
     		Modal.makeText($('.corpbox'))
     	},
+    	croperClose(){
+    		Modal.closeModal($('.corpbox'))
+    	}
     },
   }
 </script>
@@ -572,6 +578,15 @@
 				}
 				.thumbBox{
 					border-radius: 50%;
+				}
+				.cha{
+					position: absolute;
+					top: 10px; right: 10px;
+					width: 32px;
+					height: 32px;
+					background: url(../../assets/img/personal/common/guanbi-2.png) no-repeat ;
+					background-size: 100% 100%;
+					z-index: 9;
 				}
     	}
       padding-bottom:145px;

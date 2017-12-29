@@ -8,15 +8,15 @@
 					<li v-for="item in ul">
 						<dl>
 							<dd>
-								<img :src="item.img" alt=""/>
+								<img :src="item.pic" alt=""/>
 							</dd>
 							<dt>
-								<h3>名字</h3>
-								<p>介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍</p>
+								<h3>{{item.psnName}}</h3>
+								<p>{{item.selfIntroduction}}</p>
 							</dt>
 						</dl>
 						<div class="more">
-							<router-link to="">
+							<router-link :to="{name:'personDetail',query:{id:item.pkid}}" target="_blank">
 								<img src="../../assets/img/header/more.png" />
 							</router-link>
 						</div>
@@ -34,122 +34,13 @@
 
 <script>
 	import Swiper from "../../assets/js/lib/swiper/swiper.js"
-  import MyAjax from "../../assets/js/MyAjax.js"
+    import MyAjax from "../../assets/js/MyAjax.js"
 	let gallery
   export default {
     name: 'index_personal',
     data:function(){
       return {
-        perMsg:[
-        	[
-        		{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},{
-        			"img":require("../../assets/img/header/图层97.png"),
-        		},
-        	],
-        ]
+        perMsg:[],
         
       }
     },
@@ -171,9 +62,10 @@
 				},function(data){
 					console.log(data)
 					//给获取的数据分组
-//					for(var i=0,len=data.msg.length;i<len;i+=3){
-//					   that.perMsg.push(data.msg.slice(i,i+3));
-//					}
+					that.perMsg = [];
+					for(var i=0,len=data.msg.records.length;i<len;i+=12){
+					   that.perMsg.push(data.msg.records.slice(i,i+12));
+					}
 //					console.log(that.perMsg)
 				},function(err){
 					console.log(err)
@@ -277,11 +169,16 @@
 							to {bottom:0;}
 						}
 						dd{
-							height: 61px;
+							height: 62px;
 							line-height: 60px;
 							text-align: center;
 							border-radius:50% ;
 							overflow: hidden;
+							img{
+								width: 60px;
+								height: 60px;
+								border-radius: 50%;
+							}
 						}
 						dt{
 							h3{

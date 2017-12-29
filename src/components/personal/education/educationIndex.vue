@@ -372,7 +372,7 @@
     methods:{
     	updateData(){//更新本地数据
     		var that = this;
-	    	var url = MyAjax.urlsy +"/psnEduBackGround/findByMySelf/"+"string";
+	    	var url = MyAjax.urlsy +"/psnEduBackGround/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -803,19 +803,18 @@
         }
       },
       keepEditEduNew(){//添加模式下保存
-				let condition=this.newInputValue.schoolName.length!=0
-					&&this.newInputValue.schoolTimeUp.length!=0
-					&&this.newInputValue.schoolTimeDown.length!=0;//必填项是否全部填写
+      	var that = this;
+				let condition=that.newInputValue.schoolName.length!=0
+					&&that.newInputValue.schoolTimeUp.length!=0
+					&&that.newInputValue.schoolTimeDown.length!=0;//必填项是否全部填写
 				if(condition){
 					if(that.newInputValue.schoolTimeDown=="至今"){
 						that.newInputValue.schoolTimeDown = "0000.00.00";
 					}
-          this.localEdu.push(JSON.parse(JSON.stringify(this.newInputValue)))
+          that.localEdu.push(JSON.parse(JSON.stringify(that.newInputValue)))
           /*添加的数据，追加到本地数据里一份*/
          
 					//以上是一些状态的控制
-					var that = this;
-					
 					var url = MyAjax.urlsy+"/psnEduBackGround/insert";
 					$.ajaxSetup({ contentType : 'application/json' });
 					MyAjax.ajax({
@@ -826,11 +825,11 @@
 						async: false,
 					},function(data){
 						console.log(data)
+						
 					},function(err){
 						console.log(err)
 					})
 					that.updateData();
-
 					setTimeout(function(){
 						$("#fine-uploader-manual-trigger").html("")
 					},1)
@@ -850,6 +849,7 @@
 						that.alertText.schoolTime = ""
 					}
 				}
+        Vue.set(this.editEdu,"add",false);//添加界面显示
 	    }
 
       //新建部分

@@ -235,8 +235,8 @@
           <label>
             <h5>*&nbsp;批准日期</h5>
            <!-- <input v-model="newTitleInfo.info.time" type="month" placeholder="请输入注册单位">-->
-           	<!-- <datepicker class="datePicker" v-model="newTitleInfo.assessmentTime"></datepicker> -->
-						 <year-month v-model="newTitleInfo.assessmentTime"></year-month>
+           	 <datepicker class="datePicker" v-model="newTitleInfo.assessmentTime"></datepicker> 
+						 <!--<year-month v-model="newTitleInfo.assessmentTime"></year-month>-->
             <!--<datepicker v-model="newTitleInfo.assessmentTime"></datepicker>-->
           </label>
 					<alertTip v-if="showAlert.assessmentTime" :showHide="showAlert.assessmentTime"  :alertText="alertText.assessmentTime"></alertTip>
@@ -437,7 +437,7 @@
     methods:{
     	updateData(){
     		var that = this;
-	    	var url = MyAjax.urlsy+"/psnTitleMessage/findByMySelf/"+"string";
+	    	var url = MyAjax.urlsy+"/psnTitleMessage/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,

@@ -1,11 +1,11 @@
 <template>
 	<div class="search_company">
-		<!--<div class="search-wrap">
+		<div class="search-wrap">
 			<input type="text" placeholder="请搜索公司" />
 		</div>
 		<div class="hotWordsWrap">
 			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
-		</div>-->
+		</div>
 		<div class="result-wrap">
 			<div class="stateNone">
 				在月球也没找到~
@@ -150,7 +150,7 @@
 			border-radius: 25px;
 			box-shadow: 0 0 15px rgba(179,179,179,.5);
 			padding: 0 20px;
-			margin: 120px auto 0;
+			margin: 0px auto 0;
 			background: url(../../assets/img/header/1717.png) no-repeat right center;
 			background-color: #FFFFFF;
 			background-position: 650px;

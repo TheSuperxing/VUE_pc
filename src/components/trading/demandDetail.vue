@@ -318,19 +318,19 @@
 				}
 				
 				// 判断各项有无数据
-				if(that.detailInfo.demandreviewinfo.describe!=""){
+				if(that.detailInfo.demandbasicinfo.describe!=""){
 					that.haveValue.describe=true;
 				}
-				if(that.detailInfo.demandreviewinfo.complateTime!=""){
+				if(that.detailInfo.demandbasicinfo.complateTime!=""){
 					that.haveValue.complateTime=true;
 				}
-				if(that.detailInfo.demandreviewinfo.objRequire!=""){
+				if(that.detailInfo.demandbasicinfo.objRequire!=""){
 					that.haveValue.objRequire=true;
 				}
-				if(that.detailInfo.demandreviewinfo.reword!=""){
+				if(that.detailInfo.demandbasicinfo.reword!=""){
 					that.haveValue.reword=true;
 				}
-				if(that.detailInfo.demandreviewinfo.remark!=""){
+				if(that.detailInfo.demandbasicinfo.remark!=""){
 					that.haveValue.remark=true;
 				}
 				
@@ -755,6 +755,8 @@ $activeColor:#546686;
 		width: 100%;
 		padding: 26px 20px;
 		background: #FFFFFF;
+		max-width: 1200px;
+		/*margin: 120px auto 0;*/
 		.title-wrap{
 			height:100px;
 			border-bottom:1px solid #E0E0E0;

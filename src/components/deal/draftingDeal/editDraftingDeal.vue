@@ -164,7 +164,7 @@
               协议内容
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.partyContent" placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.partyContent" placeholder="请输入协议详细描述文案" cols="62" rows="6"></textarea>
           </dd>
           <dd class="stageTask clear">
             <h4>
@@ -216,7 +216,7 @@
               备注信息
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.remarksInfo"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.remarksInfo"  placeholder="请输入备注信息" cols="62" rows="6"></textarea>
           </dd>
           <dd class="clear">
             <h4>
@@ -674,20 +674,20 @@
         // Vue.set(this.accessory,"fileAddress","");
       },
       submit(){//单击提交按钮后会有弹框提示
-      var verify = this.localDealInfo.dealName.length!=0
-                    &&this.localDealInfo.partyContent.length!=0
-                    &&this.localDealInfo.modeOfPayment.length!=0
-                    &&this.localDealInfo.cost.length!=0
-                    &&this.localDealInfo.newFileId.length!=0
+      var verify = this.localDealInfo.dealName.length
+                    &&this.localDealInfo.partyContent
+                    &&this.localDealInfo.modeOfPayment
+                    &&this.localDealInfo.cost
+                    &&this.localDealInfo.newFileId
 
         var stageTask = this.localDealInfo.dealstageinfos;
         for(let i=0;i<stageTask.length;i++){//阶段任务的每一项不能为空
           verify=verify
-          &&stageTask[i].price.length!=0
-          &&stageTask[i].taskDetail.length!=0
-          &&stageTask[i].taskName.length!=0
-          &&stageTask[i].reqCompDateStart.length!=0
-          &&stageTask[i].reqCompDateEnd.length!=0
+          &&stageTask[i].price
+          &&stageTask[i].taskDetail
+          &&stageTask[i].taskName
+          &&stageTask[i].reqCompDateStart
+          &&stageTask[i].reqCompDateEnd
         }
         if(verify){
           if(!(this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)||(this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)){

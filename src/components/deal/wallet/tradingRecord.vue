@@ -17,7 +17,7 @@
 				<td>{{item.obj}}</td>
 				<td>{{item.dealName}}</td>
 				<td>{{item.taskTypeVal}}</td>
-				<td ><span @click="goToConfirm(item.dealID,item.creAccountID)">去确认</span></td>
+				<td ><span v-if="item.taskTypeVal=='待确认'" @click="goToConfirm(item.dealID,item.creAccountID)">去确认</span></td>
 			</tr>
 			
 		</table>
@@ -61,43 +61,6 @@
 						status:"待确认"
 						
 					},
-					{
-						tradingNum:"DSAD1545256",
-						tradingDate:"2017.09.06",
-						time:"14:30",
-						amount:"8000",
-						remain:"13000",
-						dealName:"与万达的协议",
-						tradingType:"协议内付款",
-						tradingObj:"万达",
-						operate:"收款",
-						status:"已确认"
-						
-					},
-					{
-						tradingNum:"DSCA1545256",
-						tradingDate:"2015.06.06",
-						time:"14:30",
-						amount:"-8000",
-						remain:"13000",
-						dealName:"与腾讯腾讯腾讯腾讯腾讯腾讯腾讯腾讯的协议",
-						tradingType:"协议内付款",
-						tradingObj:"腾讯",
-						operate:"打款",
-						status:"待确认"
-					},
-					{
-						tradingNum:"DSCA1545256",
-						tradingDate:"2015.06.06",
-						time:"14:30",
-						amount:"-8000",
-						remain:"13000",
-						dealName:"与腾讯的协议",
-						tradingType:"协议内付款",
-						tradingObj:"腾讯",
-						operate:"打款",
-						status:"待对方确认"
-					}
 				],
 				current_page: 1, //当前页
 		        pages: "5", //总页数
@@ -164,17 +127,19 @@
 					type: "GET",
 					url:url,
 					dataType: "json",
-					async: false,
+					contentType:"application/json;charset=utf-8",
+					async:false,
 				},function(data){
 					console.log(data)
 					if(data.code==0&&data.msg.length!=0){
 						Vue.set(that,"haveValue",true)
+						Vue.set(that,"flowInfo",data.msg.records)
 					}else{
 						Vue.set(that,"haveValue",false)
 					}
 					that.pages = data.msg.pages;
 					
-					Vue.set(that,"flowInfo",data.msg.records)
+					
 				},function(err){
 					console.log(err)
 				})

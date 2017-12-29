@@ -115,7 +115,7 @@
           <i>*</i>
           协议名称
         </h4>
-        <div><input v-model="localDealInfo.dealName"  type="text" placeholder="请输入需求名称"></div>
+        <div><input v-model="localDealInfo.dealName"  type="text" placeholder="请输入协议名称"></div>
         <button v-bind:class="{unfold:reveal.dealContentUnfold.state}" @click="dealContentUnfold" v-cloak>{{reveal.dealContentUnfold.text}}</button>
       </dd>
 
@@ -164,7 +164,7 @@
               协议内容
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.partyContent"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.partyContent"  placeholder="请输入协议详细描述文案" cols="62" rows="6"></textarea>
           </dd>
           <dd class="stageTask clear">
             <h4>
@@ -216,7 +216,7 @@
               备注信息
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.remarksInfo"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.remarksInfo"  placeholder="请输入备注信息" cols="62" rows="6"></textarea>
           </dd>
           <dd class="clear">
             <h4>
@@ -436,6 +436,11 @@
 				},function(data){
 					if(data.code==0){
             that.localDealInfo=data.msg;
+            // if(that.localDealInfo.myRole=="甲方"){//如果确定本身是甲方或者乙方，对应ID值为空
+            //   that.localDealInfo.firstPartyID=""
+            // }else if(that.localDealInfo.myRole=="乙方"){
+            //   that.localDealInfo.secondPartyID=""
+            // }
             console.log(data.msg)
 					}else{
             console.log("错误返回");
@@ -703,19 +708,19 @@
         var modal= new ModalOpp("#modal-overlay");
         modal.closeModal();
 
-        var verify = this.localDealInfo.dealName.length!=0
-        &&this.localDealInfo.partyContent.length!=0
-        &&this.localDealInfo.modeOfPayment.length!=0
-        &&this.localDealInfo.cost.length!=0
-        &&(this.localDealInfo.dealfileinfos.length!=0||this.localDealInfo.newFileId.length!=0)
+        var verify = this.localDealInfo.dealName
+        &&this.localDealInfo.partyContent
+        &&this.localDealInfo.modeOfPayment
+        &&this.localDealInfo.cost
+        &&(this.localDealInfo.dealfileinfos||this.localDealInfo.newFileId)
 
         var dealstageinfos = this.localDealInfo.dealstageinfos;
         for(let i=0;i<dealstageinfos.length;i++){//阶段任务的每一项不能为空
-          verify=verify&&dealstageinfos[i].price.length!=0
-          &&dealstageinfos[i].taskDetail.length!=0
-          &&dealstageinfos[i].taskName.length!=0
-          &&dealstageinfos[i].reqCompDateStart.length!=0
-          &&dealstageinfos[i].reqCompDateEnd.length!=0
+          verify=verify&&dealstageinfos[i].price
+          &&dealstageinfos[i].taskDetail
+          &&dealstageinfos[i].taskName
+          &&dealstageinfos[i].reqCompDateStart
+          &&dealstageinfos[i].reqCompDateEnd
         }
         if(verify){
           if((this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)&&(this.localDealInfo.firstPartyID!=this.localDealInfo.secondPartyID)){//如果没有进行编辑甲方乙方都有数据
@@ -1080,7 +1085,7 @@
       dd{
         margin:20px 0;
         h4{
-          width:62px;
+          width:65px;
           text-align: justify;
           line-height: 35px;
           height:35px;

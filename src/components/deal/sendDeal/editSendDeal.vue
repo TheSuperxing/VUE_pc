@@ -115,7 +115,7 @@
           <i>*</i>
           协议名称
         </h4>
-        <input v-model="localDealInfo.dealName"  type="text" placeholder="请输入需求名称">
+        <input v-model="localDealInfo.dealName"  type="text" placeholder="请输入协议名称">
         <button v-bind:class="{unfold:reveal.dealContentUnfold.state}" @click="dealContentUnfold" v-cloak>{{reveal.dealContentUnfold.text}}</button>
       </dd>
 
@@ -164,7 +164,7 @@
               协议内容
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.partyContent"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.partyContent"  placeholder="请输入协议详细描述文案" cols="62" rows="6"></textarea>
           </dd>
           <dd class="stageTask clear">
             <h4>
@@ -216,7 +216,7 @@
               备注信息
               <span></span>
             </h4>
-            <textarea v-model="localDealInfo.remarksInfo"  placeholder="请输入需求详细描述文案" cols="62" rows="6"></textarea>
+            <textarea v-model="localDealInfo.remarksInfo"  placeholder="请输入备注信息" cols="62" rows="6"></textarea>
           </dd>
           <dd class="clear">
             <h4>
@@ -226,9 +226,13 @@
             </h4>
             <div class="fileUp clear" >
               <div v-if="reveal.accessory.state" class="deleteAccessory">
+                <div v-for="(item,index) in localDealInfo.dealfileinfos" class="clear">
+                  <a :href="item.fileAddress">{{item.fileName}}</a>
+                  <span @click="deleteAccessory(index,'oldFile')" v-cloak>删除</span>
+                </div>
                 <div v-for="(item,index) in accessory" class="clear">
                   <a :href="item.fileAddress">{{item.fileName}}</a>
-                  <span @click="deleteAccessory(index)" v-cloak>删除</span>
+                  <span @click="deleteAccessory(index,'newFile')" v-cloak>删除</span>
                 </div>
               </div>
 
@@ -411,6 +415,7 @@
       var a = JSON.stringify(this.dealInfo);
       this.localDealInfo=JSON.parse(a);
       this.getCurUser();
+      console.log(this.localDealInfo.dealfileinfos)
     },
     mounted(){
       //console.log(this.$route.query.id)
@@ -418,7 +423,7 @@
         var chineseNumber = new ChineseNumber(i+1);
         Vue.set(this.chineseNumber,[i],chineseNumber.getChineseNumber())
       }
-      if(this.accessory.length==0){//协议部分上传文件还是删除已有文件
+      if(this.localDealInfo.dealfileinfos.length==0){//协议部分上传文件还是删除已有文件
         Vue.set(this.reveal.accessory,"state",false)
       }else{
         Vue.set(this.reveal.accessory,"state",true)
@@ -433,7 +438,7 @@
       //文件上传
     },
     beforeUpdate(){
-      if(this.accessory.length==0){//协议部分上传文件还是删除已有文件
+      if(this.localDealInfo.dealfileinfos.length==0&&this.accessory.length==0){//协议部分上传文件还是删除已有文件
         Vue.set(this.reveal.accessory,"state",false)
       }else{
         Vue.set(this.reveal.accessory,"state",true)
@@ -534,7 +539,26 @@
             console.log(err)
           })
       },
-
+      delFile(index,fileId){
+        var that=this;
+        var url = MyAjax.urlsy+"/dealbasicinfo/delDealFile/"+fileId;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					contentType:"application/json;charset=utf-8",
+					async:false,
+				},function(data){
+					if(data.code==0){
+            console.log(data.msg)
+            that.localDealInfo.dealfileinfos.splice(index,1)
+					}else{
+						console.log("错误返回")	
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
       dealContentUnfold(){
         Vue.set(this.reveal.dealContentUnfold,"state",!this.reveal.dealContentUnfold.state)
         if(!this.reveal.dealContentUnfold.state){
@@ -684,39 +708,47 @@
         var chineseNumber = new ChineseNumber(this.localDealInfo.content.stageTask.length);
         Vue.set(this.chineseNumber,[this.localDealInfo.content.stageTask.length-1],chineseNumber.getChineseNumber())
       },
-      deleteAccessory(){//附件删除
-        Vue.set(this.localDealInfo.content.accessory,"showText","");
-        Vue.set(this.localDealInfo.content.accessory,"fileAddress","");
+      deleteAccessory(index,types){//附件删除
+        if(types=="newFile"){
+          this.accessory.splice(index,1)
+          this.localDealInfo.newFileId.splice(index,1)
+        }else{
+          this.delFile(index,this.localDealInfo.dealfileinfos[index].pkid)
+        }
       },
       submit(){//单击提交按钮后会有弹框提示
-        var verify = this.localDealInfo.dealName.length!=0
-                    &&this.localDealInfo.partyContent.length!=0
-                    &&this.localDealInfo.modeOfPayment.length!=0
-                    &&this.localDealInfo.cost.length!=0
-                    &&(this.localDealInfo.dealfileinfos.length!=0||this.localDealInfo.newFileId.length!=0)
+        var verify = this.localDealInfo.dealName
+                    &&this.localDealInfo.partyContent
+                    &&this.localDealInfo.modeOfPayment
+                    &&this.localDealInfo.cost
+                    &&(this.localDealInfo.dealfileinfos||this.localDealInfo.newFileId)
 
         var stageTask = this.localDealInfo.dealstageinfos;
         for(let i=0;i<stageTask.length;i++){//阶段任务的每一项不能为空
           verify=verify
-          &&stageTask[i].price.length!=0
-          &&stageTask[i].taskDetail.length!=0
-          &&stageTask[i].taskName.length!=0
-          &&stageTask[i].reqCompDateStart.length!=0
-          &&stageTask[i].reqCompDateEnd.length!=0
+          &&stageTask[i].price
+          &&stageTask[i].taskDetail
+          &&stageTask[i].taskName
+          &&stageTask[i].reqCompDateStart
+          &&stageTask[i].reqCompDateEnd
         }
         if(verify){
-          if(!(this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)||(this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)){
-            alert("请重新确定协议甲方和协议乙方")
-            return;
+          if((this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)&&(this.localDealInfo.firstPartyID!=this.localDealInfo.secondPartyID)){//如果没有进行编辑甲方乙方都有数据
+            var modal= new ModalOpp("#modal-overlay");
+            modal.makeText();
           }else{
-            if((this.localDealInfo.firstPartyID||!this.localDealInfo.secondPartyID)||(!this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)){
-              var modal= new ModalOpp("#modal-overlay");
-              modal.makeText();
+            if(!(this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)||(this.localDealInfo.firstPartyID&&this.localDealInfo.secondPartyID)){
+              alert("请重新确定协议甲方和协议乙方")
+              return;
             }else{
-              alert("请完善必填项")  
+              if((this.localDealInfo.firstPartyID||!this.localDealInfo.secondPartyID)||(!this.localDealInfo.firstPartyID||this.localDealInfo.secondPartyID)){
+                var modal= new ModalOpp("#modal-overlay");
+                modal.makeText();
+              }else{
+                alert("请完善必填项")  
+              }
             }
           }
-          
         }else{
           alert("请完善必填项")
         }
@@ -1044,7 +1076,7 @@
       dd{
         margin:20px 0;
         h4{
-          width:62px;
+          width:65px;
           text-align: justify;
           line-height: 35px;
           height:35px;

@@ -190,7 +190,8 @@
               
               <li  v-if="!(data.dealInfo.dealState=='签订中'||data.dealInfo.dealState=='审核中')&&data.dealInfo.myRole=='甲方'" class="stageTaskButton">
                 <p v-if="!(data.dealInfo.dealState=='履行中'&&(data.dealInfo.dealstageinfos[index].taskType!='2'))">阶段内容已完成</p>
-                <button v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType!='2'" @click="stagePayment(index,item)" v-cloak>{{stageTask.text[index]}}</button>
+                <p v-if="!(data.dealInfo.dealState=='履行中'&&(data.dealInfo.dealstageinfos[index].taskType!='2'))">等待对方确认收款</p>
+                <button v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType!='2'||data.dealInfo.dealstageinfos[index].taskType!='4'" @click="stagePayment(index,item)" v-cloak>{{stageTask.text[index]}}</button>
               </li>
 
               <li  v-if="!(data.dealInfo.dealState=='签订中'||data.dealInfo.dealState=='审核中')&&data.dealInfo.myRole=='乙方'" class="stageTaskButton">
@@ -238,7 +239,7 @@
     <!--协议关联的需求结束-->
 
     <!--协议评价甲方开始-->
-    <div class="firstParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中')||(this.data.dealInfo.dealState=='履行中'))">
+    <div class="firstParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中')||(this.data.dealInfo.dealState=='履行中')||(this.data.dealInfo.dealState=='已终止'))">
       <div class="dealContentTitle">
         <h3>协议甲方</h3>
       </div>
@@ -271,7 +272,7 @@
     <!--协议评价甲方结束-->
 
     <!--协议评价乙方开始-->
-    <div class="secondParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中')||(this.data.dealInfo.dealState=='履行中'))">
+    <div class="secondParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中')||(this.data.dealInfo.dealState=='履行中')||(this.data.dealInfo.dealState=='已终止'))">
       <div class="dealContentTitle">
         <h3>协议乙方</h3>
       </div>
@@ -394,7 +395,7 @@
     </div>
     <!--协议评价乙方结束-->
     <!-- 协议签订开始 -->
-    <div class="signing" v-if="this.data.dealInfo.dealState=='签订中'&&this.reveal.signing">
+    <div class="signing" v-if="this.data.dealInfo.dealState=='签订中'&&this.reveal.signing&&!this.data.dealInfo.agreement">
       <div class="dealContentTitle">
         <h3>协议签订</h3>
       </div>
@@ -408,7 +409,7 @@
     </div>
     <!-- 协议签订结束 -->
     <!--协议关联方意见开始-->
-    <div class="agreement" v-if="this.data.dealInfo.dealState!='协议完成'&&this.data.dealInfo.dealState!='评价完成'&&this.data.dealInfo.dealState!='审核中'">
+    <div class="agreement" v-if="this.data.dealInfo.dealState=='签订中'&&(this.reveal.signing||this.data.dealInfo.agreement)"><!--&&this.data.dealInfo.dealState!='评价完成'&&this.data.dealInfo.dealState!='审核中'&&this.data.dealInfo.dealState!='履行中'&&this.data.dealInfo.dealState!='终止申请中'-->
       <div class="dealContentTitle">
         <h3>协议关联方意见</h3>
         <button v-cloak @click="agreementUnfold" :class="{unfold:reveal.agreementUnfold.state}">{{reveal.agreementUnfold.text}}</button>
@@ -617,31 +618,30 @@
             var myRole=that.data.dealInfo.myRole
             for(let i=0;i<dealstageinfos.length;i++){
               if(myRole=="甲方"){
-                switch (dealstageinfos[i].taskType){
-                  case null:
-                    Vue.set(that.stageTask.text,[i],"收到成果");
-                    break;
-                  case 1:
-                    Vue.set(that.stageTask.text,[i],"支付");
-                    break;
-                  case 2:
+                  if(dealstageinfos[i].taskType==null||dealstageinfos[i].taskType==3){
+                      Vue.set(that.stageTask.text,[i],"收到成果");
+                  }
+                  if(dealstageinfos[i].taskType==1){
+                      Vue.set(that.stageTask.text,[i],"支付");
+                  }
+                  if(dealstageinfos[i].taskType==4||dealstageinfos[i].taskType==2){
                     Vue.set(that.stageTask.text,[i],"");
-                    break;
+                  }
                 }
-              }
-              if(myRole=="乙方"){
-                switch (dealstageinfos[i].taskType){
-                  case null:
+                
+                if(myRole=="乙方"){
+                  if(dealstageinfos[i].taskType==null){
                     Vue.set(that.stageTask.text,[i],"成果已发送");
-                    break;
-                  case 3:
+                  }
+                  if(dealstageinfos[i].taskType==3||dealstageinfos[i].taskType==2||dealstageinfos[i].taskType==1){
                     Vue.set(that.stageTask.text,[i],"已收到付款");
-                    break;
-                  case 4:
+                    
+                  }
+                  if(dealstageinfos[i].taskType==4){
                     Vue.set(that.stageTask.text,[i],"");
-                    break;
+                  }
+                  console.log("123123")
                 }
-              }
             }
 
             if(!data.msg.agreement){
@@ -841,7 +841,7 @@
 					async: false,
 				},function(data){
 					if(data.code==0){
-            Vue.set(that.reveal,"agreementList",true)
+            Vue.set(that.reveal,"agreementList",false)
             Vue.set(that.reveal,"signing",true)
             that.gitdealDetail(that.$route.query.id)
 					}else{
@@ -976,6 +976,10 @@
               var modal5=new ModalOpp("#modal-overlay5");
               modal5.makeText();
               break;
+            case 3:  
+              var modal5=new ModalOpp("#modal-overlay5");
+              modal5.makeText();
+              break;
           }
         }
         if(myRole=="乙方"){
@@ -993,33 +997,34 @@
               //this.price=dealstageinfos[index].price
               this.getMoneyReceived(index,dealstageinfos[index].pkid)
               break;
+            case 2:
+              this.getMoneyReceived(index,dealstageinfos[index].pkid)
+              break;
           }
         }
         /*支付状态的顺序改变*/
         if(myRole=="甲方"){
-          switch (dealstageinfos[index].taskType){
-            case null:
+          if(dealstageinfos[index].taskType==null||dealstageinfos[index].taskType==3){
               Vue.set(this.stageTask.text,[index],"收到成果");
-              break;
-            case 1:
+          }
+          if(dealstageinfos[index].taskType==1){
               Vue.set(this.stageTask.text,[index],"支付");
-              break;
-            case 2:
-              Vue.set(this.stageTask.text,[index],"");
-              break;
+          }
+          if(dealstageinfos[index].taskType==4||dealstageinfos[index].taskType==2){
+            Vue.set(this.stageTask.text,[index],"");
           }
         }
+        
         if(myRole=="乙方"){
-          switch (dealstageinfos[index].taskType){
-            case null:
-              Vue.set(this.stageTask.text,[index],"成果已发送");
-              break;
-            case 3:
-              Vue.set(this.stageTask.text,[index],"已收到付款");
-              break;
-            case 4:
-              Vue.set(this.stageTask.text,[index],"");
-              break;
+          if(dealstageinfos[index].taskType==null){
+            Vue.set(this.stageTask.text,[index],"成果已发送");
+          }
+          if(dealstageinfos[index].taskType==3||dealstageinfos[index].taskType==2||dealstageinfos[index].taskType==1){
+            Vue.set(this.stageTask.text,[index],"已收到付款");
+            
+          }
+          if(dealstageinfos[index].taskType==4){
+            Vue.set(this.stageTask.text,[index],"");
           }
         }
         /*在页面没有刷新的添加下改变相应文本*/

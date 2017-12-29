@@ -3,7 +3,7 @@
     <div id="modal-overlay">
       <div class="alert">
         <ul>
-          <li>编辑提交后，该协议将进入审核流程</li>
+          <li>确认提交后，该协议将进入审核流程</li>
           <li>审核通过后将发送至协议相关方</li>
           <li>否则，将被退回您的“协议草稿”</li>
         </ul>
@@ -452,6 +452,7 @@
 					if(data.code==0){
             that.dealInfo=data.msg;
             that.dealInfo.newFileId==null?that.dealInfo.newFileId=[]:that.dealInfo=that.dealInfo;
+
             console.log(that.dealInfo)
           }else{
             console.log("错误返回");
@@ -463,7 +464,7 @@
       },
       setCommitReview(){
           var that = this;
-          var url = MyAjax.urlsy+"/dealbasicinfo/commitReview/"+this.$route.query.id;
+          var url = MyAjax.urlsy+"/dealbasicinfo/commitReview/";
           MyAjax.ajax({
 						type: "POST",
 						url:url,
@@ -474,7 +475,7 @@
 					}, function(data){
 						if(data.code==0){
               console.log("成功")
-              location.hash="#/yhzx/deal/sendDealIndex/sendDealInfo?id="+this.$route.query.id
+              location.hash="#/yhzx/deal/sendDealIndex/sendDealInfo?id="+that.$route.query.id
 						}else if(data.code==-1){
 							console.log("失败")
 						}
@@ -588,7 +589,7 @@
         /*以上是搜索结果选中状态样式控制*/
       },
       confirmFirstPartyMember(){
-       if(this.reveal.agreementMembers.selectedMember.psnName.length!=0||this.reveal.agreementMembers.selectMembers.length==0){
+       if(this.reveal.agreementMembers.selectedMember.psnName||this.reveal.agreementMembers.selectMembers.length==0){
           Vue.set(this.localDealInfo,"firstPartyName",this.reveal.agreementMembers.selectedMember.psnName)
           Vue.set(this.localDealInfo,"firstPartyID",this.reveal.agreementMembers.selectedMember.accountID)
 
@@ -884,10 +885,11 @@
           border:0;
         }
         .protocolMemberType{
+          width: 508px;
           float: left;
           margin-top:48px;
           border-bottom:1px solid rgb(235,235,235);
-          padding:0 56px;
+          padding-left:56px;
           li{
             float: left;
             font-size:18px;
@@ -904,21 +906,27 @@
         }
         .typeContainer{
           float: left;
-          margin-left:20px;
+          width: 508px;
           li{
             ul{
               li{
                 margin-bottom:30px;
                 h4{
-                  width:126px;
+                  padding-left: 20px;
                   text-align: right;
                   float: left;
                   line-height: 40px;
-                  margin-right:20px;
                   color: #484949;
+                  min-width: 146px;
+                }
+                h5{
+                  width: 146px;
+                  text-align: right;
+                  float: left;
+                  line-height: 40px;
                 }
                 .search{
-                  float: left;
+                  float: right;
                   position: relative;
                   width:323px;
                   height: 40px;
@@ -952,8 +960,13 @@
                 /*以上是搜索样式*/
                 .selectMember{
                   width:326px;
-                  float: left;
+                  float: right;
                   background: rgb(248,248,248);
+                  div{
+                    background: #ffffff;
+                    text-align: left;
+                    line-height: 40px;
+                  }
                   p{
                     cursor: pointer;
                     text-align: left;

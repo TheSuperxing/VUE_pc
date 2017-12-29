@@ -223,7 +223,7 @@
     position: fixed;
     top: 0;
     left:0;
-    z-index: 100;
+    z-index: 1030;
     font-size: 14px;
     .headerTop{
       height: 39px;

@@ -3,7 +3,7 @@
     <div id="modal-overlay">
       <div class="alert">
         <ul class="clear">
-          <li>编辑提交后，该协议将进入审核流程</li>
+          <li>确认提交后，该协议将进入审核流程</li>
           <li>审核通过后将发送至协议相关方</li>
           <li>否则，将被退回您的“协议草稿”</li>
         </ul>
@@ -770,6 +770,7 @@
         //   &&stageTask[i].reqCompDateStart.length!=0
         //   &&stageTask[i].reqCompDateEnd.length!=0
         // }
+        this.setCommitReview()
       },
     }
   }

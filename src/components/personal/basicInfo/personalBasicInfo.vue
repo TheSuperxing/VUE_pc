@@ -348,7 +348,7 @@
     },
     methods:{
     	updateData(){
-            var that = this;
+        var that = this;
 	    	var url = MyAjax.urlsy+"/personalbasicinfo/findByMySelf";
 	    	MyAjax.ajax({
 					type: "GET",
@@ -360,7 +360,8 @@
 				},function(data){
 					console.log(data)
 					if(data.code==0){
-                     that.baseInfo = data.msg;
+            console.log(data.msg)
+            that.baseInfo = data.msg;
 						//判断用户的全部信息为空值
 			    	if(that.baseInfo.sex=="0"){
 			    		that.baseInfo.sex = "男"
@@ -455,7 +456,7 @@
 //				console.log(d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate())
 				if(this.localBaseInfo.dateOfBirth == "（暂无信息）"){
 					
-					this.localBaseInfo.dateOfBirth =d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+					this.localBaseInfo.dateOfBirth =d.getFullYear()+"."+(d.getMonth()+1)+"."+d.getDate();
 					console.log(this.localBaseInfo)
 				}
 				
@@ -609,7 +610,7 @@
       },
       /*0-name 1-sex 2-age 3-phone 4-mail*/
      	openOrPrivacy(index){
-            Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
+        Vue.set(this.reveal.openOrPrivacy,[index],!this.reveal.openOrPrivacy[index]);//通过类名控制图片和文字颜色
      		for(let i=0;i<this.reveal.openOrPrivacy.length;i++){
 	        	if(this.reveal.openOrPrivacy[i]===false){
 	        		this.reveal.openOrPrivacy[i] = 0;

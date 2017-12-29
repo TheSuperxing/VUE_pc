@@ -3,7 +3,7 @@
     <div id="modal-overlay">
       <div class="alert">
         <ul>
-          <li>编辑提交后，该协议将由交易管理员进行审核。</li>
+          <li>确认提交后，该协议将由交易管理员进行审核。</li>
           <li>审核通过后，将发生至协议相关方</li>
           <li>如未通过审核，该协议将退回至“我的协议”——“协议草稿”</li>
         </ul>
@@ -25,6 +25,13 @@
         <p>已向协议关联方发送终止通知</p>
         <button class="close" v-on:click="closeAlert"></button>
         <button class="confirm" v-on:click="closeStopDealAlert">确认退出</button>
+      </div>
+    </div>
+    <div id="modal-overlay8">
+      <div class="alert">
+        <p>是否同意终止协议？</p>
+        <button class="close" v-on:click="closeAlert"></button>
+        <button class="confirm" v-on:click="confirmAgreeDealStop">同意</button>
       </div>
     </div>
     <!--终止/编辑提示-->
@@ -109,6 +116,9 @@
         <p v-cloak>发布时间：{{this.data.dealInfo.publishTime}}</p>
       </div>
       <ul class="titleRight">
+        <li @click="agreeDealStopBtn(index)" v-if="reveal.dealState[1]&&data.dealInfo.ifConfirmStop" class="cancel">
+          终止
+        </li>
         <li @click="stopDeal" v-if="reveal.dealState[1]" class="cancel">
           终止
           <!--<router-link :to="{path:'/yhzx/deal/sendDealIndex/editSendDeal',query:{id:this.$route.query.id}}"></router-link>-->
@@ -161,19 +171,19 @@
                 <p>
                   <span v-cloak>{{item.reqCompDateStart}}</span>
                   <i>——</i>
-                  <span v-cloak>{{index.reqCompDateEnd}}</span>
+                  <span v-cloak>{{item.reqCompDateEnd}}</span>
                   
                 </p>
               </li>       
               <li class="clear">
                 <p>
-                  <span v-cloak>{{index.taskDetail}}</span>
+                  <span v-cloak>{{item.taskDetail}}</span>
                   
                 </p>
               </li>       
               <li class="clear">
                 <p>
-                  <span v-cloak>{{index.price}}</span>
+                  <span v-cloak>{{item.price}}</span>
                   
                 </p>
               </li>       
@@ -228,7 +238,7 @@
     <!--协议关联的需求结束-->
 
     <!--协议评价甲方开始-->
-    <div class="firstParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中'))">
+    <div class="firstParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中')||(this.data.dealInfo.dealState=='履行中'))">
       <div class="dealContentTitle">
         <h3>协议甲方</h3>
       </div>
@@ -261,7 +271,7 @@
     <!--协议评价甲方结束-->
 
     <!--协议评价乙方开始-->
-    <div class="secondParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中'))">
+    <div class="secondParty" v-if="!((this.data.dealInfo.dealState=='签订中')||(this.data.dealInfo.dealState=='审核中')||(this.data.dealInfo.dealState=='履行中'))">
       <div class="dealContentTitle">
         <h3>协议乙方</h3>
       </div>
@@ -384,7 +394,7 @@
     </div>
     <!--协议评价乙方结束-->
     <!-- 协议签订开始 -->
-    <div class="signing" v-if="this.data.dealInfo.dealState=='签订中'">
+    <div class="signing" v-if="this.data.dealInfo.dealState=='签订中'&&this.reveal.signing">
       <div class="dealContentTitle">
         <h3>协议签订</h3>
       </div>
@@ -405,8 +415,9 @@
       </div>
       <transition name="agreement-unfold-fade">
         <div class="agreementList" v-if="reveal.agreementUnfold.state">
-          <textarea v-model="data.dealInfo.agreement" name="" id="" cols="120" rows="5" placeholder="请输入需求详细描述文案..."></textarea>
-          <div class="clear">
+          <p v-if="!reveal.agreementList" v-cloak >{{this.data.dealInfo.agreement}}</p>
+          <textarea v-if="reveal.agreementList" v-model="data.dealInfo.agreement" name="" id="" cols="120" rows="5" placeholder="请输入需求详细描述文案..."></textarea>
+          <div v-if="reveal.agreementList" class="clear">
             <button @click="giveAdvices">保存</button> 
             <button @click="cancelGiveAdvices">取消</button>
           </div>
@@ -453,6 +464,8 @@
             state:true,
             text:"收起"
           },
+          agreementList:"",
+          signing:"",
           sigChecked:false,
           agreementUnfold:{//协议关联方的收起或者展开
             state:true,
@@ -514,26 +527,36 @@
       //通过query传递的对象，通过this.$route.query获取
       //console.log(this.dealInfo[this.$route.query.id])
       //for(let i=0;i<this.data.dealInfo.length;i++){
-        switch (this.data.dealInfo.dealState){
+         switch (this.data.dealInfo.dealState){
           case "签订中":
             this.reveal.dealState.push(true)
             this.reveal.dealState.push(true)
+            this.reveal.dealState.push(false)
             break;
           case "履行中":
             this.reveal.dealState.push(true)
             this.reveal.dealState.push(true)
+            this.reveal.dealState.push(false)
             break;
           case "协议完成":
             this.reveal.dealState.push(false)//协议完成时，可以编辑
             this.reveal.dealState.push(false)//协议完成时不能终止
+            this.reveal.dealState.push(false)
             break;
           case "评价完成":
+            this.reveal.dealState.push(false)
             this.reveal.dealState.push(false)
             this.reveal.dealState.push(false)
             break;
           case "审核中":
             this.reveal.dealState.push(false)
             this.reveal.dealState.push(false)
+            this.reveal.dealState.push(false)
+            break;
+          case "终止申请中":
+            this.reveal.dealState.push(false)
+            this.reveal.dealState.push(false)
+            this.reveal.dealState.push(true)
             break;
         }
       //}
@@ -620,6 +643,14 @@
                 }
               }
             }
+
+            if(!data.msg.agreement){
+              Vue.set(that.reveal,"agreementList",true)
+              Vue.set(that.reveal,"signing",true)
+            }else{
+              Vue.set(that.reveal,"agreementList",false)
+              Vue.set(that.reveal,"signing",false)
+            }
 					}else{
             console.log("错误返回");
             //window.location.hash="/error/404"
@@ -641,6 +672,7 @@
 					}, function(data){
 						if(data.code==0){
               console.log("成功")
+              
 						}else if(data.code==-1){
 							console.log("失败")
 						}
@@ -664,6 +696,29 @@
             var modal3= new ModalOpp("#modal-overlay3");
             modal3.makeText();
             console.log("终止提醒发送成功")
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      agreeDealStop(pkid){
+        console.log("456")
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/agreeDealStop/"+pkid;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.reveal.dealState[2]=false;
+            that.reveal.dealState[1]=false;
+            that.reveal.dealState[0]=false;
+            console.log("终止确定成功")
 					}else{
             console.log("错误返回");
             //window.location.hash="/error/404"
@@ -786,6 +841,8 @@
 					async: false,
 				},function(data){
 					if(data.code==0){
+            Vue.set(that.reveal,"agreementList",true)
+            Vue.set(that.reveal,"signing",true)
             that.gitdealDetail(that.$route.query.id)
 					}else{
             console.log("错误返回");
@@ -808,6 +865,8 @@
         }, function(data){
           if(data.code==0){
             that.gitdealDetail(that.$route.query.id)
+            Vue.set(that.reveal,"agreementList",false)
+            Vue.set(that.reveal,"signing",false)
           }else if(data.code==-1){
             console.log("失败")
           }
@@ -834,6 +893,8 @@
         modal6.closeModal();
         var modal7= new ModalOpp("#modal-overlay7");
         modal7.closeModal();
+        var modal8= new ModalOpp("#modal-overlay8");
+        modal8.closeModal();
         if(index=="4"){
           Vue.set(this.addSecondPartyMember.searchResults,"stage",false)//乙方添加成员返回没有搜索之前的状态
           Vue.set(this.addSecondPartyMember,"searchText","")
@@ -853,6 +914,16 @@
         var modal2= new ModalOpp("#modal-overlay2");
         modal2.closeModal();
         this.setStopDeal(this.$route.query.id)
+      },
+      agreeDealStopBtn(index){
+        var modal8= new ModalOpp("#modal-overlay8");
+        modal8.makeText();
+        Vue.set(this.reveal,"index",index)
+      },
+      confirmAgreeDealStop(){
+        var modal8= new ModalOpp("#modal-overlay8");
+        modal8.closeModal();
+        this.agreeDealStop(this.$route.query.id)
       },
       closeStopDealAlert(){//关闭通知
         var modal3= new ModalOpp("#modal-overlay3");
@@ -985,8 +1056,8 @@
       editFirstPartyComment(){//编辑甲方评价按钮单击事件
         Vue.set(this.reveal.firstPartyComment,"edit",true);
 
-        Vue.set(this.localFirstPartyComment,"star",this.data.dealInfo.dealevainfo.star)
-        Vue.set(this.localFirstPartyComment,"text",this.data.dealInfo.dealevainfo.comment)
+        Vue.set(this.localFirstPartyComment,"star",this.data.dealInfo.dealevainfoFirst.star)
+        Vue.set(this.localFirstPartyComment,"text",this.data.dealInfo.dealevainfoFirst.comment)
         /*同步星级和评论文本用于编辑*/
       },
       commentFirstParty(index){//甲方评价
@@ -999,14 +1070,14 @@
         Vue.set(this.localFirstPartyComment,"star",index+1+"");
       },
       keepFirstPartyComment(){//保存甲方评价修改后的数据
-        Vue.set(this.data.dealInfo.dealevainfo,"star",this.localFirstPartyComment.star)
-        Vue.set(this.data.dealInfo.dealevainfo,"comment",this.localFirstPartyComment.text)
+        Vue.set(this.data.dealInfo.dealevainfoFirst,"star",this.localFirstPartyComment.star)
+        Vue.set(this.data.dealInfo.dealevainfoFirst,"comment",this.localFirstPartyComment.text)
         Vue.set(this.reveal.firstPartyComment,"edit",false)
-        console.log(this.data.dealInfo.dealevainfo)
+        //console.log(this.data.dealInfo.dealevainfo)
         this.setComment();
       },
       cancelFirstPartyComment(){//取消保存保存甲方评价修改后的数据
-        let star=this.data.dealInfo.dealevainfo.star;
+        let star=this.data.dealInfo.dealevainfoFirst.star;
         for(let i=0;i<5;i++){
           Vue.set(this.reveal.firstPartyComment.starSelected,[i],false)
         }
@@ -1049,8 +1120,8 @@
         Vue.set(this.reveal.secondPartyComment,"edit",true)//编辑和可视切换
 
 
-        Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfo.star)
-        Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfo.comment)
+        Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfoSecond.star)
+        Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfoSecond.comment)
         /*Vue的数据同步到本地一份,用于数据的修改后的保存或者提交（团队整体评价）*/
         // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
         // for(let i=0;i<memberNum.length;i++){
@@ -1086,8 +1157,8 @@
         // console.log(this.reveal.secondPartyComment.memberComment.starSelected[index])
       },
       keepSecondPartyMemberComment(){//保存乙方评价
-        Vue.set(this.data.dealInfo.dealevainfo,"star",this.localSecondPartyComment.teamComment.star)
-        Vue.set(this.data.dealInfo.dealevainfo,"comment",this.localSecondPartyComment.teamComment.text)
+        Vue.set(this.data.dealInfo.dealevainfoSecond,"star",this.localSecondPartyComment.teamComment.star)
+        Vue.set(this.data.dealInfo.dealevainfoSecond,"comment",this.localSecondPartyComment.teamComment.text)
 
         // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
         // for(let i=0;i<memberNum.length;i++){
@@ -1104,8 +1175,8 @@
       },
       cancelSecondPartyMemberComment(){//取消保存乙方评价
 
-        Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfo.star)
-        Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfo.comment)
+        Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfoSecond.star)
+        Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfoSecond.comment)
 
         // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
         // for(let i=0;i<memberNum.length;i++){
@@ -1119,7 +1190,7 @@
         //   Vue.set(this.localSecondPartyComment.memberComment.text,[i],memberNum[i].comment.text)
         // }
         /*保证数据没有更改*/
-        let secondPartyStartTeam=parseInt(this.data.dealInfo.dealevainfo.star)
+        let secondPartyStartTeam=parseInt(this.data.dealInfo.dealevainfoSecond.star)
         for(let i=0;i<5;i++){
           Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],false)
         }
@@ -1554,6 +1625,43 @@
         }
       }
     }
+    #modal-overlay8{
+      .alert{
+        width: 549px;
+        height:326px;
+        overflow: hidden!important;
+        position:absolute;top:50%;left:50%;
+        transform:translate(-50%,-50%);
+        -webkit-transform:translate(-50%,-50%);
+        -moz-transform:translate(-50%,-50%);
+        -ms-transform:translate(-50%,-50%);
+        -o-transform:translate(-50%,-50%);
+        background: #FFFFFF;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 18px;
+        line-height: 34px;
+        padding-top:102px;
+        color: $alertColor;
+        .close{
+          width: 20px;
+          height:20px;
+          position: absolute;
+          top: 20px;
+          right:20px;
+          background: url("../../../assets/img/deal/sendDeal/close.png") left center no-repeat;
+          border:0;
+        }
+        .confirm{
+          width: 160px;
+          height:42px;
+          margin-top: 52px;
+          background: url("../../../assets/img/deal/sendDeal/confirm.png") left center no-repeat;
+          border:0px;
+          color: #ffffff;
+        }
+      }
+    }
     /*乙方添加成员*/
     .sendDealInfoTitle{
       height:90px;
@@ -1674,18 +1782,21 @@
                 span{
                   float: left;
                 }
-                span:nth-child(1){
-                  display: none;
+                // span:nth-child(1){
+                //   display: none;
+                // }
+                i{
+                  float: left;
                 }
               }
             }
-            li:nth-child(1){
-              p{
-                span:nth-child(1){
-                  display: block;
-                }
-              }
-            }
+            // li:nth-child(1){
+            //   p{
+            //     span:nth-child(1){
+            //       display: block;
+            //     }
+            //   }
+            // }
             .stageTaskButton{
               width: 100px;
               position: absolute;
@@ -1808,6 +1919,9 @@
     .agreement{
       .agreementList{
         margin-top:16px;
+        p{
+          word-wrap:break-word;
+        }
         textarea{
           padding: 12px;
         }

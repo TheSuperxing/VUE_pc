@@ -3,7 +3,7 @@
     <div id="modal-overlay">
       <div class="alert">
         <ul>
-          <li>编辑提交后，该协议将进入审核流程</li>
+          <li>确认提交后，该协议将进入审核流程</li>
           <li>审核通过后将发送至协议相关方</li>
           <li>否则，将被退回您的“协议草稿”</li>
         </ul>
@@ -510,7 +510,13 @@
         var modal= new ModalOpp("#modal-overlay");
         modal.closeModal();
 
-        var verify = this.localDealInfo.mainInfo.name.length!=0&&this.localDealInfo.content.firstParty.length!=0&&this.localDealInfo.content.secondParty.length!=0&&this.localDealInfo.content.partyContent.length!=0&&this.localDealInfo.content.modeOfPayment.length!=0&&this.localDealInfo.content.cost.length!=0&&this.localDealInfo.content.accessory.showText.length!=0
+        var verify = this.localDealInfo.mainInfo.name.length!=0
+        &&this.localDealInfo.content.firstParty.length!=0
+        &&this.localDealInfo.content.secondParty.length!=0
+        &&this.localDealInfo.content.partyContent.length!=0
+        &&this.localDealInfo.content.modeOfPayment.length!=0
+        &&this.localDealInfo.content.cost.length!=0
+        &&this.localDealInfo.content.accessory.showText.length!=0
 
         var stageTask = this.localDealInfo.content.stageTask;
         for(let i=0;i<stageTask.length;i++){//阶段任务的每一项不能为空

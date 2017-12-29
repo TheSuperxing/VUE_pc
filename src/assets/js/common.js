@@ -1,5 +1,5 @@
 $(function () {
-  topBarHid();
+ // topBarHid();
 //var navSessionStorageTog=new SessionStorageTog("navTogcolor",[0,0,0,0,0],0,"router-link-active",$(".navlist li a"));
 //navSessionStorageTog.setSessionStorage();
   //导航样式和路由保持一致

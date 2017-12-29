@@ -4,7 +4,7 @@
     <div id="modal-overlay">
       <div class="alert">
         <ul>
-          <li>编辑提交后，该协议将由交易管理员进行审核。</li>
+          <li>确认提交后，该协议将由交易管理员进行审核。</li>
           <li>审核通过后，将发生至协议相关方</li>
           <li>如未通过审核，该协议将退回至“我的协议”——“协议草稿”</li>
         </ul>
@@ -28,6 +28,13 @@
         <button class="confirm" v-on:click="closeStopDealAlert">确认</button>
       </div>
     </div>
+    <div id="modal-overlay4">
+      <div class="alert">
+        <p>是否同意终止协议？</p>
+        <button class="close" v-on:click="closeAlert"></button>
+        <button class="confirm" v-on:click="confirmAgreeDealStop">同意</button>
+      </div>
+    </div>
     <!--终止/编辑提示-->
     <ul class="sendDealContainer">
       <li v-for="(item,index) in data.dealInfo">
@@ -41,6 +48,9 @@
           </li>
           <li v-cloak>{{item.dealState}}</li>
           <li class="titleButton">
+            <div @click="agreeDealStopBtn(index)" v-if="reveal.dealState[index][2]&&item.ifConfirmStop" class="cancel">
+              终止
+             </div><!--对方发起终止，确认终止 -->
             <div @click="stopDeal(index)" v-if="reveal.dealState[index][1]" class="cancel">
               终止
             </div>
@@ -84,7 +94,7 @@
       /*获取数据*/
     }),
     created(){
-      this.gitdealList();
+      this.gitDealList();
       
       for(let i=0;i<this.data.dealInfo.length;i++){
         this.reveal.dealState.push([])
@@ -92,28 +102,38 @@
           case "签订中":
             this.reveal.dealState[i].push(true)
             this.reveal.dealState[i].push(true)
+            this.reveal.dealState[i].push(false)
             break;
           case "履行中":
             this.reveal.dealState[i].push(true)
             this.reveal.dealState[i].push(true)
+            this.reveal.dealState[i].push(false)
             break;
           case "协议完成":
             this.reveal.dealState[i].push(false)//协议完成时，可以编辑
             this.reveal.dealState[i].push(false)//协议完成时不能终止
+            this.reveal.dealState[i].push(false)//对方发出终止，是否可以确定终止
             break;
           case "评价完成":
+            this.reveal.dealState[i].push(false)
             this.reveal.dealState[i].push(false)
             this.reveal.dealState[i].push(false)
             break;
           case "审核中":
             this.reveal.dealState[i].push(false)
             this.reveal.dealState[i].push(false)
+            this.reveal.dealState[i].push(false)
+            break;
+          case "终止申请中":
+            this.reveal.dealState[i].push(false)
+            this.reveal.dealState[i].push(false)
+            this.reveal.dealState[i].push(true)
             break;
         }
       }
     },
     methods:{
-       gitdealList(){
+       gitDealList(){
         var that = this;
 	    	var url = MyAjax.urlsy +"/dealbasicinfo/myReceivedDeals";
 	    	MyAjax.ajax({
@@ -143,11 +163,34 @@
 					async: false,
 				},function(data){
 					if(data.code==0){
-            that.gitdealList();
+            that.gitDealList();
             that.reveal.dealState[index][1]=false;
             var modal3= new ModalOpp("#modal-overlay3");
             modal3.makeText();
             console.log("终止提醒发送成功")
+					}else{
+            console.log("错误返回");
+            //window.location.hash="/error/404"
+					}
+				},function(err){
+					console.log(err)
+				})
+      },
+      agreeDealStop(index,pkid){
+        var that = this;
+	    	var url = MyAjax.urlsy +"/dealbasicinfo/agreeDealStop/"+pkid;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					if(data.code==0){
+            that.gitDealList();
+            that.reveal.dealState[index][2]=false;
+            that.reveal.dealState[index][1]=false;
+            that.reveal.dealState[index][0]=false;
+            console.log("终止确定成功")
 					}else{
             console.log("错误返回");
             //window.location.hash="/error/404"
@@ -168,6 +211,8 @@
         modal2.closeModal();
         var modal3= new ModalOpp("#modal-overlay3");
         modal3.closeModal();
+        var modal4= new ModalOpp("#modal-overlay4");
+        modal4.closeModal();
       },
       confirmEdit(){
         var modal= new ModalOpp("#modal-overlay");
@@ -183,6 +228,17 @@
         var modal2= new ModalOpp("#modal-overlay2");
         modal2.closeModal();
         this.setStopDeal(this.reveal.index,this.data.dealInfo[this.reveal.index].pkid)
+      },
+      agreeDealStopBtn(index){
+        var modal4= new ModalOpp("#modal-overlay4");
+        modal4.makeText();
+        Vue.set(this.reveal,"index",index)
+      },
+      confirmAgreeDealStop(){
+        var modal4= new ModalOpp("#modal-overlay4");
+        modal4.closeModal();
+        console.log("123")
+        this.agreeDealStop(this.reveal.index,this.data.dealInfo[this.reveal.index].pkid)
       },
       closeStopDealAlert(){//关闭通知
         var modal3= new ModalOpp("#modal-overlay3");
@@ -271,6 +327,43 @@
       }
     }
     #modal-overlay3{
+      .alert{
+        width: 549px;
+        height:326px;
+        overflow: hidden!important;
+        position:absolute;top:50%;left:50%;
+        transform:translate(-50%,-50%);
+        -webkit-transform:translate(-50%,-50%);
+        -moz-transform:translate(-50%,-50%);
+        -ms-transform:translate(-50%,-50%);
+        -o-transform:translate(-50%,-50%);
+        background: #FFFFFF;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 18px;
+        line-height: 34px;
+        padding-top:102px;
+        color: $alertColor;
+        .close{
+          width: 20px;
+          height:20px;
+          position: absolute;
+          top: 20px;
+          right:20px;
+          background: url("../../../assets/img/deal/sendDeal/close.png") left center no-repeat;
+          border:0;
+        }
+        .confirm{
+          width: 160px;
+          height:42px;
+          margin-top: 52px;
+          background: url("../../../assets/img/deal/sendDeal/confirm.png") left center no-repeat;
+          border:0px;
+          color: #ffffff;
+        }
+      }
+    }
+    #modal-overlay4{
       .alert{
         width: 549px;
         height:326px;

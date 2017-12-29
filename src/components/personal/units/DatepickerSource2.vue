@@ -1,9 +1,9 @@
 <template>
   <div class="date-picker">
-    <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false">
-      <div class="input" @click="togglePanel" v-text="range ? value[0] + ' -- ' + value[1] : value"></div>
+    <div class="input-wrapper" @mouseenter="showCancel = true" @mouseleave="showCancel = false" @click="togglePanel">
+      <div class="input" v-text="range ? value[0] + ' -- ' + value[1] : value"></div>
       <transition name="fade">
-        <img class="cancel-btn" src="../../../assets/img/personal/education/cancel.png"  v-show="showCancel" @click="clear">
+        <img class="cancel-btn" src="../../../assets/img/company/bottom.png"  v-show="showCancel">
       </transition>
     </div>
     <transition name="toggle">
@@ -97,8 +97,8 @@
     },
     props: {
       language: {default: 'ch'},
-      min: {default: '1970.01.01'},
-      max: {default: new Date().getFullYear()+"."+(new Date().getMonth()+1)+"."+new Date().getDate()},
+      min: {default: '1970-01-01'},
+      max: {default: '3016-01-01'},
       value: {
         type: [String, Array],
         default: ''
@@ -212,7 +212,7 @@
               this.tmpStartDate = tmpD
             }
             let RangeStart = `${this.tmpStartYear}.${('0' + (this.tmpStartMonth + 1)).slice(-2)}.${('0' + this.tmpStartDate).slice(-2)}`
-            let RangeEnd = `${this.tmpEndYear}.${('0' + (this.tmpEndMonth + 1)).slice(-2)}.${('0' + this.tmpEndDate).slice(-2)}`
+            let RangeEnd = `${this.tmpEndYear}-${('0' + (this.tmpEndMonth + 1)).slice(-2)}-${('0' + this.tmpEndDate).slice(-2)}`
             let value = [RangeStart, RangeEnd]
             this.$emit('input', value)
             this.rangeStart = false
@@ -249,19 +249,19 @@
           this.rangeStart = false
         }
       },
-      clear() {
-        this.$emit('input', this.range ? ['', ''] : '')
-      }
+//    clear() {
+//      this.$emit('input', this.range ? ['', ''] : '')
+//    }
     },
     watch: {
       min (v) {
-        let minArr = v.split('.')
+        let minArr = v.split('-')
         this.minYear = Number(minArr[0])
         this.minMonth = Number(minArr[1])
         this.minDate = Number(minArr[2])
       },
       max (v) {
-        let maxArr = v.split('.')
+        let maxArr = v.split('-')
         this.maxYear = Number(maxArr[0])
         this.maxMonth = Number(maxArr[1])
         this.maxDate = Number(maxArr[2])
@@ -332,11 +332,11 @@
         }else{
           this.coordinates = {left: '0', top: `${window.getComputedStyle(this.$el.children[0]).offsetHeight + 4}px`}
         }
-        let minArr = this.min.split('.')
+        let minArr = this.min.split('-')
         this.minYear = Number(minArr[0])
         this.minMonth = Number(minArr[1])
         this.minDate = Number(minArr[2])
-        let maxArr = this.max.split('.')
+        let maxArr = this.max.split('-')
         this.maxYear = Number(maxArr[0])
         this.maxMonth = Number(maxArr[1])
         this.maxDate = Number(maxArr[2])
@@ -345,8 +345,8 @@
             throw new Error('Binding value must be an array in range mode.')
           }
           if(this.value.length){
-            let rangeStart = this.value[0].split('.')
-            let rangeEnd = this.value[1].split('.')
+            let rangeStart = this.value[0].split('-')
+            let rangeEnd = this.value[1].split('-')
             this.tmpStartYear = Number(rangeStart[0])
             this.tmpStartMonth = Number(rangeStart[1]) - 1
             this.tmpStartDate = Number(rangeStart[2])
@@ -371,7 +371,7 @@
 </script>
 
 <style scoped lang='scss'>
-  $themeColor:rgb(242,117,25);
+  $themeColor: rgb(242,117,25);
   $borderColor:#ebebeb;
   ul{
     padding: 0;
@@ -390,28 +390,30 @@
     justify-content: space-between;
     flex-flow: row nowrap;
     align-items: center;
-    padding-left:12px;
+    padding-left:15px;
     height: 33px;
     line-height: 33px;
     box-sizing: border-box;
-    padding-right:10px;
+    padding-right:15px;
   }
   .input{
     height: 100%;
     width: 100%;
     font-size: inherit;
-    padding-left: 4px;
+    padding-left: 8px;
     box-sizing: border-box;
     outline: none;
+    text-align: left;
   }
   .cancel-btn{
-    height: 14px;
-    width: 14px;
+    height: 10px;
+    width: 18px;
+    cursor: pointer;
   }
   .date-panel{
     position: absolute;
     left: -90px;
-    z-index: 5000;
+    z-index: 9000;
     border: 1px solid #eee;
     box-sizing: border-box;
     width: 320px;

@@ -3,7 +3,7 @@
     <div id="modal-overlay">
       <div class="alert">
         <ul>
-          <li>编辑提交后，该协议将进入审核流程</li>
+          <li>确认提交后，该协议将进入审核流程</li>
           <li>审核通过后将发送至协议相关方</li>
           <li>否则，将被退回您的“协议草稿”</li>
         </ul>
@@ -591,7 +591,7 @@
         /*以上是搜索结果选中状态样式控制*/
       },
       confirmFirstPartyMember(){
-        if(this.reveal.agreementMembers.selectedMember.psnName.length!=0||this.reveal.agreementMembers.selectMembers.length==0){
+        if(this.reveal.agreementMembers.selectedMember.psnName||this.reveal.agreementMembers.selectMembers.length==0){
           Vue.set(this.localDealInfo,"firstPartyName",this.reveal.agreementMembers.selectedMember.psnName)
           Vue.set(this.localDealInfo,"firstPartyID",this.reveal.agreementMembers.selectedMember.accountID)
           this.localDealInfo.myRole=="乙方"//设定当前用户角色
@@ -738,9 +738,28 @@
           alert("请完善必填项")
         }
       },
-      cancelEdit(){//单击取消按钮后会有弹框提示
-        var modal2= new ModalOpp("#modal-overlay2");
-        modal2.makeText();
+      cancelEdit(){//单机保存
+        // var modal2= new ModalOpp("#modal-overlay2");
+        // modal2.makeText();
+          var that = this;
+          var url = MyAjax.urlsy+"/dealbasicinfo/saveDraft";
+          MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(that.localDealInfo),
+            dataType: "json",
+            contentType:"application/json;charset=utf-8",
+						async:false,
+					}, function(data){
+						if(data.code==0){
+              console.log("成功")
+              location.hash="/yhzx/deal/outlineDealIndex/outlineDealInfo?id="+that.$route.query.id;
+						}else if(data.code==-1){
+							console.log("失败")
+						}
+					},function(err){
+            console.log("error")
+          })
       },
       closeAlert(index){//弹框关闭按钮
         var modal= new ModalOpp("#modal-overlay");
@@ -785,28 +804,10 @@
         this.setCommitReview()
       },
       confirmCancelEdit(){//看到取消提示后的确定取消，保存
-        var modal2= new ModalOpp("#modal-overlay2");
-        modal2.closeModal();
+        // var modal2= new ModalOpp("#modal-overlay2");
+        // modal2.closeModal();
         
-          var that = this;
-          var url = MyAjax.urlsy+"/dealbasicinfo/saveDraft";
-          MyAjax.ajax({
-						type: "POST",
-						url:url,
-						data: JSON.stringify(that.localDealInfo),
-            dataType: "json",
-            contentType:"application/json;charset=utf-8",
-						async:false,
-					}, function(data){
-						if(data.code==0){
-              console.log("成功")
-              location.hash="/yhzx/deal/outlineDealIndex/outlineDealInfo?id="+that.$route.query.id;
-						}else if(data.code==-1){
-							console.log("失败")
-						}
-					},function(err){
-            console.log("error")
-          })
+          
       }
     }
   }

@@ -9,7 +9,7 @@
 					<div class="projectDetail">
 						<h3>{{pro.projectName}}</h3>
 						<p>{{pro.projectDescription}}</p>
-						<span></span>
+						<router-link :to="{name:'projectDetail',query:{id:pro.pkid}}" class="more" target="_blank"></router-link>
 						<div class="meng"></div>
 					</div>
 					
@@ -21,7 +21,7 @@
 		<div class="swiper-button-prev swiper-button-white"></div>
 		<div class="swiper-button-next swiper-button-white"></div>
 		<div class="search">
-			<router-link to="">更多优质项目等你发掘>></router-link>
+			<router-link :to='{name:"SearchProject",query:{kw:"all"}}'>更多优质项目等你发掘>></router-link>
 		</div>
 	</div>
 </template>
@@ -29,6 +29,8 @@
 <script>
 	import Swiper from "../../assets/js/lib/swiper/swiper.js"
   	import MyAjax from "../../assets/js/MyAjax.js"
+  	import Vue from "vue"
+  	import router from "../../router"
 	let galleryProject
   	export default {
 	    name: 'index_project',
@@ -73,13 +75,16 @@
 //	        			"projectName":"赶紧的",
 //	        		},
 	        	],
-	        	
+	        	slidesNum:"",
 	        
 	      }
 	    },
-	    mounted(){
+	    created(){
 	    	this.getData();
-	    	this.lunbo()
+	    },
+	    mounted(){
+//	    	console.log(this.slidesNum)
+	    	this.lunbo(this.slidesNum)
 	    },
 	    methods:{
 	    	getData(){
@@ -89,26 +94,32 @@
 						type: "GET",
 						url:url,
 						dataType: "json",
-						async: true,
+						async: false,
 					},function(data){
 						console.log(data)
 						//给获取的数据分组
-						that.proMsg = data.msg.records;
+						Vue.set(that,"proMsg",data.msg)
+						Vue.set(that,"slidesNum",data.msg.length)
+//						that.proMsg = data.msg.records;
 //						for(var i=0,len=data.msg.records.length;i<len;i+=3){
 //						   that.perMsg.push(data.msg.records.slice(i,i+3));
 //						}
-					console.log(that.proMsg)
+//					console.log(that.slidesNum)
 					},function(err){
 						console.log(err)
 					})
 	    	},
-	    	lunbo(){
+	    	lookMore(id){
+	    		router.push({name:"projectDetail",id:id})
+	    	},
+	    	lunbo(slidesNum){
+	    		var that = this;
 	    		galleryProject = new Swiper('#index_project .gallery-project', {
 				watchSlidesProgress: true,
 				slidesPerView: 'auto',
 				centeredSlides: true,
 				loop: true,
-				loopedSlides: 12,
+				loopedSlides: slidesNum,
 				autoplay: false,
 				navigation: {
 					nextEl: '.swiper-button-next',
@@ -134,13 +145,13 @@
 							slide.transform('translateX(' + translate + ') scale(' + scale + ')');
 							slide.css('zIndex', zIndex);
 							slide.css('opacity', 1);
-							slide.find(".meng").css('opacity', 0.6)
+							slide.find(".meng").css('display', "block")
 							if (Math.abs(slideProgress) > 1) {
 								slide.css('opacity', 0);
 								
 							}
 							if(Math.abs(slideProgress)==0){
-								slide.find(".meng").css('opacity', 0)
+								slide.find(".meng").css('display', "none")
 							}
 						}
 					},
@@ -234,7 +245,7 @@
 				    padding:0 20px 1px 45px;
 				    background:url(http://newimg88.b0.upaiyun.com/newimg88/2014/09/ellipsis_bg.png) repeat-y;
 				}*/
-				span{
+				.more{
 					float:right;
 					width: 102px;
 					height: 34px;

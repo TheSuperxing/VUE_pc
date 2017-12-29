@@ -16,7 +16,7 @@
 							</dt>
 						</dl>
 						<div class="more">
-							<router-link :to="{name:'personDetail',query:{id:item.pkid}}" target="_blank">
+							<router-link :to="{name:'personDetail',query:{id:item.accountID}}" target="_blank">
 								<img src="../../assets/img/header/more.png" />
 							</router-link>
 						</div>
@@ -27,7 +27,7 @@
 			<div class="swiper-pagination swiper-pagination-personal"></div>
 			</div>  
 			<div class="search">
-				<router-link to="">去看看更多新伙伴>></router-link>
+				<router-link :to='{name:"SearchPersonal",query:{kw:"all"}}'>去看看更多新伙伴>></router-link>
 			</div>
   </div>
 </template>

@@ -2,7 +2,7 @@
 <div class="projectDetail">
 	
 		<h3 class="c-title" v-bind:class="{'comStyle':user.userState==1,'teamStyle':user.userState==2,'personStyle':user.userState==0}">
-			<span class="proname">{{project.proName}}</span>
+			<span class="proname">{{project.projectName}}</span>
 			<em class="addToPro" @click="addThisPro">加入项目</em>
 			<div id="modal-overlay" class="addNotice">
 				<div class="modal-wrap">
@@ -16,21 +16,21 @@
 		</h3>
 		<ul class="detail-content">
 			<li class="proPlace">
-				<div>项目地点</div><div class="">{{project.proPlace}}</div>
+				<div>项目地点</div><div class="">{{project.projectPlace}}</div>
 			</li>
 			<li class="proState">
-				<div>项目状态</div><div class="">{{project.proState}}</div>
+				<div>项目状态</div><div class="">{{project.projectState}}</div>
 			</li>
 			<li class="proTime">
-				<div>建成时间</div><div class="">{{project.compalteTime_E}}</div>
+				<div>建成时间</div><div class="">{{project.completeTime}}</div>
 			</li>
 			<li class="proFunc">
-				<div>建筑功能</div><div class="">{{project.proFunc}}</div>
+				<div>建筑功能</div><div class="">{{project.architectFunction}}</div>
 			</li>
 			<li class="proDesc">
 				
 				<div>项目描述</div>
-				<div class="">{{project.proDesc}}
+				<div class="">{{project.projectDescription}}
 				</div>
 				
 			</li>
@@ -40,8 +40,8 @@
 				<div>项目图片</div>
 				<div>
 					<ul id="imgViewer">
-						<li v-for="item in imgInfo">
-							<img :src="item.src" @click="ShowImgModal"/>
+						<li v-for="item in project.projectpicinfos">
+							<img :src="item.pic" @click="ShowImgModal"/>
 						</li>
 					</ul>
 				</div>
@@ -89,6 +89,7 @@
 	import 	MyAjax from "../../assets/js/MyAjax.js"
 	import Datepicker from "../units/Datepicker.vue"
 	import router from "../../router"
+	import Vue from "vue"
 	export default{
 		name:"ProjectDetail",
 		components:{
@@ -103,7 +104,6 @@
 	        dutycont:'0',
 	        detailtext:"",
 	        detailcont:'0',
-	        proInfos:[],
 	        project:{},/*由项目主页点击进去的相应项目*/
 	        id:"",
 	        compalteTime:[],
@@ -137,48 +137,82 @@
 	    
 	    computed:mapState({
 		    companyProInfo:state=>state.company.companyMessage.companyProInfo,/*获取vuex数据*/
-		 	user:state=>state.userState.user,
-		}),
-		create(){
+			 	user:state=>state.userState.user,
+			}),
+		created(){
 			
+			this.getData()
 		},
 		mounted(){
 			$('html').scrollTop(0);
 			this.user.userState = sessionStorage.getItem("state");//登录用户身份
-			console.log(this.user.userState+"aa");
 			
 			$(document.body).css("overflow-y","scroll");
-			var str = JSON.stringify(this.companyProInfo);
-    		var data = JSON.parse(str);
-    		this.proInfos = data;/*获取vuex里面所有项目信息*/
-    		
-			
-	    	this.id = this.$route.query.id;
+//			var str = JSON.stringify(this.companyProInfo);
+//  		var data = JSON.parse(str);
+//  		this.proInfos = data;/*获取vuex里面所有项目信息*/
+//  		
+//			
+//	    	this.id = this.$route.query.id;
 //	    	console.log(this.id)
-	    	for(var i=0;i<this.proInfos.length;i++){
-	    		if(this.proInfos[i].id == this.id){
-	    			
-	    			this.project = this.proInfos[i];
-	    		}
-	    	}
+//	    	for(var i=0;i<this.proInfos.length;i++){
+//	    		if(this.proInfos[i].id == this.id){
+//	    			
+//	    			this.project = this.proInfos[i];
+//	    		}
+//	    	}
 	    	
 
 			
 	    },
 	    methods:{
+	    	getData(){
+					console.log(this.$route.query.id)
+					var that = this;
+					var url = MyAjax.urlsy+"/ediHomePage/projDetail/" + that.$route.query.id
+			    	MyAjax.ajax({
+							type: "GET",
+							url:url,
+							dataType: "json",
+							async:false,
+						},function(data){
+							console.log(data)
+								if(data.code==0){
+									console.log(data.msg)
+									Vue.set(that,"project",data.msg)
+								}
+							console.log(that.project)
+						},function(err){
+							console.log(err)
+						})
+			    	function emptyText(text) {
+					    if(text == null||text.length == 0){
+					      return "（暂无信息）";
+					    }else {
+					      return text;
+					    }
+						}
+			    	that.project.completeTime = emptyText(that.project.completeTime);
+			    	that.project.projectState = emptyText(that.project.projectState);
+			    	that.project.projectDescription = emptyText(that.project.projectDescription);
+			    	that.project.partakeTimeUp = emptyText(that.project.partakeTimeUp);
+			    	that.project.partakeTimeDown = emptyText(that.project.partakeTimeDown);
+			    	that.project.takeOffice = emptyText(that.project.takeOffice);
+			    	that.project.detailDes = emptyText(that.project.detailDes);
+				},
 	    	addThisPro(){
 	    		//需先判断有没有完善基础信息；
 	    		Modal.makeText($(".addNotice"))
 	    	},
 	    	ShowImgModal(){
 //	    		Modal.makeText($(".imgShow"))
-				$("#imgViewer").viewer()
+					$("#imgViewer").viewer()
 
 	    	},
 	    	closeModal(){
-				Modal.closeModal($(".imgShow"))
-				Modal.closeModal($(".addNotice"))
-			},
+					Modal.closeModal($(".imgShow"))
+					Modal.closeModal($(".addNotice"))
+				},
 	    }
 	}
 </script>
@@ -192,6 +226,7 @@ $activeColor: #2eb3cf;
 	background: $bfColor;
 	border-radius: 5px;
 	padding: 40px;
+	margin: 120px auto;
 	.c-title{
       height:34px;
       border-bottom:1px solid #ebebeb;

@@ -29,7 +29,7 @@
 			<div class="swiper-pagination swiper-pagination-personal"></div>
 			</div>  
 			<div class="search">
-				<router-link to="">去看看更多大牛团队>></router-link>
+				<router-link :to='{name:"SearchTeam",query:{kw:"all"}}'>去看看更多大牛团队>></router-link>
 			</div>
   </div>
 </template>

@@ -15,16 +15,18 @@
 				<ul>
 					<li v-for="item in resultList">
 						<dl>
-							<dd><img :src="item.psnAvatar"/></dd>
-							<dt>
-								<h6 v-bind:class="{perconfirm:false,unperconfirm:true}">
-									{{item.nickName}}
-									<img src="../../assets/img/header/2020.png" v-if="item.rnastatus=='0'"/>
-									<img src="../../assets/img/header/2121.png" v-if="item.rnastatus=='1'"/>
-								</h6>
-								<p class="comName" v-bind:class="{comConfirm:false,uncomConfirm:true}"><!--{{item.companyName}}-->和水果撒娇咖啡和水果撒娇咖啡机机</p>
-								<p class="ocupada"><!--{{item.occupy}}-->执行总裁</p>
-							</dt>
+							<router-link :to="{name:'personDetail',query:{id:item.accountID}}" target="_blank" >
+								<dd><img :src="item.pic"/></dd>
+								<dt>
+									<h6 v-bind:class="{perconfirm:false,unperconfirm:true}">
+										{{item.nickName}}
+										<img src="../../assets/img/header/2020.png" v-if="item.rnastatus=='0'"/>
+										<img src="../../assets/img/header/2121.png" v-if="item.rnastatus=='1'"/>
+									</h6>
+									<p class="comName" v-bind:class="{comConfirm:false,uncomConfirm:true}"><!--{{item.companyName}}-->腾讯科技</p>
+									<p class="ocupada"><!--{{item.occupy}}-->执行总裁</p>
+								</dt>
+							</router-link>
 						</dl>
 					</li>
 				</ul>
@@ -176,13 +178,15 @@
 					}, function(data){
 						console.log(data)
 						if(data.code==0){
-							that.resultList = data.msg.records;
+							Vue.set(that,"resultList",data.msg.records)
+							Vue.set(that,"pages",data.msg.pages)
+							Vue.set(that,"current_page",data.msg.current)
 							if(that.resultList.length!=0){
 								that.haveResult = true;
 							}else{
 								that.haveResult = false;
 							}
-							that.pages = data.msg.pages
+							
 						}else{
 							that.haveResult = false;
 						}
@@ -210,7 +214,7 @@
     			this.searchText = this.hotWords[index]
     		},
     		search(current_page){
-    			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
+//  			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
     			
     			var that =this ;
     			var url = MyAjax.urlsy + "/ediHomePage/searchPerson/"+ current_page ;
@@ -222,8 +226,9 @@
 				},function(data){
 					console.log(data)
 					if(data.code==0){
-						that.resultList = data.msg.records
-						that.pages = data.msg.pages
+						Vue.set(that,"resultList",data.msg.records)
+						Vue.set(that,"pages",data.msg.pages)
+						Vue.set(that,"current_page",data.msg.current)
 						if(that.resultList.length!=0){
 							that.haveResult = true;
 						}else{
@@ -250,13 +255,12 @@
 			},
 		},
 		watch:{
-			current_page:function(){
+    		current_page:function(){
+//				location.hash=location.hash.split("=")[0]+"="+this.current_page
 				this.jumpPage(this.current_page);
-			},
-//			$route.query.kw:function(){
-//				console.log(this.$route.query)
-//			}
-		}
+				
+    		}
+    	}
 	}
 </script>
 
@@ -306,6 +310,7 @@
         }
 		.result-wrap{
 			min-height: 200px;
+			margin-top: 30px;
 			.stateNone{
 				width: 100%;
 				min-height: 200px;
@@ -326,10 +331,17 @@
 						margin-right: 20px;
 						margin-bottom: 20px;
 						border-radius: 10px;
+						&:hover{
+							box-shadow: 0 0 15px rgba(160,160,160,.6);
+						}
 						&:nth-child(4n){
 							margin-right: 0;
 						}
 						dl{
+							a{
+								width: 100%;
+								height: 100%;
+							}
 							width: 285px;
 							height: 140px;
 							padding: 15px 20px;
@@ -355,11 +367,18 @@
 									color: #FF7403;
 									min-height: 30px;
 									line-height: 24px;
+									min-height: 48px;
+									overflow : hidden;
+									text-overflow: ellipsis;
+									display: -webkit-box;
+									-webkit-line-clamp: 1;
+									-webkit-box-orient: vertical;
 								}
 								.comName{
 									font-size: 14px;
 									color: #333333;
 									line-height: 20px;
+									min-height: 40px;
 									flex-wrap: wrap;
 									overflow : hidden;
 									text-overflow: ellipsis;
@@ -371,7 +390,7 @@
 								.ocupada{
 									font-size: 14px;
 									color: #808080;
-									line-height: 30px;
+									line-height: 24px;
 									overflow : hidden;
 									text-overflow: ellipsis;
 									display: -webkit-box;

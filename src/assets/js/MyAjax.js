@@ -4,8 +4,8 @@
 import {cookieTool} from "./cookieTool.js"
 import fetchJsonp from "fetch-jsonp"
 var MyAjax = {
-	urlsy:"http://10.1.31.28:8080",
-	urlhw:"http://10.1.31.28:8080",
+	urlsy:"http://10.1.31.16:8080",
+	urlhw:"http://10.1.31.16:8080",
 	ajax(option,callback,errCallback) {
 		$.ajax({
 			type: option.type,

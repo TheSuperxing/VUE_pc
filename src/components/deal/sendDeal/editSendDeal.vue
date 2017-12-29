@@ -703,10 +703,9 @@
         Vue.set(select,[index],true)
       },
       addStageTask(){//阶段任务的添加
-        console.log(this.localDealInfo.content.stageTask)
-        this.localDealInfo.content.stageTask.push({price:'',taskDetail:'',taskState:'',time:''})
-        var chineseNumber = new ChineseNumber(this.localDealInfo.content.stageTask.length);
-        Vue.set(this.chineseNumber,[this.localDealInfo.content.stageTask.length-1],chineseNumber.getChineseNumber())
+        this.localDealInfo.dealstageinfos.push({price:'',taskDetail:'',taskState:'',time:''})
+        var chineseNumber = new ChineseNumber(this.localDealInfo.dealstageinfos.length);
+        Vue.set(this.chineseNumber,[this.localDealInfo.dealstageinfos.length-1],chineseNumber.getChineseNumber())
       },
       deleteAccessory(index,types){//附件删除
         if(types=="newFile"){

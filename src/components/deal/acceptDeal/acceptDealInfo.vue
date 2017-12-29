@@ -189,13 +189,13 @@
               </li>       
               
               <li  v-if="!(data.dealInfo.dealState=='签订中'||data.dealInfo.dealState=='审核中')&&data.dealInfo.myRole=='甲方'" class="stageTaskButton">
-                <p v-if="!(data.dealInfo.dealState=='履行中'&&(data.dealInfo.dealstageinfos[index].taskType!='2'))">阶段内容已完成</p>
-                <p v-if="!(data.dealInfo.dealState=='履行中'&&(data.dealInfo.dealstageinfos[index].taskType!='2'))">等待对方确认收款</p>
-                <button v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType!='2'||data.dealInfo.dealstageinfos[index].taskType!='4'" @click="stagePayment(index,item)" v-cloak>{{stageTask.text[index]}}</button>
+                <p v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType=='4'">阶段内容已完成</p>
+                <p v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType=='2'">等待对方确认收款</p>
+                <button v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType!='2'&&data.dealInfo.dealstageinfos[index].taskType!='4'" @click="stagePayment(index,item)" v-cloak>{{stageTask.text[index]}}</button>
               </li>
 
               <li  v-if="!(data.dealInfo.dealState=='签订中'||data.dealInfo.dealState=='审核中')&&data.dealInfo.myRole=='乙方'" class="stageTaskButton">
-                <p v-if="!(data.dealInfo.dealState=='履行中'&&(data.dealInfo.dealstageinfos[index].taskType!='4'))">阶段内容已完成</p>
+                <p v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType=='4'">阶段内容已完成</p>
                 <button v-if="data.dealInfo.dealState=='履行中'&&data.dealInfo.dealstageinfos[index].taskType!='4'" @click="stagePayment(index,item)" v-cloak>{{stageTask.text[index]}}</button>
               </li>
               <!--以上是阶段任务状态按钮-->
@@ -812,9 +812,9 @@
             console.log(err)
           })
       },
-      getMoneyReceived(index,pkid){//收到货款
+      getMoneyReceived(index,pkid,dealId){//收到货款
         var that=this;
-          var url = MyAjax.urlsy+"/dealbasicinfo/moneyReceived/"+pkid;
+          var url = MyAjax.urlsy+"/dealbasicinfo/moneyReceived/"+pkid+"/"+dealId;
           MyAjax.ajax({
             type: "GET",
             url:url,
@@ -995,10 +995,10 @@
               //var modal5=new ModalOpp("#modal-overlay5");
               //modal5.makeText();
               //this.price=dealstageinfos[index].price
-              this.getMoneyReceived(index,dealstageinfos[index].pkid)
+              this.getMoneyReceived(index,dealstageinfos[index].pkid,this.data.dealInfo.pkid)
               break;
             case 2:
-              this.getMoneyReceived(index,dealstageinfos[index].pkid)
+              this.getMoneyReceived(index,dealstageinfos[index].pkid,this.data.dealInfo.pkid)
               break;
           }
         }
@@ -1803,12 +1803,12 @@
             //   }
             // }
             .stageTaskButton{
-              width: 100px;
+              width: 115px;
               position: absolute;
               top: 10px;
               right:0;
               p{
-                width:100px;
+                width:115px;
                 float: left;
                 color: #f56212;
               }

@@ -5,14 +5,15 @@
 		<div class="swiper-container  gallery-project">
 			<div class="swiper-wrapper">
 				<div v-for="pro in proMsg" class="swiper-slide">
-					<div class="img"><img :src="pro.pic" /></div>
-					<div class="projectDetail">
-						<h3>{{pro.projectName}}</h3>
-						<p>{{pro.projectDescription}}</p>
-						<router-link :to="{name:'projectDetail',query:{id:pro.pkid}}" class="more" target="_blank"></router-link>
-						<div class="meng"></div>
-					</div>
-					
+					<router-link :to="{name:'projectDetail',query:{id:pro.pkid}}" target="_blank">
+						<div class="img"><img :src="pro.pic" /></div>
+						<div class="projectDetail">
+							<h3>{{pro.projectName}}</h3>
+							<p>{{pro.projectDescription}}</p>
+							<span class="more"></span>
+							<div class="meng"></div>
+						</div>
+					</router-link>
 				</div>
 			
 			</div>
@@ -201,6 +202,11 @@
 		margin-top: 50px;
 		.swiper-slide{
 			padding: 10px;
+			a{
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
 			.img{
 				width: 465px;
 				height: 322px;

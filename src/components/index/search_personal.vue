@@ -165,7 +165,7 @@
     	},
 		methods:{
 			jumpPage(current_page){
-    			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
+    			location.hash = location.hash.split("=")[0]+"="+ this.searchText;
     			var that = this;
     			if(that.searchText.trim().length!=0){
     				var url = MyAjax.urlsy+"/ediHomePage/searchPersonByKeyWords/"+ current_page +"/"+that.searchText

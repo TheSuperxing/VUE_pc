@@ -9,13 +9,16 @@
 		</div>
 		<div class="result-wrap">
 			<ul class="">
-				<li v-for="pro in resultList">
-					<img :src="pro.pic" />
-					<div class="projectDetail">
-						<h3>{{pro.projectName}}</h3>
-						<p>{{pro.projectDescription}}</p>
-						<router-link :to="{name:'projectDetail',query:{id:pro.pkid}}" class="more" target="_blank"></router-link>
-					</div>
+				<li v-for="pro in resultList" v-if="haveResult">
+					<router-link :to="{name:'projectDetail',query:{id:pro.pkid}}" target="_blank">
+						<img :src="pro.pic" />
+						<div class="projectDetail">
+							<h3>{{pro.projectName}}</h3>
+							<p>{{pro.projectDescription}}</p>
+							<span class="more"></span>
+							
+						</div>
+					</router-link>
 				</li>
 			</ul>
 			<div class="page" v-if="haveResult">
@@ -32,7 +35,7 @@
 			      <span :class="{disabled:pend}" class="next" @click="pagePlus"></span>
 			    </div>
 			</div>
-			<div class="stateNone">
+			<div class="stateNone" v-if="!haveResult">
 				在月球也没找到~
 			</div>
 		</div>
@@ -243,14 +246,20 @@ $themeColor:#ff7403;
 			box-shadow: 0 0 15px rgba(179,179,179,.5);
 			padding: 0 20px;
 			margin: 0px auto 0;
-			background: url(../../assets/img/header/1717.png) no-repeat right center;
 			background-color: #FFFFFF;
 			background-position: 650px;
 			input{
-        		width: 100%;
+        		width: 95%;
         		height: 100%;
         		background: none;
         		font-size: 16px;
+        	}
+        	.searchButton{
+        		width: 5%;
+        		height: 100%;
+        		float: right;
+        		background: url(../../assets/img/header/1717.png) no-repeat center;
+        		cursor: pointer;
         	}
 		}
 		.hotWordsWrap{
@@ -288,7 +297,11 @@ $themeColor:#ff7403;
 				width: 949px;
 				margin: 0 auto;
 				&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
-				
+				a{
+					width: 100%;
+					height: 100%;
+					display: block;
+				}
 				li{
 					width: 949px;
 					height: 342px;

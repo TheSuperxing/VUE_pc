@@ -4,7 +4,7 @@
     <h1>需求大厅</h1>
     <div v-on:mouseenter="stopPlay()" v-on:mouseleave="play()" class="swiper-container gallery-demand swiper-container-horizontal">  
 			<div class="swiper-wrapper">  
-				<ul v-for="ul in perMsg" class="swiper-slide swiper-slide-next">
+				<ul v-for="ul in perMsg" class="swiper-slide swiper-slide-next" style="width: 100%; margin-right: 15px;">
 					<li v-for="item in ul">
 							<div class="name-wrap">
 								<img :src="item.pic" alt=""/>
@@ -59,7 +59,7 @@
 					type: "GET",
 					url:url,
 					dataType: "json",
-					async: true,
+					async: false,
 				},function(data){
 					console.log(data)
 					//给获取的数据分组

@@ -30,24 +30,24 @@
 					<li>
 						<router-link :to='{name:"SearchTeam",query:{kw:"all"}}'>
 							<h1>找团队</h1>
-							<p>找个人？找同事？</p>
-							<p>即可进入搜索页，找到他们</p>
+							<p>进来试试吧</p>
+							<p>找到属于你的super team</p>
 						</router-link>
 						
 					</li>
 					<li>
 						<router-link :to='{name:"SearchCompany",query:{kw:"all"}}'>
 							<h1>找公司</h1>
-							<p>找个人？找同事？</p>
-							<p>即可进入搜索页，找到他们</p>
+							<p>来这里！来这里！</p>
+							<p>你能找到更多业内公司</p>
 						</router-link>
 						
 					</li>
 					<li>
 						<router-link :to='{name:"SearchProject",query:{kw:"all"}}'>
 							<h1>找项目</h1>
-							<p>找个人？找同事？</p>
-							<p>即可进入搜索页，找到他们</p>
+							<p>一个与你相关的</p>
+							<p>中国最知名的建筑项目</p>
 						</router-link>
 					</li>
 				</ul>

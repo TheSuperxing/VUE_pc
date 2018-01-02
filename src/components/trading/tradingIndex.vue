@@ -295,7 +295,7 @@
     	},
     	watch:{
     		current_page:function(){
-//				location.hash=location.hash.split("=")[0]+"="+this.current_page
+				
 				this.jumpPage(this.current_page);
 				
     		}

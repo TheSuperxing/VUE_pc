@@ -42,9 +42,9 @@ import languageAndSoftwareIndex from "../../components/personal/languageAndSoftw
 
 var personalRouterChildren=[
   {
-  	path:"/yhzx/personal",component:personal_content,redirect:"/yhzx/personal/overview",
+  	path:"/yhzx/personal",component:personal_content,redirect:"/yhzx/personal/info",
   	children:[
-  		{path:"/yhzx/personal/overview", component:overview,},
+//		{path:"/yhzx/personal/overview", component:overview,},
 	  	{path:"/yhzx/personal/info",component:personal,redirect:"/yhzx/personal/info/personalIndex",
 		    children:[
 		    	

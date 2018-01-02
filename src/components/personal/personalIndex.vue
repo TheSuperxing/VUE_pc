@@ -279,11 +279,12 @@
     },
     created(){
       this.getData();
+      this.getAvatar();
     },
     mounted(){
       var that=this;
       //获取头像
-      this.getAvatar();
+      
 
     	var options =
 			{
@@ -301,42 +302,48 @@
 				}
 				var files=document.getElementById("upload-file").files[0];
 				reader.readAsDataURL(files);
-				console.log(files.name)
+//				console.log(files)
 				that.fileName = files.name;
 				
 			})
+			
 			$('#btnCrop').on('click', function(){
-				var img = cropper.getDataURL();
+//				console.log(document.getElementById("upload-file").files[0])
+				if(document.getElementById("upload-file").files[0]!=undefined){
+					var img = cropper.getDataURL();
 //				console.log(img)
 //				console.log(cropper.image)
-				that.personal.personalPicture = img;
-
-				$('.cropped').html('');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+					that.personal.personalPicture = img;
+	
+					$('.cropped').html('');
+					$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
+					$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
+					$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+					
+	//				var Blob = cropper.getBlob();
+	//				var fd = new FormData();
+	//				fd.append('file',Blob);
+					Modal.closeModal($('.corpbox'))
+					var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
+					console.log(that.personal.personalPicture)
+	//				
+					
+					MyAjax.ajax({
+							type: "POST",
+							url:url,
+							data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
+							dataType: "json",
+	//						contentType:"application/json;charset=utf-8",//
+							async:false,
+						}, function(data){
+							that.dataInfo = data
+							console.log(that.dataInfo)
+							console.log(data)
+						},function(err){
+							console.log(err)
+						})
+				}
 				
-//				var Blob = cropper.getBlob();
-//				var fd = new FormData();
-//				fd.append('file',Blob);
-				Modal.closeModal($('.corpbox'))
-				var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
-				console.log(that.personal.personalPicture)
-//				
-				MyAjax.ajax({
-						type: "POST",
-						url:url,
-						data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
-						dataType: "json",
-//						contentType:"application/json;charset=utf-8",//
-						async:false,
-					}, function(data){
-						that.dataInfo = data
-						console.log(that.dataInfo)
-						console.log(data)
-					},function(err){
-						console.log(err)
-					})
 				
 			})
 			$('#btnZoomIn').on('click', function(){

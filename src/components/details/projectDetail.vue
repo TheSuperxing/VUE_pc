@@ -51,31 +51,34 @@
 			<li class="pro-companies">
 				<div>参与公司</div>
 				<ul class="list-wrap">
-					<li v-for="item in project.companies">
+					<li class="stateNone">暂无信息</li>
+					<!--<li v-for="item in project.companies">
 						<div>{{item.name}}</div>
 						<div>{{item.takeOffice}}</div>
 						<div>{{item.parTakeTime_S}}-{{item.parTakeTime_E}}</div>
-					</li>
+					</li>-->
 				</ul>
 			</li>
 			<li class="pro-companies">
 				<div>参与团队</div>
 				<ul class="list-wrap">
-					<li v-for="item in project.teams">
+					<li class="stateNone">暂无信息</li>
+					<!--<li v-for="item in project.teams">
 						<div>{{item.name}}</div>
 						<div>{{item.takeOffice}}</div>
 						<div>{{item.parTakeTime_S}}-{{item.parTakeTime_E}}</div>
-					</li>
+					</li>-->
 				</ul>
 			</li>
 			<li class="pro-companies">
 				<div>参与个人</div>
 				<ul class="list-wrap">
-					<li v-for="item in project.person">
+					<li class="stateNone">暂无信息</li>
+					<!--<li v-for="item in project.person">
 						<div>{{item.name}}</div>
 						<div>{{item.takeOffice}}</div>
 						<div>{{item.parTakeTime_S}}-{{item.parTakeTime_E}}</div>
-					</li>
+					</li>-->
 				</ul>
 			</li>
 		</ul>

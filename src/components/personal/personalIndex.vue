@@ -123,7 +123,7 @@
       <li>
         <h3 class="pi-title">团队经历</h3>
         <div class="infoContainer">
-          <div class="pi-empty" v-if="empty.teamExperience">（此处暂无信息）</div>
+          <div class="pi-empty" v-if="empty.teamOrgaInfos">（此处暂无信息）</div>
           <div v-for="(item,index) in this.psnMsg.teamOrgaInfos" class="clear">
             <h4 v-cloak>{{item.teamName}}</h4>
           </div>

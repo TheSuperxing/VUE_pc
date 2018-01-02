@@ -14,10 +14,10 @@
 					<li v-for="item in personalMessage.psnWorkExperiences">
 						<h5 class="">{{item.companyName}}</h5>
 						<div class="t-p-wrap">
-							<span>{{item.info.timeStart}}——{{item.info.timeEnd}}</span>
-							<span>{{item.info.profession}}</span>
+							<span>{{item.ocupationTimeUp}}——{{item.ocupationTimeDown}}</span>
+							<span>{{item.ocupation}}</span>
 						</div>
-						<div class="introduce">{{item.info.introduce}}</div>
+						<div class="introduce">{{item.jobDescription}}</div>
 					</li>
 				</ul> 
 			</div>
@@ -30,10 +30,10 @@
 					<li v-for="item in personalMessage.psnProjExpes">
 						<h5 class="">{{item.projectName}}</h5>
 						<div class="t-p-wrap">
-							<span>{{item.info.timeStart}}——{{item.info.timeEnd}}</span>
-							<span>{{item.info.profession}}</span>
+							<span>{{item.partakeTimeUp}}——{{item.partakeTimeDown}}</span>
+							<span>{{item.takeOffice}}</span>
 						</div>
-						<div class="introduce">{{item.info.introduce}}</div>
+						<div class="introduce">{{item.detailDes}}</div>
 						<router-link :to="{name:'ProjectDetail',query:{id:'1'}}" target="_blank">查看更多>></router-link>
 					</li>
 				</ul>
@@ -137,6 +137,19 @@
 			if(this.personalMessage.dealbasicinfos.length==0){
 				this.stateNone.dealInfo=true;
 			}
+			
+			
+			for(let i=0;i<this.personalMessage.psnWorkExperiences.length;i++){
+				if(this.personalMessage.psnWorkExperiences[i].ocupationTimeDown=="0002.12"){
+					this.personalMessage.psnWorkExperiences[i].ocupationTimeDown = "至今"
+				}
+			}
+			for(let i=0;i<this.personalMessage.psnProjExpes.length;i++){
+				if(this.personalMessage.psnProjExpes[i].partakeTimeDown=="0002.12"){
+					this.personalMessage.psnProjExpes[i].partakeTimeDown = "至今"
+				}
+			}	
+			
 			//console.log(this.stateNone)
 	},
 	methods:{

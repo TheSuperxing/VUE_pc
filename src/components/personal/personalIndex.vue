@@ -137,8 +137,12 @@
           <div v-for="(item,index) in this.psnMsg.psnQualifications" class="clear">
             <h4 v-cloak>{{item.qualificationName}}</h4>
             <div>
-              <p v-cloak>注册单位：{{item.registeredUnit}}</p>
-              <p v-cloak>证书编号：{{item.certificateNumber}}</p>
+              <p v-cloak>专业类别：&nbsp;&nbsp;{{item.professionCategory}}</p>
+	          	<p v-cloak>岗位名称：&nbsp;&nbsp;{{item.postName}}</p>
+	          	<p v-cloak>批准日期：&nbsp;&nbsp;{{item.approveDate}}</p>
+	          	<p v-cloak>签发单位：&nbsp;&nbsp;{{item.issueUnit}}</p>
+             	<p v-cloak>签发日期：&nbsp;&nbsp;{{item.issueDate}}</p>
+             	<p v-cloak>有效期至：&nbsp;&nbsp;{{item.validTill}}</p>
             </div>
           </div>
         </div>
@@ -149,13 +153,12 @@
         <div class="infoContainer">
           <div class="pi-empty" v-if="empty.psnTitleMessages">（此处暂无信息）</div>
           <div v-for="(item,index) in this.psnMsg.psnTitleMessages" class="clear">
-            <h4 v-cloak>{{item.professionalTitle}}</h4>
+            <h4 v-cloak>{{item.titleName}}</h4>
             <div>
-              <p v-cloak>职称专业：&nbsp;&nbsp;{{item.titleName}}</p>
-              <p v-cloak>职称级别：&nbsp;&nbsp;{{item.titleLevel}}</p>
+              <p v-cloak>职称专业：&nbsp;&nbsp;{{item.professionalTitle}}</p>
               <p v-cloak>证书编号：&nbsp;&nbsp;{{item.certificateNumber}}</p>
               <p v-cloak>评定日期：&nbsp;&nbsp;{{item.assessmentTime}}</p>
-              <p v-cloak>发证机构：&nbsp;&nbsp;{{item.certificateBody}}</p>
+              <p v-cloak>评审组织：&nbsp;&nbsp;{{item.certificateBody}}</p>
             </div>
           </div>
         </div>
@@ -279,11 +282,12 @@
     },
     created(){
       this.getData();
+      this.getAvatar();
     },
     mounted(){
       var that=this;
       //获取头像
-      this.getAvatar();
+      
 
     	var options =
 			{
@@ -301,42 +305,48 @@
 				}
 				var files=document.getElementById("upload-file").files[0];
 				reader.readAsDataURL(files);
-				console.log(files.name)
+//				console.log(files)
 				that.fileName = files.name;
 				
 			})
+			
 			$('#btnCrop').on('click', function(){
-				var img = cropper.getDataURL();
+//				console.log(document.getElementById("upload-file").files[0])
+				if(document.getElementById("upload-file").files[0]!=undefined){
+					var img = cropper.getDataURL();
 //				console.log(img)
 //				console.log(cropper.image)
-				that.personal.personalPicture = img;
-
-				$('.cropped').html('');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
-				$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+					that.personal.personalPicture = img;
+	
+					$('.cropped').html('');
+					$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
+					$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
+					$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+					
+	//				var Blob = cropper.getBlob();
+	//				var fd = new FormData();
+	//				fd.append('file',Blob);
+					Modal.closeModal($('.corpbox'))
+					var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
+					console.log(that.personal.personalPicture)
+	//				
+					
+					MyAjax.ajax({
+							type: "POST",
+							url:url,
+							data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
+							dataType: "json",
+	//						contentType:"application/json;charset=utf-8",//
+							async:false,
+						}, function(data){
+							that.dataInfo = data
+							console.log(that.dataInfo)
+							console.log(data)
+						},function(err){
+							console.log(err)
+						})
+				}
 				
-//				var Blob = cropper.getBlob();
-//				var fd = new FormData();
-//				fd.append('file',Blob);
-				Modal.closeModal($('.corpbox'))
-				var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
-				console.log(that.personal.personalPicture)
-//				
-				MyAjax.ajax({
-						type: "POST",
-						url:url,
-						data: {base64Data:that.personal.personalPicture,fileName:that.fileName},
-						dataType: "json",
-//						contentType:"application/json;charset=utf-8",//
-						async:false,
-					}, function(data){
-						that.dataInfo = data
-						console.log(that.dataInfo)
-						console.log(data)
-					},function(err){
-						console.log(err)
-					})
 				
 			})
 			$('#btnZoomIn').on('click', function(){
@@ -382,6 +392,9 @@
         if(psnEduBackGrounds.length!=0){
           Vue.set(this.empty,"education",false)
           for (let item in psnEduBackGrounds){
+          	if(psnEduBackGrounds[item].schoolTimeDown=="0002.12"){
+            	psnEduBackGrounds[item].schoolTimeDown = "至今"
+            }
             psnEduBackGrounds[item].professionName=emptyText(psnEduBackGrounds[item].professionName);
             psnEduBackGrounds[item].education=emptyText(psnEduBackGrounds[item].education);
           }
@@ -417,8 +430,15 @@
         if(psnQualifications.length!=0){
           Vue.set(this.empty,"psnQualifications",false)
           for (let item in psnQualifications){
-            psnQualifications[item].registeredUnit=emptyText(psnQualifications[item].registeredUnit);
+            psnQualifications[item].professionCategory=emptyText(psnQualifications[item].professionCategory);
+            psnQualifications[item].postName=emptyText(psnQualifications[item].postName);
+            psnQualifications[item].approveDate=emptyText(psnQualifications[item].approveDate);
             psnQualifications[item].qualificationName=emptyText(psnQualifications[item].qualificationName);
+            psnQualifications[item].issueUnit=emptyText(psnQualifications[item].issueUnit);
+            psnQualifications[item].issueDate=emptyText(psnQualifications[item].issueDate);
+            psnQualifications[item].validTill=emptyText(psnQualifications[item].validTill);
+            psnQualifications[item].manageNo=emptyText(psnQualifications[item].manageNo);
+            psnQualifications[item].certificateNumber=emptyText(psnQualifications[item].certificateNumber);
           }
         }
         //执业资格是否显示
@@ -427,7 +447,6 @@
           Vue.set(this.empty,"psnTitleMessages",false)
           for (let item in psnTitleMessages){
             psnTitleMessages[item].titleName=emptyText(psnTitleMessages[item].titleName);
-            psnTitleMessages[item].titleLevel=emptyText(psnTitleMessages[item].titleLevel);
             psnTitleMessages[item].certificateNumber=emptyText(psnTitleMessages[item].certificateNumber);
             psnTitleMessages[item].assessmentTime=emptyText(psnTitleMessages[item].assessmentTime);
             psnTitleMessages[item].certificateBody=emptyText(psnTitleMessages[item].certificateBody);
@@ -455,7 +474,10 @@
         
         if(psnPatents.length!=0){
           for (let item in psnPatents){
-            psnPatents[item].patentName=emptyText(psnPatents[item].patentName);
+            psnPatents[item].awardingBody=emptyText(psnPatents[item].awardingBody);
+            if(psnPatents[item].validityTermE=="0002.12"){
+            	psnPatents[item].validityTermE = "至今"
+            }
             if((psnPatents[item].validityTermS!=null||psnPatents[item].validityTermS.length!=0)&&(psnPatents[item].validityTermE!=null||psnPatents[item].validityTermE.length!=0)){
               this.validityTerm[item]= psnPatents[item].validityTermS+"——"+psnPatents[item].validityTermE
             }else{
@@ -787,17 +809,11 @@
       li:nth-child(6){
         .infoContainer{
           div{
-            p:nth-child(1){
-              width:800px;
-              padding-right:0;
-              padding-bottom:10px;
-              color: rgb(120,120,120);
-            }
-            p:nth-child(2){
-              width:800px;
-              padding-right:0;
-              color: rgb(53,53,53);
-            }
+           div{
+            p{
+	              width:800px;
+	            }
+	          }
           }
         }
       }

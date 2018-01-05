@@ -56,7 +56,7 @@
 			    	
 			    ],
 			    searchText:"",
-			    hotWords:["李彦宏","马化腾","马云","优秀"],
+			    hotWords:["全程","迈格设计","迈博","钜力结构","DI机电"],
 			    resultList:[],
 			    current_page: 1, //当前页
 		        pages: "5", //总页数

@@ -450,10 +450,10 @@
       },
       openOrPrivacy(index){//信息是否对外公开控制按钮
         var that=this;
-        if(this.paper[index].ifVisable==0){
-          Vue.set(this.paper[index],"ifVisable",1);
+        if(that.paper[index].ifVisable==0){
+          Vue.set(that.paper[index],"ifVisable",1);
         }else{
-          Vue.set(this.paper[index],"ifVisable",0);
+          Vue.set(that.paper[index],"ifVisable",0);
         }
         
         var url = MyAjax.urlsy+"/psnPaperPatent/updatePaper";
@@ -783,6 +783,9 @@
       /*显示编辑信息列表开始*/
       .paperInfo{
         border-bottom:1px solid $borderColor;
+        &:last-of-type{
+        	border-bottom: none;
+        }
         /*信息列表开始*/
         .paperInfoList{
           .paperInfoTitle{

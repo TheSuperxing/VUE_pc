@@ -1,7 +1,7 @@
 <template>
 	<div class="demandSlider">
 		<div class="wallet-bar">
-			<router-link to="/yhzx/demand/wallet" class="myWallet"><img src="../../assets/img/wallet/icon63.png" />我的钱包</router-link>
+			<router-link to="/yhzx/demand/wallet" class="myWallet"><img src="../../assets/img/wallet/icon63.png" />我的交易记录</router-link>
 			<ul class="sideNavList">
 				<li v-for="item in sideNav">
 					<router-link :to="item.router">

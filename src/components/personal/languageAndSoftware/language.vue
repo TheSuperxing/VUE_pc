@@ -669,7 +669,7 @@
 					})
 	        that.updateData();
 	        setTimeout(()=>(
-						$("#fine-uploader-manual-trigger-paper").html("")
+						$("#fine-template-manual-trigger-language").html("")
         	),1)
 	        Vue.set(this.reveal,"addLanguage",true);
       	}else{

@@ -4,7 +4,7 @@
     <h1>个人推介</h1>
     <div v-on:mouseenter="stopPlay()" v-on:mouseleave="play()" class="swiper-container gallery swiper-container-horizontal">  
 			<div class="swiper-wrapper">  
-				<ul v-for="ul in perMsg" class="swiper-slide swiper-slide-next">
+				<ul v-for="ul in perMsg" class="swiper-slide swiper-slide-next" style="width: 100%; margin-right: 15px;">
 					<li v-for="item in ul">
 						<dl>
 							<dd>
@@ -34,7 +34,7 @@
 
 <script>
 	import Swiper from "../../assets/js/lib/swiper/swiper.js"
-    import MyAjax from "../../assets/js/MyAjax.js"
+  import MyAjax from "../../assets/js/MyAjax.js"
 	let gallery
   export default {
     name: 'index_personal',
@@ -44,9 +44,13 @@
         
       }
     },
-    mounted(){
+    created(){
     	var that = this;
     	that.getData();
+    },
+    mounted(){
+    	var that = this;
+    	
     	that.lunbo()  
 			
     },
@@ -58,7 +62,7 @@
 					type: "GET",
 					url:url,
 					dataType: "json",
-					async: true,
+					async: false,
 				},function(data){
 					console.log(data)
 					//给获取的数据分组
@@ -123,6 +127,7 @@
 			color: #808080;
 		}
 		.gallery{
+			width: 1230px;
 			margin: 40px auto 0px;
 			padding-bottom: 40px;
 			padding-left: 15px;

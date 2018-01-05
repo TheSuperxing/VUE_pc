@@ -2,7 +2,7 @@
 	<div class="search_personal">
 		<div class="search-wrap" @keydown="keySearch($event)">
 			<input type="text" placeholder="搜索个人" v-model="searchText"/>
-			<span class="searchButton" @click="jumpPage(current_page)"></span>
+			<span class="searchButton" @click="searchClick(current_page)"></span>
 		</div>
 		<div class="hotWordsWrap">
 			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
@@ -15,7 +15,7 @@
 				<ul>
 					<li v-for="item in resultList">
 						<dl>
-							<router-link :to="{name:'personDetail',query:{id:item.accountID}}" target="_blank" >
+							<router-link :to="{name:'personDetail',query:{id:item.accountID}}" target="_blank">
 								<dd><img :src="item.pic"/></dd>
 								<dt>
 									<h6 v-bind:class="{perconfirm:false,unperconfirm:true}">
@@ -23,8 +23,8 @@
 										<img src="../../assets/img/header/2020.png" v-if="item.rnastatus=='0'"/>
 										<img src="../../assets/img/header/2121.png" v-if="item.rnastatus=='1'"/>
 									</h6>
-									<p class="comName" v-bind:class="{comConfirm:false,uncomConfirm:true}"><!--{{item.companyName}}-->腾讯科技</p>
-									<p class="ocupada"><!--{{item.occupy}}-->执行总裁</p>
+									<p class="comName" v-bind:class="{comConfirm:false,uncomConfirm:true}">{{item.companyName}}</p>
+									<p class="ocupada">{{item.ocupation}}</p>
 								</dt>
 							</router-link>
 						</dl>
@@ -49,25 +49,25 @@
 		</div>
 		<div class="hot-list">
 			<h1><span>热门用户</span></h1>
-			<ul v-for="ul in perMsg">
-				<li v-for="item in ul">
+			<ul >
+				<li v-for="item in hotList">
 					<dl>
 						<dd>
-							<img :src="item.img" alt=""/>
+							<img :src="item.pic" alt=""/>
 						</dd>
 						<dt>
 							<h3>名字</h3>
-							<p>介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍</p>
+							<p>{{item.selfIntroduction}}</p>
 						</dt>
 					</dl>
 					<div class="more">
-						<router-link to="">
+						<router-link :to="{name:'personDetail',query:{id:item.pkid}}" target="_blank">
 							<img src="../../assets/img/header/more.png"/>
 						</router-link>
 					</div>
 				</li>
 			</ul>
-			<div class="change">不感兴趣  换一批</div>
+			<div class="change" @click="getHotList">不感兴趣  换一批</div>
 		</div>
 	</div>
 </template>
@@ -98,8 +98,9 @@
 			    	
 			    ],
 			    searchText:"",
-			    hotWords:["李彦宏","马化腾","马云","优秀"],
+			    hotWords:["陈菁","韩飞","黄应霞","李广良","裘毅冲"],
 			    resultList:[],
+			    hotList:[],
 			    current_page: 1, //当前页
 		        pages: "5", //总页数
 		        changePage:'1',//跳转页
@@ -119,10 +120,12 @@
     		}, 	 	
     		efont: function() {
     			if(this.pages <= 7) return false;
+    			if(this.pages==8) return false;
     			return this.current_page > 5
     		},
     		ebehind: function() {
     			if(this.pages <= 7) return false;
+    			if(this.pages==8) return false;
     			var nowAy = this.indexs;
     			return nowAy[nowAy.length - 1] != this.pages;
     		},
@@ -138,11 +141,24 @@
     				} else {
     					if(this.current_page <= 5) {
     						left = 1;
-    						right = 7;
+    						if(this.pages==7&&this.current_page <=2){
+    							right = 6;
+    						}else{
+    							right = 7;
+    						}
+    						if(this.pages==8&&(this.current_page ==4||this.current_page ==5)){
+    							right = 8;
+    						}
+    						if(this.pages==9&&this.current_page ==5){
+    							right = 9;
+    						}
     					} else {
     						right = this.pages;
-
-    						left = this.pages - 6;
+    						if(this.pages==7){  //正好等于7的情况
+    							left = this.pages - 5;
+    						}else{
+    							left = this.pages - 6;
+    						}
     					}
     				}
     			}
@@ -162,10 +178,15 @@
 //  			Vue.set(this,"searchText",this.$route.query.kw)
 //  		}
     		this.search(this.current_page);
+    		this.getHotList();
     	},
 		methods:{
+			searchClick(current_page){
+				this.jumpPage(current_page);
+				this.current_page = 1;
+			},
 			jumpPage(current_page){
-    			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
+    			location.hash = location.hash.split("=")[0]+"="+ this.searchText;
     			var that = this;
     			if(that.searchText.trim().length!=0){
     				var url = MyAjax.urlsy+"/ediHomePage/searchPersonByKeyWords/"+ current_page +"/"+that.searchText
@@ -186,7 +207,14 @@
 							}else{
 								that.haveResult = false;
 							}
-							
+							for(let i=0;i<that.resultList.length;i++){
+								if(that.resultList[i].companyName==null){
+									that.resultList[i].companyName = "暂无信息"
+								}
+								if(that.resultList[i].ocupation==null){
+									that.resultList[i].ocupation = "暂无信息"
+								}
+							}
 						}else{
 							that.haveResult = false;
 						}
@@ -199,8 +227,7 @@
     				that.search(current_page)
     			}
     			
-				
-				
+//				that.current_page = 1;
     		},
     		pagePlus() {
     			this.current_page++;
@@ -234,6 +261,14 @@
 						}else{
 							that.haveResult = false;
 						}
+						for(let i=0;i<that.resultList.length;i++){
+							if(that.resultList[i].companyName==null){
+								that.resultList[i].companyName = "暂无公司信息"
+							}
+							if(that.resultList[i].ocupation==null){
+								that.resultList[i].ocupation = "暂无职位信息"
+							}
+						}
 					}else{
 						that.haveResult = false;
 					}
@@ -244,15 +279,34 @@
     		keySearch($event){//enter
 		      	var event = $event || window.event;  
 			 	if(event.keyCode==13){ 
-			     this.jumpPage(this.current_page);
-		         event.returnValue = false;    
-		         event.cancelBubble=true;
-		         event.preventDefault();
-		         //event.stopProgagation();
-		         return false;
+			        this.jumpPage(this.current_page);
+		            event.returnValue = false;    
+		            event.cancelBubble=true;
+		            event.preventDefault();
+		            //event.stopProgagation();
+		            return false;
 		      	} 
-		
+		      	this.current_page = 1;
 			},
+			getHotList(){
+				var that = this;
+				var url = MyAjax.urlsy+"/ediHomePage/popPersons";
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType:"json",
+					async: false,
+//					contentType:"application/json;charset=utf-8",
+				}, function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"hotList",data.msg)
+					}
+				},function(err){
+//					router.push("/error/404")
+					console.log(err)
+				})
+			}
 		},
 		watch:{
     		current_page:function(){
@@ -378,7 +432,7 @@
 									font-size: 14px;
 									color: #333333;
 									line-height: 20px;
-									min-height: 40px;
+									min-height: 30px;
 									flex-wrap: wrap;
 									overflow : hidden;
 									text-overflow: ellipsis;
@@ -632,6 +686,7 @@
 				font-size: 14px;
 				color: $themeColor;
 				padding-bottom: 50px;
+				cursor: pointer;
 			}
 		}
 	}

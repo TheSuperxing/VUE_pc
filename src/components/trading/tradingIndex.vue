@@ -3,7 +3,7 @@
 		
 		<div class="google" @keydown="keySearch($event)">
 			<input type="text" placeholder="搜索需求" v-model="searchText"/>
-			<span class="searchButton" @click="jumpPage(current_page)"></span>
+			<span class="searchButton" @click="searchClick(current_page)"></span>
 		</div>
 		<div class="result-table">
 			<ul class="table-head">
@@ -80,10 +80,9 @@
 		    }
 		},
 		created(){
-//			this.$route.query.page = 1;
-//			this.current_page=this.$route.query.page;
-			this.$route.query.page = this.searchText;
-			this.searchAll(this.current_page)
+			this.searchText = this.$route.query.kw;
+			this.jumpPage(this.current_page);
+//			this.searchAll(this.current_page)
 			
 		},
         mounted() {
@@ -101,10 +100,12 @@
     		},
     		efont: function() {
     			if(this.pages <= 7) return false;
+    			if(this.pages==8) return false;
     			return this.current_page > 5
     		},
     		ebehind: function() {
     			if(this.pages <= 7) return false;
+    			if(this.pages==8) return false;
     			var nowAy = this.indexs;
     			return nowAy[nowAy.length - 1] != this.pages;
     		},
@@ -114,16 +115,32 @@
     				ar = [];
     			if(this.pages >= 7) {
     				if(this.current_page > 5 && this.current_page < this.pages - 4) {
+    					
     					left = Number(this.current_page) - 3;
     					right = Number(this.current_page) + 3;
     				} else {
     					if(this.current_page <= 5) {
     						left = 1;
-    						right = 7;
+    						if(this.pages==7&&this.current_page <=2){
+    							right = 6;
+    						}else{
+    							right = 7;
+    						}
+    						if(this.pages==8&&(this.current_page ==4||this.current_page ==5)){
+    							right = 8;
+    						}
+    						if(this.pages==9&&this.current_page ==5){
+    							right = 9;
+    						}
     					} else {
     						right = this.pages;
+    						if(this.pages==7){  //正好等于7的情况
+    							left = this.pages - 5;
+    						}else{
+    							left = this.pages - 6;
+    						}
 
-    						left = this.pages - 6;
+    						
     					}
     				}
     			}
@@ -135,8 +152,12 @@
     		},
     	},
     	methods: {
+    		searchClick(current_page){
+				this.jumpPage(current_page);
+				this.current_page = 1;
+			},
     		jumpPage(current_page){
-    			console.log(current_page)
+    			location.hash = location.hash.split("=")[0]+"="+ this.searchText;
     			var that = this;
     			if(that.searchText.trim().length!=0){
     				that.haveCollect=[];
@@ -148,7 +169,7 @@
 							async: false,
 		//					contentType:"application/json;charset=utf-8",
 						}, function(data){
-							console.log(data)
+								console.log(data)
 							if(data.code==0){
 								that.dataInfo = data.msg.records;//取出当前获取的所有需求
 								that.current_page=data.msg.current;//设置当前页
@@ -290,14 +311,18 @@
 			         //event.stopProgagation();
 			         return false;
 			      	} 
-		
+				this.current_page = 1;
 			},
     	},
     	watch:{
     		current_page:function(){
-//				location.hash=location.hash.split("=")[0]+"="+this.current_page
+				
 				this.jumpPage(this.current_page);
 				
+    		},
+    		$route:function(){
+    			this.searchText = this.$route.query.kw;
+				this.jumpPage(this.current_page);	
     		}
     	}
 	}

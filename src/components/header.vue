@@ -65,7 +65,7 @@
         <ul class="navlist" v-bind:class="{'personStyle':user.userState==0}">
           <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[0]">{{item.text}}</router-link></li>
         	<li class="primary" >
-        		<div  @click="redirect"><router-link to="/yhzx">用户中心</router-link></div>
+        		<div><router-link to="/yhzx/personal/info">用户中心</router-link></div>
         		<ul class="userNav">
 		        	<li><router-link to="/yhzx/personal/info">我的资料</router-link></li>
 		        	<li><router-link to="/yhzx/demand">我的需求</router-link></li>
@@ -73,9 +73,10 @@
 		        </ul>
         	</li>
         </ul>
-        <div class="searchBox">
-        	<span class="searchButton" ><router-link to="/indexcontent/search"></router-link></span>
-        	<input type="text" placeholder="搜索个人、团队、公司" />
+        <div class="searchBox" @keydown="keySearch($event)">
+        	
+        	<input type="text" placeholder="搜索需求" v-model="searchTxt" />
+        	<span class="searchButton" @click="search(searchTxt)"></span>
         </div>
         <div class="wrap-right">
         	<div class="resLog" v-if="!haveLogin">
@@ -120,9 +121,11 @@
           active: false
         }, {
           text: "交易大厅",
-          rout: [{path:"/trading",},{path:"/trading",},{path:"/trading",}],
+          rout: [{path:"/trading",query:{kw:""}},{path:"/trading",},{path:"/trading",}],
           active: false
         },],
+        
+        searchTxt:"",//头部搜索框内容
 
        	comStyle:true,
        	teamStyle:true,
@@ -234,7 +237,22 @@
 					router.push("/login")
 				}
 				console.log(cookieTool.getCookie("token"))
-			}
+			},
+			search(searchTxt){
+				router.push({name:"Trading",query:{kw:searchTxt}})
+			},
+			keySearch($event){//enter键登录事件
+      	var event = $event || window.event;  
+				 	if(event.keyCode==13){ 
+		     		this.search(this.searchTxt);
+	         	event.returnValue = false;    
+	         	event.cancelBubble=true;
+	         	event.preventDefault();
+	         //event.stopProgagation();
+	         	return false;
+	      	} 
+		
+			},
     },
 
 

@@ -275,10 +275,11 @@
 					dataType: "json",
 					async:false,
 				},function(data){
+					console.log(data)
 					if(data.code==0){
 						Vue.set(that,"detailInfo",data.msg)
 					}
-					console.log(that.detailInfo)
+//					console.log(that.detailInfo)
 				},function(err){
 					console.log(err)
 				})

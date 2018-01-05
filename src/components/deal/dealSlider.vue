@@ -1,7 +1,7 @@
 <template>
   <div class="dealSlider">
     <div class="wallet">
-      <router-link to="/yhzx/deal/wallet" class="myWallet"><img src="../../assets/img/wallet/icon63.png" />我的钱包</router-link>
+      <router-link to="/yhzx/deal/wallet" class="myWallet"><img src="../../assets/img/wallet/icon63.png" />我的交易记录</router-link>
     </div>
     <ul>
       <li v-for="(item,index) in slider" @click="retrieveData(item)">
@@ -18,9 +18,9 @@
     data(){
       return{
         slider:[
+          {title:"起草协议",path:"/yhzx/deal/draftingDealIndex"},
           {title:"我发送的协议",path:"/yhzx/deal/sendDealIndex"},
           {title:"我收到的协议",path:"/yhzx/deal/acceptDealIndex"},
-          {title:"起草协议",path:"/yhzx/deal/draftingDealIndex"},
           {title:"协议草稿",path:"/yhzx/deal/outlineDealIndex"}
         ]
       }
@@ -89,10 +89,10 @@
       }
       li:nth-child(1){
         a{
-          background: url("../../assets/img/deal/dealSlider/senddeal-gray.png") 42px center no-repeat;
+          background: url("../../assets/img/deal/dealSlider/editdeal-gray.png") 42px center no-repeat;
         }
         .router-link-exact-active,.router-link-active{
-          background: url("../../assets/img/deal/dealSlider/senddeal.png") 42px center no-repeat;
+          background: url("../../assets/img/deal/dealSlider/editdeal.png") 42px center no-repeat;
         }
       }
       li:nth-child(2){
@@ -105,10 +105,10 @@
       }
       li:nth-child(3){
         a{
-          background: url("../../assets/img/deal/dealSlider/editdeal-gray.png") 42px center no-repeat;
+          background: url("../../assets/img/deal/dealSlider/senddeal-gray.png") 42px center no-repeat;
         }
         .router-link-exact-active,.router-link-active{
-          background: url("../../assets/img/deal/dealSlider/editdeal.png") 42px center no-repeat;
+          background: url("../../assets/img/deal/dealSlider/senddeal.png") 42px center no-repeat;
         }
       }
       li:nth-child(4){

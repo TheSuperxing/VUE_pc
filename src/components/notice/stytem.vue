@@ -17,6 +17,7 @@
 
 <script>
 	import Vue from "vue"
+	import {mapState} from "vuex"
 	import MyAjax from "../../assets/js/MyAjax.js"
   export default {
     name: 'stytem',
@@ -31,7 +32,10 @@
     },
     mounted(){
     	this.getData();
-    },
+	},
+	computed:mapState({
+		user:state=>state.userState.user,
+	}),
     methods:{
     	getData(){
     		var that = this;
@@ -102,7 +106,32 @@
 				console.log(data)
 				if(data.code==0){
 					that.getData()
+					that.getNewNote()
 				}
+			},function(err){
+				console.log(err)
+			})
+		},
+		getNewNote(){//通知是否有新消息提示
+			var that = this;
+			var url = MyAjax.urlhw +"/ediHomePage/newNotice";
+			MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				async: false,
+			},function(data){
+				console.log(data.msg)
+				if(data.code==0){
+					if(!(data.msg.sysCount||data.msg.businessCount)){
+						that.user.newNotice=false;
+					}else{
+						that.user.newNotice=true;
+					}
+				}else{
+					console.log("错误返回")
+				}
+			
 			},function(err){
 				console.log(err)
 			})

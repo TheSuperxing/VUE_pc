@@ -40,9 +40,25 @@
 			</li>
 			<li>
 				<p class="wrap-left">*需求酬劳</p>
-				<input type="text" placeholder="请输入需求酬劳（保留两位小数点）..." v-model="newDemandInfo.demandbasicinfo.reword"/>
+				<div class="select">
+					<span>请确定结算币种</span>
+					<select v-model="newDemandInfo.demandbasicinfo.currency">
+						<option value="人民币-CNY">人民币-CNY</option>
+						<option value="美元-USD">美元-USD</option>
+						<option value="日元-JPY">日元-JPY</option>
+						<option value="欧元-EUR">欧元-EUR</option>
+						<option value="英镑-GBP">英镑-GBP</option>
+						<option value="韩元-KRW">韩元-KRW</option>
+						<option value="港元-HKD">港元-HKD</option>
+						<option value="澳元-AUD">澳元-AUD</option>
+						<option value="加元-CAD">加元-CAD</option>
+					</select>
+				</div>
+				<div class="currency">
+					<input type="text" placeholder="请输入需求酬劳（保留两位小数点）..." v-model="newDemandInfo.demandbasicinfo.reword"/>
+					<span>{{currencyUnit}}</span>
+				</div>
 				<alertTip v-if="showAlert.reword" :showHide="showAlert.reword" @closeTip="closeTip" :alertText="alertText.reword"></alertTip>
-				
 			</li>
 			<li>
 				<p class="wrap-left">备注信息</p>
@@ -123,7 +139,8 @@
 				    "publishTime": "",
 				    "remark": "",
 				    "reword": "",
-				    "type": 0,
+					"type": 0,
+					currency:"人民币-CNY",
 				  },
 				  "demandobjs": [
 				    
@@ -144,7 +161,11 @@
 		},
 	    computed:mapState({
   			demandInfo:state=>state.demand.demandInfo,/*获取vuex数据   有效需求*/
-  			draftInfo:state=>state.demand.draftInfo/*获取vuex数据     需求草稿*/
+			draftInfo:state=>state.demand.draftInfo,/*获取vuex数据     需求草稿*/
+			  
+			currencyUnit:function(){
+				return this.newDemandInfo.demandbasicinfo.currency.split("-")[0]
+			},
 		}),
 		mounted(){
 			for(var i=0;i<this.demandObj.length;i++){
@@ -444,6 +465,21 @@ $bfColor:#ffffff;
 					
 				}
 			}
+			.select{
+				line-height: 34px;
+			}
+			.currency{
+              input{
+                width:400px;
+                float: left;
+              }
+              span{
+                float: left;
+                margin: 0;
+                margin-left: 10px;
+				line-height: 35px;
+              }
+            }
 			.btnBox{
 				margin-top: 10px;
 				margin-left: 115px;

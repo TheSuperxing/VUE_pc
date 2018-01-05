@@ -23,8 +23,8 @@
 
     <div class="sendDealInfoTitle">
       <div class="titleLeft">
-        <h2 v-cloak>{{this.dealInfo.dealName}}</h2>
-        <p v-cloak>发布时间：{{this.dealInfo.publishTime}}</p>
+        <h2 v-cloak>{{this.data.dealInfo.dealName}}</h2>
+        <p v-cloak>发布时间：{{this.data.dealInfo.publishTime}}</p>
       </div>
       <ul class="titleRight">
         <li @click="deleteDeal" class="cancel">
@@ -35,7 +35,7 @@
           编辑
           <!--<router-link :to="{path:'/yhzx/deal/sendDealIndex/editSendDeal',query:{id:this.$route.query.id}}"></router-link>-->
         </li>
-        <li class="dealState" v-cloak>{{this.dealInfo.dealState}}</li>
+        <li class="dealState" v-cloak>{{this.data.dealInfo.dealState}}</li>
       </ul>
     </div>
     <!--以上是协议的骨干信息-->
@@ -52,23 +52,23 @@
               甲方
               <span></span>
             </h4>
-            <p>{{this.dealInfo.firstPartyName}}</p>
+            <p>{{this.data.dealInfo.firstPartyName}}</p>
           </li>
           <li class="clear">
             <h4>
               乙方
               <span></span>
             </h4>
-            <p>{{this.dealInfo.secondPartyName}}</p>
+            <p>{{this.data.dealInfo.secondPartyName}}</p>
           </li>
           <li class="clear">
             <h4>协议内容</h4>
-            <p>{{this.dealInfo.partyContent}}</p>
+            <p>{{this.data.dealInfo.partyContent}}</p>
           </li>
           <!--阶段任务开始-->
           <li class="stageTask clear">
             <h4>阶段内容</h4>
-            <ul v-for="(item,index) in this.dealInfo.dealstageinfos">
+            <ul v-for="(item,index) in this.data.dealInfo.dealstageinfos">
               <li class="clear">
                 <!--隐藏支付状态-->
                 <p>
@@ -90,7 +90,7 @@
               </li>
               <li class="clear">
                 <p>
-                  <span>{{item.price}}</span>
+                  <span>{{item.price}}&nbsp;{{currencyUnit}}</span>
                 </p>
               </li>
             </ul>
@@ -98,19 +98,19 @@
           <!--阶段任务结束-->
           <li class="clear">
             <h4>付款总额</h4>
-            <p>{{this.dealInfo.cost}}</p>
+            <p>{{this.data.dealInfo.cost}}&nbsp;{{currencyUnit}}</p>
           </li>
           <li class="clear">
             <h4>付款方式</h4>
-            <p>{{this.dealInfo.modeOfPayment}}</p>
+            <p>{{this.data.dealInfo.modeOfPayment}}</p>
           </li>
           <li class="clear">
             <h4>备注信息</h4>
-            <p>{{this.dealInfo.remarksInfo}}</p>
+            <p>{{this.data.dealInfo.remarksInfo}}</p>
           </li>
           <li class="fileDownload clear">
             <h4>协议附件</h4>
-            <div v-for="(item,index) in this.dealInfo.dealfileinfos" class="clear">
+            <div v-for="(item,index) in this.data.dealInfo.dealfileinfos" class="clear">
               <a :href="item.fileAddress">{{item.fileName}}</a>
             </div>
           </li>
@@ -122,7 +122,7 @@
   </div>
 </template>
 <script>
-  import Vue from "vue"
+ import Vue from "vue"
   import {mapState} from "vuex"
   import ModalOpp from "../../../assets/js/modalOpp"
   import MyAjax from "../../../assets/js/MyAjax.js"
@@ -136,16 +136,19 @@
             text:"收起"
           },
         },
-        dealInfo:{
-
-        },
+        data:{
+          dealInfo:{}
+        }
       }
     },
     computed:mapState({
-      //dealInfo:state=>state.myDeal.dealInfo,
-      /*获取数据*/
+      currencyUnit:function(){
+        if(this.data.dealInfo!={}){
+          return this.data.dealInfo.currency.split("-")[0]
+        }
+      },
     }),
-    mounted(){
+    created(){
       this.gitdealDetail()
     },
     methods:{
@@ -159,7 +162,7 @@
 					async: false,
 				},function(data){
 					if(data.code==0){
-            that.dealInfo=data.msg;
+            Vue.set(that.data,"dealInfo",data.msg)
             console.log(data.msg)
 					}else{
             console.log("错误返回");
@@ -195,7 +198,7 @@
       confirmDeleteDeal(){
         var modal= new ModalOpp("#modal-overlay2");
         modal.closeModal();
-        this.dealInfo.splice(this.$route.query.id,1);
+        this.data.dealInfo.splice(this.$route.query.id,1);
         location.hash="/yhzx/deal/outlineDealIndex/outlineDeal"
       },
       closeStopDealAlert(){//关闭通知

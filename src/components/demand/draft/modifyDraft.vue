@@ -41,7 +41,24 @@
 			</li>
 			<li>
 				<p class="wrap-left">*需求酬劳</p>
-				<input type="text" placeholder="请输入需求酬劳..." v-model="DemandInfo.demandbasicinfo.reword"/>
+				<div class="select">
+					<span>请确定结算币种</span>
+					<select v-model="DemandInfo.demandbasicinfo.currency">
+						<option value="人民币-CNY">人民币-CNY</option>
+						<option value="美元-USD">美元-USD</option>
+						<option value="日元-JPY">日元-JPY</option>
+						<option value="欧元-EUR">欧元-EUR</option>
+						<option value="英镑-GBP">英镑-GBP</option>
+						<option value="韩元-KRW">韩元-KRW</option>
+						<option value="港元-HKD">港元-HKD</option>
+						<option value="澳元-AUD">澳元-AUD</option>
+						<option value="加元-CAD">加元-CAD</option>
+					</select>
+				</div>
+				<div class="currency">
+					<input type="text" placeholder="请输入需求酬劳..." v-model="DemandInfo.demandbasicinfo.reword"/>
+					<span>{{currencyUnit}}</span>
+				</div>
 				<alertTip v-if="showAlert.reword" :showHide="showAlert.reword" @closeTip="closeTip" :alertText="alertText.reword"></alertTip>
 				
 			</li>
@@ -174,11 +191,14 @@
 		 	Datepicker,
 		 	AlertTip,
 		},
-//	    computed:mapState({
+	    computed:mapState({
 //			demandInfo:state=>state.demand.demandInfo,/*获取vuex数据*/
 //			unvalidInfo:state=>state.demand.unvalidInfo,
 //			draftInfo:state=>state.demand.draftInfo,/*获取vuex数据   需求草稿的数据*/
-//		}),
+			currencyUnit:function(){
+				return this.DemandInfo.demandbasicinfo.currency.split("-")[0]
+			},
+		}),
 		created(){
 			
 			this.getData();
@@ -622,6 +642,21 @@ $bfColor:#ffffff;
 					
 				}
 			}
+			.select{
+				line-height: 34px;
+			}
+			.currency{
+              input{
+                width:400px;
+                float: left;
+              }
+              span{
+                float: left;
+                margin: 0;
+                margin-left: 10px;
+				line-height: 35px;
+              }
+            }
 			.btnBox{
 				margin-top: 10px;
 				margin-left: 115px;

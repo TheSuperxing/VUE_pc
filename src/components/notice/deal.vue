@@ -7,7 +7,7 @@
         </div>
     </div>
     <ul class="notContain">
-        <li class="clear">
+        <!-- <li class="clear">
             <span></span>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. </p>
         </li>
@@ -18,7 +18,7 @@
         <li class="clear">
             <span></span>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aliquam in odit totam itaque dolorem dolore modi nisi, veniam repellendus iusto ad, ullam perspiciatis necessitatibus temporibus voluptatibus? Aspernatur, molestias maiores?Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate aliquam in odit totam itaque dolorem dolore modi nisi, veniam repellendus iusto ad, ullam perspiciatis necessitatibus temporibus voluptatibus? Aspernatur, molestias maiores?</p>
-        </li>
+        </li> -->
     </ul>
   </div>
 </template>

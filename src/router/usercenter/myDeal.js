@@ -32,7 +32,7 @@ import outlineDealInfo from "../../components/deal/outlineDeal/outlineDealInfo.v
 import editOutlineDeal from "../../components/deal/outlineDeal/editOutlineDeal.vue"
 var dealRouterChildren=[
   {
-    path:"/yhzx/deal",name:"deal",component:deal,redirect:"/yhzx/deal/sendDealIndex",
+    path:"/yhzx/deal",name:"deal",component:deal,redirect:"/yhzx/deal/draftingDealIndex",
     children:[
       {
 				path:"/yhzx/deal/wallet",component:Wallet,redirect:"/yhzx/deal/wallet/tradingRecord",

@@ -148,7 +148,7 @@
 							async: false,
 		//					contentType:"application/json;charset=utf-8",
 						}, function(data){
-		//						console.log(data)
+							console.log(data)
 							if(data.code==0){
 								that.dataInfo = data.msg.records;//取出当前获取的所有需求
 								that.current_page=data.msg.current;//设置当前页
@@ -180,7 +180,7 @@
 									
 								}
 							}else{
-		//						router.push("/error/500")
+								router.push("/error/404")
 		//						console.log("错误返回")
 							}
 						},function(err){

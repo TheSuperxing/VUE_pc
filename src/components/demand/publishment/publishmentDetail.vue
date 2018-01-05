@@ -210,7 +210,7 @@
 					Vue.set(that,"detailInfo",data.msg)
 				}
 				
-				console.log(that.detailInfo)
+				console.log(that.detailInfo.demandbasicinfo)
 			},function(err){
 				console.log(err)
 			})

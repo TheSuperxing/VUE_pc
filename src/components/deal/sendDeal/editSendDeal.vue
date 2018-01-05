@@ -171,7 +171,21 @@
               <i>*</i>
               阶段内容
             </h4>
-            <div>
+            <div class="currency">
+              <span>请确定结算币种</span>
+              <select v-model="currency">
+                <option value="人民币-CNY">人民币-CNY</option>
+                <option value="美元-USD">美元-USD</option>
+                <option value="日元-JPY">日元-JPY</option>
+                <option value="欧元-EUR">欧元-EUR</option>
+                <option value="英镑-GBP">英镑-GBP</option>
+                <option value="韩元-KRW">韩元-KRW</option>
+                <option value="港元-HKD">港元-HKD</option>
+                <option value="澳元-AUD">澳元-AUD</option>
+                <option value="加元-CAD">加元-CAD</option>
+              </select>
+            </div>
+            <!-- <div>
               <ul v-for="(item,index) in localDealInfo.dealstageinfos">
                 <h5>{{chineseNumber[index]}}、</h5>
                 <li>
@@ -192,23 +206,48 @@
                 </li>
               </ul>
               <span @click="addStageTask" class="add">添加</span>
+            </div> -->
+            <div class="stageInfos">
+              <ul  v-for="(item,index) in localDealInfo.dealstageinfos">
+                <h5>{{chineseNumber[index]}}、</h5>
+                  <li>
+                    <input v-model="item.taskName"  type="text" placeholder="请输入阶段名称">
+                  </li>
+                  <li>
+                    <datepicker class="datePicker" v-model="item.reqCompDateStart" :max="maxYear"></datepicker>
+                    <span>——</span>
+                    <datepicker class="datePicker" v-model="item.reqCompDateEnd" :min="item.reqCompDateStart" :max="maxYear"></datepicker>
+                  </li>
+                  <li>
+                    <input v-model="item.taskDetail"  type="text" placeholder="请输入工作内容">
+                  </li>
+                  <li class="currency">
+                    <input v-model.number="item.price"  type="number" placeholder="请输入薪酬"  @blur="cost">
+                    <span>{{currencyUnit}}</span>
+                  </li>
+              </ul>
+              <span @click="addStageTask" class="add">添加</span>
             </div>
           </dd>
-          <dd  class="clear">
+          <dd  class="modeOfPayment clear">
             <h4>
               <i>*</i>
               付款方式
               <span></span>
             </h4>
-            <input v-model="localDealInfo.modeOfPayment"  type="text" placeholder="请输入付款方式">
+            <select v-model="localDealInfo.modeOfPayment">
+              <option value="支付宝">支付宝</option>
+              <option value="现金">现金</option>
+            </select>
           </dd>
-          <dd class="clear">
+          <dd class="cost clear">
             <h4>
               <i>*</i>
               协议总额
               <span></span>
             </h4>
-            <input v-model="localDealInfo.cost"  type="text" placeholder="请输入协议总额">
+            <input  v-model="localDealInfo.cost"  type="number" placeholder="请输入协议总额">
+            <span>{{currencyUnit}}</span>
           </dd>
           <dd class="remarksInfo clear">
             <h4>
@@ -402,13 +441,16 @@
         dealInfo:{},
         localDealInfo:'',
         chineseNumber:[],//阶段任务的编号
+        currency:"人民币-CNY",//阶段任务的币种
       }
     },
     components:{
 	    Datepicker,
 	  },
     computed:mapState({
-      //dealInfo:state=>state.myDeal.dealInfo,
+      currencyUnit:function(){
+       return this.currency.split("-")[1]
+      },
     }),
     created(){
       this.gitdealDetail(this.$route.query.id)
@@ -707,6 +749,16 @@
         var chineseNumber = new ChineseNumber(this.localDealInfo.dealstageinfos.length);
         Vue.set(this.chineseNumber,[this.localDealInfo.dealstageinfos.length-1],chineseNumber.getChineseNumber())
       },
+      cost(){
+        let dealstageinfos=this.localDealInfo.dealstageinfos
+        let sum=0;
+        for(let i in dealstageinfos){
+          if(dealstageinfos[i].price!=""||dealstageinfos[i].price!=null){
+            sum+=dealstageinfos[i].price;
+            Vue.set(this.localDealInfo,"cost",sum)
+          }
+        }
+      },
       deleteAccessory(index,types){//附件删除
         if(types=="newFile"){
           this.accessory.splice(index,1)
@@ -812,6 +864,13 @@
   $textColor:#8c8c8c;
   $themeColor:#546686;
   $alertColor:#525252;
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+  }
+  input[type="number"]{
+      -moz-appearance: textfield;
+  }
   .editSendDeal{
     #modal-overlay{
       .alert{
@@ -1138,6 +1197,17 @@
           padding:0 14px;
         }
       }
+      .cost{
+        input{
+          width: 140px;
+          float: left;
+        }
+        span{
+          float: left;
+          line-height: 35px;
+          margin-left: 10px;
+        }
+      }
       dd:nth-child(2){
         height:35px;
         button{
@@ -1155,7 +1225,10 @@
         }
       }
       .stageTask{
-        div{
+        .currency{
+          line-height: 35px;
+        }
+        .stageInfos{
           width:808px;
           float: right;
           ul{
@@ -1169,24 +1242,31 @@
             li{
               width:480px;
               float: left;
-              div{
+              margin:5px 0;
+              .date-picker{
+                width:140px;
                 float: left;
-                margin:5px 0;
-                .date-picker{
-                  width:140px;
-                  float: left;
-                  margin-top: 0px;
-                  font-size: 14px;
-                }
-                span{
-                  float: left;
-                  margin: 5px 10px;
-                }
+                margin-top: 0px;
+                font-size: 14px;
               }
-              div:first-child{
-                margin-top:0px;
+              span{
+                float: left;
+                margin: 5px 10px;
               }
-
+            }
+            li:first-child{
+              margin-top:0px;
+            }
+            .currency{
+              input{
+                width:140px;
+                float: left;
+              }
+              span{
+                float: left;
+                margin: 0;
+                margin-left: 10px;
+              }
             }
           }
           ul:nth-child(1){
@@ -1201,6 +1281,16 @@
             background: url("../../../assets/img/deal/sendDeal/add.png") left center no-repeat;
 
           }
+        }
+      }
+      .modeOfPayment{
+        select{
+          width:140px;
+          height: 35px;
+          line-height: 35px;
+          border: 1px solid #ebebeb;
+          border-radius: 5px;
+          padding-left: 14px;
         }
       }
       .remarksInfo{

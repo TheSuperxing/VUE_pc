@@ -49,7 +49,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
    	{
-    	path:"/",redirect:"/login"
+    	path:"/",redirect:"/indexcontent/index"
     },
     {
     	path:"/login",name:"LoginIndex",component:Login

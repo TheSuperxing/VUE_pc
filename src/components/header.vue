@@ -83,7 +83,10 @@
         		<router-link to="/register">注册</router-link>
         	</div>
         	<div class="logState" v-if="haveLogin">
-        		<router-link to="/notice">通知</router-link>
+        		<router-link to="/notice">
+						通知
+						<span v-if="user.newNotice"></span>
+						</router-link>
         		<div class="userImg">
         			<img src="../assets/img/header/1515.png" alt="../assets/img/header/1515.png"/>
         			<div class="log-out">
@@ -127,15 +130,18 @@
 
         /*导航颜色切换原始状态*/
        	state:"",
-       	haveLogin:true,
+				haveLogin:true,
+				
       }
     },
     computed:mapState({
 	      petName:state=>state.personal.personalMessage.baseInfo.petName,
-	      user:state=>state.userState.user
-
+	      user:state=>state.userState.user,
+				//newNotice:state=>state.userState.user.newNotice
 	    }),
-
+		created(){
+			this.getNewNote();
+		},
 	  mounted(){
 				
 				this.user.userState = sessionStorage.getItem("state");
@@ -158,12 +164,35 @@
 					console.log(err)
 				})
 
-	  },
+		},
 	  updated(){
 	  	this.user.userState = sessionStorage.getItem("state");
 	  },
     methods: {
-
+				getNewNote(){//通知是否有新消息提示
+					var that = this;
+					var url = MyAjax.urlhw +"/ediHomePage/newNotice";
+					MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType: "json",
+						async: false,
+					},function(data){
+						console.log(data.msg)
+						if(data.code==0){
+							if(!(data.msg.sysCount||data.msg.businessCount)){
+								that.user.newNotice=false;
+							}else{
+								that.user.newNotice=true;
+							}
+						}else{
+							console.log("错误返回")
+						}
+					
+					},function(err){
+						console.log(err)
+					})
+				},
 				/*nav单击切换颜色*/
 	      outTogOver:function (tog) {
 	        Vue.set(tog,"value",true)
@@ -350,9 +379,18 @@
         		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
         		a{
         			float: left;
-        			color: $themeColor;
+        			color: #353535;
         			margin-right: 16px;
-        			
+        			position: relative;
+							span{
+								display: block;
+								width:10px;
+								height: 10px;
+								background: url("../assets/img/header/notice.png") left center no-repeat;
+								position: absolute;
+								top:24px;
+								right: -6px;
+							}
         		}
         		.userImg{
         			width: 40px;

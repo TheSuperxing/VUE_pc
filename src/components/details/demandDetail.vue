@@ -110,7 +110,7 @@
 					</li>
 					<li>
 						<div class="wrap-left">需求酬劳</div>
-						<p>{{detailInfo.demandbasicinfo.reword}}</p>
+						<p>{{detailInfo.demandbasicinfo.reword}}{{currencyUnit}}</p>
 						<p v-if="!haveValue.reword">暂无信息</p>
 					</li>
 					<li>
@@ -246,7 +246,7 @@
 				}
 			}
 		},
-//		computed:mapState({
+		computed:mapState({
 //			detailInfo:state=>state.demand.detailInfo,/*获取vuex数据  需求数组*/
 //		    demandInfo:state=>state.demand.demandInfo,/*获取vuex数据  需求数组*/
 //		    unvalidInfo:state=>state.demand.unvalidInfo,
@@ -254,8 +254,10 @@
 //		    draftInfo:state=>state.demand.draftInfo,/*获取vuex数据  需求数组*/
 //		    colletionInfo:state=>state.demand.colletionInfo,
 //		    userID:state=>state.userState.user.userID,/*我的ID*/
-//		   	
-//		}),
+			currencyUnit:function(){
+				return this.detailInfo.demandbasicinfo.currency.split("-")[0]
+			},		   	
+		}),
 		created(){
 			this.getData()
 		},
@@ -265,7 +267,6 @@
 		},
 		methods:{
 			getData(){
-				console.log(this.$route.query.id)
 				var that = this;
 				var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.$route.query.id
 		    	MyAjax.ajax({
@@ -274,9 +275,7 @@
 					dataType: "json",
 					async:false,
 				},function(data){
-					console.log(data)
 					if(data.code==0){
-						console.log(data.msg)
 						Vue.set(that,"detailInfo",data.msg)
 					}
 					console.log(that.detailInfo)

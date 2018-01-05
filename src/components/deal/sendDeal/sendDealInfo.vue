@@ -175,13 +175,13 @@
                 </p>
               </li>       
               <li class="clear">
-                <p>
+                <p v-cloak>
                   {{item.taskDetail}}
                 </p>
               </li>       
               <li class="clear">
-                <p>
-                  {{item.price}}
+                <p v-cloak>
+                  {{item.price}}&nbsp;{{currencyUnit}}
                 </p>
               </li>       
               
@@ -201,20 +201,20 @@
           <!--阶段任务结束-->
           <li class="clear">
             <h4>付款总额</h4>
-            <p>{{this.data.dealInfo.cost}}</p>
+            <p v-cloak>{{this.data.dealInfo.cost}}&nbsp;{{currencyUnit}}</p>
           </li>
           <li class="clear">
             <h4>付款方式</h4>
-            <p>{{this.data.dealInfo.modeOfPayment}}</p>
+            <p v-cloak>{{this.data.dealInfo.modeOfPayment}}</p>
           </li>
           <li class="clear">
             <h4>备注信息</h4>
-            <p>{{this.data.dealInfo.remarksInfo}}</p>
+            <p v-cloak>{{this.data.dealInfo.remarksInfo}}</p>
           </li>
           <li class="fileDownload clear">
             <h4>协议附件</h4>
             <p v-for="(item,index) in data.dealInfo.dealfileinfos">
-              <a v-bind:href="item.fileAddress">{{item.fileName}}</a>
+              <a v-bind:href="item.fileAddress" v-cloak>{{item.fileName}}</a>
             </p>
           </li>
         </ul>
@@ -242,19 +242,23 @@
        <dl class="firstPartyList clear">
         <dt class="clear">
           <p>{{this.data.dealInfo.firstPartyName}}</p>
-          <p class="comment" @click="editFirstPartyComment" v-if="!reveal.firstPartyComment.edit&&this.data.dealInfo.myRole!='甲方'&&this.data.dealInfo.dealState!='履行中'">编辑评论</p>
+          <p class="comment" @click="editFirstPartyComment" v-if="!reveal.firstPartyComment.edit&&this.data.dealInfo.myRole!='甲方'&&this.data.dealInfo.dealState!='履行中'">添加评论</p>
         </dt>
 
-        <dd class="clear" v-if="!reveal.firstPartyComment.edit">
-          <ul class="clear" v-if="this.data.dealInfo.dealevainfoFirst.star!=0">
-            <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.firstPartyComment.starSelected[index]}"></li>
-          </ul>
-          <p v-if="data.dealInfo.dealevainfoFirst.comment!=''" v-cloak>{{data.dealInfo.dealevainfoFirst.comment}}</p>
+        <dd class="clear"  v-for="(itemT,indexT) in data.dealInfo.dealevainfoFirst">
+          <div class="commentTitle clear">
+            <ul>
+              <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.firstPartyComment.starSelected[indexT][index]}"></li>
+            </ul>
+            <p v-cloak>评价时间：{{itemT.creTime}}</p>
+            <p class="deleteComment" @click="delFirstComment(indexT)" v-if="data.dealInfo.myRole!='甲方'" title="删除评论"></p>
+          </div>
+          <p v-cloak>{{itemT.comment}}</p>
         </dd>
         <!--甲方对应的评价-->
         <dd class="clear" v-if="reveal.firstPartyComment.edit">
           <ul class="clear">
-            <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentFirstParty(index)" :class="{selected:reveal.firstPartyComment.starSelected[index]}"></li>
+            <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentFirstParty(index)" :class="{selected:reveal.dealevainfoNew.starSelected[index]}"></li>
           </ul>
           <textarea v-model="localFirstPartyComment.text"  cols="63" rows="5" placeholder="你的评论"></textarea>
           <div class="clear">
@@ -277,19 +281,23 @@
         <dl class="secondPartyTitle  clear">
           <dt class="clear">
             <p v-cloak>{{this.data.dealInfo.secondPartyName}}</p>
-            <p class="editComment" v-if="this.data.dealInfo.myRole!='乙方'&&!reveal.secondPartyComment.edit&&this.data.dealInfo.dealState!='履行中'" @click="editSecondPartyComment">编辑评论</p>
+            <p class="editComment" v-if="this.data.dealInfo.myRole!='乙方'&&!reveal.secondPartyComment.edit&&this.data.dealInfo.dealState!='履行中'" @click="editSecondPartyComment">添加评论</p>
           </dt>
 
-          <dd class="clear" v-if="!reveal.secondPartyComment.edit&&this.data.dealInfo.dealState!='履行中'">
-            <ul class="clear" v-if="this.data.dealInfo.dealevainfoSecond.star!=0">
-              <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.secondPartyComment.teamComment.starSelected[index]}"></li>
-            </ul>
-            <p v-if="this.data.dealInfo.dealevainfoSecond.comment!=''" v-cloak>{{this.data.dealInfo.dealevainfoSecond.comment}}</p>
+          <dd class="clear" v-for="(itemT,indexT) in data.dealInfo.dealevainfoSecond">
+            <div class="commentTitle clear">
+              <ul>
+                <li v-for="(item,index) in [1,2,3,4,5]" :class="{selected:reveal.secondPartyComment.teamComment.starSelected[indexT][index]}"></li>
+              </ul>
+              <p v-cloak>评价时间：{{itemT.creTime}}</p>
+              <p class="deleteComment" @click="delSecondComment(indexT)" v-if="data.dealInfo.myRole!='乙方'" title="删除评论"></p>
+            </div>
+            <p v-cloak>{{itemT.comment}}</p>
           </dd>
           <!--对于团队的整体评价-->
           <dd class="clear" v-if="reveal.secondPartyComment.edit">
             <ul class="clear">
-              <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyTeam(index)" :class="{selected:reveal.secondPartyComment.teamComment.starSelected[index]}"></li>
+              <li v-for="(item,index) in [1,2,3,4,5]" @mouseenter="commentSecondPartyTeam(index)" :class="{selected:reveal.dealevainfoNew.starSelected[index]}"></li>
             </ul>
 
             <textarea v-model="localSecondPartyComment.teamComment.text"  cols="63" rows="5" placeholder="你的评论"></textarea>
@@ -453,14 +461,15 @@
           },
           editMemberInfo:[],//是否编辑成员的职责
           confirmAddMember:false,
+          dealevainfoNew:{
+            starSelected:[],
+          },
           firstPartyComment:{
-            edit:false,
-            starSelected:[false,false,false,false,false],
+            starSelected:[],
           },
           secondPartyComment:{
-            edit:false,
             teamComment:{
-              starSelected:[false,false,false,false,false],
+              starSelected:[],
             },
             memberComment:{
               starSelected:[],
@@ -490,8 +499,11 @@
       }
     },
     computed:mapState({
-      //dealInfo:state=>state.myDeal.dealInfo[0],
-      /*获取数据*/
+      currencyUnit:function(){
+        if(this.data.dealInfo!={}){
+          return this.data.dealInfo.currency.split("-")[0]
+        }
+      },
     }),
     created(){
       this.gitdealDetail(this.$route.query.id)
@@ -545,6 +557,7 @@
             break;
         }
       //}
+      /*以上是乙方团队整体评价星级初始展示数据*/
       // let secondPartMember=this.dealInfo[this.$route.query.id].content.secondParty.member;
       // this.localSecondPartyMember.member=JSON.parse(JSON.stringify(secondPartMember))
       /*以上是同步到本地乙方成员数据*/
@@ -562,19 +575,19 @@
       // }
     },
     mounted(){
-      
-      /*评论部分开始*/
-      let firstPartyStar=parseInt(this.data.dealInfo.dealevainfoFirst.star);
-      for(let i=0;i<firstPartyStar;i++){
-        Vue.set(this.reveal.firstPartyComment.starSelected,[i],true)
-      }
-      /*以上是甲方评价星级*/
-      let secondPartyStartTeam=parseInt(this.data.dealInfo.dealevainfoSecond.star)
-      for(let i=0;i<secondPartyStartTeam;i++){ 
-        Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],true)
-      }
-      /*以上是乙方团队整体评价星级*/
-
+      // if(this.data.dealInfo!={}){//用来判断是否为空对象
+      //   /*评论部分开始*/
+      //   let firstPartyStar=parseInt(this.data.dealInfo.dealevainfoFirst.star);
+      //   for(let i=0;i<firstPartyStar;i++){
+      //     Vue.set(this.reveal.firstPartyComment.starSelected,[i],true)
+      //   }
+      //   /*以上是甲方评价星级*/
+      //   let secondPartyStartTeam=parseInt(this.data.dealInfo.dealevainfoSecond.star)
+      //   for(let i=0;i<secondPartyStartTeam;i++){ 
+      //     Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],true)
+      //   }
+      //   /*以上是乙方团队整体评价星级*/
+      // }
       /*评论部分结束*/
 
 
@@ -600,7 +613,19 @@
             Vue.set(that.data,"dealInfo",data.msg)
             console.log(data.msg)
             var dealstageinfos=that.data.dealInfo.dealstageinfos
-            var myRole=that.data.dealInfo.myRole
+            let flag=true;
+            let myRole=that.data.dealInfo.myRole
+            for(let i=0;i<dealstageinfos.length;i++){
+              if(dealstageinfos[i].taskType!=4){
+                flag=false;
+              }
+            }
+            if(flag){
+              that.data.dealInfo.dealevainfoNew={
+                comment:"",
+                star:0
+              }
+            }
             for(let i=0;i<dealstageinfos.length;i++){
                if(myRole=="甲方"){
                   if(dealstageinfos[i].taskType==null||dealstageinfos[i].taskType==3){
@@ -625,10 +650,9 @@
                   if(dealstageinfos[i].taskType==4){
                     Vue.set(that.stageTask.text,[i],"");
                   }
-                  console.log("123123")
                 }
               }
-              
+              that.initComment();
 					}else{
             console.log("错误返回");
             //window.location.hash="/error/404"
@@ -638,24 +662,44 @@
 				})
       },
       setComment(){
-          var that = this;
-          var url = MyAjax.urlsy+"/dealbasicinfo/comment";
-          MyAjax.ajax({
-						type: "POST",
-						url:url,
-						data: JSON.stringify(that.data.dealInfo),
-            dataType: "json",
-            contentType:"application/json;charset=utf-8",
-						async:false,
-					}, function(data){
-						if(data.code==0){
-              console.log("成功")
-						}else if(data.code==-1){
-							console.log("失败")
-						}
-					},function(err){
-            console.log("error")
-          })
+        var that = this;
+        var url = MyAjax.urlsy+"/dealbasicinfo/comment";
+        MyAjax.ajax({
+          type: "POST",
+          url:url,
+          data: JSON.stringify(that.data.dealInfo),
+          dataType: "json",
+          contentType:"application/json;charset=utf-8",
+          async:false,
+        }, function(data){
+          if(data.code==0){
+            console.log("成功")
+            that.gitdealDetail(that.$route.query.id)
+          }else if(data.code==-1){
+            console.log("失败")
+          }
+        },function(err){
+          console.log("error")
+        })
+      },
+      deleteComment(pkid){
+        var that = this;
+        var url = MyAjax.urlsy+"/dealbasicinfo/delComment/"+pkid;
+        MyAjax.ajax({
+          type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+        }, function(data){
+          if(data.code==0){
+            console.log("成功")
+            that.gitdealDetail(that.$route.query.id)
+          }else if(data.code==-1){
+            console.log("失败")
+          }
+        },function(err){
+          console.log("error")
+        })
       },
       setStopDeal(pkid){
         var that = this;
@@ -763,6 +807,32 @@
           },function(data){
             if(data.code==0){
               Vue.set(that.data.dealInfo.dealstageinfos[index],"taskType",1)
+              let dealstageinfos=that.data.dealInfo.dealstageinfos;
+              let myRole=that.data.dealInfo.myRole
+              if(myRole=="甲方"){
+                if(dealstageinfos[index].taskType==null||dealstageinfos[index].taskType==3){
+                    Vue.set(that.stageTask.text,[index],"收到成果");
+                }
+                if(dealstageinfos[index].taskType==1){
+                    Vue.set(that.stageTask.text,[index],"支付");
+                }
+                if(dealstageinfos[index].taskType==4||dealstageinfos[index].taskType==2){
+                  Vue.set(that.stageTask.text,[index],"");
+                }
+              }
+              
+              if(myRole=="乙方"){
+                if(dealstageinfos[index].taskType==null){
+                  Vue.set(that.stageTask.text,[index],"成果已发送");
+                }
+                if(dealstageinfos[index].taskType==3||dealstageinfos[index].taskType==2||dealstageinfos[index].taskType==1){
+                  Vue.set(that.stageTask.text,[index],"已收到付款");
+                  
+                }
+                if(dealstageinfos[index].taskType==4){
+                  Vue.set(that.stageTask.text,[index],"");
+                }
+              }
             }else{
               console.log("错误返回")	
             }
@@ -782,6 +852,32 @@
           },function(data){
             if(data.code==0){
               Vue.set(that.data.dealInfo.dealstageinfos[index],"taskType",3)
+              let dealstageinfos=that.data.dealInfo.dealstageinfos;
+              let myRole=that.data.dealInfo.myRole
+              if(myRole=="甲方"){
+                if(dealstageinfos[index].taskType==null||dealstageinfos[index].taskType==3){
+                    Vue.set(that.stageTask.text,[index],"收到成果");
+                }
+                if(dealstageinfos[index].taskType==1){
+                    Vue.set(that.stageTask.text,[index],"支付");
+                }
+                if(dealstageinfos[index].taskType==4||dealstageinfos[index].taskType==2){
+                  Vue.set(that.stageTask.text,[index],"");
+                }
+              }
+              
+              if(myRole=="乙方"){
+                if(dealstageinfos[index].taskType==null){
+                  Vue.set(that.stageTask.text,[index],"成果已发送");
+                }
+                if(dealstageinfos[index].taskType==3||dealstageinfos[index].taskType==2||dealstageinfos[index].taskType==1){
+                  Vue.set(that.stageTask.text,[index],"已收到付款");
+                  
+                }
+                if(dealstageinfos[index].taskType==4){
+                  Vue.set(that.stageTask.text,[index],"");
+                }
+              }
             }else{
               console.log("错误返回")	
             }
@@ -801,12 +897,69 @@
           },function(data){
             if(data.code==0){
               Vue.set(that.data.dealInfo.dealstageinfos[index],"taskType",4)
+              let dealstageinfos=that.data.dealInfo.dealstageinfos;
+              let flag=true;
+              let myRole=that.data.dealInfo.myRole
+              for(let i=0;i<dealstageinfos.length;i++){
+                if(dealstageinfos[i].taskType!=4){
+                  flag=false;
+                }
+              }
+              if(flag){
+                Vue.set(that.data.dealInfo,"dealState","协议完成")
+                that.data.dealInfo.dealevainfoNew={
+                  comment:"",
+                  star:0
+                }
+              }
+              if(myRole=="甲方"){
+                if(dealstageinfos[index].taskType==null||dealstageinfos[index].taskType==3){
+                    Vue.set(that.stageTask.text,[index],"收到成果");
+                }
+                if(dealstageinfos[index].taskType==1){
+                    Vue.set(that.stageTask.text,[index],"支付");
+                }
+                if(dealstageinfos[index].taskType==4||dealstageinfos[index].taskType==2){
+                  Vue.set(that.stageTask.text,[index],"");
+                }
+              }
+              
+              if(myRole=="乙方"){
+                if(dealstageinfos[index].taskType==null){
+                  Vue.set(that.stageTask.text,[index],"成果已发送");
+                }
+                if(dealstageinfos[index].taskType==3||dealstageinfos[index].taskType==2||dealstageinfos[index].taskType==1){
+                  Vue.set(that.stageTask.text,[index],"已收到付款");
+                  
+                }
+                if(dealstageinfos[index].taskType==4){
+                  Vue.set(that.stageTask.text,[index],"");
+                }
+              }
             }else{
               console.log("错误返回")	
             }
           },function(err){
             console.log(err)
           })
+      },
+      initComment(){//获取数据后对星级进行初始化
+
+        let firstPartyComment=this.data.dealInfo.dealevainfoFirst
+        for(let i=0;i<firstPartyComment.length;i++){
+          Vue.set(this.reveal.firstPartyComment.starSelected,[i],[false,false,false,false,false])
+          for(let j=0;j<parseInt(firstPartyComment[i].star);j++){
+          Vue.set(this.reveal.firstPartyComment.starSelected[i],[j],true)
+          }
+        }
+        /*以上是甲方评价星级初始展示数据*/
+        let secondPartyComment=this.data.dealInfo.dealevainfoSecond
+        for(let i=0;i<secondPartyComment.length;i++){
+          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],[false,false,false,false,false])
+          for(let j=0;j<parseInt(secondPartyComment[i].star);j++){
+          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected[i],[j],true)
+          }
+        }
       },
       editPrompt(){//协议编辑的提示信息
         var modal= new ModalOpp("#modal-overlay");
@@ -924,30 +1077,30 @@
           }
         }
         /*支付状态的顺序改变*/
-        if(myRole=="甲方"){
-          if(dealstageinfos[index].taskType==null||dealstageinfos[index].taskType==3){
-              Vue.set(this.stageTask.text,[index],"收到成果");
-          }
-          if(dealstageinfos[index].taskType==1){
-              Vue.set(this.stageTask.text,[index],"支付");
-          }
-          if(dealstageinfos[index].taskType==4||dealstageinfos[index].taskType==2){
-            Vue.set(this.stageTask.text,[index],"");
-          }
-        }
+        // if(myRole=="甲方"){
+        //   if(dealstageinfos[index].taskType==null||dealstageinfos[index].taskType==3){
+        //       Vue.set(this.stageTask.text,[index],"收到成果");
+        //   }
+        //   if(dealstageinfos[index].taskType==1){
+        //       Vue.set(this.stageTask.text,[index],"支付");
+        //   }
+        //   if(dealstageinfos[index].taskType==4||dealstageinfos[index].taskType==2){
+        //     Vue.set(this.stageTask.text,[index],"");
+        //   }
+        // }
         
-        if(myRole=="乙方"){
-          if(dealstageinfos[index].taskType==null){
-            Vue.set(this.stageTask.text,[index],"成果已发送");
-          }
-          if(dealstageinfos[index].taskType==3||dealstageinfos[index].taskType==2||dealstageinfos[index].taskType==1){
-            Vue.set(this.stageTask.text,[index],"已收到付款");
+        // if(myRole=="乙方"){
+        //   if(dealstageinfos[index].taskType==null){
+        //     Vue.set(this.stageTask.text,[index],"成果已发送");
+        //   }
+        //   if(dealstageinfos[index].taskType==3||dealstageinfos[index].taskType==2||dealstageinfos[index].taskType==1){
+        //     Vue.set(this.stageTask.text,[index],"已收到付款");
             
-          }
-          if(dealstageinfos[index].taskType==4){
-            Vue.set(this.stageTask.text,[index],"");
-          }
-        }
+        //   }
+        //   if(dealstageinfos[index].taskType==4){
+        //     Vue.set(this.stageTask.text,[index],"");
+        //   }
+        // }
         /*在页面没有刷新的添加下改变相应文本*/
         this.reveal.index=index;
       },
@@ -982,33 +1135,33 @@
       editFirstPartyComment(){//编辑甲方评价按钮单击事件
         Vue.set(this.reveal.firstPartyComment,"edit",true);
 
-        Vue.set(this.localFirstPartyComment,"star",this.data.dealInfo.dealevainfoFirst.star)
-        Vue.set(this.localFirstPartyComment,"text",this.data.dealInfo.dealevainfoFirst.comment)
+        //Vue.set(this.localFirstPartyComment,"star",this.data.dealInfo.dealevainfoFirst.star)
+        //Vue.set(this.localFirstPartyComment,"text",this.data.dealInfo.dealevainfoFirst.comment)
         /*同步星级和评论文本用于编辑*/
       },
       commentFirstParty(index){//甲方评价
         for(let i=0;i<5;i++){
-          Vue.set(this.reveal.firstPartyComment.starSelected,[i],false)
+          Vue.set(this.reveal.dealevainfoNew.starSelected,[i],false)
         }
         for(let i=0;i<index+1;i++){
-          Vue.set(this.reveal.firstPartyComment.starSelected,[i],true)
+          Vue.set(this.reveal.dealevainfoNew.starSelected,[i],true)
         }
         Vue.set(this.localFirstPartyComment,"star",index+1+"");
       },
       keepFirstPartyComment(){//保存甲方评价修改后的数据
-        Vue.set(this.data.dealInfo.dealevainfoFirst,"star",this.localFirstPartyComment.star)
-        Vue.set(this.data.dealInfo.dealevainfoFirst,"comment",this.localFirstPartyComment.text)
+        Vue.set(this.data.dealInfo.dealevainfoNew,"star",this.starSelected.star)
+        Vue.set(this.data.dealInfo.dealevainfoNew,"comment",this.starSelected.text)
         Vue.set(this.reveal.firstPartyComment,"edit",false)
         this.setComment();
       },
       cancelFirstPartyComment(){//取消保存保存甲方评价修改后的数据
-        let star=this.data.dealInfo.dealevainfoFirst.star;
+        //let star=this.data.dealInfo.dealevainfoFirst.star;
         for(let i=0;i<5;i++){
-          Vue.set(this.reveal.firstPartyComment.starSelected,[i],false)
+          Vue.set(this.reveal.dealevainfoNew.starSelected,[i],false)
         }
-        for(let i=0;i<star;i++){
-          Vue.set(this.reveal.firstPartyComment.starSelected,[i],true)
-        }
+        // for(let i=0;i<star;i++){
+        //   Vue.set(this.reveal.firstPartyComment.starSelected,[i],true)
+        // }
         Vue.set(this.reveal.firstPartyComment,"edit",false)
       },
       /*甲方评价结束*/
@@ -1061,8 +1214,8 @@
         Vue.set(this.reveal.secondPartyComment,"edit",true)//编辑和可视切换
 
 
-        Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfoSecond.star)
-        Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfoSecond.comment)
+        //Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfoSecond.star)
+        //Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfoSecond.comment)
         /*Vue的数据同步到本地一份,用于数据的修改后的保存或者提交（团队整体评价）*/
         // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
         // for(let i=0;i<memberNum.length;i++){
@@ -1080,10 +1233,10 @@
       },
       commentSecondPartyTeam(index){//鼠标滑过后，乙方总体评价不同的星级的选定
         for(let i=0;i<5;i++){
-          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],false)
+          Vue.set(this.reveal.dealevainfoNew.starSelected,[i],false)
         }
         for(let i=0;i<index+1;i++){
-          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],true)
+          Vue.set(this.reveal.dealevainfoNew.starSelected,[i],true)
         }
         Vue.set(this.localSecondPartyComment.teamComment,"star",index+1+"");
       },
@@ -1098,8 +1251,8 @@
        // console.log(this.reveal.secondPartyComment.memberComment.starSelected[index])
       },
       keepSecondPartyMemberComment(){//保存乙方评价
-        Vue.set(this.data.dealInfo.dealevainfoSecond,"star",this.localSecondPartyComment.teamComment.star)
-        Vue.set(this.data.dealInfo.dealevainfoSecond,"comment",this.localSecondPartyComment.teamComment.text)
+        Vue.set(this.data.dealInfo.dealevainfoNew,"star",this.localSecondPartyComment.teamComment.star)
+        Vue.set(this.data.dealInfo.dealevainfoNew,"comment",this.localSecondPartyComment.teamComment.text)
 
         // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
         // for(let i=0;i<memberNum.length;i++){
@@ -1116,8 +1269,8 @@
       },
       cancelSecondPartyMemberComment(){//取消保存乙方评价
 
-        Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfoSecond.star)
-        Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfoSecond.comment)
+        //Vue.set(this.localSecondPartyComment.teamComment,"star",this.data.dealInfo.dealevainfoSecond.star)
+        //Vue.set(this.localSecondPartyComment.teamComment,"text",this.data.dealInfo.dealevainfoSecond.comment)
 
         // let memberNum=this.dealInfo[this.$route.query.id].content.secondParty.member
         // for(let i=0;i<memberNum.length;i++){
@@ -1131,20 +1284,28 @@
         //   Vue.set(this.localSecondPartyComment.memberComment.text,[i],memberNum[i].comment.text)
         // }
         /*保证数据没有更改*/
-        let secondPartyStartTeam=parseInt(this.data.dealInfo.dealevainfoSecond.star)
+        //let secondPartyStartTeam=parseInt(this.data.dealInfo.dealevainfoSecond.star)
         for(let i=0;i<5;i++){
-          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],false)
+          Vue.set(this.reveal.dealevainfoNew.starSelected,[i],false)
         }
-        for(let i=0;i<secondPartyStartTeam;i++){
-          Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],true)
-        }
+        // for(let i=0;i<secondPartyStartTeam;i++){
+        //   Vue.set(this.reveal.secondPartyComment.teamComment.starSelected,[i],true)
+        // }
         Vue.set(this.reveal.secondPartyComment,"edit",false)
         
         // let $this=this
         // setTimeout(function () {//通过1ms延时，在单击编辑后，获取最后一个元素的高度，从新设置遮挡高度
         //   Vue.set($this.borderWhite,"height",parseInt($('.secondPartyMember').children("li:last").css("height"))-45+"px")
         // },1)
-      }
+      },
+      delFirstComment(index){//删除评论
+        let pkid=this.data.dealInfo.dealevainfoFirst[index].pkid
+        this.deleteComment(pkid)
+      },
+      delSecondComment(index){//删除评论
+        let pkid=this.data.dealInfo.dealevainfoSecond[index].pkid
+        this.deleteComment(pkid)
+      },
     }
   }
 </script>
@@ -1852,26 +2013,58 @@
           .comment{
             float: right;
             padding-left: 24px;
-            background: url("../../../assets/img/deal/sendDeal/edit.png") left center no-repeat;
+            background: url("../../../assets/img/deal/sendDeal/add.png") left center no-repeat;
             cursor: pointer;
           }
         }
         dd{
           margin-left:20px;
-          ul{
-            padding:16px 0 10px 0;
-            li{
-              width: 16px;
-              height: 16px;
+          .commentTitle{
+            padding: 0;
+            height: 42px;
+            overflow: hidden;
+            ul{
+              padding:16px 0 10px 0;
               float: left;
-              margin-right:10px;
-              background: url("../../../assets/img/deal/sendDeal/start.png") left center no-repeat;
+              li{
+                width: 16px;
+                height: 16px;
+                float: left;
+                margin-right:10px;
+                background: url("../../../assets/img/deal/sendDeal/start.png") left center no-repeat;
+                cursor: pointer;
+              }
+              .selected{
+                background: url("../../../assets/img/deal/sendDeal/startSelected.png") -1px center no-repeat;
+              }
+            }
+            p{
+              line-height: 48px;
+              float: left;
+              margin-left: 30px;
+            }
+            .deleteComment{
+              float: right;
+              padding-left: 24px;
+              height: 42px;
+              background: url("../../../assets/img/deal/sendDeal/delete.png") left center no-repeat;
               cursor: pointer;
             }
-            .selected{
-              background: url("../../../assets/img/deal/sendDeal/startSelected.png") -1px center no-repeat;
-            }
           }
+           ul{
+              padding:16px 0 10px 0;
+              li{
+                width: 16px;
+                height: 16px;
+                float: left;
+                margin-right:10px;
+                background: url("../../../assets/img/deal/sendDeal/start.png") left center no-repeat;
+                cursor: pointer;
+              }
+              .selected{
+                background: url("../../../assets/img/deal/sendDeal/startSelected.png") -1px center no-repeat;
+              }
+            }
           p{
             word-wrap: break-word;
             word-break: break-all;
@@ -1917,12 +2110,44 @@
             .editComment{
               float: right;
               padding-left: 24px;
-              background: url("../../../assets/img/deal/sendDeal/edit.png") left center no-repeat;
+              background: url("../../../assets/img/deal/sendDeal/add.png") left center no-repeat;
               cursor: pointer;
             }
           }
           dd{//乙方团队对应的评价
             padding-left:10px;
+            .commentTitle{
+              padding: 0;
+              height: 42px;
+              overflow: hidden;
+              ul{
+                padding:16px 0 10px 0;
+                float: left;
+                li{
+                  width: 16px;
+                  height: 16px;
+                  float: left;
+                  margin-right:10px;
+                  background: url("../../../assets/img/deal/sendDeal/start.png") left center no-repeat;
+                  cursor: pointer;
+                }
+                .selected{
+                  background: url("../../../assets/img/deal/sendDeal/startSelected.png") -1px center no-repeat;
+                }
+              }
+              p{
+                line-height: 48px;
+                float: left;
+                margin-left: 30px;
+              }
+              .deleteComment{
+                float: right;
+                padding-left: 24px;
+                height: 42px;
+                background: url("../../../assets/img/deal/sendDeal/delete.png") left center no-repeat;
+                cursor: pointer;
+              }
+            }
             ul{
               padding:16px 0 10px 0;
               li{
@@ -1936,6 +2161,10 @@
               .selected{
                 background: url("../../../assets/img/deal/sendDeal/startSelected.png") -1px center no-repeat;
               }
+            }
+            p{
+              word-wrap: break-word;
+              word-break: break-all;
             }
             textarea{
               padding:0 10px;

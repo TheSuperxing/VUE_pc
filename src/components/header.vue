@@ -73,10 +73,10 @@
 		        </ul>
         	</li>
         </ul>
-        <div class="searchBox">
+        <div class="searchBox" @keydown="keySearch($event)">
         	
-        	<input type="text" placeholder="搜索需求" />
-        	<span class="searchButton" ><router-link to="/trading"></router-link></span>
+        	<input type="text" placeholder="搜索需求" v-model="searchTxt" />
+        	<span class="searchButton" @click="search(searchTxt)"></span>
         </div>
         <div class="wrap-right">
         	<div class="resLog" v-if="!haveLogin">
@@ -118,9 +118,11 @@
           active: false
         }, {
           text: "交易大厅",
-          rout: [{path:"/trading",},{path:"/trading",},{path:"/trading",}],
+          rout: [{path:"/trading",query:{kw:""}},{path:"/trading",},{path:"/trading",}],
           active: false
         },],
+        
+        searchTxt:"",//头部搜索框内容
 
        	comStyle:true,
        	teamStyle:true,
@@ -206,7 +208,22 @@
 					router.push("/login")
 				}
 				console.log(cookieTool.getCookie("token"))
-			}
+			},
+			search(searchTxt){
+				router.push({name:"Trading",query:{kw:searchTxt}})
+			},
+			keySearch($event){//enter键登录事件
+      	var event = $event || window.event;  
+				 	if(event.keyCode==13){ 
+		     		this.search(this.searchTxt);
+	         	event.returnValue = false;    
+	         	event.cancelBubble=true;
+	         	event.preventDefault();
+	         //event.stopProgagation();
+	         	return false;
+	      	} 
+		
+			},
     },
 
 

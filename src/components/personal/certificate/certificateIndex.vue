@@ -396,7 +396,13 @@
 				  "ifVisable": 1,
 				  "pkid": "",
 				  "qualificationName": "",
-				  "registeredUnit": "",
+				  "issueUnit": "",
+				  "issueDate":"",
+				  "professionCategory":"",
+				  "approveDate":"",
+				  "manageNo":"",
+				  "validTill":"",
+				  "postName":"",
 				  picId:[],
         },
         picArr:[],//图片展示的数组
@@ -740,7 +746,13 @@
         Vue.set(this.reveal,"empty",false)
         Vue.set(this.newCertificate,"qualificationName","");
         Vue.set(this.newCertificate,"certificateNumber","");
-        Vue.set(this.newCertificate,"registeredUnit","");
+        Vue.set(this.newCertificate,"approveDate","");
+        Vue.set(this.newCertificate,"issueDate","");
+        Vue.set(this.newCertificate,"issueUnit","");
+        Vue.set(this.newCertificate,"manageNo","");
+        Vue.set(this.newCertificate,"postName","");
+        Vue.set(this.newCertificate,"professionCategory","");
+        Vue.set(this.newCertificate,"validTill","");
         
         singleManualUploader({
 	        element:"fine-uploader-manual-trigger",

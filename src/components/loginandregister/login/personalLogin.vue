@@ -110,12 +110,10 @@
 						}else if(data.code==-1){
 							switch (data.msg){
 								case "100001":
-									console.log(222)
 									that.showAlert = true;
 									that.alertText = "手机号或密码错误";
 									break;
 								case "100008":
-									console.log(222)
 									that.showAlert = true;
 									that.alertText = "手机号未注册";
 									break;

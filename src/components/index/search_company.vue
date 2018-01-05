@@ -56,7 +56,7 @@
 			    	
 			    ],
 			    searchText:"",
-			    hotWords:["李彦宏","马化腾","马云","优秀"],
+			    hotWords:["悉地","匠人","建筑设计","研究院","MAD"],
 			    resultList:[],
 			    current_page: 1, //当前页
 		        pages: "5", //总页数

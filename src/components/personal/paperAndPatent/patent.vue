@@ -408,7 +408,7 @@
             return text;
           }
         }
-        this.localPatent=JSON.parse(JSON.stringify(this.patent));
+        that.localPatent=JSON.parse(JSON.stringify(that.patent));
         that.fineUploaderId = [];
 				that.qqTemplate = [];
 				that.qqTriggerUpload = [];
@@ -419,10 +419,18 @@
 				that.showAlert.validityTerm = false;
 				that.alertText.validityTerm = null;
 				
+				
         //数据库的数据放本地一份
         for(var i=0;i<that.patent.length;i++){
-          that.fineUploaderId.push("fine-uploader-manual-trigger-paper"+that.patent[i].pkid);
-          that.qqTemplate.push("qq-template-manual-trigger-paper"+that.patent[i].pkid);
+        	if(that.patent[i].validityTermE=="0002.12"){
+						that.patent[i].validityTermE = "至今";
+		      }
+		      if(that.localPatent[i].validityTermE=="0002.12"){
+						that.localPatent[i].validityTermE = "至今";
+		      }
+		      that.patent[i].awardingBody = emptyText(that.patent[i].awardingBody)
+          that.fineUploaderId.push("fine-uploader-manual-trigger-patent"+that.patent[i].pkid);
+          that.qqTemplate.push("qq-template-manual-trigger-patent"+that.patent[i].pkid);
           //通过pkid生成fineuploader特有的模版和对应模版容器
           that.show.tag[i]=true;
           that.updowntxt.push("展开查看更多");
@@ -455,12 +463,17 @@
       },
       openOrPrivacy(index){//信息是否对外公开控制按钮
         var that=this;
-        if(this.patent[index].ifVisable==0){
-          Vue.set(this.patent[index],"ifVisable",1);
+        console.log(that.patent[index].ifVisable)
+        if(that.patent[index].ifVisable==0){
+          Vue.set(that.patent[index],"ifVisable",1);
         }else{
-          Vue.set(this.patent[index],"ifVisable",0);
+          Vue.set(that.patent[index],"ifVisable",0);
         }
-        
+        if(that.patent[index].validityTermE=="至今"){
+					that.patent[index].validityTermE = "0002.12";
+	      }
+	      
+        console.log(that.patent[index].ifVisable)
         var url = MyAjax.urlsy+"/psnPaperPatent/updatePatent";
           MyAjax.ajax({
             type: "POST",
@@ -470,7 +483,7 @@
             contentType: "application/json;charset=UTF-8",
             async:false,
           },function(data){
-            //console.log(data)
+              console.log(data)
           },function(err){
             console.log(err)
           })
@@ -584,6 +597,12 @@
       paperEditKeep(index){//编辑状态，保存按钮
         var that=this;
         let condition = that.localPatent[index].patentName.trim().length!=0&&(that.localPatent[index].validityTermS.trim().length!=0||that.localPatent[index].validityTermE.trim().length!=0);
+        if(that.localPatent[index].validityTermS=="至今"){
+					that.localPatent[index].validityTermS = "0002.12";
+	      }
+	      if(that.localPatent[index].validityTermE=="至今"){
+					that.localPatent[index].validityTermE = "0002.12";
+	      }
         if(condition){
         	var url = MyAjax.urlsy+"/psnPaperPatent/updatePatent";
           MyAjax.ajax({
@@ -672,6 +691,12 @@
       },
       keepNewPatent(){//添加模式下的保存
       	var that = this;
+      	if(that.newPatent.validityTermS=="至今"){
+					that.newPatent.validityTermS = "0002.12";
+	      }
+	      if(that.newPatent.validityTermE=="至今"){
+					that.newPatent.validityTermE = "0002.12";
+	      }
       	let condition = that.newPatent.patentName.trim().length!=0&&(that.newPatent.validityTermS.trim().length!=0||that.newPatent.validityTermE.trim().length!=0);
       	if(condition){
       		var url = MyAjax.urlsy+"/psnPaperPatent/insertPatent";
@@ -695,7 +720,7 @@
 	        Vue.set(this.newPatent,"organ","");
 	        Vue.set(this.newPatent,"time","");
 	        setTimeout(()=>(
-						$("#fine-uploader-manual-trigger-paper").html("")
+						$("#fine-uploader-manual-trigger-patent").html("")
         	),1)
       	}else{
       		if(that.newPatent.patentName.trim().length===0){
@@ -778,6 +803,9 @@
       /*显示编辑信息列表开始*/
       .patentInfo{
         border-bottom:1px solid $borderColor;
+        &:last-of-type{
+        	border-bottom: none;
+        }
         /*信息列表开始*/
         .patentInfoList{
           .patentInfoTitle{

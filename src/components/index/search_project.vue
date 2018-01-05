@@ -2,7 +2,7 @@
 	<div class="search_project">
 		<div class="search-wrap" @keydown="keySearch($event)">
 			<input type="text" placeholder="请搜索项目" v-model="searchText"/>
-			<span class="searchButton" @click="jumpPage(current_page)"></span>
+			<span class="searchButton" @click="searchClick(current_page)"></span>
 		</div>
 		<div class="hotWordsWrap">
 			<p v-for="(item,index) in hotWords" @click="choseHot(index)">{{item}}</p>
@@ -40,14 +40,16 @@
 			</div>
 		</div>
 		<div class="hot-list">
-			<h1><span>热门团队</span></h1>
+			<h1><span>热门项目</span></h1>
 			<ul>
-				<li v-for="item in proMsg">
-					<img :src="item.img" />
-					<p>{{item.projectName}}</p>
+				<li v-for="item in hotList">
+					<router-link :to="{name:'projectDetail',query:{id:item.pkid}}" target="_blank">
+						<img :src="item.pic"/>
+						<p>{{item.projectName}}</p>
+					</router-link>
 				</li>
 			</ul>
-			<div class="change">不感兴趣  换一批</div>
+			<div class="change" @click="getHotList">不感兴趣  换一批</div>
 		</div>
 	</div>
 </template>
@@ -76,12 +78,14 @@
 	        		
 			    ],
 			    searchText:"",
-			    hotWords:["李彦宏","马化腾","马云","优秀"],
+			    hotWords:["体育场","大剧院","广场","游泳中心","中国馆"],
 			    resultList:[],
+			    hotList:[],
 			    current_page: 1, //当前页
-	        pages: "", //总页数
-	        changePage:'1',//跳转页
-	        haveResult:false,
+		        pages: "", //总页数
+		        changePage:'1',//跳转页
+		        haveResult:false,
+		        
 			}
 		},
 		computed: {
@@ -96,10 +100,12 @@
     		}, 	 	
     		efont: function() {
     			if(this.pages <= 7) return false;
+    			if(this.pages==8) return false;
     			return this.current_page > 5
     		},
     		ebehind: function() {
     			if(this.pages <= 7) return false;
+    			if(this.pages==8) return false;
     			var nowAy = this.indexs;
     			return nowAy[nowAy.length - 1] != this.pages;
     		},
@@ -115,11 +121,24 @@
     				} else {
     					if(this.current_page <= 5) {
     						left = 1;
-    						right = 7;
+    						if(this.pages==7&&this.current_page <=2){
+    							right = 6;
+    						}else{
+    							right = 7;
+    						}
+    						if(this.pages==8&&(this.current_page ==4||this.current_page ==5)){
+    							right = 8;
+    						}
+    						if(this.pages==9&&this.current_page ==5){
+    							right = 9;
+    						}
     					} else {
     						right = this.pages;
-
-    						left = this.pages - 6;
+    						if(this.pages==7){  //正好等于7的情况
+    							left = this.pages - 5;
+    						}else{
+    							left = this.pages - 6;
+    						}
     					}
     				}
     			}
@@ -139,36 +158,41 @@
 //  			Vue.set(this,"searchText",this.$route.query.kw)
 //  		}
     		this.search(this.current_page);
+    		this.getHotList();
     	},
 		methods:{
+			searchClick(current_page){
+				this.jumpPage(current_page);
+				this.current_page = 1;
+			},
 			jumpPage(current_page){
     			
     			location.hash = location.hash=location.hash.split("=")[0]+"="+ this.searchText;
     			var that = this;
     			if(that.searchText.trim().length!=0){
     				var url = MyAjax.urlsy+"/ediHomePage/searchProjsByKeyWords/"+ current_page +"/"+that.searchText
-						MyAjax.ajax({
-							type: "GET",
-							url:url,
-							dataType:"json",
-							async: false,
-		//					contentType:"application/json;charset=utf-8",
-						}, function(data){
-							console.log(data)
-							if(data.code==0){
-								Vue.set(that,"resultList",data.msg.records)
-								Vue.set(that,"pages",data.msg.pages)
-								Vue.set(that,"current_page",data.msg.current)
-								if(that.resultList.length!=0){
-									that.haveResult = true;
-								}else{
-									that.haveResult = false;
-								}
+					MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType:"json",
+						async: false,
+	//					contentType:"application/json;charset=utf-8",
+					}, function(data){
+						console.log(data)
+						if(data.code==0){
+							Vue.set(that,"resultList",data.msg.records)
+							Vue.set(that,"pages",data.msg.pages)
+							Vue.set(that,"current_page",data.msg.current)
+							if(that.resultList.length!=0){
+								that.haveResult = true;
+							}else{
+								that.haveResult = false;
 							}
-						},function(err){
-		//					router.push("/error/404")
-							console.log(err)
-						})
+						}
+					},function(err){
+	//					router.push("/error/404")
+						console.log(err)
+					})
     			}else{
     				that.search(current_page)
     			}
@@ -223,8 +247,27 @@
 		         //event.stopProgagation();
 		         return false;
 		      	} 
-		
+				this.current_page = 1;
 			},
+			getHotList(){
+				var that = this;
+				var url = MyAjax.urlsy+"/ediHomePage/popProjs";
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType:"json",
+					async: false,
+//					contentType:"application/json;charset=utf-8",
+				}, function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"hotList",data.msg)
+					}
+				},function(err){
+//					router.push("/error/404")
+					console.log(err)
+				})
+			}
 		},
 		watch:{
 			current_page:function(){
@@ -509,6 +552,11 @@ $themeColor:#ff7403;
 				&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
 				
 				li{
+					a{
+						width: 100%;
+						height: 100%;
+						display: block;
+					}
 					width: 285px;
 					margin-right: 20px;
 					float: left;
@@ -518,9 +566,19 @@ $themeColor:#ff7403;
 					img{
 						width: 285px;
 						height: 160px;
-						
 					}
-					
+					p{
+						padding-left: 12px;
+						color: #333333;
+						line-height: 24px;
+						height: 24px;
+					}
+					&:hover{
+						p{
+							color: $themeColor;
+						}
+						box-shadow: 0 0 15px rgba(160,160,160,.6);
+					}
 				}
 			}
 			
@@ -530,7 +588,8 @@ $themeColor:#ff7403;
 				text-align: center;
 				font-size: 14px;
 				color: $themeColor;
-				margin-bottom: 50px;
+				padding-bottom: 50px;
+				cursor: pointer;
 			}
 		}
 	}

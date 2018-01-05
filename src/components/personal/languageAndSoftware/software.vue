@@ -651,7 +651,7 @@
 					})
 	        that.updateData();
 					setTimeout(()=>(
-						$("#fine-uploader-manual-trigger-paper").html("")
+						$("#fine-template-manual-trigger-software").html("")
         	),1)
 					Vue.set(this.reveal,"addSoftware",true);
         }else{
@@ -672,7 +672,7 @@
         Vue.set(this.newSoftware,"proficiency","");
         /*清除数据，保证下次输入时输入框为空*/
 				setTimeout(()=>(
-					$("#fine-uploader-manual-trigger-paper").html("")
+					$("#fine-template-manual-trigger-software").html("")
 	    	),1)
 				this.updateData();
       }

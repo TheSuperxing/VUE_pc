@@ -255,8 +255,8 @@
 //		    colletionInfo:state=>state.demand.colletionInfo,
 //		    userID:state=>state.userState.user.userID,/*我的ID*/
 		   	currencyUnit:function(){
-				return this.detailInfo.demandbasicinfo.currency.split("-")[0]
-			},
+					return this.detailInfo.demandbasicinfo.currency.split("-")[0]
+				},
 		}),
 		created(){
 			this.getData()
@@ -276,6 +276,7 @@
 					dataType: "json",
 					async:false,
 				},function(data){
+					console.log(data)
 					if(data.code==0){
 						Vue.set(that,"detailInfo",data.msg)
 					}else{
@@ -306,24 +307,24 @@
 				})
 		    	that.detailInfo.demandobjs = that.detailInfo.demandobjs[0].split(",")
 		    	for(let i=0;i<that.detailInfo.demandobjs.length;i++){
-					if(that.detailInfo.demandobjs.length!=0){
-						that.haveValue.demandObj = true;
-					}
-					switch (that.detailInfo.demandobjs[i]){
-						case "1001":
-							Vue.set(that.detailInfo.demandobjs,[i],"个人")
-							break;
-						case "1002":
-							Vue.set(that.detailInfo.demandobjs,[i],"公司")
-							break;
-						case "1003":
-							Vue.set(that.detailInfo.demandobjs,[i],"团队")
-							break;
-						default:
-							break;
-					}
+						if(that.detailInfo.demandobjs.length!=0){
+							that.haveValue.demandObj = true;
+						}
+						switch (that.detailInfo.demandobjs[i]){
+							case "1001":
+								Vue.set(that.detailInfo.demandobjs,[i],"个人")
+								break;
+							case "1002":
+								Vue.set(that.detailInfo.demandobjs,[i],"公司")
+								break;
+							case "1003":
+								Vue.set(that.detailInfo.demandobjs,[i],"团队")
+								break;
+							default:
+								break;
+						}
 					
-				}
+					}
 				console.log(that.detailInfo.demandobjs)
 				//判断是否为我发布的需求
 				if(that.detailInfo.demandbasicinfo.basic_isMine==true){

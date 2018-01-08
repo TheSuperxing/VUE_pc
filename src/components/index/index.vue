@@ -110,7 +110,7 @@
 				msg:"首页",
 				lbt: [  
 	        {  
-	          'imgs': require('../../assets/img/header/banner3.jpeg')
+	          'imgs': require('../../assets/img/header/banner8.jpg')
 	        }, {  
 	          'imgs': require('../../assets/img/header/banner1.jpg') 
 	        }, {  

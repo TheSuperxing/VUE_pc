@@ -245,7 +245,7 @@
 				// }
 				cookieTool.delCookie("token");
 				router.push("/indexcontent/index")
-				console.log(cookieTool.getCookie())
+				this.haveLogin = false;
 			},
 			search(searchTxt){
 				router.push({name:"Trading",query:{kw:searchTxt}})
@@ -263,7 +263,6 @@
 		
 			},
     },
-
 
 
  }

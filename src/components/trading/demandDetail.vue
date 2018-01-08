@@ -278,6 +278,7 @@
 				},function(data){
 					console.log(data)
 					if(data.code==0){
+						console.log(data.msg)
 						Vue.set(that,"detailInfo",data.msg)
 					}else{
 						// that.detailInfo={
@@ -305,6 +306,7 @@
 				},function(err){
 					console.log(err)
 				})
+				//console.log(that.detailInfo.demandobjs[0])
 		    	that.detailInfo.demandobjs = that.detailInfo.demandobjs[0].split(",")
 		    	for(let i=0;i<that.detailInfo.demandobjs.length;i++){
 						if(that.detailInfo.demandobjs.length!=0){

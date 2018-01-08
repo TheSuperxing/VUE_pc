@@ -201,9 +201,9 @@
 									
 								}
 							}else{
-								if(data.msg=="100003"||data.msg=="100004"){//没有成功登陆
-									window.location.hash="/login"
-								}
+								// if(data.msg=="100003"||data.msg=="100004"){//没有成功登陆
+								// 	window.location.hash="/login"
+								// }
 							}
 						},function(err){
 		//					router.push("/error/404")
@@ -294,7 +294,7 @@
 						}
 						
 					}else{
-						if(data.msg=="100003"){//没有成功登陆
+						if(data.msg=="100003"||data.msg=="100004"){//没有成功登陆
 							that.searchAllNotLogin(current_page)
 						}
 					}

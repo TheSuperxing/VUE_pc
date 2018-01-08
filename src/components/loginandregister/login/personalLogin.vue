@@ -105,7 +105,8 @@
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
               console.log("success")
-              window.location.hash="/indexcontent/index"
+              console.log(window.history.length)
+              window.history.back()
 							//router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){

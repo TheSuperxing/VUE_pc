@@ -95,6 +95,7 @@
         				<em @click="loginOut">退出登录</em>
         			</div>
         		</div>
+        		
         	</div>
         </div>
       </div>
@@ -146,6 +147,13 @@
 			this.getNewNote();
 		},
 	  mounted(){
+				//判断有没有登录
+				console.log(cookieTool.getCookie("token"))
+				if(cookieTool.getCookie("token")==null){
+					this.haveLogin = false;
+				}else{
+					this.haveLogin = true;
+				}
 				
 				this.user.userState = sessionStorage.getItem("state");
 				
@@ -381,9 +389,14 @@
         	height: 70px;
         	text-align: 70px;
         	.resLog{
+        		height:70px; 
+        		line-height: 70px;
         		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
         		a{
+        			height: 30px;
+        			line-height: 30px;
 	        		float: left;
+	        		margin-top: 20px;
 	        		color: $themeColor;
 	        		
 	        		&:first-child{
@@ -446,6 +459,10 @@
         					
         				}
         			}
+        		}
+        		.loginBox{
+        			height: 70px;
+	        		line-height: 70px;
         		}
         	}
         	
@@ -550,6 +567,7 @@
 
          a.router-link-active{
            	background: #333333;
+           	color: #FFFFFF;
             span{
               border-bottom-color: #2eb3df;
             }

@@ -177,6 +177,7 @@
 						dataType:"json",
 						async: false,
 	//					contentType:"application/json;charset=utf-8",
+						ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
 					}, function(data){
 						console.log(data)
 						if(data.code==0){
@@ -220,6 +221,7 @@
 					url:url,
 					dataType: "json",
 					async: false,
+					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
 				},function(data){
 					console.log(data)
 					if(data.code==0){
@@ -258,6 +260,7 @@
 					dataType:"json",
 					async: false,
 //					contentType:"application/json;charset=utf-8",
+					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
 				}, function(data){
 					console.log(data)
 					if(data.code==0){

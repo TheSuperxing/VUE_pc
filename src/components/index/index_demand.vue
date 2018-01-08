@@ -60,6 +60,7 @@
 					url:url,
 					dataType: "json",
 					async: false,
+					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
 				},function(data){
 					console.log(data)
 					//给获取的数据分组

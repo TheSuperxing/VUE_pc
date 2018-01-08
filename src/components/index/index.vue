@@ -131,6 +131,7 @@
 				dataType: "json",
 //				contentType:"application/json;charset=utf-8",
 				async: false,
+				ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
 			},function(data){
 				data = data.msg;
 				that.baseInfo = data;

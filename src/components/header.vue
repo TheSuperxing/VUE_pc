@@ -164,7 +164,8 @@
 					type: "GET",
 					url:url,
 					dataType: "json",
-					async:false,					
+					async:false,
+					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取					
 				},function(data){
           data = data.msg;
 					// if(data == "100004"){
@@ -188,6 +189,7 @@
 						url:url,
 						dataType: "json",
 						async: false,
+						ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
 					},function(data){
 						console.log(data.msg)
 						if(data.code==0){

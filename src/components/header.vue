@@ -230,12 +230,14 @@
 				event.stopPropagation();
 			},
 			loginOut(){
-				cookieTool.setCookie("token","")
-				console.log(cookieTool.getCookie("token"))
-				if(cookieTool.getCookie("token")==""){
-					router.push("/login")
-				}
-				console.log(cookieTool.getCookie("token"))
+				// cookieTool.setCookie("token","")
+				// console.log(cookieTool.getCookie("token"))
+				// if(cookieTool.getCookie("token")==""){
+				// 	router.push("/login")
+				// }
+				cookieTool.delCookie("token");
+				router.push("/indexcontent/index")
+				console.log(cookieTool.getCookie())
 			},
 			search(searchTxt){
 				router.push({name:"Trading",query:{kw:searchTxt}})

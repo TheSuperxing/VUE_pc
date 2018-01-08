@@ -24,10 +24,10 @@
 		data:function(){
 			return{
 				sideNav:[
-					{text:"发布需求",pic1:require("../../assets/img/demand/icon40.png"),pic2:require("../../assets/img/demand/icon41.png"),router:"/yhzx/demand/publish"},
-					{text:"需求草稿",pic1:require("../../assets/img/demand/icon42.png"),pic2:require("../../assets/img/demand/icon48.png"),router:"/yhzx/demand/draft"},
 					{text:"我的发布",pic1:require("../../assets/img/demand/icon43.png"),pic2:require("../../assets/img/demand/icon52.png"),router:"/yhzx/demand/publishment"},
 					{text:"我的申请",pic1:require("../../assets/img/demand/icon44.png"),pic2:require("../../assets/img/demand/icon58.png"),router:"/yhzx/demand/application"},
+					{text:"发布需求",pic1:require("../../assets/img/demand/icon40.png"),pic2:require("../../assets/img/demand/icon41.png"),router:"/yhzx/demand/publish"},
+					{text:"需求草稿",pic1:require("../../assets/img/demand/icon42.png"),pic2:require("../../assets/img/demand/icon48.png"),router:"/yhzx/demand/draft"},
 					{text:"我的收藏",pic1:require("../../assets/img/demand/icon45.png"),pic2:require("../../assets/img/demand/icon45.png"),router:"/yhzx/demand/collection"},
 				]
 			}

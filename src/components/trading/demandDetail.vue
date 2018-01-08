@@ -278,8 +278,29 @@
 				},function(data){
 					if(data.code==0){
 						Vue.set(that,"detailInfo",data.msg)
+					}else{
+						// that.detailInfo={
+						// 	appTimes:1,
+						// 	basic_isMine:false,
+						// 	complateTime:"2017.12.28",
+						// 	creTime:"2017.12.28",
+						// 	currency:null,
+						// 	demandName:"12.28需求2",
+						// 	describe:"的萨芬",
+						// 	objRequire:"地方撒个",
+						// 	pkid:"4d8a7faddbef4665be53191b01ef6164",
+						// 	pubAccountID:"a07134f5cf434a3993c6859f3bb644a9",
+						// 	pubName:"CCDI_EDI_10000",
+						// 	publishTime:"2017.12.28",
+						// 	remark:"规范第三个",
+						// 	reword:4534,
+						// 	type:2
+						// }
+						// if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
 					}
-					console.log(that.detailInfo.demandbasicinfo.currency)
+					//console.log(that.detailInfo.demandbasicinfo.currency)
 				},function(err){
 					console.log(err)
 				})

@@ -145,6 +145,9 @@
             Vue.set(that.data,"dealInfo",data.msg)
             console.log(data.msg)
 					}else{
+            // if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
             console.log("错误返回");
             //window.location.hash="/error/404"
 					}

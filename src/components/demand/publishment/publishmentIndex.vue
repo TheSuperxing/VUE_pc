@@ -194,6 +194,10 @@
 					if(data.code==0){
 						console.log(data.msg)
 						Vue.set(that,"invalidDemand",data.msg)
+					}else{
+						// if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
 					}
 					
 					console.log(that.invalidDemand)

@@ -540,6 +540,10 @@
           if(data.code==0&&data.msg.personalbasicinfo!=null){
             that.psnMsg=data.msg;
             //Vue.set(that,"psnMsg",data.msg);
+          }else{
+            // if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
           }
         },function(err){
           if(err.status!=200){

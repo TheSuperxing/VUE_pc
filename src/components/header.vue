@@ -57,7 +57,7 @@
     </div>-->
 
     <!--个人状态的导航-->
-    <div class="headerNavBg"  v-if="user.userState==0">
+    <div class="headerNavBg"  >
       <div class="headerNav" >
         <div class="wrap-left">
         	<img src="../assets/img/header/001.png" />
@@ -159,10 +159,10 @@
 					async:false,					
 				},function(data){
           data = data.msg;
-					if(data == "100004"){
-						cookieTool.delCookie("token")
-						router.push("/login")
-          } 
+					// if(data == "100004"){
+					// 	cookieTool.delCookie("token")
+					// 	router.push("/login")
+          // } 
 				},function(err){
 					console.log(err)
 				})
@@ -211,9 +211,9 @@
 
 	     redirect(){
 	     	//console.log(this.user.userState)
-				if(cookieTool.getCookie("token")==null){
-					router.push("/login")
-				}
+				// if(cookieTool.getCookie("token")==null){
+				// 	router.push("/login")
+				// }
 				switch (this.user.userState){
 					case '1':
 						router.push("/yhzx/company/overview")
@@ -230,7 +230,6 @@
 				event.stopPropagation();
 			},
 			loginOut(){
-				console.log(74837)
 				cookieTool.setCookie("token","")
 				console.log(cookieTool.getCookie("token"))
 				if(cookieTool.getCookie("token")==""){

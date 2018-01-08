@@ -18,9 +18,9 @@
     data(){
       return{
         slider:[
-          {title:"起草协议",path:"/yhzx/deal/draftingDealIndex"},
           {title:"我发送的协议",path:"/yhzx/deal/sendDealIndex"},
           {title:"我收到的协议",path:"/yhzx/deal/acceptDealIndex"},
+          {title:"起草协议",path:"/yhzx/deal/draftingDealIndex"},
           {title:"协议草稿",path:"/yhzx/deal/outlineDealIndex"}
         ]
       }

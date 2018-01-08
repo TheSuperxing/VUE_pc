@@ -50,39 +50,45 @@
 				that.notice = [];
 				that.mesState = [];
 				that.noticeNum=data.msg.length;
-				for(let i=0;i<data.msg.length;i++){
-					if(data.msg[i].mesType==1){
-						that.mesState.push(true) //未读
-					}else{
-						that.mesState.push(false) //已读
-					}
-					if(data.msg[i].mesContent.match(/##(\S*)##/)!=null){
-						let useful = data.msg[i].mesContent.match(/##(\S*)##/)[1];
-						useful = useful.split(";");
-						let obj = {
-							mes:"",
-							urlName:"",
-							id:"",
-							pkid:""
+				if(data.code==0){
+					for(let i=0;i<data.msg.length;i++){
+						if(data.msg[i].mesType==1){
+							that.mesState.push(true) //未读
+						}else{
+							that.mesState.push(false) //已读
 						}
-						obj.mes =data.msg[i].mesContent.split(/##(\S*)##/);
-						obj.mes[1] = useful[0];
-						obj.urlName = useful[1]; 
-						obj.id = useful[2];
-						obj.pkid = data.msg[i].pkid;
-						that.notice.push(obj);
-					}else{
-						let obj = {
-							mes:[],
-							urlName:"",
-							id:"",
-							pkid:""
+						if(data.msg[i].mesContent.match(/##(\S*)##/)!=null){
+							let useful = data.msg[i].mesContent.match(/##(\S*)##/)[1];
+							useful = useful.split(";");
+							let obj = {
+								mes:"",
+								urlName:"",
+								id:"",
+								pkid:""
+							}
+							obj.mes =data.msg[i].mesContent.split(/##(\S*)##/);
+							obj.mes[1] = useful[0];
+							obj.urlName = useful[1]; 
+							obj.id = useful[2];
+							obj.pkid = data.msg[i].pkid;
+							that.notice.push(obj);
+						}else{
+							let obj = {
+								mes:[],
+								urlName:"",
+								id:"",
+								pkid:""
+							}
+							obj.mes[0] =data.msg[i].mesContent;
+							obj.pkid = data.msg[i].pkid;
+							that.notice.push(obj);
 						}
-						obj.mes[0] =data.msg[i].mesContent;
-						obj.pkid = data.msg[i].pkid;
-						that.notice.push(obj);
+						
 					}
-					
+				}else{
+					// if(data.msg=="100004"){//没有token
+					// 	window.location.hash="/login"
+					// }
 				}
 				console.log(that.notice)
 			},function(err){

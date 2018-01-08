@@ -201,8 +201,9 @@
 									
 								}
 							}else{
-								router.push("/error/404")
-		//						console.log("错误返回")
+								if(data.msg=="100003"||data.msg=="100004"){//没有成功登陆
+									window.location.hash="/login"
+								}
 							}
 						},function(err){
 		//					router.push("/error/404")
@@ -260,7 +261,7 @@
 					async: false,
 					contentType:"application/json;charset=utf-8",
 				}, function(data){
-					console.log(data)
+					//console.log(data)
 					if(data.code==0){
 						that.dataInfo = data.msg.records;//取出当前获取的所有需求
 						that.current_page=data.msg.current;//设置当前页
@@ -293,8 +294,9 @@
 						}
 						
 					}else{
-	//						router.push("/error/500")
-	//						console.log("错误返回")
+						if(data.msg=="100003"){//没有成功登陆
+							that.searchAllNotLogin(current_page)
+						}
 					}
 				},function(err){
 	//					router.push("/error/404")
@@ -313,6 +315,58 @@
 			      	} 
 				this.current_page = 1;
 			},
+			searchAllNotLogin(current_page){
+    			this.haveCollect=[];
+				var that = this;
+				var url = MyAjax.urlsy+"/tradeHall/findDemandsNoRegister/" + current_page
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType:"json",
+					async: false,
+					contentType:"application/json;charset=utf-8",
+				}, function(data){
+					//console.log(data)
+					if(data.code==0){
+						that.dataInfo = data.msg.records;//取出当前获取的所有需求
+						that.current_page=data.msg.current;//设置当前页
+						that.pages=data.msg.pages;//设置最大页数
+						if(that.dataInfo.length!=0){
+							that.haveResult = true;
+						}else{
+							that.haveResult = false;
+						}
+						for(let i=0;i<that.dataInfo.length;i++){
+							that.dataInfo[i].demandobjs= that.dataInfo[i].demandObjCode.split(",")
+							for(let j=0;j<that.dataInfo[i].demandobjs.length;j++){
+								switch (that.dataInfo[i].demandobjs[j]){
+									case "1001":
+										Vue.set(that.dataInfo[i].demandobjs,[j],"个人")
+										break;
+									case "1002":
+										Vue.set(that.dataInfo[i].demandobjs,[j],"公司")
+										break;
+									case "1003":
+										Vue.set(that.dataInfo[i].demandobjs,[j],"团队")
+										break;
+									default:
+										break;
+								}
+							}
+							console.log(that.dataInfo[i].demandobjs)
+							that.dataInfo[i].status=="1"?that.haveCollect.push(true):that.haveCollect.push(false);
+							
+						}
+						
+					}else{
+						
+					}
+				},function(err){
+	//					router.push("/error/404")
+					console.log(err)
+				})
+    		}
+
     	},
     	watch:{
     		current_page:function(){

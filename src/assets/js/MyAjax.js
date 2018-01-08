@@ -22,8 +22,11 @@ var MyAjax = {
 			async: option.async, // 使用同步方式  
 			success: function(data){		
 				callback(data);
-				if(data.msg==="100004"){
-					window.location.hash ="/login"
+				// if(data.msg==="100004"){//tooken为空
+				// 	window.location.hash ="/login"
+				// }
+				if(data.msg=="100003"){//没有成功登陆
+					window.location.hash="/login"
 				}
 			},error:function(error){
 				errCallback(error)

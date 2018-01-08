@@ -32,7 +32,7 @@ import CollectionDetail from "../../components/trading/demandDetail.vue"
 //import DemandDetail from "../../components/trading/demandDetail.vue"
 var myDemand = [
 	{
-		path:"/yhzx/demand",name:"demand",component:Demand,redirect:"/yhzx/demand/publish",
+		path:"/yhzx/demand",name:"demand",component:Demand,redirect:"/yhzx/demand/publishment/index",
 		children:[
 			{
 				path:"/yhzx/demand/wallet",component:Wallet,redirect:"/yhzx/demand/wallet/tradingRecord",

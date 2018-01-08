@@ -20,9 +20,6 @@ import "./assets/js/units/pagination/pagination.css"
 /*corpbox*/
 
 import {cookieTool} from "./assets/js/cookieTool.js"
-if(cookieTool.getCookie("token")==null){
-	router.push("/login")
-}
 /*自定义指令开始*/
 import title from "./assets/js/directive/directive"
 /*自定义指令结束*/

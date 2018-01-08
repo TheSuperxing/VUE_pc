@@ -28,7 +28,7 @@
 			<div class="swiper-pagination swiper-pagination-personal"></div>
 			</div>  
 			<div class="search">
-				<router-link to="/trading">更多需求等你发现>></router-link>
+				<router-link :to="{name:'Trading',query:{kw:''}}">更多需求等你发现>></router-link>
 			</div>
   </div>
 </template>

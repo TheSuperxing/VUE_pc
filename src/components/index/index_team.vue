@@ -8,12 +8,12 @@
 					<li v-for="item in ul">
 						<dl>
 							<dd>
-								<img :src="item.img" alt=""/>
+								<img :src="item.pic" alt=""/>
 							</dd>
 							<dt>
 								<h3>{{item.teamName}}</h3>
-								<p>认证员工<em>12</em></p>
-								<p>{{item.com}}</p>
+								<p>认证员工<em>{{item.cerCounts}}</em></p>
+								<p>{{item.companyName}}</p>
 								<div class="more">
 									<router-link to="">
 										MORE>>
@@ -42,172 +42,37 @@
     name: 'index_team',
     data:function(){
       return {
-        perMsg:[
-        	[
-        		{
-        			"img":require("../../assets/img/images/1.jpg"),
-        			"teamName":"鼎城建筑",
-        			"com":"鼎城建筑设计公司"
-        		},{
-        			"img":require("../../assets/img/images/2.jpg"),
-        			"teamName":"建宸设计",
-        			"com":"建宸设计上海分公司"
-        		},{
-        			"img":require("../../assets/img/images/3.jpg"),
-        			"teamName":"辰耀招标",
-        			"com":"辰耀集团"
-        		},{
-        			"img":require("../../assets/img/images/4.jpg"),
-        			"teamName":"天保中天建筑",
-        			"com":"天保中天科技有限公司"
-        		},{
-        			"img":require("../../assets/img/images/5.jpg"),
-        			"teamName":"建科测绘",
-        			"com":"建科建筑研究院"
-        		},{
-        			"img":require("../../assets/img/images/6.jpg"),
-        			"teamName":"筑梦宝地",
-        			"com":"筑梦地产有限公司"
-        		},{
-        			"img":require("../../assets/img/images/7.jpg"),
-        			"teamName":"CCDI-EDI",
-        			"com":"悉地国际CCDI"
-        		},{
-        			"img":require("../../assets/img/images/8.jpg"),
-        			"teamName":"天咨拓维",
-        			"com":"天津一建"
-        		},{
-        			"img":require("../../assets/img/images/9.jpg"),
-        			"teamName":"聚星材料",
-        			"com":"悉地国际CCDI"
-        		},
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/images/1.jpg"),
-        			"teamName":"鼎城建筑",
-        			"com":"鼎城建筑设计公司"
-        		},{
-        			"img":require("../../assets/img/images/2.jpg"),
-        			"teamName":"建宸设计",
-        			"com":"建宸设计上海分公司"
-        		},{
-        			"img":require("../../assets/img/images/3.jpg"),
-        			"teamName":"辰耀招标",
-        			"com":"辰耀集团"
-        		},{
-        			"img":require("../../assets/img/images/4.jpg"),
-        			"teamName":"天保中天建筑",
-        			"com":"天保中天科技有限公司"
-        		},{
-        			"img":require("../../assets/img/images/5.jpg"),
-        			"teamName":"建科测绘",
-        			"com":"建科建筑研究院"
-        		},{
-        			"img":require("../../assets/img/images/6.jpg"),
-        			"teamName":"筑梦宝地",
-        			"com":"筑梦地产有限公司"
-        		},{
-        			"img":require("../../assets/img/images/7.jpg"),
-        			"teamName":"CCDI-EDI",
-        			"com":"悉地国际CCDI"
-        		},{
-        			"img":require("../../assets/img/images/8.jpg"),
-        			"teamName":"天咨拓维",
-        			"com":"天津一建"
-        		},{
-        			"img":require("../../assets/img/images/9.jpg"),
-        			"teamName":"聚星材料",
-        			"com":"悉地国际CCDI"
-        		},
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/images/1.jpg"),
-        			"teamName":"鼎城建筑",
-        			"com":"鼎城建筑设计公司"
-        		},{
-        			"img":require("../../assets/img/images/2.jpg"),
-        			"teamName":"建宸设计",
-        			"com":"建宸设计上海分公司"
-        		},{
-        			"img":require("../../assets/img/images/3.jpg"),
-        			"teamName":"辰耀招标",
-        			"com":"辰耀集团"
-        		},{
-        			"img":require("../../assets/img/images/4.jpg"),
-        			"teamName":"天保中天建筑",
-        			"com":"天保中天科技有限公司"
-        		},{
-        			"img":require("../../assets/img/images/5.jpg"),
-        			"teamName":"建科测绘",
-        			"com":"建科建筑研究院"
-        		},{
-        			"img":require("../../assets/img/images/6.jpg"),
-        			"teamName":"筑梦宝地",
-        			"com":"筑梦地产有限公司"
-        		},{
-        			"img":require("../../assets/img/images/7.jpg"),
-        			"teamName":"CCDI-EDI",
-        			"com":"悉地国际CCDI"
-        		},{
-        			"img":require("../../assets/img/images/8.jpg"),
-        			"teamName":"天咨拓维",
-        			"com":"天津一建"
-        		},{
-        			"img":require("../../assets/img/images/9.jpg"),
-        			"teamName":"聚星材料",
-        			"com":"悉地国际CCDI"
-        		},
-        	],
-        	[
-        		{
-        			"img":require("../../assets/img/images/1.jpg"),
-        			"teamName":"鼎城建筑",
-        			"com":"鼎城建筑设计公司"
-        		},{
-        			"img":require("../../assets/img/images/2.jpg"),
-        			"teamName":"建宸设计",
-        			"com":"建宸设计上海分公司"
-        		},{
-        			"img":require("../../assets/img/images/3.jpg"),
-        			"teamName":"辰耀招标",
-        			"com":"辰耀集团"
-        		},{
-        			"img":require("../../assets/img/images/4.jpg"),
-        			"teamName":"天保中天建筑",
-        			"com":"天保中天科技有限公司"
-        		},{
-        			"img":require("../../assets/img/images/5.jpg"),
-        			"teamName":"建科测绘",
-        			"com":"建科建筑研究院"
-        		},{
-        			"img":require("../../assets/img/images/6.jpg"),
-        			"teamName":"筑梦宝地",
-        			"com":"筑梦地产有限公司"
-        		},{
-        			"img":require("../../assets/img/images/7.jpg"),
-        			"teamName":"CCDI-EDI",
-        			"com":"悉地国际CCDI"
-        		},{
-        			"img":require("../../assets/img/images/8.jpg"),
-        			"teamName":"天咨拓维",
-        			"com":"天津一建"
-        		},{
-        			"img":require("../../assets/img/images/9.jpg"),
-        			"teamName":"聚星材料",
-        			"com":"悉地国际CCDI"
-        		},
-        	],
-        ]
+        perMsg:[]
         
       }
     },
     mounted(){
     	var that = this;
-    	that.lunbo()  
+    	that.getData();
+    	that.lunbo();  
     },
     methods:{
+    	getData(){
+    		var that = this;
+    		var url = MyAjax.urlsy + "/ediHomePage/findTeams";
+    		MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
+				},function(data){
+					console.log(data)
+					//给获取的数据分组
+					that.perMsg = [];
+					for(var i=0,len=data.msg.records.length;i<len;i+=9){
+					   that.perMsg.push(data.msg.records.slice(i,i+9));
+					}
+					
+				},function(err){
+					console.log(err)
+				})
+    	},
 			lunbo () {  
 	      galleryTeam = new Swiper('.gallery-team', {  
 //	        navigation: {

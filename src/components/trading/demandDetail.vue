@@ -21,7 +21,7 @@
 						</span>
 					</div>
 					<div class="auditStatus" >{{auditStatusTxt}}</div>
-					<div v-if="!isMine">
+					<div >
 						<span class="cancelBtn" @click="cancelCollect(detailInfo.demandbasicinfo.pkid)" v-if="haveCollect">
 							<img src="../../assets/img/demand/icon59.png"/>
 							<img src="../../assets/img/demand/icon59.png"/>
@@ -215,6 +215,8 @@
 	import Modal from "../../assets/js/modal.js"
 	import router from '../../router'
 	import MyAjax from "../../assets/js/MyAjax.js"
+	import {cookieTool} from "../../assets/js/cookieTool.js"
+	
 	export default{
 		name:"demandDetail",
 		data:function(){
@@ -267,45 +269,45 @@
 		},
 		methods:{
 			getData(){
+				console.log(cookieTool.getCookie("token")==null)
 				console.log(this.$route.query.id)
 				var that = this;
-				var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.$route.query.id
-		    	MyAjax.ajax({
-					type: "GET",
-					url:url,
-					dataType: "json",
-					async:false,
-				},function(data){
-					console.log(data)
-					if(data.code==0){
-						console.log(data.msg)
-						Vue.set(that,"detailInfo",data.msg)
-					}else{
-						// that.detailInfo={
-						// 	appTimes:1,
-						// 	basic_isMine:false,
-						// 	complateTime:"2017.12.28",
-						// 	creTime:"2017.12.28",
-						// 	currency:null,
-						// 	demandName:"12.28需求2",
-						// 	describe:"的萨芬",
-						// 	objRequire:"地方撒个",
-						// 	pkid:"4d8a7faddbef4665be53191b01ef6164",
-						// 	pubAccountID:"a07134f5cf434a3993c6859f3bb644a9",
-						// 	pubName:"CCDI_EDI_10000",
-						// 	publishTime:"2017.12.28",
-						// 	remark:"规范第三个",
-						// 	reword:4534,
-						// 	type:2
-						// }
-						// if(data.msg=="100004"){//没有token
-						// 	window.location.hash="/login"
-						// }
-					}
-					//console.log(that.detailInfo.demandbasicinfo.currency)
-				},function(err){
-					console.log(err)
-				})
+				if(cookieTool.getCookie("token")==null||cookieTool.getCookie("token")==""){
+					var url = MyAjax.urlhw+"/demandbasicinfo/findByIDWithOutUser/" + that.$route.query.id
+			    	MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+						if(data.code==0){
+							console.log(data.msg)
+							Vue.set(that,"detailInfo",data.msg)
+						}
+						//console.log(that.detailInfo.demandbasicinfo.currency)
+					},function(err){
+						console.log(err)
+					})
+				}else{
+					var url = MyAjax.urlhw+"/demandbasicinfo/findByID/" + that.$route.query.id
+			    	MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+						if(data.code==0){
+							console.log(data.msg)
+							Vue.set(that,"detailInfo",data.msg)
+						}
+						//console.log(that.detailInfo.demandbasicinfo.currency)
+					},function(err){
+						console.log(err)
+					})
+				}
+				
 				//console.log(that.detailInfo.demandobjs[0])
 		    	that.detailInfo.demandobjs = that.detailInfo.demandobjs[0].split(",")
 		    	for(let i=0;i<that.detailInfo.demandobjs.length;i++){

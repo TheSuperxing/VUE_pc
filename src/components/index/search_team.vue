@@ -39,6 +39,7 @@
 </template>
 
 <script>
+	
 	export default{
 		name:"SearchTeam",
 		data:function(){
@@ -58,6 +59,7 @@
 			    searchText:"",
 			    hotWords:["全程","迈格设计","迈博","钜力结构","DI机电"],
 			    resultList:[],
+			    hotList:[],
 			    current_page: 1, //当前页
 		        pages: "5", //总页数
 		        changePage:'1',//跳转页
@@ -75,10 +77,12 @@
     		}, 	 	
     		efont: function() {
     			if(this.pages <= 7) return false;
+    			if(this.pages==8) return false;
     			return this.current_page > 5
     		},
     		ebehind: function() {
     			if(this.pages <= 7) return false;
+    			if(this.pages==8) return false;
     			var nowAy = this.indexs;
     			return nowAy[nowAy.length - 1] != this.pages;
     		},
@@ -94,11 +98,24 @@
     				} else {
     					if(this.current_page <= 5) {
     						left = 1;
-    						right = 7;
+    						if(this.pages==7&&this.current_page <=2){
+    							right = 6;
+    						}else{
+    							right = 7;
+    						}
+    						if(this.pages==8&&(this.current_page ==4||this.current_page ==5)){
+    							right = 8;
+    						}
+    						if(this.pages==9&&this.current_page ==5){
+    							right = 9;
+    						}
     					} else {
     						right = this.pages;
-
-    						left = this.pages - 6;
+    						if(this.pages==7){  //正好等于7的情况
+    							left = this.pages - 5;
+    						}else{
+    							left = this.pages - 6;
+    						}
     					}
     				}
     			}
@@ -110,20 +127,15 @@
     		},
     	},
     	methods:{
-    		jumpPage(num){
+    		searchClick(current_page){
+				this.jumpPage(current_page);
+				this.current_page = 1;
+			},
+    		jumpPage(current_page){
     			
     			var that = this;
-				var url = "http://datainfo.duapp.com/shopdata/getGoods.php"
-	//			MyAjax.fetchJsonp(url, function(data){
-	//				console.log(data)
-	////				data = data.replace("callback(","");
-	////				Vue.set(this,"dataInfo",data);
-	////				console.log(this.dataInfo);
-	//				
-	//			},function(err){
-	//				console.log(err)
-	//			})
-				this.current_page = num;
+				var url = 
+				this.current_page = current_page;
 //				
     		},
     		pagePlus() {
@@ -136,7 +148,27 @@
     		},
     		choseHot(index){
     			this.searchText = this.hotWords[index]
-    		}
+    		},
+    		getHotList(){
+				var that = this;
+				var url = MyAjax.urlsy+"/ediHomePage/popTeams";
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType:"json",
+					async: false,
+//					contentType:"application/json;charset=utf-8",
+					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
+				}, function(data){
+					console.log(data)
+					if(data.code==0){
+						Vue.set(that,"hotList",data.msg)
+					}
+				},function(err){
+//					router.push("/error/404")
+					console.log(err)
+				})
+			}
     	}
 	}
 </script>

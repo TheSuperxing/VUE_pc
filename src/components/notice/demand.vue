@@ -8,8 +8,8 @@
     </div>
     <ul class="notContain">
 		<li v-for="(item,index) in notice" class="clear"  v-bind:class="{read:!mesState[index],unread:mesState[index]}">
-			<span></span>
-			<p>{{item.mes[0]}}<em @click="read(item.id,item.pkid,item.urlName)">{{item.mes[1]}}</em>{{item.mes[2]}}</p>
+			<span  @click="read(item.pkid)"></span>
+			<p>{{item.mes[0]}}<em @click="goToDetail(item.id,item.pkid,item.urlName)">{{item.mes[1]}}</em>{{item.mes[2]}}</p>
 		</li>
     </ul>
   </div>
@@ -89,9 +89,12 @@
 					console.log(err)
 				})
     	},
-    	read(id,pkid,urlName){
-    		console.log(id,pkid,urlName)
-    		console.log(id)
+    	goToDetail(id,pkid,urlName){
+    		this.read(pkid);
+    		router.push({name:urlName,query:{id:id}})
+    	},
+    	read(pkid){
+    		console.log(pkid)
     		var that = this;
     		var url = MyAjax.urlhw +"/businessmessageaccountrela/update";
     		var data = {
@@ -112,7 +115,7 @@
 			},function(err){
 				console.log(err)
 			})
-    		router.push({name:urlName,query:{id:id}})
+    		
 		},
 		getNewNote(){//通知是否有新消息提示
 			var that = this;
@@ -185,6 +188,7 @@
                     top: 50%;
                     left: 14px;
                     margin-top: -5px;
+                    cursor: pointer;
                 }
                 p{
                     float: left;

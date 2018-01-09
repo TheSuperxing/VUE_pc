@@ -228,7 +228,6 @@
     				that.search(current_page)
     			}
     			
-//				that.current_page = 1;
     		},
     		pagePlus() {
     			this.current_page++;

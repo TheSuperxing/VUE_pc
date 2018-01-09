@@ -7,9 +7,9 @@
         </div>
     </div>
     <ul class="notContain">
-    	<li v-for="(item,index) in notice" class="clear" @click="read(item.pkid)" v-bind:class="{read:!mesState[index],unread:mesState[index]}">
-			<span></span>
-			<p>{{item.mes[0]}}<router-link :to='{name:item.urlName,query:{id:item.id}}'>{{item.mes[1]}}</router-link>{{item.mes[2]}}</p>
+    	<li v-for="(item,index) in notice" class="clear"  v-bind:class="{read:!mesState[index],unread:mesState[index]}">
+			<span @click="read(item.pkid)"></span>
+			<p>{{item.mes[0]}}<em @click="goToDetail(item.id,item.pkid,item.urlName)">{{item.mes[1]}}</em>{{item.mes[2]}}</p>
 		</li>
     </ul>
   </div>
@@ -40,83 +40,87 @@
     	getData(){
     		var that = this;
     		var url = MyAjax.urlhw +"/sysmessageaccountrela/findByMySelf";
-			MyAjax.ajax({
-				type: "GET",
-				url:url,
-				dataType: "json",
-				async: false,
-			},function(data){
-				console.log(data)
-				that.notice = [];
-				that.mesState = [];
-				that.noticeNum=data.msg.length;
-				if(data.code==0){
-					for(let i=0;i<data.msg.length;i++){
-						if(data.msg[i].mesType==1){
-							that.mesState.push(true) //未读
-						}else{
-							that.mesState.push(false) //已读
-						}
-						if(data.msg[i].mesContent.match(/##(\S*)##/)!=null){
-							let useful = data.msg[i].mesContent.match(/##(\S*)##/)[1];
-							useful = useful.split(";");
-							let obj = {
-								mes:"",
-								urlName:"",
-								id:"",
-								pkid:""
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async: false,
+				},function(data){
+					console.log(data)
+					that.notice = [];
+					that.mesState = [];
+					that.noticeNum=data.msg.length;
+					if(data.code==0){
+						for(let i=0;i<data.msg.length;i++){
+							if(data.msg[i].mesType==1){
+								that.mesState.push(true) //未读
+							}else{
+								that.mesState.push(false) //已读
 							}
-							obj.mes =data.msg[i].mesContent.split(/##(\S*)##/);
-							obj.mes[1] = useful[0];
-							obj.urlName = useful[1]; 
-							obj.id = useful[2];
-							obj.pkid = data.msg[i].pkid;
-							that.notice.push(obj);
-						}else{
-							let obj = {
-								mes:[],
-								urlName:"",
-								id:"",
-								pkid:""
+							if(data.msg[i].mesContent.match(/##(\S*)##/)!=null){
+								let useful = data.msg[i].mesContent.match(/##(\S*)##/)[1];
+								useful = useful.split(";");
+								let obj = {
+									mes:"",
+									urlName:"",
+									id:"",
+									pkid:""
+								}
+								obj.mes =data.msg[i].mesContent.split(/##(\S*)##/);
+								obj.mes[1] = useful[0];
+								obj.urlName = useful[1]; 
+								obj.id = useful[2];
+								obj.pkid = data.msg[i].pkid;
+								that.notice.push(obj);
+							}else{
+								let obj = {
+									mes:[],
+									urlName:"",
+									id:"",
+									pkid:""
+								}
+								obj.mes[0] =data.msg[i].mesContent;
+								obj.pkid = data.msg[i].pkid;
+								that.notice.push(obj);
 							}
-							obj.mes[0] =data.msg[i].mesContent;
-							obj.pkid = data.msg[i].pkid;
-							that.notice.push(obj);
+							
 						}
-						
+					}else{
+						// if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
 					}
-				}else{
-					// if(data.msg=="100004"){//没有token
-					// 	window.location.hash="/login"
-					// }
-				}
-				console.log(that.notice)
-			},function(err){
-				console.log(err)
-			})
+					console.log(that.notice)
+				},function(err){
+					console.log(err)
+				})
    		},
-    	read(id){
-			console.log(id)
-			var that = this;
-			var url = MyAjax.urlhw +"/sysmessageaccountrela/update";
-			var data = {
-				id:id
-			}
-			MyAjax.ajax({
-				type: "POST",
-				url:url,
-				dataType: "json",
-				data:data,
-				async: false,
-			},function(data){
-				console.log(data)
-				if(data.code==0){
-					that.getData()
-					that.getNewNote()
+   		goToDetail(id,pkid,urlName){
+    		this.read(pkid);
+    		router.push({name:urlName,query:{id:id}})
+    	},
+    	read(pkid){
+				console.log(pkid)
+				var that = this;
+				var url = MyAjax.urlhw +"/sysmessageaccountrela/update";
+				var data = {
+					id:pkid
 				}
-			},function(err){
-				console.log(err)
-			})
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					dataType: "json",
+					data:data,
+					async: false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.getData()
+						that.getNewNote()
+					}
+				},function(err){
+					console.log(err)
+				})
 		},
 		getNewNote(){//通知是否有新消息提示
 			var that = this;
@@ -189,9 +193,14 @@
                     top: 50%;
                     left: 14px;
                     margin-top: -5px;
+                    cursor: pointer;
                 }
                 p{
                     float: left;
+                    em{
+                    	color: #00afc7;
+                    	cursor: pointer;
+                    }
                 }
             }
             .read{

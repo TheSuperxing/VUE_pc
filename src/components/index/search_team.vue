@@ -13,7 +13,7 @@
 		</div>
 		<div class="hot-list">
 			<h1><span>热门团队</span></h1>
-			<ul v-for="ul in perMsg" >
+			<ul v-for="ul in teamMsg" >
 				<li v-for="item in ul">
 					<dl>
 						<dd>
@@ -44,7 +44,7 @@
 		name:"SearchTeam",
 		data:function(){
 			return{
-				perMsg:[
+				teamMsg:[
 			    	[
 			    		{
 							"img":require("../../assets/img/header/图层108.png"),

@@ -21,7 +21,8 @@
 </template>
 <script>
 	import Vue from "vue";
-  	import {mapState} from "vuex"
+  import {mapState} from "vuex"
+  import router from "../../../router"
   export default {
     name:"companyLogin",
     data(){
@@ -36,28 +37,17 @@
       user:state=>state.userState.user
     }),
     mounted(){
-    	Vue.set(this.user,'userState',2)
-      sessionStorage.setItem("state",this.user.userState)
       
       
     },
     methods:{
       teamLogin(){
-        var account = JSON.parse(sessionStorage.getItem("account"));
-        if((this.reveal.username==account.username&&this.reveal.password==account.password)||(this.reveal.username=="root"&&this.reveal.password=="root")){
-          location.hash="/indexcontent/index";
-        }else if(this.reveal.username!=account.username&&this.reveal.username!="root"){
-          alert("账号不存在")
-        }else if(this.reveal.password!=account.password&&this.reveal.password!="root"){
-          alert("密码错误")
-        }
+        sessionStorage.setItem("state","team")
+        router.push("/indexcontent/index")
       }
     },
     destroyed(){
-    	Vue.set(this.user,'userState',2)
-
-      sessionStorage.setItem("state",this.user.userState)
-//    sessionStorage.setItem("state",1)
+			sessionStorage.setItem("state","team")
     }
   }
 </script>

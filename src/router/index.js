@@ -55,7 +55,7 @@ export default new Router({
     	path:"/login",name:"LoginIndex",component:Login
     },
     {
-    	path:"/register",redirect:"/register/regkind/0",
+    	path:"/register",redirect:"/register/regkind/per",
     },
     {
     	path:"/register",name:"Register",component:Register,

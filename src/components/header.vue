@@ -1,26 +1,5 @@
 <template>
   <div class="header">
-    <!--<div class="headerTop">
-      <h2>{{petName}}</h2>
-      <ul class="topRight">
-        <li>
-           <p v-on:mouseover="outTogOver(tog)" v-on:mouseout="outTogOut(tog)">
-            <span>设置</span>
-          </p> 
-           <div class="tuichu" v-if="tog.value">
-            <span></span>
-            <p><em>退出登录</em></p>
-          </div> 
-        </li>
-        <li class="notice">
-          <router-link to="/notice">
-            <span>消息</span>
-            <span v-cloak>（{{msgNum}}）</span>
-          </router-link>
-        </li>
-      </ul>
-    </div>-->
-
     <!--<div class="headerNavBg" v-if="user.userState==1">
       <div class="headerNav">
         <h1>LOGO</h1>
@@ -65,11 +44,26 @@
         <ul class="navlist" v-bind:class="{'personStyle':user.userState==0}">
           <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[0]">{{item.text}}</router-link></li>
         	<li class="primary" >
-        		<div><router-link to="/yhzx/personal/info">用户中心</router-link></div>
-        		<ul class="userNav">
+        		<div @click="toUserCenter" class=""><router-link to="/yhzx">用户中心</router-link></div>
+        		<ul class="userNav" v-if="user.userState=='per'">
 		        	<li><router-link to="/yhzx/personal/info">我的资料</router-link></li>
 		        	<li><router-link to="/yhzx/demand">我的需求</router-link></li>
 		        	<li><router-link to="/yhzx/deal">我的协议</router-link></li>
+		        </ul>
+		        <ul class="userNav" v-if="user.userState=='com'">
+		        	<li><router-link to="/yhzx/company/info">我的资料</router-link></li>
+		        	<li><router-link to="/yhzx/demand">我的需求</router-link></li>
+		        	<li><router-link to="/yhzx/deal">我的协议</router-link></li>
+		        </ul>
+		        <ul class="userNav" v-if="user.userState=='team'">
+		        	<li><router-link to="/yhzx/team/info">我的资料</router-link></li>
+		        	<li><router-link to="/yhzx/demand">我的需求</router-link></li>
+		        	<li><router-link to="/yhzx/deal">我的协议</router-link></li>
+		        </ul>
+		        <ul class="userNav" v-if="user.userState==''||user.userState==null">
+		        	<li><router-link to="/login">我的资料</router-link></li>
+		        	<li><router-link to="/login">我的需求</router-link></li>
+		        	<li><router-link to="/login">我的协议</router-link></li>
 		        </ul>
         	</li>
         </ul>
@@ -156,7 +150,7 @@
 				}
 				
 				this.user.userState = sessionStorage.getItem("state");
-				
+				console.log(this.user.userState)
 				//首页请求信息
 				var that = this;
 				var url = MyAjax.urlhw+"/accountmanainfo/home";
@@ -219,20 +213,17 @@
 	     	this.state = sessionStorage.getItem("state");
 	     },
 
-	     redirect(){
-	     	//console.log(this.user.userState)
-				// if(cookieTool.getCookie("token")==null){
-				// 	router.push("/login")
-				// }
+	     toUserCenter(){
+	     	
 				switch (this.user.userState){
-					case '1':
-						router.push("/yhzx/company/overview")
+					case 'com':
+						router.push("/yhzx/company/info")
 						break;
-					case '2':
-						router.push("/yhzx/team/overview")
+					case 'team':
+						router.push("/yhzx/team/info")
 						break;
-					case '0':
-						router.push("/yhzx/personal/overview")
+					case 'per':
+						router.push("/yhzx/personal/info")
 						break;
 					default:
 						break;

@@ -1,6 +1,6 @@
 <template>
 <div class="regkind">
-	<ul class="person-wrap" v-if="state==0" @keydown="keyRegisterDonePer($event)">
+	<ul class="person-wrap" v-if="state=='per'" @keydown="keyRegisterDonePer($event)">
 		<li>
 			<input type="text"  placeholder="请输入手机号" v-model="personalRegInput.tel" @blur="personTelCfm" class="tel"/>
 		</li>
@@ -31,7 +31,7 @@
 			</router-link>
 		</p>
 	</ul>
-	<ul class="com-wrap" v-if="state==1">
+	<ul class="com-wrap" v-if="state=='com'">
 		<li>
 			<input type="text"  placeholder="请输入公司名" v-model="comRegInput.name" @blur="nameConfirm"/>
 		</li>
@@ -56,7 +56,7 @@
 			</router-link>
 		</p>
 	</ul>
-	<ul class="team-wrap" v-if="state==2">
+	<ul class="team-wrap" v-if="state=='team'">
 		<li>
 			<input type="text"  placeholder="请输入公司名" v-model="teamRegInput.name" @blur="nameConfirm"/>
 		</li>
@@ -64,10 +64,10 @@
 			<input type="text"  placeholder="请输入您的邮箱" @blur="mailConfirm"/>
 		</li>
 		<li>
-			<input type="text" placeholder="请输入密码(字母、数字及.或_，6到18个字符。)" v-model="teamRegInput.passWord" @blur="pwdConfirm"/>
+			<input type="password" placeholder="请输入密码(字母、数字及.或_，6到18个字符。)" v-model="teamRegInput.passWord" @blur="pwdConfirm"/>
 		</li>
 		<li>
-			<input type="text" placeholder="请确认密码" v-model="teamRegInput.passWordCfm" @blur="samePwd"/>
+			<input type="password" placeholder="请确认密码" v-model="teamRegInput.passWordCfm" @blur="samePwd"/>
 		</li>
 		<alertTip v-if="teamRegInput.showAlert" :showHide="teamRegInput.showAlert" @closeTip="closeTip" :alertText="teamRegInput.alertText"></alertTip>
 		<div class="regBtn" @click="goRegisterDoneTeam">
@@ -105,26 +105,26 @@
 				picSrc:"",
 				comRegInput:{
 					name:"",
-					email:null,
-					passWord:null,
-					passWordCfm:null,
+					email:"",
+					passWord:"",
+					passWordCfm:"",
 					showAlert: false, //显示提示组件
-					alertText: null, //提示的内容
+					alertText: "", //提示的内容
 				},
 				teamRegInput:{
 					name:"",
-					email:null,
-					passWord:null,
-					passWordCfm:null,
+					email:"",
+					passWord:"",
+					passWordCfm:"",
 					showAlert: false, //显示提示组件
-					alertText: null, //提示的内容
+					alertText: "", //提示的内容
 				},
 				personalRegInput:{
 		           tel:"",
 		           picConfirm:"",
 		           messageConfirm:"",
 		           showAlert: false, //显示提示组件
-				   alertText: null, //提示的内容
+				   alertText: "", //提示的内容
 		        },
 		        makeRandom:{num:"",},
 		        reveal:{
@@ -154,7 +154,6 @@
 			
 			this.changePic();//图形验证码
 			var id = this.$route.params.id
-//			console.log(id)
 			this.state = id;
 //			console.log(this.state)
 			do{
@@ -164,8 +163,6 @@
 		
 		methods:{
 			settime(e) {
-				
-				
 				var that = this;
 				var url = MyAjax.urlsy + "/accountmanainfo/registorMobileCode/" + that.personalRegInput.tel;
 		        MyAjax.ajax({
@@ -244,7 +241,8 @@
 						console.log(data.token)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
-							router.push("/indexcontent")
+							router.push("/indexcontent");
+							sessionStorage.setItem("state","per");
 						}else if(data.code==-1){
 							switch (data.msg){
 								case "100002":
@@ -313,8 +311,8 @@
 		        
 		       
 		    },
-		    nameConfirm(){/*验证输入的名字是否为空*/console.log(111)
-		    	if(!/^[A-Za-z0-9\u4e00-\u9fa5]+$/gi.test(this.comRegInput.name)){
+		    nameConfirm(){/*验证输入的名字是否为空*/
+		    	if(!/^[A-Za-z0-9\u4e00-\u9fa5]+$/gi.test(this.comRegInput.name.trim())){
 		    		
 		    		this.comRegInput.showAlert = true;
 		    		this.comRegInput.alertText = '您输入的公司名称不能为空';
@@ -322,8 +320,7 @@
 		    		this.comRegInput.showAlert = false;
 		    	};/*验证公司*/
 		    	
-		    	if(!/^[A-Za-z0-9\u4e00-\u9fa5]+$/gi.test(this.teamRegInput.name)){
-		    		console.log(222)
+		    	if(!/^[A-Za-z0-9\u4e00-\u9fa5]+$/gi.test(this.teamRegInput.name.trim())){
 		    		this.teamRegInput.showAlert = true;
 		    		this.teamRegInput.alertText = '您输入的团队名称不能为空';
 		    	}else{
@@ -347,20 +344,19 @@
 		    	};/*验证团队邮箱*/
 		    },
 		    pwdConfirm(){/*验证密码*/
-		    	if(!/^[a-zA-Z0-9]{1}([a-zA-Z0-9]|[._]){4,18}$/gi.test(this.comRegInput.passWord)){
+		    	if(!/^[a-zA-Z0-9]{1}([a-zA-Z0-9]|[._]){4,18}$/gi.test(this.comRegInput.passWord)&&this.comRegInput.passWord.trim().length!=0){
 		    		this.comRegInput.showAlert = true;
 		    		this.comRegInput.alertText = '您输入的密码格式不正确';
 		    	}else{
 		    		this.comRegInput.showAlert = false;
 		    	};/*验证公司密码*/
 		    	
-		    	if(!/^[a-zA-Z0-9]{1}([a-zA-Z0-9]|[._]){4,18}$/gi.test(this.teamRegInput.passWord)){
+		    	if(!/^[a-zA-Z0-9]{1}([a-zA-Z0-9]|[._]){4,18}$/gi.test(this.teamRegInput.passWord)&&this.teamRegInput.passWord.trim().length!=0){
 		    		this.teamRegInput.showAlert = true;
 		    		this.teamRegInput.alertText = '您输入的密码格式不正确';
 		    	}else{
 		    		this.teamRegInput.showAlert = false;
 		    	};/*验证团队密码*/
-		    	
 		    },
 		    samePwd(){
 		    	if(this.comRegInput.passWord != this.comRegInput.passWordCfm){
@@ -379,7 +375,7 @@
 		    	}
 		    },
 		    personTelCfm(){/*验证个人登录的手机号*/
-		    	if(!/^1[34578]\d{9}$/gi.test(this.personalRegInput.tel)){
+		    	if(!/^1[34578]\d{9}$/gi.test(this.personalRegInput.tel)&&this.personalRegInput.tel.trim().length!=0){
 		    		this.personalRegInput.showAlert = true;
 		    		this.personalRegInput.alertText = '请输入正确的手机号码';
 		    	}else{
@@ -390,7 +386,7 @@
 		    	console.log(99)
 		    	if(this.personalRegInput.messageConfirm.trim().length==0){
 		    		this.personalRegInput.showAlert = true;
-		    		this.personalRegInput.alertText = '请输入短信验证码验证码';
+		    		this.personalRegInput.alertText = '请输入短信验证码';
 		    	}else{
 		    		this.personalRegInput.showAlert = false;
 		    	}

@@ -4,7 +4,7 @@
 			<div class="reg-wrap">
 				<ul class="reg-tab">
 					<li v-for="(item,index) in tab" @click="switchTab(index)">
-						<router-link :to='{name:"regkind",params:{id:index}}'>
+						<router-link :to='{name:"regkind",params:{id:params[index]}}'>
 							{{item.text}}
 						</router-link>
 					</li>
@@ -53,6 +53,7 @@
 					},
 					
 				],
+				params:["per","com","team"],
 				indexActive:""
 			}
 		},
@@ -61,21 +62,32 @@
 			Modal.makeText(modal);
 			var id= window.location.href.split("/register/regkind/")[1];
 //			console.log(id)
-			this.indexActive = id;
+			switch (id){
+				case "per":
+					Vue.set(this,"indexActive",0)
+					break;
+				case "com":
+					Vue.set(this,"indexActive",1)
+					break;
+				case "team":
+					Vue.set(this,"indexActive",2)
+					break;
+				default:
+					Vue.set(this,"indexActive",0)
+					break;
+			}
 			this.switchTab(this.indexActive)
 		},
 		methods:{
 			switchTab(index){
 //				console.log(index);
 				this.indexActive = index;
-				console.log(this.indexActive)
 //				
 
 			}
 		},
 		updated(){
-			sessionStorage.setItem("state",this.indexActive);
-			Vue.set(this.user,'userState',this.indexActive)
+//			sessionStorage.setItem("state",this.indexActive);
 		},
 		beforeDestroy(){
 			$(document.body).css("overflow","scoll");

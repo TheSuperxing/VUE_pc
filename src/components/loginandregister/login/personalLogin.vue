@@ -79,8 +79,6 @@
         Vue.set(this.makeRandom,"num",parseInt(Math.random()*10000))
       }while (this.makeRandom.num<1000);
 
-      Vue.set(this.user,'userState',0)
-      sessionStorage.setItem("state",this.user.userState)
       
       
     },
@@ -107,6 +105,7 @@
               console.log("success")
               console.log(window.history.length)
               window.history.back()
+              sessionStorage.setItem("state",0);
 							//router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){
@@ -266,8 +265,6 @@
 		 },
     },
     destroyed(){
-    	Vue.set(this.user,'userState',0)
-      sessionStorage.setItem("state",this.user.userState)
     }
   }
 </script>

@@ -46,10 +46,20 @@
       }
     },
     mounted(){
-    	if(sessionStorage.getItem("state")==null){
-    		sessionStorage.setItem("state",0)
+    	switch (sessionStorage.getItem("state")){
+    		case "per":
+    			this.loginTog(0)
+    			break;
+    		case "com":
+    			this.loginTog(1)
+    			break;
+    		case "team":
+    			this.loginTog(2)
+    			break;
+    		default:
+    			this.loginTog(0)
+    			break;
     	}
-    	this.loginTog(sessionStorage.getItem("state"))//自调用点击切换事件 刷新之后还在当前登录类别
     	
       var modeal= new ModalOpp("#modal-overlay");
       modeal.makeText();

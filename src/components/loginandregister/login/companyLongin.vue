@@ -42,10 +42,7 @@
       user:state=>state.userState.user
     }),
     mounted(){
-    	Vue.set(this.user,'userState',1)
-      sessionStorage.setItem("state",this.user.userState)
       
-      sessionStorage.setItem("account","{\"username\":\"123@qq.com\",\"password\":\"123\"}")
 			
       var placeholder = 'placeholder' in document.createElement('input');
 //    console.log($("input").eq(1))
@@ -73,9 +70,6 @@
       }
     },
     destroyed(){
-//  	Vue.set(this.user,'userState',0)
-//    sessionStorage.setItem("state",this.user.userState)
-//    sessionStorage.setItem("state",0)
     }
   }
 </script>

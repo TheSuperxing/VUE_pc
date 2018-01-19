@@ -15,7 +15,7 @@
 								<p>认证员工<em>{{item.cerCounts}}</em></p>
 								<p>{{item.companyName}}</p>
 								<div class="more">
-									<router-link to="">
+									<router-link :to="{name:'teamReferral',query:{id:item.accountID}}" target="_blank">
 										MORE>>
 									</router-link>
 								</div>
@@ -231,7 +231,6 @@
 								line-height: 55px;
 								text-align: center;
 								background: #333333;
-								display: none;/*//暂时不给看*/
 								a{
 									color: #FFFFFF;
 									font-size: 18px;

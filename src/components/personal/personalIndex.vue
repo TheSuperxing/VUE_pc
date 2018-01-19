@@ -287,8 +287,6 @@
     mounted(){
       var that=this;
       //获取头像
-      
-
     	var options =
 			{
 				thumbBox: '.thumbBox',
@@ -329,8 +327,6 @@
 					Modal.closeModal($('.corpbox'))
 					var url = MyAjax.urlsy+"/psnHomePage/uploadHead";
 					console.log(that.personal.personalPicture)
-	//				
-					
 					MyAjax.ajax({
 							type: "POST",
 							url:url,
@@ -349,13 +345,12 @@
 				
 				
 			})
-			$('#btnZoomIn').on('click', function(){
-				cropper.zoomIn();
-			})
-			$('#btnZoomOut').on('click', function(){
-				cropper.zoomOut();
-				
-			})
+				$('#btnZoomIn').on('click', function(){
+					cropper.zoomIn();
+				})
+				$('#btnZoomOut').on('click', function(){
+					cropper.zoomOut();
+				})
       //上传头像end
 
       
@@ -612,7 +607,7 @@
 					height: 32px;
 					background: url(../../assets/img/personal/common/guanbi-2.png) no-repeat ;
 					background-size: 100% 100%;
-					z-index: 9;
+					z-index: 9;cursor: pointer;
 				}
     	}
       padding-bottom:145px;

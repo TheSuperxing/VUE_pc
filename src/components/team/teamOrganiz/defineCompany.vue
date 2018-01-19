@@ -4,11 +4,11 @@
 		<ul class="content-wrap">
 			<li class="name-wrap">
 				<p>公司名称</p>
-			   	<input type="text" v-model="company.name"/>
+			   	<input type="text" v-model="company.name" placeholder="请输入公司名称"/>
 			</li>
 			<li class="address-wrap">
 				<p>公司地址</p>
-			   	<input type="text" v-model="company.address"/>
+			   	<input type="text" v-model="company.address" placeholder="请输入公司地址"/>
 			</li>
 		</ul>
 		<div class="btnBox" >
@@ -31,8 +31,8 @@
       	title:"编辑公司信息",
       	company:{
   			id:"",
-  			name:"一幢大楼有限公司",
-  			address:"淮海中路999号"
+  			name:"",
+  			address:""
       	}
       	
       }

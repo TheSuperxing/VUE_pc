@@ -4,21 +4,20 @@
     <div class="orgTable"><!--高管部分 begin-->
     	<p class="org-title"><img src="../../../assets/img/team/icon_management.png" />高管团队</p>
     	<ul class="seniorInfo">
-    		<li class="stateOne" v-if="haveSenior">(暂无高管团队)</li><!--暂无高管团队-->
-    		<li v-for="(item,index) in orgaInfo.senior" class="seniorList" v-if="!haveSenior"><!--有高管团队-->
+    		<li class="stateOne" v-if="!haveSenior">(暂无高管团队)</li><!--暂无高管团队-->
+    		<li v-for="(item,index) in teamOrgaInfo.topManagers" class="seniorList" v-if="haveSenior"><!--有高管团队-->
     			<dl class="senior">
     				<dt>
-    					<img src="../../../assets/img/team/senior-green.png" v-if="cerState.senior[index]"/>
-    					<img src="../../../assets/img/team/senior-gray.png" v-if="!cerState.senior[index]"/>
+    					<img :src="item.pic" :class="{'gray':item.IfCer=='0'}"/>
     				</dt>
-    				<dd class="seniorName">{{item.dealId}}</dd>
+    				<dd class="seniorName">{{item.name}}</dd>
     			</dl>
     			<span class="deleSen" @click="removeSenior(index)" v-if="editSeniorShow"></span>
     		</li>
-    		<li class="addMoreS" @click="overlay" v-if="editSeniorShow"></li>
+    		<li class="addMoreS" @click="overlay(state[0])" v-if="editSeniorShow"></li>
 
     		<!--添加高管模态框-->
-				<div id="modal-overlay" class="modal-a">
+				<div id="modal-overlay" class="modal-topManagers">
 					<div class="searchSenior">
 						<h5>搜索个人用户</h5>
 						<span class="modalChaBtn" @click="closeModal"></span>
@@ -27,69 +26,86 @@
 									<span class="wrap-left">个人用户手机号</span>
 									<p class="wrap-right">
 										<input type="text" v-model="searchText"/>
-										<span class="sBtn" @click="getData"><img src="../../../assets/img/team/icon.search.png" />搜索</span>
+										<span class="sBtn" @click="getList" @keydown="keySearch($event)"><img src="../../../assets/img/team/icon.search.png" />搜索</span>
 									</p>
 								</div>
 								<div class="result-wrap">
 									<span class="wrap-left">搜索结果</span>
 									<ul class="resultList">
-								<li class="noResult">抱歉，未找到该项目，请重新搜索</li>
-								<li v-for="" @click="choseThis">
-									<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-									<span class="choseBtn">
-									</span>
-								</li>
-								<li v-for="" @click="choseThis">
-									<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-									<span class="choseBtn">
-									</span>
-								</li>
-								<li v-for="" @click="choseThis">
-									<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-									<span class="choseBtn">
-									</span>
-								</li>
-								
-							</ul>
-									<span class="confirmBtn">确认</span>
+										<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
+										<li v-for="(item,index) in list">
+											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.nickName}}</router-link>
+											<span class="choseBtn" @click="choseThis($event,index)">
+											</span>
+										</li>
+									</ul>
+									<span class="confirmBtn" @click="saveAdd(state[0])">确认</span>
 								</div>
 						</div>
 					</div>
 				</div>
 				<!--添加高管模态框-->
 				<div class="btnBox" v-if="editSeniorShow">
-					<span class="saveBtn" @click="editDoneSenior">保存</span>
-					<span class="cancelBtn" @click="cancleEditSenior">取消</span>
+					<span class="saveBtn" @click="editDone(state[0])">保存</span>
+					<span class="cancelBtn" @click="cancleEdit(state[0])">取消</span>
 				</div>
     	</ul>
 
 
-    <span class="editPersonBtn" @click="toEditSenior" v-if="!editSeniorShow">编辑</span>
+    <span class="editPersonBtn" @click="toEdit(state[0])" v-if="!editSeniorShow">编辑</span>
     </div><!--高管部分 end-->
     <div class="orgTable"><!--骨干部分 begin-->
     	<p class="org-title"><img src="../../../assets/img/team/icon_bigpotato.png"/>重要骨干</p>
     	<ul class="backboneInfo">
-    		<li class="stateOne" v-if="haveBackbone">(暂无骨干团队)</li><!--暂无骨干-->
-    		<li v-for="(item,index) in orgaInfo.backbone" class="backboneList" v-if="!haveBackbone"><!--有骨干团队-->
+    		<li class="stateOne" v-if="!haveBackbone">(暂无骨干团队)</li><!--暂无骨干-->
+    		<li v-for="(item,index) in teamOrgaInfo.importantPsns" class="backboneList" v-if="haveBackbone"><!--有骨干团队-->
     			<dl class="backbone">
     				<dt>
-    					<img src="../../../assets/img/team/senior-green.png" v-if="cerState.backbone[index]"/>
-    					<img src="../../../assets/img/team/senior-gray.png" v-if="!cerState.backbone[index]"/>
+    					<img :src="item.pic" :class="{'gray':item.IfCer=='0'}"/>
 
     				</dt>
-    				<dd class="seniorName">{{item.dealId}}</dd>
+    				<dd class="seniorName">{{item.name}}</dd>
     			</dl>
     			<span class="deleSen" @click="removeBackbone(index)" v-if="editBackboneShow"></span>
     		</li>
-    		<li class="addMoreS" @click="overlay" v-if="editBackboneShow"></li>
+    		<li class="addMoreS" @click="overlay(state[1])" v-if="editBackboneShow"></li>
+    		
+    		<!--添加骨干-->
+    		<div id="modal-overlay" class="modal-importantPsns">
+					<div class="searchSenior">
+						<h5>搜索个人用户</h5>
+						<span class="modalChaBtn" @click="closeModal"></span>
+						<div class="content-wrap">
+								<div class="search-wrap">
+									<span class="wrap-left">个人用户手机号</span>
+									<p class="wrap-right">
+										<input type="text" v-model="searchText"/>
+										<span class="sBtn" @click="getList" @keydown="keySearch($event)"><img src="../../../assets/img/team/icon.search.png" />搜索</span>
+									</p>
+								</div>
+								<div class="result-wrap">
+									<span class="wrap-left">搜索结果</span>
+									<ul class="resultList">
+										<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
+										<li v-for="(item,index) in list" >
+											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.nickName}}</router-link>
+											<span class="choseBtn" @click="choseThis($event,index)">
+											</span>
+										</li>
+									</ul>
+									<span class="confirmBtn" @click="saveAdd(state[1])">确认</span>
+								</div>
+						</div>
+					</div>
+				</div>
 
 				<div class="btnBox" v-if="editBackboneShow">
-					<span class="saveBtn" @click="editDoneBackbone">保存</span>
-					<span class="cancelBtn" @click="cancleEditBackbone">取消</span>
+					<span class="saveBtn" @click="editDone(state[1])">保存</span>
+					<span class="cancelBtn" @click="cancleEdit(state[1])">取消</span>
 				</div>
     	</ul>
 
-    	<span class="editPersonBtn" @click="toEditBackbone" v-if="!editBackboneShow">编辑</span>
+    	<span class="editPersonBtn" @click="toEdit(state[1])" v-if="!editBackboneShow">编辑</span>
     </div><!--骨干部分 end-->
 
 
@@ -102,31 +118,57 @@
     	<div class="staff">
 
 
-            <div v-if="haveStaff" class="staffList">
+            <div v-if="!haveStaff" class="staffList">
             	<p class="stateNone">(此处暂无下属成员)</p>
             </div>
-            <div v-if="!haveStaff" class="staffList">
+            <div v-if="haveStaff" class="staffList">
             	<ul v-if="tab.aa[0]">
-            		<li v-for="(item,index) in orgaInfo.staff">
+            		<li v-for="(item,index) in teamOrgaInfo.members">
             			<dl class="person">
             				<dt>
-								<img src="../../../assets/img/team/staff-green.png" v-if="cerState.staff[index]"/>
-								<img src="../../../assets/img/team/staff-gray.png" v-if="!cerState.staff[index]"/>
+											<img :src="item.pic" :class="{'gray':item.IfCer=='0'}" />
             				</dt>
-            				<dd>{{item.dealId}}</dd>
+            				<dd>{{item.name}}</dd>
             			</dl>
             			<span class="deleSen" @click="removeStaff(index)" v-if="editStaffShow"></span>
             		</li>
-            		<li class="addMoreS" @click="overlay" v-if="editStaffShow"></li>
+            		<li class="addMoreS" @click="overlay(state[2])" v-if="editStaffShow"></li>
             	</ul>
 
             </div>
+						<!--添加下属员工-->
+						<div id="modal-overlay" class="modal-members">
+							<div class="searchSenior">
+								<h5>搜索个人用户</h5>
+								<span class="modalChaBtn" @click="closeModal"></span>
+								<div class="content-wrap">
+										<div class="search-wrap">
+											<span class="wrap-left">个人用户手机号</span>
+											<p class="wrap-right">
+												<input type="text" v-model="searchText"/>
+												<span class="sBtn" @click="getList" @keydown="keySearch($event)"><img src="../../../assets/img/team/icon.search.png" />搜索</span>
+											</p>
+										</div>
+										<div class="result-wrap">
+											<span class="wrap-left">搜索结果</span>
+											<ul class="resultList">
+												<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
+												<li v-for="(item,index) in list" >
+													<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.nickName}}</router-link>
+													<span class="choseBtn" @click="choseThis($event,index)">
+													</span>
+												</li>
+											</ul>
+											<span class="confirmBtn" @click="saveAdd(state[2])">确认</span>
+										</div>
+								</div>
+							</div>
+						</div>
 
-
-    		<span class="editPersonBtn" @click="editPerson" v-if="!editStaffShow">编辑</span>
+    		<span class="editPersonBtn" @click="toEdit(state[2])" v-if="!editStaffShow">编辑</span>
     		<div class="btnBox" v-if="editStaffShow">
-					<span class="saveBtn" @click="saveEditPerson">保存</span>
-					<span class="cancelBtn" @click="cancleEditPerson">取消</span>
+					<span class="saveBtn" @click="editDone(state[2])">保存</span>
+					<span class="cancelBtn" @click="cancleEdit(state[2])">取消</span>
 				</div>
     	</div>
 
@@ -136,11 +178,11 @@
 			<ul class="companyInfo">
 				<li class="stateNone" v-if="haveCompany">(暂无所属公司)</p>
 				<li class="addMoreC" @click="overlay_com" v-if="haveCompany">添加所属公司</li>
-				<li v-for="(item,index) in orgaInfo.company" class="companyList">
+				<li class="companyList">
 					<p class="comName">
-						{{item.companyName}}
+						{{teamOrgaInfo.companyName}}
 					</p>
-					<span class="deleSen" @click="removeCompany(index)" v-if="editCompanyShow"></span>
+					<!--<span class="deleSen" @click="removeCompany(index)" v-if="editCompanyShow"></span>-->
 				</li>
 				<li class="addMoreS" @click="overlay_com" v-if="!haveCompany">更改所属公司</li>
 				
@@ -149,43 +191,32 @@
 			
 			<!--<span class="addMoreS" @click="toEditCompany" v-if="!editCompanyShow"></span>-->
 			<!--添加	公司模态框-->
-				<div id="modal-overlay" class="modal-b">
+				<div id="modal-overlay" class="modal-com">
 					<div class="searchCompany">
 						<h5>搜索公司</h5>
 						<span class="modalChaBtn" @click="closeModal"></span>
 						<div class="content-wrap">
-								<div class="search-wrap">
+								<div class="search-wrap" @keydown="keySearchCom($event)">
 									<span class="wrap-left">公司名称</span>
 									<p class="wrap-right">
-										<input type="text" />
-										<span class="sBtn"><img src="../../../assets/img/team/icon.search.png" />搜索</span>
+										<input type="text" v-model="searchText"/>
+										<span class="sBtn" @click="searchCompany" ><img src="../../../assets/img/team/icon.search.png" />搜索</span>
 									</p>
 								</div>
 								<div class="result-wrap">
 									<span class="wrap-left">搜索结果</span>
 									<ul class="resultList">
-										<li class="noResult">抱歉，未找到该项目，请重新搜索</li>
-										<li v-for="" @click="choseThis">
-											<router-link :to="{name:'TeamProDetail',query:{id:'1'}}">王大麻子</router-link>
-											<span class="choseBtn">
+										<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
+										<li v-for="(item,index) in list" >
+											<router-link :to="{name:'TeamProDetail',query:{id:'1'}}">{{item.companyName}}</router-link>
+											<span class="choseBtn" @click="choseThis($event,index)">
 											</span>
 										</li>
-										<li v-for="" @click="choseThis">
-											<router-link :to="{name:'TeamProDetail',query:{id:'1'}}">王大麻子</router-link>
-											<span class="choseBtn">
-											</span>
-										</li>
-										<li v-for="" @click="choseThis">
-											<router-link :to="{name:'TeamProDetail',query:{id:'1'}}">王大麻子</router-link>
-											<span class="choseBtn">
-											</span>
-										</li>
-										
 									</ul>
 									<router-link to="/yhzx/team/info/teamOrganiz/defineCompany" @click="closeModal">
 										<div class="goToDefinedCom">自定义添加公司</div>
 									</router-link>
-									<span class="confirmBtn">确认</span>
+									<span class="confirmBtn" @click="saveChangeCom">确认</span>
 								</div>
 						</div>
 					</div>
@@ -202,6 +233,8 @@
 	import Vue from "vue"
 	import {mapState} from "vuex"
 	import Modal from "../../../assets/js/modal.js"
+	import MyAjax from "../../../assets/js/MyAjax.js"
+	
   export default {
     name:"teamOrganizIndex",
     data:function(){
@@ -211,12 +244,13 @@
         haveSenior:false,/*有无高管*/
        	haveBackbone:false,/*有无骨干*/
        	haveCompany:false,
+       	haveResult:false,/*有无搜索结果*/
        	cerState:{
        		senior:[],
        		backbone:[],
        		staff:[]
        	},
-        state:"",
+        state:["topManagers","importantPsns","members"],
         editSeniorShow:false,
         editBackboneShow:false,
         editCompanyShow:false,
@@ -225,12 +259,6 @@
        	removeCerArr:[],/*移除并取消认证的已认证员工*/
         Tabflag:0,
         active:0,
-        orgaInfo:{
-        	senior:[],
-        	backbone:[],
-        	staff:[],
-        	company:[]
-        },
         tabbarinfo:[
         	{txt:"未认证员工",pic1:require("../../../assets/img/company/Authentication02.png"),
         	pic2:require("../../../assets/img/company/Authentication04.png"),
@@ -245,71 +273,160 @@
         have:{value:""},
        	searchText:"", /*搜索框input值*/
         list:[], /*搜索结果*/
-
-
+//     	comList:[],/*公司的搜索结果*/
+				teamOrgaInfo:{},
+				chosedOne:{
+					IfCer:"",
+          defaultPic:"",
+					name:"",
+					pic:"",
+					psnID:""
+				}
       }
     },
 
-    computed:mapState({
-      teamOrgaInfo:state=>state.team.teamMessage.teamOrgaInfo/*获取vuex数据*/
-    }),
+    
+    created(){
+    	this.getData();
+    },
     mounted(){
-//  	console.log(this.teamOrgaInfo);
-    	var str = JSON.stringify(this.teamOrgaInfo);
-    	var data = JSON.parse(str);
-    	console.log(data);
-
-    	for(var item in data){/*遍历  引用赋值*/
-
-    		this.orgaInfo.senior = data.senior;
-    		this.orgaInfo.backbone = data.backbone;
-    		this.orgaInfo.staff = data.staff;
-    		this.orgaInfo.company = data.company;
-    		for(var i=0; i<data[item].length; i++){
-    				//console.log(data.item)
-						switch (item){
-							case "senior":
-								this.cerState.senior.push(data[item][i].cerState)
-								break;
-							case "backbone":
-								this.cerState.backbone.push(data[item][i].cerState)
-								break;
-							case "staff":
-								this.cerState.staff.push(data[item][i].cerState)
-								break;
-							default:
-								break;
-						}
-    		}
-    		console.log(this.cerState)
-
-    	}
-//  	console.log(this.orgaInfo)
-    	/*判断有无高管团队*/
-    	if(this.teamOrgaInfo.senior.length==0){
-    		this.haveSenior = true;
-    	}
-    	if(this.teamOrgaInfo.backbone.length==0){
-
-    		this.haveBackbone = true;
-    	}
-    	if(this.teamOrgaInfo.staff.length==0){
-    		this.haveStaff = true;
-    	}
-    	if(this.teamOrgaInfo.company.length==0){
-    		this.haveCompany = true;
-    	}
-
-			/*判断是否被对方个人确认添加*/
-			for(var i=0;i<this.orgaInfo.senior.length;i++){
-
-			}
-
-
+    	
+//  	
 
     },
     methods:{
-
+			getData(){
+				console.log(888)
+        var that=this;
+        var url = MyAjax.urlsy+"/teamOrgaInfo/teamOrgInfo";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+          if(data.code==0){
+            that.teamOrgaInfo=data.msg;
+            //Vue.set(that,"psnMsg",data.msg);
+          }else{
+            // if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
+          }
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+        /*判断有无高管团队*/
+		  	if(this.teamOrgaInfo.topManagers.length!=0){
+		  		this.haveSenior = true;
+		  	}
+		  	if(this.teamOrgaInfo.importantPsns.length!=0){
+		  		this.haveBackbone = true;
+		  	}
+		  	if(this.teamOrgaInfo.members.length!=0){ 
+		  		this.haveStaff = true;
+		  	}
+		  	if(this.teamOrgaInfo.companyName.length!=0||this.teamOrgaInfo.companyName!=null){
+		  		this.haveBackbone = true;
+		  	}
+      },
+      getList(){
+      	
+      	var that=this;
+        var url = MyAjax.urlsy+"/teamOrgaInfo/searchPerson/" + that.searchText;
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+          if(data.code==0){
+          	that.list = [];
+          	that.haveResult = false;
+            that.list.push(data.msg);
+            if(that.list.length!=0){
+            	Vue.set(that,"haveResult",true)
+            }else{
+            	Vue.set(that,"haveResult",false)
+            }
+            //Vue.set(that,"psnMsg",data.msg);
+          }else{
+            // if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
+          }
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+        console.log(that.haveResult)
+        $('.search-wrap').animate({marginTop:"30px",marginBottom:"40px"},100);
+				$('.result-wrap').fadeIn(200);
+      },
+      searchCompany(){
+      	var that=this;
+        var url = MyAjax.urlsy+"/teamOrgaInfo/searchCompany/" + that.searchText;
+        if(that.searchText.trim().length!=0){
+        	MyAjax.ajax({
+	          type: "GET",
+	          url:url,
+	          dataType: "json",
+	          async:false,
+	        },function(data){
+	        	console.log(data)
+	          if(data.code==0){
+	          	Vue.set(that,"list",data.msg)
+	          }
+	          that.haveResult = false;
+		        if(that.list.length!=0){
+		        	Vue.set(that,"haveResult",true)
+		        }else{
+		        	Vue.set(that,"haveResult",false)
+		        }
+	        },function(err){
+	          if(err.status!=200){
+	            //router.push("/index")
+	            status=err.status;
+	          }
+	        })
+	        $('.search-wrap').animate({marginTop:"30px",marginBottom:"40px"},100);
+					$('.result-wrap').fadeIn(200);
+        }
+        
+      },
+      keySearch($event){//enter键登录事件
+		      	var event = $event || window.event;  
+				 	if(event.keyCode==13){ 
+				      this.getList()
+			         event.returnValue = false;    
+			         event.cancelBubble=true;
+			         event.preventDefault();
+			         //event.stopProgagation();
+			         return false;
+			      	} 
+				this.current_page = 1;
+			},
+			keySearchCom($event){//enter键登录事件
+				console.log(66666)
+		      	var event = $event || window.event;  
+				 	if(event.keyCode==13){ 
+				      this.searchCompany();
+			         event.returnValue = false;    
+			         event.cancelBubble=true;
+			         event.preventDefault();
+			         //event.stopProgagation();
+			         return false;
+			      	} 
+				this.current_page = 1;
+			},
+			
     	switchTab(index){
 				this.active = index;
 
@@ -324,77 +441,136 @@
     		}
 
     	},
-    	toEditSenior(){
-//  		$('.seniorInfo').css("display","none").siblings('.editPersonBtn').css("display","none");
-    		this.editSeniorShow = true;
-
-//  		console.log($('.seniorInfo'));
-    	},
-    	editDoneSenior(){
-    		var str = JSON.stringify(this.orgaInfo);
-	    	var data = JSON.parse(str);
-    		for(var item in data){
-    			this.teamOrgaInfo.senior = data.senior;
+    	toEdit(state){
+    		switch (state){
+    			case "topManagers":
+    				this.editSeniorShow = true;
+    				break;
+    			case "importantPsns":
+    				this.editBackboneShow = true;
+    				break;
+    			case "members":
+    				this.editStaffShow = true; 
+    				break;
+    			default:
+    				break;
     		}
-    		this.editSeniorShow = false;
-
-    		$('.seniorInfo').css("display","block").siblings('.editPersonBtn').css("display","block");
-
     	},
-    	cancleEditSenior(){/*取消编辑的高管状态 （再获取一次vuex数据放到页面）*/
-
-    		var str = JSON.stringify(this.teamOrgaInfo);
-	    	var data = JSON.parse(str);
-	    	console.log(data);
-	    	for(var item in data){/*遍历  非引用赋值*/
-	    		this.orgaInfo.senior = data.senior;
-	    		this.orgaInfo.backbone = data.backbone;
-	    		this.orgaInfo.staff = data.staff;
-	    	}
-    		this.editSeniorShow = false;
-
-    		$('.seniorInfo').css("display","block").siblings('.editPersonBtn').css("display","block");
-    	},
-
-    	toEditBackbone(){
-    		this.editBackboneShow = true;
-
-//  		console.log($('.seniorInfo'));
-    	},
-    	editDoneBackbone(){
-    		var str = JSON.stringify(this.orgaInfo);
-	    	var data = JSON.parse(str);
-    		for(var item in data){
-    			this.teamOrgaInfo.backbone = data.backbone;
+    	cancleEdit(state){
+    		switch (state){
+    			case "topManagers":
+    				this.editSeniorShow = false;
+    				break;
+    			case "importantPsns":
+    				this.editBackboneShow = false;
+    				break;
+    			case "members":
+    				this.editStaffShow = false; 
+    				break;
+    			default:
+    				break;
     		}
-    		this.editBackboneShow = false;
-    		$('.backboneInfo').css("display","block").siblings('.editPersonBtn').css("display","block");
+    		this.getData()
     	},
-    	cancleEditBackbone(){/*取消编辑的高管状态 （再获取一次vuex数据放到页面）*/
-
-    		var str = JSON.stringify(this.teamOrgaInfo);
-	    	var data = JSON.parse(str);
-	    	console.log(data);
-	    	for(var item in data){/*遍历  非引用赋值*/
-	    		this.orgaInfo.senior = data.senior;
-	    		this.orgaInfo.backbone = data.backbone;
-	    		this.orgaInfo.staff = data.staff;
-	    	}
-    		this.editBackboneShow = false;
-    		$('.backboneInfo').css("display","block").siblings('.editPersonBtn').css("display","block");
+    	
+    	editDone(state){
+    		var that=this;
+    		switch (state){
+    			case "topManagers":
+    				var type = "高管";
+    				var list = that.teamOrgaInfo.topManagers;
+    				break;
+    			case "importantPsns":
+    				var type = "重要骨干";
+    				var list = that.teamOrgaInfo.importantPsns;
+    				break;
+    			case "members":
+    				var type = "下属员工";
+    				var list = that.teamOrgaInfo.members;
+    				break;
+    			default:
+    				break;
+    		}
+        var url = MyAjax.urlsy+"/teamOrgaInfo/saveTeamOrgInfo";
+        var data = {
+        	list:list,
+        	staffType:type
+        }
+        console.log(data)
+    		MyAjax.ajax({
+          type: "POST",
+          url:url,
+          data:JSON.stringify(data),
+          dataType: "json",
+          async:false,
+          contentType:"application/json;",
+        },function(data){
+        	console.log(data)
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+    		switch (state){
+    			case "topManagers":
+    				that.editSeniorShow = false;
+    				break;
+    			case "importantPsns":
+    				that.editBackboneShow = false;
+    				break;
+    			case "members":
+    				that.editStaffShow = false; 
+    				break;
+    			default:
+    				break;
+    		}
+    		that.getData();
     	},
+    	saveAdd(state){/*添加员工   暂时   还需要点击确认或者取消*/
+				console.log(state)
+    		switch (state){
+    			case "topManagers":
+    				this.teamOrgaInfo.topManagers.push(this.chosedOne)
+    				break;
+    			case "importantPsns":
+    				this.teamOrgaInfo.importantPsns.push(this.chosedOne)
+    				break;
+    			case "members":
+    				this.teamOrgaInfo.members.push(this.chosedOne)
+    				break;
+    			default:
+    				break;
+    		}
+    		this.closeModal()
+    		console.log(this.teamOrgaInfo.topManagers)
+    	},
+    	saveChangeCom(){
+    		var that=this;
+        var url = MyAjax.urlsy+"/teamOrgaInfo/saveCompany/" + that.chosedOne.psnID;
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+          
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+        that.closeModal()
+        that.getData();
+    	},
+  
     	toEditCompany(){
     		this.editCompanyShow = true;
     		$(this).parent().remove()
     	},
-    	editDoneCom(){
-    		var str = JSON.stringify(this.orgaInfo);
-	    	var data = JSON.parse(str);
-    		for(var item in data){
-    			this.teamOrgaInfo.company = data.company;
-    		}
-    		this.editCompanyShow = false;
-    	},
+    	
     	cancleEditCom(){
     		var str = JSON.stringify(this.teamOrgaInfo);
 	    	var data = JSON.parse(str);
@@ -416,128 +592,84 @@
     	},
     	removeSenior(index){
 //  		var that = this;
-    		this.orgaInfo.senior.splice(index,1);
-
-    		console.log($(this))
-
+    		this.teamOrgaInfo.topManagers.splice(index,1);
     	},
     	removeBackbone(index){
 			
-    		this.orgaInfo.backbone.splice(index,1);
+    		this.teamOrgaInfo.importantPsns.splice(index,1);
 
 
     	},
     	removeStaff(index){
-    		this.orgaInfo.staff.splice(index,1);
-    	},
-    	editPerson(){
-    		this.editStaffShow = true;
-//  		console.log(this.showCer)
-    	},
-    	saveEditPerson(){
-    		/*保存取消和添加认证的操作到本地中*/
-    		var str = JSON.stringify(this.orgaInfo);
-	    	var data = JSON.parse(str);
-    		for(var item in data){
-    			this.teamOrgaInfo.staff = data.staff;
-    		}
-    		this.editStaffShow = false; /*关闭取消和添加按钮显示*/
-
-    	},
-    	cancleEditPerson(){
-    		var str = JSON.stringify(this.teamOrgaInfo);
-	    	var data = JSON.parse(str);
-	    	console.log(data);
-	    	for(var item in data){/*遍历  非引用赋值*/
-	    		this.orgaInfo.senior = data.senior;
-	    		this.orgaInfo.backbone = data.backbone;
-	    		this.orgaInfo.staff = data.staff;
-	    		this.orgaInfo.company = data.company
-	    	}
-	    	this.editStaffShow = false; /*关闭取消和添加按钮显示*/
+    		this.teamOrgaInfo.members.splice(index,1);
     	},
     	addCer(index){/*添加认证 */
 //  		console.log(index);
-
     		this.addCerArr.push(this.orgaInfo.staff.uncertified[index])/*把未认证的添加员工添加到data中的addCerArr*/
     		this.orgaInfo.staff.uncertified.splice(index,1);/*把这个员工从本地未认证数据数组中删除*/
 //  		console.log(this.orgaInfo.staff.uncertified);
-
     	},
     	removeCer(index){
     		this.removeCerArr.push(this.orgaInfo.staff.certified[index])/*把已认证的添加员工添加到data中的addCerArr*/
     		this.orgaInfo.staff.certified.splice(index,1);/*把这个员工从本地认证数据数组中删除*/
     	},
-    	overlay(){
+    	overlay(state){
     		/*模态框弹出有无可搜索员工判断*/
-    			var modalA= $('.modal-a')
+    		if(state == "topManagers"){
+    			var modalA= $('.modal-topManagers')
 					Modal.makeText(modalA)
-
-//  			var modalC = $('.modal-c')
-//  			Modal.makeText(modalC)
-
+    		}else if(state == "importantPsns"){
+    			var modalA= $('.modal-importantPsns')
+					Modal.makeText(modalA)
+    		}else if(state == "members"){
+    			var modalA= $('.modal-members')
+					Modal.makeText(modalA)
+    		}
+    		$('.search-wrap').animate({marginTop:"50px",marginBottom:"80px"},100);
+				$('.result-wrap').css("display","none");
+				this.haveResult = false;
 			},
 			overlay_com(){
-					var modalB = $('.modal-b')
+					var modalB = $('.modal-com')
 					Modal.makeText(modalB)
+					$('.search-wrap').animate({marginTop:"50px",marginBottom:"80px"},100);
+					$('.result-wrap').css("display","none");
+					this.haveResult = false;
+					
 			},
-
 			closeModal(){
-				var modalA = $('.modal-a')
+				var modalA = $('.modal-topManagers')
 				Modal.closeModal(modalA)
-				var modalB = $('.modal-b')
+				var modalB = $('.modal-importantPsns')
 				Modal.closeModal(modalB)
-				var modalC = $('.modal-c')
+				var modalC = $('.modal-members')
 				Modal.closeModal(modalC)
+				var modalD = $('.modal-com')
+				Modal.closeModal(modalD)
+				this.searchText = "",
+				this.list = [];
 			},
-			choseThis(e){
-				$(".resultList li span").removeClass('selected');
-				$(e.target).addClass("selected");
-				console.log($(".resultList li span"))
+			choseThis(e,index){
+//				$(".resultList li span").removeClass('selected');
+//				$(e.target).addClass("selected");
+				console.log($(e.target).hasClass("selected"))
+				if($(e.target).hasClass("selected")==false){
+					console.log(999)
+					$(e.target).addClass("selected");
+					$(e.target).parent().siblings().find("span").removeClass('selected');
+//					console.log($(e.target).attr("class"))
+				}else if($(e.target).hasClass("selected") == true){
+//					console.log($(e.target).attr("class"))
+					$(e.target).removeClass("selected");
+					console.log($(e.target).attr("class"))
+				}
+				this.chosedOne.psnID = this.list[index].pkid;
+				this.chosedOne.pic = this.list[index].pic;
+				this.chosedOne.name = this.list[index].nickName;
+				console.log(this.chosedOne)
 				
 			},
-
-			/*模态框搜索获取数据*/
-			getData(){
-				/*var timer = "";
-				var url = "https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd="+this.searchText;
-				var that = this;
-				clearTimeout(this.timer);
-
-				this.timer = setTimeout(function(){
-					axios.get(url).then((responseText) => {
-						//获取到的数据一般都在responseText.data中
-						console.log(responseText)
-					}).catch((err) => {
-						console.log(err);
-					})
-//					that.$http.jsonp(url,{
-//						jsonp:"cb"
-//					}).then((responseText)=>{
-//						console.log(responseText.body)
-//					},(err)=>{
-//						console.log(err)
-//					})
-				},500)*/
-			},
-
-    },
-    updated(){
-    	if(this.teamOrgaInfo.senior.length===0){
-    		this.haveSenior = true;
-    	}
-    	if(this.teamOrgaInfo.backbone.length===0){
-    		this.haveBackbone = true;
-    	}
-    	if(this.teamOrgaInfo.staff.length===0){
-    		this.haveStaff = true;
-    	}
-    	if(this.teamOrgaInfo.company.length===0){
-    		this.haveCompany = true;
-    	}
-
-    	console.log(this.teamOrgaInfo.backbone)
-    	console.log(this.orgaInfo.backbone);
+			
     },
     watch:{
 //  	searchText:function(val){
@@ -575,6 +707,16 @@
     		}
 			}
 		}
+		.gray{
+			 -webkit-filter: grayscale(100%);
+		    -moz-filter: grayscale(100%);
+		    -ms-filter: grayscale(100%);
+		    -o-filter: grayscale(100%);
+		    
+		    filter: grayscale(100%);
+			
+		    filter: gray;
+		}
 		.searchSenior{
 			width: 549px;
 			overflow: hidden;
@@ -608,10 +750,157 @@
 	     }
 	    .content-wrap{
 	    	width: 100%;
+	    	
 	    	overflow: hidden;
+	    		.result-wrap{
+						display:none;
+						
+					}
 	    		.search-wrap,.result-wrap{
 						text-align: center;
 						padding-left:35px;
+						margin-top:50px;
+						margin-bottom:80px;
+						overflow: hidden;
+						.wrap-left{
+							margin-right: 20px;
+							font-size: 18px;
+							float: left;
+							height: 40px;
+						  line-height: 40px;
+						}
+						.wrap-right{
+							width: 325px;
+							height: 40px;
+							line-height: 40px;
+							float: left;
+							border: 1px solid #ebebeb;
+							border-radius: 5px;
+							overflow: hidden;
+							input{
+								width: 222px;
+								float: left;
+								text-indent: 8px;
+							}
+							.sBtn{
+								display: inline-block;
+								float: right;
+								height: 40px;
+								line-height: 40px;
+								text-align: center;
+								vertical-align: middle;
+								width: 100px;
+								color: #FFFFFF;
+								cursor: pointer;
+								background: url(../../../assets/img/team/icon_searching.png) no-repeat center;
+								img{
+									display: inline;
+									vertical-align: middle;
+									margin-right: 10px;
+									margin-bottom: 5px;
+									width: 21px; height: 20px;
+								}
+							}
+						}
+						.resultList{
+							width: 325px;
+							overflow: hidden;
+							li{
+								width: 325px;
+								height: 36px;
+								line-height: 36px;
+								padding: 0 13px;
+								text-align: left;
+								float: left;
+								background: #f8f8f8;
+								overflow: hidden;
+								a{
+									color: $activeColor;
+								}
+								&:nth-child(2n){
+									background: #f2f2f2;
+								}
+								.choseBtn{
+									width: 15px;
+									height: 15px;
+									display: inline-block;
+									float: right;
+									margin-top: 10px;
+									background: url(../../../assets/img/team/icon_selected.png) no-repeat center;
+									cursor: pointer;
+									&.selected{
+										background: url(../../../assets/img/team/icon_selected_green.png) no-repeat center;
+									}
+								}
+								
+							}
+						}
+						.confirmBtn{
+							width: 117px;
+							height: 33px;
+							line-height: 33px;
+							text-align: center;
+							color: #FFFFFF;
+							/*margin: 30px auto;*/
+							margin-left: 149px;
+							margin-top: 30px;
+							display: block;
+							background: url(../../../assets/img/team/icon_green_119inform_confirm.png) no-repeat center;
+							&:hover{
+	                filter:alpha(opacity=80);       /* IE */
+	                -moz-opacity:0.8;              /* 老版Mozilla */
+	                -khtml-opacity:0.8;              /* 老版Safari */
+	                opacity: 0.8;           /* 支持opacity的浏览器*/
+	            }
+						}
+	    		}
+	    		.result-wrap{
+	    			display: none;
+	    			padding-left: 90px;
+	    		}
+
+	    }
+		}
+		.searchCompany{
+			width: 549px;
+			overflow: hidden;
+	     position:absolute;top:50%;left:50%;
+			 transform:translate(-50%,-50%);
+			 -webkit-transform:translate(-50%,-50%);
+			-moz-transform:translate(-50%,-50%);
+			-ms-transform:translate(-50%,-50%);
+			-o-transform:translate(-50%,-50%);
+	     background: #FFFFFF;
+	     border-radius: 10px;
+	     text-align: center;
+	    h5{
+		     color:$activeColor;
+		     font-size: 18px;
+		     height: 50px;
+		     line-height: 50px;
+		     text-align: left;
+		     background: $bfColor;
+		     padding: 0 40px;
+
+			}
+			.modalChaBtn{
+		     width: 20px;
+		     height: 20px;
+		     background: url(../../../assets/img/team/icon_green_cancel.png) no-repeat center;
+		     position: absolute;
+		     top: 16px;
+		     right: 40px;
+		     cursor: pointer;
+	     }
+	     .content-wrap{
+	    	width: 100%;
+	    	overflow: hidden;
+	    		.result-wrap{
+						display:none;
+					}
+	    		.search-wrap,.result-wrap{
+						text-align: center;
+						padding-left:70px;
 						margin-top:30px;
 						margin-bottom:30px;
 						overflow: hidden;
@@ -683,152 +972,11 @@
 									margin-top: 10px;
 									background: url(../../../assets/img/team/icon_selected.png) no-repeat center;
 								
-									&:hover,&.selected{
+									&.selected{
 										background: url(../../../assets/img/team/icon_selected_green.png) no-repeat center;
 										
 									}
 								}
-								
-							}
-						}
-						.confirmBtn{
-							width: 117px;
-							height: 33px;
-							line-height: 33px;
-							text-align: center;
-							color: #FFFFFF;
-							/*margin: 30px auto;*/
-							margin-left: 149px;
-							margin-top: 30px;
-							display: block;
-							background: url(../../../assets/img/team/icon_green_119inform_confirm.png) no-repeat center;
-							&:hover{
-	                filter:alpha(opacity=80);       /* IE */
-	                -moz-opacity:0.8;              /* 老版Mozilla */
-	                -khtml-opacity:0.8;              /* 老版Safari */
-	                opacity: 0.8;           /* 支持opacity的浏览器*/
-	            }
-						}
-	    		}
-	    		.result-wrap{
-	    			padding-left: 90px;
-	    		}
-
-	    }
-		}
-		.searchCompany{
-			width: 549px;
-			overflow: hidden;
-	     position:absolute;top:50%;left:50%;
-			 transform:translate(-50%,-50%);
-			 -webkit-transform:translate(-50%,-50%);
-			-moz-transform:translate(-50%,-50%);
-			-ms-transform:translate(-50%,-50%);
-			-o-transform:translate(-50%,-50%);
-	     background: #FFFFFF;
-	     border-radius: 10px;
-	     text-align: center;
-	    h5{
-		     color:$activeColor;
-		     font-size: 18px;
-		     height: 50px;
-		     line-height: 50px;
-		     text-align: left;
-		     background: $bfColor;
-		     padding: 0 40px;
-
-			}
-			.modalChaBtn{
-		     width: 20px;
-		     height: 20px;
-		     background: url(../../../assets/img/team/icon_green_cancel.png) no-repeat center;
-		     position: absolute;
-		     top: 16px;
-		     right: 40px;
-		     cursor: pointer;
-	     }
-	     .content-wrap{
-	    	width: 100%;
-	    	overflow: hidden;
-	    		.search-wrap,.result-wrap{
-						text-align: center;
-						padding-left:70px;
-						margin-top:30px;
-						margin-bottom:30px;
-						overflow: hidden;
-						.wrap-left{
-							margin-right: 20px;
-							font-size: 18px;
-							float: left;
-							height: 40px;
-						  line-height: 40px;
-						}
-						.wrap-right{
-							width: 325px;
-							height: 40px;
-							line-height: 40px;
-							float: left;
-							border: 1px solid #ebebeb;
-							border-radius: 5px;
-							overflow: hidden;
-							input{
-								width: 222px;
-								float: left;
-								text-indent: 8px;
-							}
-							.sBtn{
-								display: inline-block;
-								float: right;
-								height: 40px;
-								line-height: 40px;
-								text-align: center;
-								vertical-align: middle;
-								width: 100px;
-								color: #FFFFFF;
-								cursor: pointer;
-								background: url(../../../assets/img/team/icon_searching.png) no-repeat center;
-								img{
-									display: inline;
-									vertical-align: middle;
-									margin-right: 10px;
-									margin-bottom: 5px;
-									width: 21px; height: 20px;
-								}
-							}
-						}
-						.resultList{
-							width: 325px;
-							overflow: hidden;
-							li{
-								width: 325px;
-								height: 36px;
-								line-height: 36px;
-								padding: 0 13px;
-								text-align: left;
-								float: left;
-								background: #f8f8f8;
-								overflow: hidden;
-								cursor: pointer;
-								cursor: pointer;
-								a{
-									color: $activeColor;
-								}
-								&:nth-child(2n){
-									background: #f2f2f2;
-								}
-									.choseBtn{
-										width: 15px;
-										height: 15px;
-										display: inline-block;
-										float: right;
-										margin-top: 10px;
-										background: url(../../../assets/img/team/icon_selected.png) no-repeat center;
-									
-										&:hover,&.selected{
-											background: url(../../../assets/img/team/icon_selected_green.png) no-repeat center;
-											
-										}
-									}
 									
 							}
 
@@ -862,7 +1010,7 @@
 					    	background: url(../../../assets/img/team/plus.png) no-repeat left center;
 						}
 	    		}
-
+					
 
 	    }
 		}
@@ -951,21 +1099,13 @@
 					margin-right: 30px;
 					position: relative;
 					margin-bottom: 30px;
-					.imgBox{
+					img{
 							width: 100px;
 							height: 100px;
 							border-radius: 50%;
 							background:#e6e6e6;
 							position:relative;
-						img{
-							position:absolute;top:50%;left:50%;
-							transform:translate(-50%,-50%);
-							-webkit-transform:translate(-50%,-50%);
-							-moz-transform:translate(-50%,-50%);
-							-ms-transform:translate(-50%,-50%);
-							-o-transform:translate(-50%,-50%);
-
-						}
+						
 					}
 
 					.seniorName,.backboneName{
@@ -1010,7 +1150,10 @@
 				.staffList{
 						padding-top: 20px;
 						overflow: hidden;
-						&:after{display:block; content:'clear'; clear:both; line-height:0; visibility:hidden;}
+						
+						ul{
+							&:after{display:block; content:''; clear:both; line-height:0; visibility:hidden;}
+						}
 						.stateNone{
 							font-size: 18px;
 							color: #898989;
@@ -1041,33 +1184,25 @@
 								cursor: pointer;
 							}
 							.person{
-								text-align: center;
+								/**/
 								dt{
-									width: 80px;
-									height: 80px;
-
-									.imgBox{
-										width: 80px;
+									height: 82px;
+									line-height: 82px;
+									text-align: center;
+									overflow: hidden;
+									img{
+										width:80px;
 										height: 80px;
 										border-radius: 50%;
-										background:#e6e6e6;
-										position:relative;
-									img{
-										width: 60%;
-										position:absolute;top:50%;left:50%;
-										transform:translate(-50%,-50%);
-										-webkit-transform:translate(-50%,-50%);
-										-moz-transform:translate(-50%,-50%);
-										-ms-transform:translate(-50%,-50%);
-										-o-transform:translate(-50%,-50%);
-
-										}
+										margin-bottom: 1px;
 									}
+									
 								}
 								dd{
 									margin-top: 15px;
 									height: 15px;
 									line-height: 15px;
+									text-align: center;
 								}
 								.cerBtn{
 									width: 80px;

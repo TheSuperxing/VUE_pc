@@ -2,15 +2,17 @@
   <div class="companyLogin">
     <ul class="loginInput">
       <li>
-        <input v-model="reveal.username" type="text" placeholder="请输入您的邮箱">
+        <input v-model="reveal.email" type="text" placeholder="请输入您的邮箱">
       </li>
       <li>
-        <input v-model="reveal.password" type="text" placeholder="请输入您的密码">
+        <input v-model="reveal.pwd" type="text" placeholder="请输入您的密码">
       </li>
     </ul>
+		<alertTip v-if="showAlert" :showHide="showAlert" :alertText="alertText"></alertTip>
+    
     <ul class="loginSubmit">
       <li>
-        <button @click="teamLogin"><router-link to="">登录</router-link></button>
+        <button @click="teamLogin" @keydown="keyLogin($event)"><router-link to="">登录</router-link></button>
       </li>
       <li>
         <p>忘记密码？</p>
@@ -23,28 +25,80 @@
 	import Vue from "vue";
   import {mapState} from "vuex"
   import router from "../../../router"
+  import alertTip from '../alertTip'
+	import MyAjax from "../../../assets/js/MyAjax.js"
+  import {cookieTool} from "../../../assets/js/cookieTool.js"
+	
   export default {
     name:"companyLogin",
     data(){
       return{
         reveal:{
-          username:"",//用户名
-          password:""//密码
-        }
+          email:"",//用户名
+          pwd:""//密码
+        },
+        showAlert: false, //显示提示组件
+				alertText: "", //提示的内容
       }
     },
     computed:mapState({
       user:state=>state.userState.user
     }),
+    components: {
+      alertTip,
+    },
     mounted(){
       
       
     },
     methods:{
       teamLogin(){
-        sessionStorage.setItem("state","team")
-        router.push("/indexcontent/index")
-      }
+//    	var that = this;
+//				var url = MyAjax.urlsy+"/teamOrgaInfo/login";
+//				if(that.reveal.email.trim().length!=0&&that.reveal.pwd.trim().length!=0){
+//					var data = that.reveal;
+//					MyAjax.ajax({
+//						type: "POST",
+//						url:url,
+//						data: JSON.stringify(data),
+//						dataType: "json",
+//						contentType:"application/json;charset=utf-8",
+//					}, function(data){
+//						console.log(data)
+//						console.log(data.token)
+//						cookieTool.setCookie("token",data.token)
+//						if(data.code==0){
+//							router.push("/indexcontent");
+//							sessionStorage.setItem("state","team");
+//						}else if(data.code==-1){
+//							switch (data.msg){
+//								case "登录错误":
+//									that.showAlert = true;
+//									that.alertText = "登录错误";
+//									break;
+//								default:
+//									break;
+//							}
+//						}
+//					},function(err){
+//						console.log(err)
+//					})
+//				}
+				router.push("/indexcontent");
+				sessionStorage.setItem("state","team");
+      },
+      keyLogin($event){//enter键登录事件
+	      var event = $event || window.event;  
+			 	if(event.keyCode==13){ 
+			     this.teamLogin()
+	         event.returnValue = false;    
+	         event.cancelBubble=true;
+	         event.preventDefault();
+	         //event.stopProgagation();
+	         return false;
+	      } 
+
+		 },
     },
     destroyed(){
 			sessionStorage.setItem("state","team")
@@ -70,6 +124,12 @@
         height: 25px;
       }
     }
+  }
+  .alet_container{
+  	bottom: 230px !important;
+  	.tip_text{
+  		font-size: 14px !important;
+  	}
   }
   .loginSubmit{
     margin-top:40px;

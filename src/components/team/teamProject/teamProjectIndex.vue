@@ -5,57 +5,45 @@
   	<div id="modal-overlay" class="search-modal">
   		<div class="searchPro">
 				<h5>搜索项目</h5>
-				<span class="modalChaBtn" @click="closeModal"></span>
+				<span class="modalChaBtn" @click="closeModal()"></span>
 				<div class="content-wrap">
-					<div class="search-wrap">
+					<div class="search-wrap" @keydown="keySearch($event)">
 						<span class="wrap-left">项目名称</span>
 						<p class="wrap-right">
 							<input type="text" placeholder="请输入项目名称" v-model="searchText" class="searchInput"/>
-							<span class="sBtn" @click="getData"><img src="../../../assets/img/team/icon.search.png" />搜索</span>
+							<span class="sBtn" @click="search"><img src="../../../assets/img/team/icon.search.png" />搜索</span>
 						</p>
 					</div>
 					<div class="result-wrap">
 						<span class="wrap-left">搜索结果</span>
 						<ul class="resultList">
-							<li class="noResult">抱歉，未找到该项目，请重新搜索</li>
-							<li v-for="" @click="choseThis">
-								<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-								<span class="choseBtn">
+							<li class="noResult" v-if="noresult">抱歉，未找到该项目，请重新搜索</li>
+							<li v-for="(item,$index) in searchResult" >
+								<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.projectName}}</router-link>
+								<span class="choseBtn" @click="choseThis($event,$index)">
 								</span>
 							</li>
-							<li v-for="" @click="choseThis">
-								<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-								<span class="choseBtn">
-								</span>
-							</li>
-							<li v-for="" @click="choseThis">
-								<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-								<span class="choseBtn">
-								</span>
-							</li>
-							
 						</ul>
-						<router-link to="/yhzx/team/info/teamProject/definedProject" @click="closeModal">
+						<router-link to="/yhzx/team/info/teamProject/definedProject" @click="closeModal()">
 							<div class="goToDefinedPro">自定义添加项目</div>
 						</router-link>
-						
-						<span class="confirmBtn">确认</span>
+						<span class="confirmBtn" @click="confirmAddPro">确认</span>
 					</div>
 				</div>
   		</div>
   	</div>
   	<!--搜索项目模态框-->
     <h3 class="t-title"><span>{{title}}</span></h3>
-    <div class="projectTable" v-for="(item,$index) in teamProInfo">
-    	<h5 class="tableTitle">{{item.proName}}</h5>
+    <div class="projectTable" v-for="(item,$index) in proInfo">
+    	<h5 class="tableTitle">{{item.projectName}}</h5>
     	<div class="toolsBox">
     		<!--点击跳转到编辑该项目的页面  路由传值index-->
-    		<span class="editBtn" @click="goToEditPro(item.id)">编辑</span>
+    		<span class="editBtn" @click="goToEditPro($index,item)">编辑</span>
     		<span class="deleBtn" @click="deletePro($index)">删除</span>
     		<!--确认删除该项目模态框-->
-    			<div id="modal-overlay" v-bind:class="deleteModal[$index]">
+    			<div id="modal-overlay" v-bind:class="deleteModalClass[$index]">
 						<div class="deletePro">
-							<h5>搜索项目</h5>
+							<h5>删除项目</h5>
 							<span class="modalChaBtn" @click="closeModal($index)"></span>
 							<div class="content-wrap">
 							<p class="deleteOrNo">确定删除该项目吗？</p>
@@ -69,13 +57,18 @@
     		<!--确认删除该项目模态框-->
     	</div>
     	<div class="pr-wrap-a">
-    		<span class="completeTime">Time : {{item.parTakeTime_S}} 至 {{item.parTakeTime_E}}</span>
+    		<span class="completeTime">Time : {{item.partakeTimeUp}} — {{item.partakeTimeDown}}</span>
   			<span class="takeOfficeBar">项目责任：<em class="takeOffice">{{item.takeOffice}}</em></span>
     	</div>
-    	<div class="pr-wrap-b">{{item.detailDes}}
+    	<div class="pr-wrap-b">
+    		责任描述：
+    		<em>{{item.detailDes}}</em>
     	</div>
-    	
     	<div class="morePics" v-if="!show.tag[$index]">
+    		<img v-for="item in show.picList[$index]" :src="item.pic" />
+    		<!-- <img v-for="item in show.picList" :src="data:image/png;base64,item.pic" /> -->
+    	</div>
+    	<!--<div class="morePics" v-if="!show.tag[$index]">
     		<img src="../../../assets/img/company/img.png" />
     		<img src="../../../assets/img/company/img.png" />
     		<img src="../../../assets/img/company/img.png" />
@@ -83,7 +76,7 @@
     		<img src="../../../assets/img/company/img.png" />
     		<img src="../../../assets/img/company/img.png" />
     		
-    	</div>
+    	</div>-->
     	<div class="viewMore">
     		<p v-bind:class="{viewDown:show.tag[$index],viewUp:!show.tag[$index]}" @click="upDown($index)">
     			<!--<img src="../../../assets/img/company/double-bottom-down.png" />
@@ -100,6 +93,7 @@
 	import router from "../../../router"
 	import Vue from "vue"
 	import {mapState} from "vuex"
+	import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"teamProjectIndex",
     data:function(){
@@ -108,42 +102,124 @@
 //      updown:"view-down",
         updowntxt:[],
         show:{
-        	tag:[],
-        	
+					tag:[],
+					picList:[],
         },
         proInfo:[],
         searchText:"", /*搜索框input值*/
+        searchResult:[],
+        noresult:false,
         list:[], /*搜索结果*/
-       	deleteModal:[]//删除确认的模态框
+       	deleteModalClass:[]//删除确认的模态框
       }
     },
     computed:mapState({
       teamProInfo:state=>state.team.teamMessage.teamProInfo/*获取vuex数据*/
     }),
-    mounted(){
-    	/*将vuex里面的数据获取到本组件*/
-    	this.proInfo= this.teamProInfo.reduce(function(coll,item){
-    		coll.push(item);
-    		return coll;
-    	},this.proInfo)
-//  	console.log(this.proInfo);
-//  	console.log(this.teamProInfo)
+    created(){
     	
-    	this.show.tag.length = this.teamProInfo.length;
-//  	console.log(this.show.tag.length)
-    	for(var i=0;i<this.teamProInfo.length;i++){
-    		this.show.tag[i]=true;
-    		this.updowntxt.push("展开查看更多");
-    		this.deleteModal.push("deleteModal"+i);//遍历所有项目数组 获取个数来确认模态框个数
-    		
-    	}
+    },
+    mounted(){
+    	this.getData();
+    	/*将vuex里面的数据获取到本组件*/
+//  	this.proInfo= this.teamProInfo.reduce(function(coll,item){
+//  		coll.push(item);
+//  		return coll;
+//  	},this.proInfo)
+////  	console.log(this.proInfo);
+////  	console.log(this.teamProInfo)
+//  	
+//  	this.show.tag.length = this.teamProInfo.length;
+////  	console.log(this.show.tag.length)
+//  	for(var i=0;i<this.teamProInfo.length;i++){
+//  		this.show.tag[i]=true;
+//  		this.updowntxt.push("展开查看更多");
+//  		this.deleteModal.push("deleteModal"+i);//遍历所有项目数组 获取个数来确认模态框个数
+//  		
+//  	}
     	
     },
     methods:{
-    	goToEditPro(id){
-    		console.log(id)
-    		router.push({name:'editTeamProject',params:{id:id}})
-    	},
+    	getData(){
+    		console.log(7777)
+    		var that = this;
+			  var url = MyAjax.urlsy+"/teamOrgaInfo/findProjExpes";//暂时先写成这样
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.proInfo = data.msg;
+					}else{
+						console.log("错误返回");
+					}
+				},function(err){
+					console.log(err)
+				})
+	    	/*数据同步本地一份开始*/
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			  }
+	    	
+	    	//判断有无项目经历信息
+	    	
+				that.localProInfo=JSON.parse(JSON.stringify(that.proInfo));
+				that.show.tag = [];
+				that.updowntxt = [];
+				that.deleteModalClass = [];
+				that.openOrPrivacy = [];
+				that.openOrPrivacyText = [];
+				that.show.tag.length = that.proInfo.length;
+	//  	console.log(this.show.tag.length)
+	    	for(var i=0;i<this.proInfo.length;i++){
+	    		if(that.proInfo[i].partakeTimeDown=="0002.12"){
+					 	that.proInfo[i].partakeTimeDown = "至今";
+					}
+	    		if(that.localProInfo[i].partakeTimeDown=="0002.12"){
+					 	that.localProInfo[i].partakeTimeDown = "至今";
+					}
+	    		that.proInfo[i].takeOffice = emptyText(that.proInfo[i].takeOffice);
+	    	  that.proInfo[i].detailDes = emptyText(that.proInfo[i].detailDes);
+	    		that.show.tag[i]=true;
+	    		that.updowntxt.push("展开查看更多");
+	    		that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
+					if(that.proInfo[i].ifVisable==1){
+						that.openOrPrivacy.push(true);
+						that.openOrPrivacyText.push("显示")
+					}else{
+						that.openOrPrivacy.push(false);
+						that.openOrPrivacyText.push("隐藏")
+					}
+		      /*对每一个循环列表的对外显示赋初始值*/
+	    	}
+			},
+			getPic(expeID,index){
+				var that=this;
+				var url=MyAjax.urlsy+"/teamOrgaInfo/findPicsById/"+expeID;
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:true,
+				},function(data){
+					console.log(data)
+					Vue.set(that.show.picList,[index],data.msg)
+				},function(err){
+					console.log(err)
+				})
+			},
+		goToEditPro(index,item){
+			console.log(item.projectID,item.pkid)
+			router.push({name:'editTeamProject',query:{projId:item.projectID,expeId:item.pkid}})
+			/*通过路由传值*/
+		},
     	viewMore(){
     		/*$('.morePics').css("display",$('.morePics').css('display')==
     		'block'?'none':'block'
@@ -159,21 +235,22 @@
     		
     	},
     	upDown(index){
-//  		Vue.set(this.show,"tag[index]",false)
-				console.log(this.show.tag[index])
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+					this.updowntxt[index] = "收起"
+					this.getPic(this.proInfo[index].pkid,index)
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
-    		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+				this.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
+			
+				console.log(this.show.picList)
     	},
     	deletePro(index){
     		//删除模态框的弹出按钮事件
-    		var aa = "deleteModal"+index;
+    		var aa = "deleteModalClass"+index;
     		Modal.makeText($('.'+aa))
     	},
     	cancleDele(index){
@@ -182,9 +259,47 @@
     	},
     	saveDele(index){
     		//确认删除该项目
-    		this.teamProInfo.splice(index,1);
+    		var that = this;
+				console.log(that.proInfo[index].pkid)
+				var url = MyAjax.urlsy+"//teamOrgaInfo/del/"+that.proInfo[index].pkid;
+				MyAjax.delete(url)
+				that.getData();//更新一下数据
     		this.closeModal(index);
+    		
     	},
+    	search(){
+				var that = this;
+	    	var url = MyAjax.urlsy+"/teamOrgaInfo/findProjByName/"+that.searchText;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.searchResult = data;
+					if(that.searchResult.length!=0){
+						that.noresult=false;
+					}else{
+						that.noresult=true;
+					}
+					$('.search-wrap').animate({marginTop:"30px",marginBottom:"40px"},100);
+					$('.result-wrap').fadeIn(200);
+				},function(err){
+					console.log(err)
+				})
+					
+			},
+			keySearch(){//enter键登录事件
+			 	var event = event || window.event;  
+			 	if(event.keyCode==13){ 
+			 		console.log("222")
+			    this.search()
+			    event.returnValue = false;    
+			    return false;
+			  }
+			},
     	//模态框
 			overlay(){
 				Modal.makeText($('.search-modal'))
@@ -192,23 +307,37 @@
 			closeModal(index){
 				Modal.closeModal($('.search-modal'))
 				
-				var aa = "deleteModal"+index;
+				var aa = "deleteModalClass"+index;
     		Modal.closeModal($('.'+aa))
     		
 				$('.search-wrap').css({marginTop:"120px",marginBottom:"170px"})
 				$('.result-wrap').css({display:"none"})
 			},
-			getData(){
-//				console.log($('.search-wrap').offsetTop())
-					$('.search-wrap').animate({marginTop:"30px",marginBottom:"40px"},100);
-					$('.result-wrap').fadeIn(200);
+//			getList(){
+////				console.log($('.search-wrap').offsetTop())
+//					$('.search-wrap').animate({marginTop:"30px",marginBottom:"40px"},100);
+//					$('.result-wrap').fadeIn(200);
+//			},
+			choseThis(e,index){
+				console.log($(e.target).hasClass("selected"))
+				if($(e.target).hasClass("selected")==false){
+					console.log($(e.target))
+					$(e.target).addClass("selected");
+					$(e.target).parent().siblings().find("span").removeClass('selected');
+					return false;
+				}else if($(e.target).hasClass("selected") == true){
+					console.log($(e.target))
+					$(e.target).removeClass("selected");
+					return false;
+				}
+				 e.stopPropagation();    //阻止冒泡  
+//				this.chosedOne.psnID = this.list[index].pkid;
+//				this.chosedOne.pic = this.list[index].pic;
+//				this.chosedOne.name = this.list[index].nickName;
+//				console.log(this.chosedOne)
+//				
 			},
-			choseThis(e){
-				$(".resultList li span").removeClass('selected');
-				$(e.target).addClass("selected");
-				console.log($(".resultList li span"))
-				
-			},
+			
 	
     
     }
@@ -372,13 +501,6 @@ $activeColor: #02a672;
 						.resultList{
 							width: 325px;
 							overflow: hidden;
-							.noResult{
-								color:rgb(140,140,140);
-								margin-bottom: 9px;
-								height: 40px;
-								line-height: 40px;
-								background: none;
-							}
 							li{
 								width: 325px;
 								height: 36px;
@@ -388,27 +510,25 @@ $activeColor: #02a672;
 								float: left;
 								background: #f8f8f8;
 								overflow: hidden;
-								cursor: pointer;
 								a{
 									color: $activeColor;
 								}
 								&:nth-child(2n){
 									background: #f2f2f2;
 								}
-									.choseBtn{
-										width: 15px;
-										height: 15px;
-										display: inline-block;
-										float: right;
-										margin-top: 10px;
-										background: url(../../../assets/img/team/icon_selected.png) no-repeat center;
-									
-										&:hover,&.selected{
-											background: url(../../../assets/img/team/icon_selected_green.png) no-repeat center;
-											
-										}
+								.choseBtn{
+									width: 15px;
+									height: 15px;
+									display: inline-block;
+									float: right;
+									margin-top: 10px;
+									background: url(../../../assets/img/team/icon_selected.png) no-repeat center;
+									cursor: pointer;
+									&.selected{
+										background: url(../../../assets/img/team/icon_selected_green.png) no-repeat center;
 									}
-									
+								}
+								
 							}
 						}
 						.confirmBtn{

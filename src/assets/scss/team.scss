@@ -39,9 +39,14 @@ $activeColor:#02a672;
         border-radius: 50%;
         overflow: hidden;
         position: relative;
+        &:hover{
+            .meng{
+                display: block;
+            }
+        }
         img{
-            width: 50%;
-            height: 50%;
+            width: 100%;
+            height: 100%;
             position:absolute;top:50%;left:50%;
              transform:translate(-50%,-50%);
              -webkit-transform:translate(-50%,-50%);
@@ -49,8 +54,43 @@ $activeColor:#02a672;
             -ms-transform:translate(-50%,-50%);
             -o-transform:translate(-50%,-50%);
         }
-
+        .meng{
+            position: absolute;
+            width: 100%;
+            height: 115px;
+            line-height: 115px;
+            text-align: center;
+            background: rgba(0,0,0,.5);
+            top: 0; left: 0;
+            color: #FFFFFF;
+            cursor: pointer;
+            display: none;
+        }
       }
+      .container{
+        position:absolute;top:50%;left:50%; 
+        transform:translate(-50%,-50%);
+        -webkit-transform:translate(-50%,-50%);
+        -moz-transform:translate(-50%,-50%);
+        -ms-transform:translate(-50%,-50%);
+        -o-transform:translate(-50%,-50%);
+        .Btnsty_peyton{
+            text-align: center;
+        }
+        .thumbBox{
+            border-radius: 50%;
+        }
+        .cha{
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 32px;
+            height: 32px;
+            background: url(../../assets/img/personal/common/guanbi-2.png) no-repeat ;
+            background-size: 100% 100%;
+            z-index: 9;
+            cursor: pointer;
+        }
+    }
       .m-warp{
         float: left;
         margin-left:40px;

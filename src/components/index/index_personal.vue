@@ -16,7 +16,7 @@
 							</dt>
 						</dl>
 						<div class="more">
-							<router-link :to="{name:'personDetail',query:{id:item.accountID}}" target="_blank">
+							<router-link :to="{name:'personReferral',query:{id:item.accountID}}" target="_blank">
 								<img src="../../assets/img/header/more.png" />
 							</router-link>
 						</div>
@@ -92,7 +92,6 @@
 			      clickable:true,
 			    },
 	      })  
-	      
 	      gallery.params.control = gallery   
 	    },  
 	    stopPlay () {  

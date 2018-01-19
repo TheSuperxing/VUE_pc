@@ -24,10 +24,10 @@
         transitionName: 'slide-left',
         pics:[
           {text:"团队主页",pic2:require("../../assets/img/team/sidebar/home-green.png"),pic1:require("../../assets/img/team/sidebar/home-gray.png"),route:"/yhzx/team/info/teamIndex"},
-          {text:"团队账号信息",pic1:require("../../assets/img/team/sidebar/account-gray.png"),pic2:require("../../assets/img/team/sidebar/account-green.png"),route:"/yhzx/team/info/teamAccount"},
-          {text:"团队基本信息",pic1:require("../../assets/img/team/sidebar/info-gray.png"),pic2:require("../../assets/img/team/sidebar/info-green.png"),route:"/yhzx/team/info/teamInfo"},
-          {text:"团队组织信息",pic1:require("../../assets/img/team/sidebar/organiz-gray.png"),pic2:require("../../assets/img/team/sidebar/organiz-green.png"),route:"/yhzx/team/info/teamOrganiz"},
-          {text:"团队项目信息",pic1:require("../../assets/img/team/sidebar/pro-gray.png"),pic2:require("../../assets/img/team/sidebar/pro-green.png"),route:"/yhzx/team/info/teamProject"},
+          {text:"账号信息",pic1:require("../../assets/img/team/sidebar/account-gray.png"),pic2:require("../../assets/img/team/sidebar/account-green.png"),route:"/yhzx/team/info/teamAccount"},
+          {text:"基本信息",pic1:require("../../assets/img/team/sidebar/info-gray.png"),pic2:require("../../assets/img/team/sidebar/info-green.png"),route:"/yhzx/team/info/teamInfo"},
+          {text:"组织信息",pic1:require("../../assets/img/team/sidebar/organiz-gray.png"),pic2:require("../../assets/img/team/sidebar/organiz-green.png"),route:"/yhzx/team/info/teamOrganiz"},
+          {text:"项目信息",pic1:require("../../assets/img/team/sidebar/pro-gray.png"),pic2:require("../../assets/img/team/sidebar/pro-green.png"),route:"/yhzx/team/info/teamProject"},
         ]
       }
 

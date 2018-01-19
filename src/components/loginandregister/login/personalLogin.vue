@@ -105,7 +105,7 @@
               console.log("success")
               console.log(window.history.length)
               window.history.back()
-              sessionStorage.setItem("state",0);
+              sessionStorage.setItem("state","per");
 							//router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){

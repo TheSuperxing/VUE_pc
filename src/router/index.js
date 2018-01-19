@@ -13,6 +13,10 @@ import DemandDetail from "../components/trading/demandDetail.vue"
 import PersonDetail from "../components/details/personDetail.vue"
 import ProjectDetail from "../components/details/projectDetail.vue"
 import demandDetail from "../components/details/demandDetail.vue"
+/*推介的个性主页*/
+import teamReferral from "../components/details/teamReferral.vue"
+import personReferral from "../components/details/personReferral.vue"
+
 import Users from "../components/users.vue"
 import Register from "../components/loginandregister/register/Register.vue"
 import Login from "../components/loginandregister/login/loginIndex.vue"
@@ -91,6 +95,10 @@ export default new Router({
     			path:'/indexcontent/projectDetail',name:'projectDetail',component:ProjectDetail
     		},{
     			path:'/indexcontent/demandDetail',name:'demandDetail',component:demandDetail
+    		},{
+    			path:'/indexcontent/teamReferral',name:'teamReferral',component:teamReferral
+    		},{
+    			path:'/indexcontent/personReferral',name:'personReferral',component:personReferral
     		}
     		
     	]

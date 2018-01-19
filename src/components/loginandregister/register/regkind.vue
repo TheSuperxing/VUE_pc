@@ -39,13 +39,13 @@
 			<input type="text"  placeholder="请输入您的邮箱" v-model="comRegInput.email" @blur="mailConfirm"/>
 		</li>
 		<li>
-			<input type="text" placeholder="请输入密码(字母、数字及.或_，6到18个字符。)" v-model="comRegInput.passWord" @blur="pwdConfirm"/>
+			<input type="text" placeholder="请输入密码(密码由6-14位字母（区分大小写）、数字或符号组成)" v-model="comRegInput.passWord" @blur="pwdConfirm"/>
 		</li>
 		<li>
 			<input type="text" placeholder="请再次输入密码" v-model="comRegInput.passWordCfm" @blur="samePwd"/>
 		</li>
 		<alertTip v-if="comRegInput.showAlert" :showHide="comRegInput.showAlert" @closeTip="closeTip" :alertText="comRegInput.alertText"></alertTip>
-		<div class="regBtn" @click="goRegisterDoneCom">
+		<div class="regBtn" @click="goRegisterDoneCom" @keydown="keyRegisterDoneTeam($event)">
 			注册
 		</div>
 		<p class="notice">
@@ -58,13 +58,13 @@
 	</ul>
 	<ul class="team-wrap" v-if="state=='team'">
 		<li>
-			<input type="text"  placeholder="请输入公司名" v-model="teamRegInput.name" @blur="nameConfirm"/>
+			<input type="text"  placeholder="请输入团队名" v-model="teamRegInput.name" @blur="nameConfirm"/>
 		</li>
 		<li>
-			<input type="text"  placeholder="请输入您的邮箱" @blur="mailConfirm"/>
+			<input type="text"  placeholder="请输入您的邮箱"v-model="teamRegInput.email" @blur="mailConfirm"/>
 		</li>
 		<li>
-			<input type="password" placeholder="请输入密码(字母、数字及.或_，6到18个字符。)" v-model="teamRegInput.passWord" @blur="pwdConfirm"/>
+			<input type="password" placeholder="请输入密码(密码由6-14位字母（区分大小写）、数字或符号组成)" v-model="teamRegInput.passWord" @blur="pwdConfirm"/>
 		</li>
 		<li>
 			<input type="password" placeholder="请确认密码" v-model="teamRegInput.passWordCfm" @blur="samePwd"/>
@@ -135,7 +135,7 @@
                 
 			}
 		},
-		 components: {
+		components: {
             alertTip,
         },
         computed:{
@@ -145,7 +145,7 @@
         		
         	},
         	rightTeamEmail:function(){
-        		return /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/gi.test(this.comRegInput.email);
+        		return /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/gi.test(this.teamRegInput.email);
         		
         	},
         	
@@ -210,8 +210,72 @@
 		    goRegisterDoneCom(){
 		    	
 		    },
-		    goRegisterDoneTeam(){
+		    keyRegisterDoneTeam($event){//enter键登录事件
 		    	
+		      var event = $event || window.event;  
+		      console.log(666)
+			 	if(event.keyCode==13){ 
+			     this.goRegisterDoneTeam()
+		         event.returnValue = false;    
+		         event.cancelBubble=true;
+		         event.preventDefault();
+		         //event.stopProgagation();
+		         return false;
+		      } 
+		
+			},
+		    goRegisterDoneTeam(){
+		    	var that = this;
+				var url = MyAjax.urlsy+"/teamOrgaInfo/register";
+				if(that.teamRegInput.name.trim().length!=0&&that.teamRegInput.email.trim().length!=0&&that.teamRegInput.passWord.trim().length!=0&&that.teamRegInput.passWordCfm.trim().length!=0){
+					var data = {name:that.teamRegInput.name,email:that.teamRegInput.email,pwd:that.teamRegInput.passWord,confirmPwd:that.teamRegInput.passWordCfm};
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(data),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+					}, function(data){
+						console.log(data)
+						console.log(data.token)
+						cookieTool.setCookie("token",data.token)
+						if(data.code==0){
+							router.push("/indexcontent");
+							sessionStorage.setItem("state","team");
+						}else if(data.code==-1){
+							switch (data.msg){
+								case "该团队名称已被注册":
+									console.log(222)
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "该团队名称已被注册";
+									break;
+								case "该邮箱已被注册":
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "该邮箱已被注册";
+									that.teamRegInput.picConfirm = "";
+		    						$(".pic").focus();
+		    						that.changePic();
+									break;
+								case "密码不一致":
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "密码不一致";
+									break;
+								case "对象不能为空":
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "对象不能为空";
+									break;
+								case "null":
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "系统报错";
+									break;
+								default:
+									break;
+							}
+						}
+					},function(err){
+						console.log(err)
+					})
+				}
 		    },
 		    keyRegisterDonePer($event){//enter键登录事件
 		    	
@@ -344,14 +408,14 @@
 		    	};/*验证团队邮箱*/
 		    },
 		    pwdConfirm(){/*验证密码*/
-		    	if(!/^[a-zA-Z0-9]{1}([a-zA-Z0-9]|[._]){4,18}$/gi.test(this.comRegInput.passWord)&&this.comRegInput.passWord.trim().length!=0){
+		    	if(!/^[\@A-Za-z0-9\!\#\$\%\^\&\*\.\~]{6,14}$/gi.test(this.comRegInput.passWord)&&this.comRegInput.passWord.trim().length!=0){
 		    		this.comRegInput.showAlert = true;
 		    		this.comRegInput.alertText = '您输入的密码格式不正确';
 		    	}else{
 		    		this.comRegInput.showAlert = false;
 		    	};/*验证公司密码*/
 		    	
-		    	if(!/^[a-zA-Z0-9]{1}([a-zA-Z0-9]|[._]){4,18}$/gi.test(this.teamRegInput.passWord)&&this.teamRegInput.passWord.trim().length!=0){
+		    	if(!/^[\@A-Za-z0-9\!\#\$\%\^\&\*\.\~]{6,14}$/gi.test(this.teamRegInput.passWord)&&this.teamRegInput.passWord.trim().length!=0){
 		    		this.teamRegInput.showAlert = true;
 		    		this.teamRegInput.alertText = '您输入的密码格式不正确';
 		    	}else{

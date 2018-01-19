@@ -126,7 +126,7 @@
     methods:{
     	updateData(){
     		var that = this;
-			var url = MyAjax.urlsy+"/psnProjExpe/findProjExpe";//暂时先写成这样
+			  var url = MyAjax.urlsy+"/psnProjExpe/findProjExpe";//暂时先写成这样
 	    	MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -217,7 +217,7 @@
 				console.log(this.show.picList)
     	},
     	OpenOrPrivacy(index){//显示隐藏按钮，通过这个按钮可以控制显示到别人查看信息页的信息
-			Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index])
+				Vue.set(this.openOrPrivacy,[index],!this.openOrPrivacy[index])
 			// if(this.openOrPrivacyText[index]=="显示"){
 			// 	Vue.set(this.openOrPrivacyText,[index],"隐藏")
 			// }else {
@@ -226,32 +226,32 @@
 			if(this.openOrPrivacy[index]){
 				this.proInfo[index].ifVisable=1
 				Vue.set(this.openOrPrivacyText,[index],"隐藏")
-			}else{
-				this.proInfo[index].ifVisable = 0;
-				Vue.set(this.openOrPrivacyText,[index],"显示")
-			}
-			var that=this;
-			if(that.proInfo[index].partakeTimeDown=="至今"){
-				that.proInfo[index].partakeTimeDown = "0000.00.00";
-			}
-			console.log(that.proInfo[index])
-			var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe/";
-			$.ajaxSetup({ contentType : 'application/json' });
-			MyAjax.ajax({
-				type: "POST",
-				url:url,
-				data:JSON.stringify(that.proInfo[index]),
-				dataType: "json",
-				async:false,
-			},function(data){
-				if(data.code == 0){
-					that.updateData();
+				}else{
+					this.proInfo[index].ifVisable = 0;
+					Vue.set(this.openOrPrivacyText,[index],"显示")
 				}
-				
-			},function(err){
-				console.log(err)
-			})
-      	},
+				var that=this;
+				if(that.proInfo[index].partakeTimeDown=="至今"){
+					that.proInfo[index].partakeTimeDown = "0000.00.00";
+				}
+				console.log(that.proInfo[index])
+				var url = MyAjax.urlsy+"/psnProjExpe/insertOrUpdateProjExpe/";
+				$.ajaxSetup({ contentType : 'application/json' });
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					data:JSON.stringify(that.proInfo[index]),
+					dataType: "json",
+					async:false,
+				},function(data){
+					if(data.code == 0){
+						that.updateData();
+					}
+					
+				},function(err){
+					console.log(err)
+				})
+      },
     	deletePro(index){
     		//删除模态框的弹出按钮事件
     		var aa = "deleteModalClass"+index;
@@ -267,8 +267,8 @@
     		var that = this;
 			console.log(that.proInfo[index].psnProExpeID)
 			var url = MyAjax.urlsy+"/psnProjExpe/del/"+that.proInfo[index].psnProExpeID;
-			MyAjax.delete(url)
-			that.updateData();//更新一下数据
+				MyAjax.delete(url)
+				that.updateData();//更新一下数据
     		this.closeModal(index);
     		
     	},
@@ -321,8 +321,19 @@
 			},
 			choseThis(e,index){
 				
-				$(".resultList li span").removeClass('selected');
-				$(e.target).addClass("selected");
+//				$(".resultList li span").removeClass('selected');
+//				$(e.target).addClass("selected");
+				
+				if($(e.target).hasClass("selected")==false){
+					console.log(999)
+					$(e.target).addClass("selected");
+					$(e.target).parent().siblings().find("span").removeClass('selected');
+//					console.log($(e.target).attr("class"))
+				}else if($(e.target).hasClass("selected") == true){
+//					console.log($(e.target).attr("class"))
+					$(e.target).removeClass("selected");
+					console.log($(e.target).attr("class"))
+				}
 				this.chosedOne = this.searchResult[index]
 //				console.log($(".resultList li span"))
         		console.log(this.chosedOne)

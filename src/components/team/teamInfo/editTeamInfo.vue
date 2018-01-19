@@ -3,22 +3,19 @@
 	<div class="editTeamInfo">
 		<h3 class="t-title"><span>{{title}}</span></h3>
 		<ul class="ci-list">
-	      <li class="clear">
+	      <!--<li class="clear">
 	        <h4>团队标志</h4>
 	        <div class="logoBox">
 	        	<input type="file" />
 	        	<img src="../../../assets/img/logo/logo02.png" alt="">
 	        	<div class="modifyLogo" @click="overlay">点击更换标示</div>
-	        	<!--<el-button type="text" @click="modifyLogo" class="modifyLogo">点击更换标志 </el-button>-->
 	        </div>
-	        
-	        
-	        
-	      </li>
+ 
+	      </li>-->
 	      
 	      <li>
 	      	<h4>团队名称</h4>
-	      	<input placeholder="请在此输入公司名称" v-model="info.teamName"/>
+	      	<input placeholder="请在此输入公司名称" v-model="basicInfo.teamName"/>
 	      	<p class="limit-words"><span >{{nameCont}}</span>/30</p>
 	      </li>
 	      <!--<li>
@@ -28,12 +25,12 @@
 	      </li>-->
 	      <li>
 	      	<h4>团队简介</h4>
-	      	<textarea placeholder="请在此输入公司简介" v-model="info.teamDesc"></textarea>
+	      	<textarea placeholder="请在此输入公司简介" v-model="basicInfo.teamProfile"></textarea>
 	      	<p class="limit-words">{{detailCont}}/500</p>
 	      </li>
 	      <li>
 	      	<h4>团队电话</h4>
-	      	<input placeholder="请在此输入公司电话" v-model="info.teamPhone"/>
+	      	<input placeholder="请在此输入公司电话" v-model="basicInfo.contactInfo"/>
 	      </li>
 	    </ul>
 	    <div class="btnBox">
@@ -64,6 +61,7 @@
 //	import {MessageBox,Button} from "element-ui"
 //	Vue.use(MessageBox)
 //	Vue.use(Button)
+	import MyAjax from "../../../assets/js/MyAjax.js"
     import Modal from "../../../assets/js/modal.js"
     import Vue from "vue"
 	import {mapState} from "vuex"
@@ -81,25 +79,53 @@
         	teamDesc:"",
 			teamPhone:"",
         },
+        basicInfo:{}
       }
     },
     computed:mapState({
-      basicInfo:state=>state.team.teamMessage.basicInfo
+//    basicInfo:state=>state.team.teamMessage.basicInfo
     }),
     mounted(){
-    	console.log(this.basicInfo)
+    	this.getData()
     	//将vuex数据取到本组件
-    	for(var item in this.basicInfo){
-// 			this.contactsss.info.push(this.accountInfo.contacts[i])
-				this.info.teamName=this.basicInfo.teamName;
-				this.info.teamAddress=this.basicInfo.teamAddress;
-				this.info.teamDesc=this.basicInfo.teamDesc;
-				this.info.teamPhone=this.basicInfo.teamPhone;
-   		}
-    	console.log(this.info)
+    	
     	
     },
     methods:{
+    	getData(){
+	        var that=this;
+	        var url = MyAjax.urlsy+"/teamOrgaInfo/getTeamBasicInfo";
+	        MyAjax.ajax({
+	          type: "GET",
+	          url:url,
+	          dataType: "json",
+	          async:false,
+	        },function(data){
+	        	console.log(data)
+	          if(data.code==0){
+	            that.basicInfo=data.msg;
+	            //Vue.set(that,"psnMsg",data.msg);
+	          }else{
+	            // if(data.msg=="100004"){//没有token
+							// 	window.location.hash="/login"
+							// }
+	          }
+	        },function(err){
+	          if(err.status!=200){
+	            //router.push("/index")
+	            status=err.status;
+	          }
+	        })
+	        function emptyText(text) {
+		        if(text==null||text.length==0){
+		          return "";
+		        }else{
+		          return text;
+		        }
+		    }
+	        that.basicInfo.teamProfile = emptyText(that.basicInfo.teamProfile)
+	        that.basicInfo.contactInfo = emptyText(that.basicInfo.contactInfo)
+	    },
     	cancleEdit(){
 			for(var item in this.basicInfo){
 	// 			this.contactsss.info.push(this.accountInfo.contacts[i])
@@ -108,15 +134,33 @@
 				this.info.teamDesc=this.basicInfo.teamDesc;
 				this.info.teamPhone=this.basicInfo.teamPhone;
 			}
-			router.push({path:"/yhzx/team/info/teamInfo/index"})
+			router.push({path:"/yhzx/team/info/teamInfo/teamInfoIndex"})
     	},
     	saveEdit(){
-    		for(var item in this.info){
-    			this.basicInfo.teamName=this.info.teamName;
-    			this.basicInfo.teamAddress=this.info.teamAddress;
-    			this.basicInfo.teamDesc=this.info.teamDesc;
-    			this.basicInfo.teamPhone=this.info.teamPhone;
-    		}
+    		var that=this;
+	        var url = MyAjax.urlsy+"/teamOrgaInfo/saveTeamBasicInfo";
+//	        if(that.basicInfo.teamName.trim().length!=0||that.basicInfo.teamProfile.trim().length!=0
+//	        ||that.basicInfo.contactInfo.trim().length!=0){
+	        	var data = that.basicInfo
+	        	console.log(JSON.stringify(data))
+	        	MyAjax.ajax({
+		          type: "POST",
+		          url:url,
+		          data:JSON.stringify(data),
+		          dataType: "json",
+		          async:false,
+	              contentType:"application/json;charset=utf-8",
+		          
+		        },function(data){
+		        	console.log(data)
+	        		
+		        },function(err){
+		          if(err.status!=200){
+		            //router.push("/index")
+		            status=err.status;
+		          }
+		        })
+//	        }
     		router.push({path:"/yhzx/team/info/teamInfo/teamInfoIndex"})
     	},
 		overlay(){
@@ -149,6 +193,7 @@
 	    border-radius:5px;
 	    position: relative;
 	    .ci-list{
+	    	margin-top: 30px;
 			padding-left: 30px;
 			overflow:hidden;
 			li{
@@ -192,7 +237,7 @@
 			  
 			  
 			}
-				li:nth-child(3){
+				li:nth-child(2){
 					margin-bottom: 20px;
 					position: relative;
 					.limit-words{
@@ -202,14 +247,14 @@
 					  	color: #b0b0b0;
 					}
 				}
-				li:nth-child(2){
+				li:nth-child(1){
 					.limit-words{
 						float: left;
 						margin-left: 15px;
 						color: #B0B0B0;
 					}
 				}
-			    li:nth-child(1){
+			    /*li:nth-child(1){
 			      height:130px;
 			      line-height: 100px;
 			      padding-top: 30px;
@@ -253,7 +298,7 @@
 				    }
 			      }
 			      
-			    }
+			    }*/
 		}
 		/*模态框模态框模态框模态框模态框模态框模态框模态框模态框模态框模态框*/
 		.previewZz{

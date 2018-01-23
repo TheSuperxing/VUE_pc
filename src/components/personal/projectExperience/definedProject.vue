@@ -42,10 +42,7 @@
 						<em></em>
 						<p>{{item}}</p>
 					</label>
-					<!--<label  v-for="(item,index) in projectInfo.architectFunctions" v-on:click="changeProjectTypeColor(index)" v-bind:class="{projectTypeColor:projectTypeColor[index]}">
-						<em></em>
-						<p>{{item}}</p>
-					</label>-->
+					
 					<label><em></em><input type="text" placeholder="可自行填写建筑功能" @blur="keepAddProjectTypeName" v-model="addProjectType.value"/></label>
 				</div>
 			</li>

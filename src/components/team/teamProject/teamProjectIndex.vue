@@ -66,7 +66,6 @@
     	</div>
     	<div class="morePics" v-if="!show.tag[$index]">
     		<img v-for="item in show.picList[$index]" :src="item.pic" />
-    		<!-- <img v-for="item in show.picList" :src="data:image/png;base64,item.pic" /> -->
     	</div>
     	<!--<div class="morePics" v-if="!show.tag[$index]">
     		<img src="../../../assets/img/company/img.png" />
@@ -79,8 +78,6 @@
     	</div>-->
     	<div class="viewMore">
     		<p v-bind:class="{viewDown:show.tag[$index],viewUp:!show.tag[$index]}" @click="upDown($index)">
-    			<!--<img src="../../../assets/img/company/double-bottom-down.png" />
-					<img src="../../../assets/img/company/double-bottom-up.png" />-->
 					<span>{{updowntxt[$index]}}</span>
     		</p>
     	</div>
@@ -109,8 +106,10 @@
         searchText:"", /*搜索框input值*/
         searchResult:[],
         noresult:false,
-        list:[], /*搜索结果*/
-       	deleteModalClass:[]//删除确认的模态框
+       	deleteModalClass:[],//删除确认的模态框
+       	chosedOne:{
+       		
+       	}
       }
     },
     computed:mapState({
@@ -179,10 +178,10 @@
 				that.show.tag.length = that.proInfo.length;
 	//  	console.log(this.show.tag.length)
 	    	for(var i=0;i<this.proInfo.length;i++){
-	    		if(that.proInfo[i].partakeTimeDown=="0002.12"){
+	    		if(that.proInfo[i].partakeTimeDown==("0002.12.01"||"0002.12")){
 					 	that.proInfo[i].partakeTimeDown = "至今";
 					}
-	    		if(that.localProInfo[i].partakeTimeDown=="0002.12"){
+	    		if(that.localProInfo[i].partakeTimeDown==("0002.12.01"||"0002.12")){
 					 	that.localProInfo[i].partakeTimeDown = "至今";
 					}
 	    		that.proInfo[i].takeOffice = emptyText(that.proInfo[i].takeOffice);
@@ -216,24 +215,11 @@
 				})
 			},
 		goToEditPro(index,item){
-			console.log(item.projectID,item.pkid)
-			router.push({name:'editTeamProject',query:{projId:item.projectID,expeId:item.pkid}})
+			console.log(item.projectID,item.teamProExpeID)
+			router.push({name:'editTeamProject',query:{projId:item.projectID,expeId:item.teamProExpeID}})
 			/*通过路由传值*/
 		},
-    	viewMore(){
-    		/*$('.morePics').css("display",$('.morePics').css('display')==
-    		'block'?'none':'block'
-    		)*/
-//  		$('.morePics').innerHTML('收起图片')
-//  		$(".viewMore img").attr('src',$(".viewMore img").attr('src')==
-//  		'../../../assets/img/company/double-bottom-down.png '?
-//  		'../../../assets/img/company/double-bottom-up.png': 
-//  		'../../../assets/img/company/double-bottom-down.png');
-//  		this.updown == "view-down"?"view-up":"view-down";
-//  		this.updowntxt ='展开查看更多'?'收起图片':'展开查看更多';
-//  		console.log(this.updowntxt)
-    		
-    	},
+  
     	upDown(index){
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
@@ -319,25 +305,24 @@
 //					$('.result-wrap').fadeIn(200);
 //			},
 			choseThis(e,index){
-				console.log($(e.target).hasClass("selected"))
+//				console.log($(e.target).hasClass("selected"))
 				if($(e.target).hasClass("selected")==false){
-					console.log($(e.target))
+//					console.log($(e.target))
 					$(e.target).addClass("selected");
 					$(e.target).parent().siblings().find("span").removeClass('selected');
-					return false;
 				}else if($(e.target).hasClass("selected") == true){
-					console.log($(e.target))
+//					console.log($(e.target))
 					$(e.target).removeClass("selected");
-					return false;
 				}
 				 e.stopPropagation();    //阻止冒泡  
-//				this.chosedOne.psnID = this.list[index].pkid;
-//				this.chosedOne.pic = this.list[index].pic;
-//				this.chosedOne.name = this.list[index].nickName;
-//				console.log(this.chosedOne)
-//				
+				 this.chosedOne = this.searchResult[index]
+				 console.log(this.chosedOne)
 			},
-			
+			confirmAddPro(){
+				var that = this;
+				console.log(that.chosedOne.projectID,that.chosedOne.teamProExpeID)
+				router.push({name:'editTeamProject',query:{projId:that.chosedOne.projectID,expeId:that.chosedOne.teamProExpeID}})
+			}
 	
     
     }
@@ -434,6 +419,7 @@ $activeColor: #02a672;
 			    		&.confirmBtn{
 			    			background-image: url("../../../assets/img/team/icon_green_next_nor.png") ;
 			    			color: #FFFFFF;
+			    			cursor:pointer; 
 			    			&:hover{
 			    				filter:alpha(opacity=80);       /* IE */
 							  -moz-opacity:0.8;              /* 老版Mozilla */
@@ -542,6 +528,7 @@ $activeColor: #02a672;
 							margin-top: 30px;
 							display: block;
 							background: url(../../../assets/img/team/icon_green_119inform_confirm.png) no-repeat center;
+							cursor:pointer; 
 							&:hover{
 	                filter:alpha(opacity=80);       /* IE */
 	                -moz-opacity:0.8;              /* 老版Mozilla */

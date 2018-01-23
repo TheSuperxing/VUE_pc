@@ -231,6 +231,29 @@
           if(data.code==0){
             that.teamInfo=data.msg;
             //Vue.set(that,"psnMsg",data.msg);
+            if(that.teamInfo.teamProfile==""||null){
+			    		that.stateOne.haveTeamDesc=false;
+			//  		console.log(1)
+			    	}
+			    	if(that.teamInfo.contactInfo==""||null){
+			    		that.stateOne.haveTeamMail=false;
+			//  		console.log(2)
+			    	}
+			    	if(that.teamInfo.companyName==""||null){
+			    		that.stateOne.haveCompany=false;
+			//  		console.log(3)
+			    	}
+			    	if(that.teamInfo.topManagers.length===0){
+			    		that.stateOne.haveSenior = false;
+			//  		console.log(4)
+			    	}
+			    	if(that.teamInfo.importantPsns.length===0){
+			    		that.stateOne.haveBackbone = false;
+			//  		console.log(5)
+			    	}
+			    	if(that.teamInfo.teamprojexpes.length === 0){
+			    		that.stateOne.haveProject = false;
+			    	}
           }else{
             // if(data.msg=="100004"){//没有token
 						// 	window.location.hash="/login"
@@ -242,29 +265,7 @@
             status=err.status;
           }
         })
-        if(that.teamInfo.teamProfile==""||null){
-	    		that.stateOne.haveTeamDesc=false;
-	//  		console.log(1)
-	    	}
-	    	if(that.teamInfo.contactInfo==""||null){
-	    		that.stateOne.haveTeamMail=false;
-	//  		console.log(2)
-	    	}
-	    	if(that.teamInfo.companyName==""||null){
-	    		that.stateOne.haveCompany=false;
-	//  		console.log(3)
-	    	}
-	    	if(that.teamInfo.topManagers.length===0){
-	    		that.stateOne.haveSenior = false;
-	//  		console.log(4)
-	    	}
-	    	if(that.teamInfo.importantPsns.length===0){
-	    		that.stateOne.haveBackbone = false;
-	//  		console.log(5)
-	    	}
-	    	if(that.teamInfo.teamprojexpes.length === 0){
-	    		that.stateOne.haveProject = false;
-	    	}
+        
       },
       croperShow(){
     		Modal.makeText($('.corpbox'))

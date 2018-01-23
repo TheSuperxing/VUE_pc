@@ -302,7 +302,7 @@
 				singleManualUploader({
 					element:"fine-uploader-manual-trigger",
 	        		template: "qq-template-manual-trigger",
-					url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+					url:MyAjax.urlsy+'/teamOrgaInfo/uploadPic',
 					picIdCont:that.project.picId,
 					btnPrimary:".btn-primary",
 					canUploadNum:Math.floor(3-that.picNum),
@@ -326,9 +326,37 @@
 					});
 				})
 			},
-	    	textcount(){
-	    		
-	    	},
+			async deletePic(index,$index){
+				var that =this;
+				var url = MyAjax.urlsy+"/teamOrgaInfo/delPic/"+this.picList[$index].id
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+				})
+				const data = await that.getPic(that.psnProExpeID) 
+				if(data.code===0){
+					Vue.set(that,"picList",data.msg)
+				    Vue.set(that,"picNum",data.msg.length)
+				}
+				$("#fine-uploader-manual-trigger").html("")
+				if(Math.floor(3-that.picNum)>0){
+					singleManualUploader({
+						element:"fine-uploader-manual-trigger",
+		        		template: "qq-template-manual-trigger",
+						url:MyAjax.urlsy+'/teamOrgaInfo/uploadPic',
+						picIdCont:that.project.picId,
+						btnPrimary:".btn-primary",
+						canUploadNum:Math.floor(3-that.picNum),
+					})
+				}
+			},
+	    	
 	    	overlayA(){
 	    		var modal = $('.modal-a')
 				Modal.makeText(modal)

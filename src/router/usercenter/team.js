@@ -1,5 +1,5 @@
 /*团队部分路由*/
-import team_content from "../../components/company/company_content.vue"
+import team_content from "../../components/team/team_content.vue"
 /*概览页*/
 import overview from "../../components/company/overview.vue"
 
@@ -28,8 +28,9 @@ var teamRouterPath="/yhzx/team";
 var teamRouterComponent=Team;
 var teamRouterChildren=[
 	{
-		path:"/yhzx/team",component:team_content,redirect:"/yhzx/team/overview",
+		path:"/yhzx/team",component:team_content,
 		children:[
+			
 			{path:"/yhzx/team/overview", component:overview,},
 			{
 				path:"/yhzx/team/info",component:Team,redirect:"/yhzx/team/info/teamIndex",

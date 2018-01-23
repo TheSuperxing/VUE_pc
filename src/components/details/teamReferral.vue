@@ -53,6 +53,29 @@
 				<h2>LEADING MEMBER</h2>
 				<h1>主要成员</h1>
 			</div>
+			<div v-on:mouseenter="stopPlay()" v-on:mouseleave="play()" class="swiper-container galleryMember swiper-container-horizontal">  
+				<div class="swiper-wrapper">  
+					<ul v-for="ul in proMsg" class="swiper-slide swiper-slide-next" style="width: 100%; margin-right: 15px;">
+						<li v-for="item in ul">
+							<dl>
+								<dd>
+									<img :src="item.pic" alt=""/>
+								</dd>
+								<dt>
+									<h3>{{item.projectName}}</h3>
+									<p>参与角色： {{item.takeOffice}}</p>
+								</dt>
+							</dl>
+							<!--<div class="more">
+								<router-link :to="{name:'personReferral',query:{id:item.accountID}}" target="_blank">
+									<img src="../../assets/img/header/more.png" />
+								</router-link>
+							</div>-->
+						</li>
+					</ul>
+				</div>  
+				<div class="swiper-pagination swiper-pagination-personal"></div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -62,13 +85,12 @@
 	import Swiper from "../../assets/js/lib/swiper/swiper.js"
 	import Vue from "vue"
 	let galleryPro
+	let galleryMember5
 	export default{
 		name:"teamReferral",
 		data:function(){
 			return{
-				teamInfo:{
-					
-				},
+				teamInfo:{},
 				proMsg:[]
 			}
 		},
@@ -113,9 +135,25 @@
 				    el: '.swiper-pagination',
 				    clickable:true,
 				},
+		      }) 
+		      galleryMember = new Swiper('.galleryMember', {  
+	//	        navigation: {
+	//				    nextEl: '.swiper-button-next',
+	//				    prevEl: '.swiper-button-prev',
+	//				  }, 
+		        spaceBetween: 15,  
+		        initialSlide: 0,  
+		        slideToClickedSlide: true,
+		        preventLinksPropagation : false,
+		        autoplayDisableOnInteraction: false,
+		        pagination: {
+				    el: '.swiper-pagination',
+				    clickable:true,
+				},
 		      })  
 		        
 		        galleryPro.params.control = galleryPro   
+		        galleryMember.params.control = galleryMember   
 		    }, 
 		    stopPlay () {  
 		        galleryPro.autoplay.stop();  

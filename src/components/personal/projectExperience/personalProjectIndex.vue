@@ -161,10 +161,10 @@
 			that.show.tag.length = that.proInfo.length;
 	//  	console.log(this.show.tag.length)
 	    	for(var i=0;i<this.proInfo.length;i++){
-	    		if(that.proInfo[i].partakeTimeDown=="0002.12"){
+	    		if(that.proInfo[i].partakeTimeDown==("0002.12.01"||"0002.12")){
 					 	that.proInfo[i].partakeTimeDown = "至今";
 					}
-	    		if(that.localProInfo[i].partakeTimeDown=="0002.12"){
+	    		if(that.localProInfo[i].partakeTimeDown==("0002.12.01"||"0002.12")){
 					 	that.localProInfo[i].partakeTimeDown = "至今";
 					}
 	    		that.proInfo[i].takeOffice = emptyText(that.proInfo[i].takeOffice);

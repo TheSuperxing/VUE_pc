@@ -1,14 +1,14 @@
 <template>
 	<div id="modal-overlay" class="registerDone" >
-		<div class="content-wrap" v-bind:class='[{"com-wrap":state==1},{"team-wrap":state==2},{"person-wrap":state==0}]'>
+		<div class="content-wrap" v-bind:class='[{"com-wrap":state=="com"},{"team-wrap":state=="team"},{"person-wrap":state=="per"}]'>
 			<p class="congraduation">恭喜您注册成功！</p>
 			<p class="mail-wrap">
-				邮件已经发送至<router-link to="">xing@163.com</router-link>
+				邮件已经发送至{{email}}
 			</p>
 			<p v-if="!sendAgainflag">请登录邮箱，点击链接激活账号，链接在24小时内有效。</p>
 			<p v-if="sendAgainflag">已重新发送邮件，请登录邮箱，点击链接激活账号，链接在24小时内有效。</p>
 			<div class="btnBox">
-				<span><router-link to="/index">暂不激活</router-link></span>
+				<span><router-link to="/indexcontent">暂不激活</router-link></span>
 				<span @click="sendAgain">重新发送</span>
 			</div>
 		</div>
@@ -26,33 +26,44 @@
 			return{
 				state:"",
 				sendAgainflag:false,
+				email:""
 			}
 		},
-		computed:mapState({
-	      user:state=>state.userState.user
-	    }),
 		mounted(){
-			console.log(this.user);
 			var modal = $('.registerDone');
 			Modal.makeText(modal);
-			var id = this.$route.params.id
-			console.log(id)
+			var id = this.$route.query.id
 			this.state = id;
-//			console.log(this.state)
-			Vue.set(this.user,'userState',id)
-//			this.user = id;
-			console.log(this.user.userState);
-			sessionStorage.setItem("state",this.user.userState);
+			Vue.set(this,"email",sessionStorage.getItem("email"))
+			
 		},
 		methods:{
 			sendAgain(){
-				this.sendAgainflag = true;
+				var url2 = MyAjax.urlsy + "/teamOrgaInfo/sendMail"
+				var data2 = {
+					url:"10.1.31.27:8080/yhzx/comfirmActivate/"+data.accountID,
+					email:that.teamRegInput.email
+				}
+				console.log(data2)
+				MyAjax.ajax({
+					type: "POST",
+					url:url2,
+					data: data2,
+					dataType: "json",
+//								contentType:"application/json;charset=utf-8",
+				}, function(data_url){
+					console.log(data_url)
+					if(data.msg == "success"&&data.code == 0){
+						this.sendAgainflag = true;
+					}
+				},function(err_url){
+					console.log(err)
+				})
 					
 			}
 		},
 		beforeDestroy(){
 			$(document.body).css("overflow","scoll");
-//			console.log(2222)
 			var modal = $('.registerDone');
 			Modal.closeModal(modal);
 			

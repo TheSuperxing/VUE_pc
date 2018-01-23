@@ -45,7 +45,7 @@
 			<input type="text" placeholder="请再次输入密码" v-model="comRegInput.passWordCfm" @blur="samePwd"/>
 		</li>
 		<alertTip v-if="comRegInput.showAlert" :showHide="comRegInput.showAlert" @closeTip="closeTip" :alertText="comRegInput.alertText"></alertTip>
-		<div class="regBtn" @click="goRegisterDoneCom" @keydown="keyRegisterDoneTeam($event)">
+		<div class="regBtn" @click="goRegisterDoneCom" >
 			注册
 		</div>
 		<p class="notice">
@@ -56,7 +56,7 @@
 			</router-link>
 		</p>
 	</ul>
-	<ul class="team-wrap" v-if="state=='team'">
+	<ul class="team-wrap" v-if="state=='team'" @keydown="keyRegisterDoneTeam($event)">
 		<li>
 			<input type="text"  placeholder="请输入团队名" v-model="teamRegInput.name" @blur="nameConfirm"/>
 		</li>
@@ -88,6 +88,7 @@
 <script>
 	import router from "../../../router"
 	import Vue from "vue";
+	 import {mapState} from "vuex"
 	import alertTip from '../alertTip'
 	import MyAjax from "../../../assets/js/MyAjax.js"
     import {cookieTool} from "../../../assets/js/cookieTool.js"
@@ -160,7 +161,10 @@
 		        Vue.set(this.makeRandom,"num",parseInt(Math.random()*10000))
 		      }while (this.makeRandom.num<1000);
 		},
-		
+		computed:mapState({
+	      user:state=>state.userState.user,
+				//newNotice:state=>state.userState.user.newNotice
+	    }),
 		methods:{
 			settime(e) {
 				var that = this;
@@ -210,22 +214,22 @@
 		    goRegisterDoneCom(){
 		    	
 		    },
-		    keyRegisterDoneTeam($event){//enter键登录事件
-		    	
-		      var event = $event || window.event;  
-		      console.log(666)
-			 	if(event.keyCode==13){ 
-			     this.goRegisterDoneTeam()
-		         event.returnValue = false;    
-		         event.cancelBubble=true;
-		         event.preventDefault();
-		         //event.stopProgagation();
-		         return false;
-		      } 
+	    keyRegisterDoneTeam($event){//enter键登录事件
+	      var event = $event || window.event;  
+		 	if(event.keyCode==13){ 
+		     this.goRegisterDoneTeam()
+	         event.returnValue = false;    
+	         event.cancelBubble=true;
+	         event.preventDefault();
+	         //event.stopProgagation();
+	         return false;
+	      } 
 		
 			},
-		    goRegisterDoneTeam(){
-		    	var that = this;
+	    goRegisterDoneTeam(){
+	    	/*,url:"10.1.31.27:8080/yhzx/comfirmActivate/"*/
+	    	console.log(555)
+	    	var that = this;
 				var url = MyAjax.urlsy+"/teamOrgaInfo/register";
 				if(that.teamRegInput.name.trim().length!=0&&that.teamRegInput.email.trim().length!=0&&that.teamRegInput.passWord.trim().length!=0&&that.teamRegInput.passWordCfm.trim().length!=0){
 					var data = {name:that.teamRegInput.name,email:that.teamRegInput.email,pwd:that.teamRegInput.passWord,confirmPwd:that.teamRegInput.passWordCfm};
@@ -240,21 +244,47 @@
 						console.log(data.token)
 						cookieTool.setCookie("token",data.token)
 						if(data.code==0){
-							router.push("/indexcontent");
-							sessionStorage.setItem("state","team");
+							//传递url用于发送邮件
+							sessionStorage.setItem("accountID",data.accountID);
+							var url2 = MyAjax.urlsy + "/teamOrgaInfo/sendMail"
+							var data2 = {
+								url:"10.1.31.27:8080/yhzx/comfirmActivate/"+data.accountID,
+								email:that.teamRegInput.email
+							}
+							console.log(data2)
+							MyAjax.ajax({
+								type: "POST",
+								url:url2,
+								data: data2,
+								dataType: "json",
+//								contentType:"application/json;charset=utf-8",
+							}, function(data_url){
+								console.log(data_url)
+								if(data.msg == "success" && data.code == 0){
+									router.push({name:"RegisterDone",query:{id:"team"}});
+									sessionStorage.setItem("state","team");
+									sessionStorage.setItem("email",that.teamRegInput.email);
+								}
+							},function(err_url){
+								console.log(err)
+							})
+							
+							if(data.ifActivated == 0){
+								sessionStorage.setItem("ifActivated",false);
+							}else{
+								sessionStorage.setItem("ifActivated",true);
+							}
+							
 						}else if(data.code==-1){
 							switch (data.msg){
 								case "该团队名称已被注册":
-									console.log(222)
 									that.teamRegInput.showAlert = true;
 									that.teamRegInput.alertText = "该团队名称已被注册";
 									break;
 								case "该邮箱已被注册":
+								console.log(222)
 									that.teamRegInput.showAlert = true;
 									that.teamRegInput.alertText = "该邮箱已被注册";
-									that.teamRegInput.picConfirm = "";
-		    						$(".pic").focus();
-		    						that.changePic();
 									break;
 								case "密码不一致":
 									that.teamRegInput.showAlert = true;
@@ -456,10 +486,10 @@
 		    	}
 		    },
 		    closeTip(){  /*关闭提示框*/
-                this.comRegInput.showAlert = false;
-                this.teamRegInput.showAlert = false;
-                this.personalRegInput.showAlert = false;
-            }
+            this.comRegInput.showAlert = false;
+            this.teamRegInput.showAlert = false;
+            this.personalRegInput.showAlert = false;
+        }
 		},
 		updated(){
 			var id = this.$route.params.id
@@ -516,6 +546,7 @@
 			}
 			.notice{
 				.agreeBtn{
+					cursor: pointer;
 					&.selected{
 						background: url(../../../assets/img/register/icon_blue_ok.png) no-repeat left center
 					}
@@ -557,6 +588,7 @@
 			}
 			.notice{
 				.agreeBtn{
+					cursor: pointer;
 					&.selected{
 						background: url(../../../assets/img/register/icon_green_ok.png) no-repeat left center
 					}
@@ -656,6 +688,7 @@
 			}
 			.notice{
 				.agreeBtn{
+					cursor: pointer;
 					&.selected{
 						background: url(../../../assets/img/register/icon_orange_ok.png) no-repeat left center
 					}
@@ -694,6 +727,7 @@
 				height: 17px;
 				margin-right: 14px;
 				background: url(../../../assets/img/register/agree_no.png) no-repeat left center;
+				cursor: pointer;
 			}
 		}
 		

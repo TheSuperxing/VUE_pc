@@ -1,18 +1,18 @@
 <template>
-  <div class="companyLogin">
+  <div class="companyLogin"  @keydown="keyLogin($event)">
     <ul class="loginInput">
       <li>
         <input v-model="reveal.email" type="text" placeholder="请输入您的邮箱">
       </li>
       <li>
-        <input v-model="reveal.pwd" type="text" placeholder="请输入您的密码">
+        <input v-model="reveal.pwd" type="password" placeholder="请输入您的密码">
       </li>
     </ul>
 		<alertTip v-if="showAlert" :showHide="showAlert" :alertText="alertText"></alertTip>
     
     <ul class="loginSubmit">
       <li>
-        <button @click="teamLogin" @keydown="keyLogin($event)"><router-link to="">登录</router-link></button>
+        <button @click="teamLogin"><router-link to="">登录</router-link></button>
       </li>
       <li>
         <p>忘记密码？</p>
@@ -53,39 +53,45 @@
     },
     methods:{
       teamLogin(){
-//    	var that = this;
-//				var url = MyAjax.urlsy+"/teamOrgaInfo/login";
-//				if(that.reveal.email.trim().length!=0&&that.reveal.pwd.trim().length!=0){
-//					var data = that.reveal;
-//					MyAjax.ajax({
-//						type: "POST",
-//						url:url,
-//						data: JSON.stringify(data),
-//						dataType: "json",
-//						contentType:"application/json;charset=utf-8",
-//					}, function(data){
-//						console.log(data)
-//						console.log(data.token)
-//						cookieTool.setCookie("token",data.token)
-//						if(data.code==0){
-//							router.push("/indexcontent");
-//							sessionStorage.setItem("state","team");
-//						}else if(data.code==-1){
-//							switch (data.msg){
-//								case "登录错误":
-//									that.showAlert = true;
-//									that.alertText = "登录错误";
-//									break;
-//								default:
-//									break;
-//							}
-//						}
-//					},function(err){
-//						console.log(err)
-//					})
-//				}
-				router.push("/indexcontent");
-				sessionStorage.setItem("state","team");
+      	var that = this;
+				var url = MyAjax.urlsy+"/teamOrgaInfo/login";
+				if(that.reveal.email.trim().length!=0&&that.reveal.pwd.trim().length!=0){
+					var data = that.reveal;
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(data),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+					}, function(data){
+						console.log(data)
+						console.log(data.token)
+						cookieTool.setCookie("token",data.token)
+						if(data.code==0){
+							router.push("/indexcontent");
+							sessionStorage.setItem("state","team");
+							sessionStorage.setItem("email",that.reveal.email);
+							if(data.ifActivated == 0){
+								sessionStorage.setItem("ifActivated",false);
+							}else{
+								sessionStorage.setItem("ifActivated",true);
+							}
+						}else if(data.code==-1){
+							switch (data.msg){
+								case "登录错误":
+									that.showAlert = true;
+									that.alertText = "登录错误";
+									break;
+								default:
+									break;
+							}
+						}
+					},function(err){
+						console.log(err)
+					})
+				}
+//				router.push("/indexcontent");
+//				sessionStorage.setItem("state","team");
       },
       keyLogin($event){//enter键登录事件
 	      var event = $event || window.event;  

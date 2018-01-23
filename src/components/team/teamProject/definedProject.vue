@@ -8,7 +8,7 @@
 		<ul class="modify-table-wrap">
 			<li class="name-wrap">
 				<span class="table-wrap-left">* 项目名称</span>
-				<input type="text" placeholder="请输入项目名称" v-model="projectInfo.proName"/>
+				<input type="text" placeholder="请输入项目名称" v-model="projectInfo.projectName"/>
 				<alertTip v-if="showAlert.name" :showHide="showAlert.name" @closeTip="closeTip" :alertText="alertText.name"></alertTip>
 			</li>
 			<li class="place-wrap">
@@ -25,10 +25,12 @@
 			</li>
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 建成时间</span>
-				<datepicker class="datePicker" v-model="projectInfo.compalteTime_S"></datepicker>
-				<span class="heng"></span>
-				<datepicker class="datePicker" v-model="projectInfo.compalteTime_E"></datepicker>
-				<alertTip v-if="showAlert.compalteTime" :showHide="showAlert.compalteTime" @closeTip="closeTip" :alertText="alertText.compalteTime"></alertTip>
+				<year-month v-model="projectInfo.completeTime"></year-month> 
+				<alertTip v-if="showAlert.completeTime" :showHide="showAlert.completeTime" @closeTip="closeTip" :alertText="alertText.completeTime"></alertTip>
+				<div class="timeGray" v-if="complated">
+					<span class="table-wrap-left">* 建成时间</span>
+					<span class="picker"></span>
+				</div>
 			</li>
 			<li class="func-wrap">
 				<span class="table-wrap-left">建筑功能</span>
@@ -43,14 +45,15 @@
 			</li>
 			<li class="describe-wrap">
 				<span class="table-wrap-left">项目描述</span>
-				<textarea placeholder="请输入项目详细描述文案..." v-model="projectInfo.proDesc" maxlength="500"></textarea>
+				<textarea placeholder="请输入项目详细描述文案..." v-model="projectInfo.projectDescription" maxlength="500"></textarea>
 				<p class="limit-words">{{procont}}/500</p>
 			</li>
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 参与时间</span>
-				<datepicker class="datePicker" v-model="projectInfo.parTakeTime_S"></datepicker>
+				<year-month v-model="projectInfo.partakeTimeUp"></year-month> 
 				<span class="heng"></span>
-				<datepicker class="datePicker" v-model="projectInfo.parTakeTime_E"></datepicker>
+				<!-- <datepicker class="datePicker" v-model="projectInfo.partakeTimeDown"></datepicker> -->
+				<year-month v-model="projectInfo.partakeTimeDown" :min="projectInfo.partakeTimeUp" :today="true"></year-month>
 				<alertTip v-if="showAlert.parTakeTime" :showHide="showAlert.parTakeTime" @closeTip="closeTip" :alertText="alertText.parTakeTime"></alertTip>
 			</li>
 			<li class="duty-wrap">
@@ -154,26 +157,29 @@
 	import Vue from "vue"
 	import {mapState} from "vuex"
 	import ProvincesCity from "../units/province-city-county.vue"
-	import Datepicker from "../units/Datepicker.vue"
 	import alertTip from "../units/alertTip.vue"
 	import router from "../../../router"
 	import qq from "fine-uploader"
+	import Datepicker from "../units/Datepicker.vue"
+	import YearMonth from "../units/yearMonth.vue"
+    import MyAjax from "../../../assets/js/MyAjax.js"
+	import {singleManualUploader} from "../../../assets/js/manualUploader.js"
 	
 	export default {
 	    name:"editProject",
 	    components:{
 	      ProvincesCity,
 	      Datepicker,
-	      alertTip
-	      
+		  alertTip,
+		  YearMonth
 	    },
 	    data:function(){
 	      return {
 	        title:"编辑公司参加项目信息",
 	        state:"",
 	        editSeniorShow:false,
-	        showAlert:{name:false,compalteTime:false,parTakeTime:false,takeOffice:false},//提示框显隐
-	        alertText:{name:null,compalteTime:null,parTakeTime:null,takeOffice:null},
+	        showAlert:{name:false,completeTime:false,parTakeTime:false,takeOffice:false},//提示框显隐
+	        alertText:{name:null,completeTime:null,parTakeTime:null,takeOffice:null},
 	        dutycont:'0',
 	        detailcont:'0',
 	        procont:'0',
@@ -181,95 +187,222 @@
         	addProjectType:{value:"",type:false},//建筑功能的扩展
             projectStateColor:[],//项目状态的选中(单选)
             projectTypeColor:[],//建筑功能的选中(单选)
+            complated:false,//项目状态在建或者是建成的标志，控制建成时间的可操作性
+	        exceedProjectType:false,
+	        
 	        projectInfo:{//新增的项目信息采集
-	        	id:"",
-	        	proName:"",//同步到项目主页的信息 (必填*)
-				proPlace:"",
-				projectAds:{province:"上海市",city:"上海市",county:"杨浦区"},//项目地址
-				proState:"",//项目状态projectState
-				compalteTime_S:"",//同步到项目主页的信息 (必填*)
-				compalteTime_E:"",//同步到项目主页的信息 (必填*)
-				proFunc:[],//建筑功能种类projectType
-				proDesc:"",////项目详细描述文案
-				proPics:"",
-				parTakeTime_S:"",// (必填*)
-				parTakeTime_E:"",// (必填*)
+	        	projectName:"",//同步到项目主页的信息 (必填*)
+				projectPlaceObj:{
+					city:"北京市",
+					county:"东城区",
+					province:"北京市",
+					street:"",
+				},//项目地址
+				projectState:"",//项目状态projectState
+				completeTime:"",//同步到项目主页的信息 (必填*)
+				architectFunctions:[],//建筑功能种类projectType
+				projectDescription:"",////项目详细描述文案
+				partakeTimeUp:"",// (必填*)
+				partakeTimeDown:"",// (必填*)
 				takeOffice:"",//公司职责(必填*)
 				detailDes:"",//职责详细描述
-				picsDisplay:"",
-	        }
+				"ifVisable": 1,
+				picId:[],//上传图片返回的ID
+	        },
+	        picList:[],
+	        picNum:"",
 	      }
 	    },
-	    computed:mapState({
-		  teamProInfo:state=>state.team.teamMessage.teamProInfo/*获取vuex数据*/
-		}),
-	    mounted(){
-	    	$(document.body).css("overflow","scroll");
+	    created(){
+	    	var that = this;
+			that.projectID = that.$route.query.proId;
+			that.psnProExpeID = that.$route.query.psnId;
+			
+			if(that.psnProExpeID == undefined){
+				that.psnProExpeID = '""';
+			}
+			if(that.projectID == undefined){
+				that.projectID = '""';
+			}
+			var url = MyAjax.urlsy+"/teamOrgaInfo/selectProjAndExpe/" + that.projID +"/" + that.expeID//暂时先写成这样
+	    	MyAjax.ajax({
+				type: "GET",
+				url:url,
+				dataType: "json",
+				async:false,
+			},function(data){
+				if(data.code==-1){
+					Vue.set(that,"projectInfo",that.projectInfo)
+				}else if(data.code==0){
+					console.log(data.msg)
+					Vue.set(that,"projectInfo",data.msg)
+					that.projectInfo.picId=[];
+				}
+				
+				console.log(that.projectInfo)
+			},function(err){
+				console.log(err)
+			})
+	    	if(that.projectInfo.partakeTimeDown=="0002.12"){
+			 	that.projectInfo.partakeTimeDown = "至今";
+			}
 	    	for(var i=0;i<this.addNewProject.projectState.length;i++){
 	    		this.projectStateColor.push(false)
 	    	};
 	    	for(var i=0;i<this.addNewProject.projectType.length;i++){
 	    		this.projectTypeColor.push(false)
 	    	}
+	    	switch (that.projectInfo.projectState){
+	    		case "建成":
+	    			Vue.set(that.projectStateColor,[0],true)
+	    			break;
+	    		case "在建":
+	    			Vue.set(that.projectStateColor,[1],true)
+	    			break;
+	    		case "未建":
+	    			Vue.set(that.projectStateColor,[2],true)
+	    			break;
+	    		default:
+	    			break;
+	    	}
+	    	if(that.addNewProject.projectType.length<that.projectInfo.architectFunctions.length){
+	    		Vue.set(that,"exceedProjectType",true)//项目建筑功能类型超过原有平台展示的
+	    	}else{
+	    		Vue.set(that,"exceedProjectType",false)
+	    	}
+			var flag=[];
+	    	for(let i=0;i<that.projectInfo.architectFunctions.length;i++){
+	    		flag[i]=false;
+	    		for(let j=0;j<that.addNewProject.projectType.length;j++){
+					if(that.projectInfo.architectFunctions[i]==that.addNewProject.projectType[j]){
+						flag[i]=true;
+						console.log(flag[i]+"________");
+						
+					}
+	    			
+	    		}
+	    		if(!flag[i]){
+	    			that.addNewProject.projectType.push(that.projectInfo.architectFunctions[i])//添加到建筑功能列表里
+	    			that.projectTypeColor.push(true);//使得新添加的建筑功能被选中
+	    		}
+	    		switch (that.projectInfo.architectFunctions[i]){
+		    		case "绿地":
+		    			Vue.set(that.projectTypeColor,[0],true)
+		    			break;
+		    		case "公园":
+		    			Vue.set(that.projectTypeColor,[1],true)
+		    			break;
+		    		case "住宅":
+		    			Vue.set(that.projectTypeColor,[2],true)
+		    			break;
+		    		case "写字楼":
+		    			Vue.set(that.projectTypeColor,[3],true)
+		    			break;
+		    		case "交通枢纽":
+		    			Vue.set(that.projectTypeColor,[4],true)
+		    			break;
+		    		case "文化场馆":
+		    			Vue.set(that.projectTypeColor,[5],true)
+		    			break;
+		    		case "体育场馆":
+		    			Vue.set(that.projectTypeColor,[6],true)
+		    			break;
+		    		case "展示中心":
+		    			Vue.set(that.projectTypeColor,[7],true)
+		    			break;
+		    		default:
+		    			break;
+		    	}
+	    		that.addNewProject.projectType.push.apply(that.addNewProject.projectType,[])//去重
+	    		
+	    	}
+	    	console.log(that.addNewProject.projectType)
 	    	
-	    	//上传图片
-			var manualUploader = new qq.FineUploader({
-	            element: document.getElementById('fine-uploader-manual-trigger'),
-	            template: 'qq-template-manual-trigger',
-	            request: {
-	                endpoint: '/server/uploads'
-	            },
-	            thumbnails: {
-//	                placeholders: {
-//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-//	                }
-	            },
-	            validation: {
-	                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-	                itemLimit: 5,
-	                sizeLimit: 1500000
-	            },
-	            autoUpload: false,
-	            debug: true,
-	            callbacks:{
-		        	onSubmit:  function(id,  fileName)  {
-		        		$('#trigger-upload').show()
-		        	},
-		        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-		                //alert('This is onComplete function.');
-										//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-		                $('#message').append(responseJSON.msg);
-	//	                $('#progress').hide();//隐藏进度动画
-		                //清除已上传队列
-		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-		                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-	//	                $('.stateOne').hide();
-	//	                $('.stateTwo').show()
-		                
-		                $('#trigger-upload').hide()
-		                console.log(maybeXhr)
-		          },
-	        	}
-	        });
-			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	            manualUploader.uploadStoredFiles();
-	        });
+	    },
+	    async mounted(){
 			
-		},
+			
+			$(document.body).css("overflow-y","scroll");
+			var that = this;
+			//上传图片
+			const data = await that.getPic(that.psnProExpeID)
+			if(data.code===0){
+				Vue.set(that,"picList",data.msg)
+			    Vue.set(that,"picNum",data.msg.length)
+			}
+//			console.log(that.picList)
+//			console.log(that.picNum)
+//			console.log(Math.floor(8-that.picNum))
+			if(Math.floor(8-that.picNum)>0){
+				singleManualUploader({
+					element:"fine-uploader-manual-trigger",
+	        		template: "qq-template-manual-trigger",
+					url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+					picIdCont:that.projectInfo.picId,
+					btnPrimary:".btn-primary",
+					canUploadNum:Math.floor(8-that.picNum),
+				})
+			}
+	    },
 		methods: {
+			getPic(psnProExpeID){
+				var that=this;
+				var url=MyAjax.urlsy+"/psnProjExpe/findById/"+psnProExpeID;
+				return new Promise((resolve, reject) => {
+					MyAjax.ajax({
+				        type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				    	resolve(data)
+				    },(err) => {
+				        reject(err);
+					});
+				})
+			},
+			async deletePic(index,$index){
+				var that =this;
+				var url = MyAjax.urlsy+"/psnProjExpe/delPic/"+this.picList[$index].id
+				MyAjax.ajax({
+					type: "POST",
+					url:url,
+					dataType: "json",
+					async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+				})
+				const data = await that.getPic(that.psnProExpeID) 
+				if(data.code===0){
+					Vue.set(that,"picList",data.msg)
+				    Vue.set(that,"picNum",data.msg.length)
+				}
+				$("#fine-uploader-manual-trigger").html("")
+				if(Math.floor(8-that.picNum)>0){
+					singleManualUploader({
+						element:"fine-uploader-manual-trigger",
+		        		template: "qq-template-manual-trigger",
+						url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+						picIdCont:that.projectInfo.picId,
+						btnPrimary:".btn-primary",
+						canUploadNum:Math.floor(8-that.picNum),
+					})
+				}
+			},
 		    changeProjectAds(val){//通过事件同步子组件信息
-		        this.projectInfo.projectAds=val;
-		     },
+		        this.projectInfo.projectPlaceObj=val;
+		        //console.log(this.projectInfo.projectPlaceObj)
+		    },
 		     changeProjectStateColor(index){//添加模式下，标记项目状态选中
 			    for(var i=0 ; i<this.addNewProject.projectState.length ; i++){
 			      if(i==index){
 			        Vue.set(this.projectStateColor,[index],true);
-			        this.projectInfo.proState=this.addNewProject.projectState[index];//更改项目状态名
-			     	
+			        this.projectInfo.projectState=this.addNewProject.projectState[index];//更改项目状态名
 			      }else{
 			        Vue.set(this.projectStateColor,[i],false);
+			        
 			      }
 			    }
 			  },
@@ -313,23 +446,26 @@
 		
 		      },
 			addProject(){
+				qq(document.getElementById("trigger-upload")).attach("click", function() {
+		            manualUploader.uploadStoredFiles();
+		        });
 				//判断几个必填项是否为空
 				
-				if(this.projectInfo.proName.trim().length==0){
+				if(this.projectInfo.projectName.trim().length==0){
 					this.showAlert.name = true;
 					this.alertText.name = "项目名称为必填项"
 				}else{
 					this.showAlert.name = false;
 				};//判断项目名称不能为空
 				
-				if(this.projectInfo.compalteTime_S.trim().length==0||this.projectInfo.compalteTime_E.trim().length==0){
-					this.showAlert.compalteTime = true;
-					this.alertText.compalteTime = "项目建成时间为必填项"
+				if(this.projectInfo.completeTime.trim().length==0&&this.complated==false){
+					this.showAlert.completeTime = true;
+					this.alertText.completeTime = "项目建成时间为必填项"
 				}else{
-					this.showAlert.compalteTime = false;
+					this.showAlert.completeTime = false;
 				};//判断建成时间不能为空
 				
-				if(this.projectInfo.parTakeTime_S.trim().length==0||this.projectInfo.parTakeTime_E.trim().length==0){
+				if(this.projectInfo.partakeTimeUp.trim().length==0||this.projectInfo.partakeTimeDown.trim().length==0){
 					this.showAlert.parTakeTime = true;
 					this.alertText.parTakeTime = "项目参与时间为必填项"
 				}else{
@@ -342,13 +478,63 @@
 				}else{
 					this.showAlert.takeOffice = false;
 				};//判断项目职责不能为空
-				
-				if(this.projectInfo.proName.trim().length!=0&&this.projectInfo.compalteTime_S.trim().length!=0&&this.projectInfo.parTakeTime_S.trim().length!=0
-				&&this.projectInfo.parTakeTime_E.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0){
-					this.teamProInfo.push(this.projectInfo)
-					console.log(this.companyProInfo)
-					router.push("/yhzx/team/info/teamProject/teamProjectIndex")
+				if(this.complated==false){//判断是否为在建，在建的话建成时间为必填
+					console.log(this.complated)
+					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.completeTime.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
+					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0&&this.projectInfo.projectPlaceObj.street.trim().length!=0){
+						var that = this;
+						if(that.projectInfo.partakeTimeDown=="至今"){
+							that.projectInfo.partakeTimeDown = "0000.00";
+						}
+					    console.log(JSON.stringify(that.projectInfo))
+					    var url = MyAjax.urlsy+"/teamOrgaInfo/insertOrUpdateProjExpe";
+					    $.ajaxSetup({ contentType : 'application/json' });
+					    MyAjax.ajax({
+							type: "POST",
+							url:url,
+							data:JSON.stringify(that.projectInfo),
+							dataType: "json",
+							async:false,
+						},function(data){
+							console.log(data)
+							if(data.code == 0){
+								router.push("/yhzx/team/info/teamProject/teamProjectIndex")
+							}
+							
+						},function(err){
+							console.log(err)
+						})
+					}
+				}else{
+					if(this.projectInfo.projectName.trim().length!=0&&this.projectInfo.partakeTimeUp.trim().length!=0
+					&&this.projectInfo.partakeTimeDown.trim().length!=0&&this.projectInfo.takeOffice.trim().length!=0&&this.projectInfo.projectPlaceObj.street.trim().length!=0){
+						var that = this;
+						if(that.projectInfo.partakeTimeDown=="至今"){
+							that.projectInfo.partakeTimeDown = "0000.00";
+						}
+					    console.log(JSON.stringify(that.projectInfo))
+					    var url = MyAjax.urlsy+"/teamOrgaInfo/insertOrUpdateProjExpe";
+					    $.ajaxSetup({ contentType : 'application/json' });
+					    MyAjax.ajax({
+							type: "POST",
+							url:url,
+							data:JSON.stringify(that.projectInfo),
+							dataType: "json",
+							async:false,
+						},function(data){
+							console.log(data)
+							if(data.code == 0){
+								router.push("/yhzx/team/info/teamProject/teamProjectIndex")
+							}
+							
+						},function(err){
+							console.log(err)
+						})
+						
+					}
 				}
+				console.log(this.projectInfo.picId)
+				
 				
 			},
 			closeTip(){  /*关闭提示框*/

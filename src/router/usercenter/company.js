@@ -50,7 +50,7 @@ import companyTeamIndex from "../../components/company/companyTeam/companyTeamIn
 //var companyRouterComponent=Company;
 var companyRouterChildren=[
 		{
-			path:"/yhzx/company",component:company_content,redirect:"/yhzx/company/overview",
+			path:"/yhzx/company",component:company_content,
 			children:[
 				{path:"/yhzx/company/overview", component:overview,},
 				{

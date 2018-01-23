@@ -12,7 +12,7 @@
 				<p>如您修改其中内容，已添加过的该项目信息也会随之变化</p>
 				<div class="btnBox">
 					<span class="cancelBtn" @click="closeModalA">取消</span>
-					<span class="confirmBtn" @click="closeModalA()">确认</span>
+					<span class="confirmBtn" @click="goToDefined">确认</span>
 				</div>
 			</div>
 		</div>
@@ -222,13 +222,14 @@
 			if(that.projectID == undefined){
 				that.projectID = '""';
 			}
-			var url = MyAjax.urlsy+"/psnProjExpe/selectProjAndExpe/" + that.projectID +"/" + that.psnProExpeID//暂时先写成这样
+			var url = MyAjax.urlsy+"/psnProjExpe/selectProjAndExpe/" + that.projectID + "/" + that.psnProExpeID//暂时先写成这样
 	    	MyAjax.ajax({
 				type: "GET",
 				url:url,
 				dataType: "json",
 				async:false,
 			},function(data){
+				console.log(data)
 				data = data.msg;
 				Vue.set(that,"project",data)
 				that.project.picId=[];
@@ -362,6 +363,8 @@
 			closeModalA(id){
 				var modal = $('.modal-a')
 				Modal.closeModal(modal)
+			},
+			goToDefined(){
 				router.push({name:"definedProject",query:{proId:this.projectID,psnId:this.psnProExpeID}})
 			},
 			dutyWrap(){

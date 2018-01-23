@@ -80,6 +80,7 @@
 		    }
 		},
 		created(){
+			console.log(this.$route.query.kw)
 			this.searchText = this.$route.query.kw;
 			this.jumpPage(this.current_page);
 //			this.searchAll(this.current_page)
@@ -157,7 +158,8 @@
 				this.current_page = 1;
 			},
     		jumpPage(current_page){
-    			location.hash = location.hash.split("=")[0]+"="+ this.searchText;
+    			console.log(location.href.split("#"))
+//  			location.href = location.href.split("#")[0] + this.searchText;
     			var that = this;
     			if(that.searchText.trim().length!=0){
     				that.haveCollect=[];

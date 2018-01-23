@@ -41,30 +41,30 @@
         <div class="wrap-left">
         	<img src="../assets/img/header/001.png" />
         </div>
-        <ul class="navlist" v-bind:class="{'personStyle':user.userState==0}">
+        <ul class="navlist" v-bind:class="{'personStyle':user.userState=='per'}">
           <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[0]">{{item.text}}</router-link></li>
         	<li class="primary" >
         		<div @click="toUserCenter" class=""><router-link to="/yhzx">用户中心</router-link></div>
-        		<ul class="userNav" v-if="user.userState=='per'">
+        		<ul class="userNav" v-if="user.userState=='per'&&haveLogin">
 		        	<li><router-link to="/yhzx/personal/info">我的资料</router-link></li>
 		        	<li><router-link to="/yhzx/demand">我的需求</router-link></li>
 		        	<li><router-link to="/yhzx/deal">我的协议</router-link></li>
 		        </ul>
-		        <ul class="userNav" v-if="user.userState=='com'">
+		        <ul class="userNav" v-if="user.userState=='com'&&haveLogin">
 		        	<li><router-link to="/yhzx/company/info">我的资料</router-link></li>
 		        	<li><router-link to="/yhzx/demand">我的需求</router-link></li>
 		        	<li><router-link to="/yhzx/deal">我的协议</router-link></li>
 		        </ul>
-		        <ul class="userNav" v-if="user.userState=='team'">
+		        <ul class="userNav" v-if="user.userState=='team'&&haveLogin">
 		        	<li><router-link to="/yhzx/team/info">我的资料</router-link></li>
 		        	<li><router-link to="/yhzx/demand">我的需求</router-link></li>
 		        	<li><router-link to="/yhzx/deal">我的协议</router-link></li>
 		        </ul>
-		        <ul class="userNav" v-if="user.userState==''||user.userState==null">
-		        	<li><router-link to="/login">我的资料</router-link></li>
-		        	<li><router-link to="/login">我的需求</router-link></li>
-		        	<li><router-link to="/login">我的协议</router-link></li>
-		        </ul>
+		        <!--<ul class="userNav" v-if="!ifActivated">
+		        	<li><router-link to="/yhzx/activate">我的资料</router-link></li>
+		        	<li><router-link to="/yhzx/activate">我的需求</router-link></li>
+		        	<li><router-link to="/yhzx/activate">我的协议</router-link></li>
+		        </ul>-->
         	</li>
         </ul>
         <div class="searchBox" @keydown="keySearch($event)">
@@ -116,7 +116,7 @@
           active: false
         }, {
           text: "交易大厅",
-          rout: [{path:"/trading",query:{kw:""}},{path:"/trading",},{path:"/trading",}],
+          rout: [{name:"Trading",query:{kw:""}},{name:"Trading",},{name:"Trading",}],
           active: false
         },],
         
@@ -128,8 +128,8 @@
 
         /*导航颜色切换原始状态*/
        	state:"",
-				haveLogin:true,
-				
+		haveLogin:true,
+		ifActivated:false,	/*有没有激活*/	
       }
     },
     computed:mapState({
@@ -140,15 +140,21 @@
 		created(){
 			this.getNewNote();
 		},
-	  mounted(){
+	    mounted(){
 				//判断有没有登录
-				console.log(cookieTool.getCookie("token"))
-				if(cookieTool.getCookie("token")==null){
+				console.log(cookieTool.getCookie("token")==null)
+				if(cookieTool.getCookie("token")==null||cookieTool.getCookie("token")=='undefined'){
 					this.haveLogin = false;
 				}else{
 					this.haveLogin = true;
 				}
+				if(sessionStorage.getItem("ifActivated") == "false"){
+					this.ifActivated = false;
+				}else{
+					this.ifActivated = true;
+				}
 				
+				console.log(this.haveLogin)
 				this.user.userState = sessionStorage.getItem("state");
 				console.log(this.user.userState)
 				//首页请求信息
@@ -161,7 +167,7 @@
 					async:false,
 					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取					
 				},function(data){
-          data = data.msg;
+         		 data = data.msg;
 					// if(data == "100004"){
 					// 	cookieTool.delCookie("token")
 					// 	router.push("/login")
@@ -214,8 +220,8 @@
 	     },
 
 	     toUserCenter(){
-	     	
-				switch (this.user.userState){
+	     	if(this.ifActivated == true){
+	     		switch (this.user.userState){
 					case 'com':
 						router.push("/yhzx/company/info")
 						break;
@@ -228,6 +234,10 @@
 					default:
 						break;
 				}
+	     	}else{
+	     		router.push("/yhzx/activate")
+	     	}
+				
 				event.stopPropagation();
 			},
 			loginOut(){

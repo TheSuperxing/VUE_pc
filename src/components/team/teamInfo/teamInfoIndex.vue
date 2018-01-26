@@ -19,13 +19,12 @@
       </li>-->
       <li class="clear">
         <h4>团队简介</h4>
-        <p v-html="basicInfo.teamProfile" v-if="stateOne.haveteamDesc"></p>
+        <p v-if="stateOne.haveteamDesc">{{basicInfo.teamProfile}}</p>
         <p v-if="!stateOne.haveteamDesc">暂无信息</p>
       </li>
       <li  class="clear">
         <h4>团队电话</h4>
-        
-        <p v-html="basicInfo.contactInfo" v-if="stateOne.haveteamPhone"></p>
+        <p v-if="stateOne.haveteamPhone">{{basicInfo.contactInfo}}</p>
         <p v-if="!stateOne.haveteamPhone">暂无信息</p>
       </li>
     </ul>
@@ -48,8 +47,8 @@
 			    teamPhone:"",
         },
         stateOne:{
-        	haveteamDesc:true,
-        	haveteamPhone:true
+        	haveteamDesc:false,
+        	haveteamPhone:false
         },
         basicInfo:{}
         
@@ -63,12 +62,7 @@
     	
 
 
-    	if(this.basicInfo.teamProfile.replace(/\s/g,"").length===0){/*两端空格*/
-    		this.stateOne.haveteamDesc = false;
-    	}
-    	if(this.basicInfo.contactInfo.length===0){
-    		this.stateOne.contactInfo = false;
-    	}
+    	
 //    console.log(this.stateOne)
     },
     methods:{
@@ -84,6 +78,12 @@
         	console.log(data)
           if(data.code==0){
             that.basicInfo=data.msg;
+            if(that.basicInfo.teamProfile!=""&&that.basicInfo.teamProfile != null){/*两端空格*/
+			    		that.stateOne.haveteamDesc = true;
+			    	}
+			    	if(that.basicInfo.contactInfo!=""){
+			    		that.stateOne.haveteamPhone = true;
+			    	}
             //Vue.set(that,"psnMsg",data.msg);
           }else{
             // if(data.msg=="100004"){//没有token

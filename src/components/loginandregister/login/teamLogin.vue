@@ -1,5 +1,5 @@
 <template>
-  <div class="companyLogin"  @keydown="keyLogin($event)">
+  <div class="teamLogin"  @keydown="keyLogin($event)">
     <ul class="loginInput">
       <li>
         <input v-model="reveal.email" type="text" placeholder="请输入您的邮箱">
@@ -15,7 +15,7 @@
         <button @click="teamLogin"><router-link to="">登录</router-link></button>
       </li>
       <li>
-        <p>忘记密码？</p>
+        <p><router-link :to='{name:"ForgotPwd",params:{id:"team"}}'> 忘记密码？</router-link></p>
         <!-- <p><router-link to="/register">立即注册>></router-link></p> -->
       </li>
     </ul>
@@ -30,10 +30,11 @@
   import {cookieTool} from "../../../assets/js/cookieTool.js"
 	
   export default {
-    name:"companyLogin",
+    name:"teamLogin",
     data(){
       return{
         reveal:{
+        	
           email:"",//用户名
           pwd:""//密码
         },
@@ -104,7 +105,7 @@
 	         return false;
 	      } 
 
-		 },
+		  },
     },
     destroyed(){
 			sessionStorage.setItem("state","team")
@@ -162,6 +163,9 @@
       p{
         color: $teamThemeColor;
         cursor: pointer;
+        a{
+        	color:  $teamThemeColor;
+        }
       }
       p:nth-child(1){
         float: left;

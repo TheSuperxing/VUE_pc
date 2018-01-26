@@ -22,6 +22,8 @@ import Register from "../components/loginandregister/register/Register.vue"
 import Login from "../components/loginandregister/login/loginIndex.vue"
 import Regkind from "../components/loginandregister/register/regkind.vue"
 import RegisterDone from "../components/loginandregister/register/registerDone.vue"
+import ForgotPwd from "../components/loginandregister/login/forgotPwd.vue"
+
 /*用户部分路由开始*/
 
 /*|获取公司部分路由|*/
@@ -72,6 +74,8 @@ export default new Router({
     },
     {
     	path:"/registerDone/:id",name:"RegisterDone",component:RegisterDone
+    },{
+    	path:"/forgotPwd/:id",name:"ForgotPwd",component:ForgotPwd
     },{
     	path:"/indexcontent",name:"IndexContent",component:IndexContent,redirect:'/indexcontent/index',
     	children:[

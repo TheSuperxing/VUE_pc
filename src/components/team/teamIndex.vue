@@ -99,7 +99,7 @@
 			  	</h5>
 			  	<p class="pr-wrap-b">{{item.detailDes}}</p>
 			  	
-			  	<router-link :to="{name:'ProjectDetail',query:{id:item.pkid}}">
+			  	<router-link :to="{name:'ProjectDetail',query:{id:item.projectID}}">
 			  		<span class="more">查看详情>></span>
 			  	</router-link>
       </div>
@@ -128,12 +128,12 @@
        		staff:[]
        	},
        	stateOne:{ /**/
-       		haveTeamDesc:true,/*有无团队介绍*/
-       		haveTeamMail:true,/*团队联系方式*/
-       		haveCompany:true,/*有无所属公司*/
-       		haveSenior:true,/*有无管理人员*/
-       		haveBackbone:true,/*有无骨干*/
-       		haveProject:true,/*有无项目展示*/
+       		haveTeamDesc:false,/*有无团队介绍*/
+       		haveTeamMail:false,/*团队联系方式*/
+       		haveCompany:false,/*有无所属公司*/
+       		haveSenior:false,/*有无管理人员*/
+       		haveBackbone:false,/*有无骨干*/
+       		haveProject:false,/*有无项目展示*/
        		
        	},
        	teamInfo:{}
@@ -231,28 +231,28 @@
           if(data.code==0){
             that.teamInfo=data.msg;
             //Vue.set(that,"psnMsg",data.msg);
-            if(that.teamInfo.teamProfile==""||null){
-			    		that.stateOne.haveTeamDesc=false;
+            if(that.teamInfo.teamProfile!=(""||null)){
+			    		that.stateOne.haveTeamDesc=true;
 			//  		console.log(1)
 			    	}
-			    	if(that.teamInfo.contactInfo==""||null){
-			    		that.stateOne.haveTeamMail=false;
+			    	if(that.teamInfo.contactInfo!=(""||null)){
+			    		that.stateOne.haveTeamMail=true;
 			//  		console.log(2)
 			    	}
-			    	if(that.teamInfo.companyName==""||null){
-			    		that.stateOne.haveCompany=false;
+			    	if(that.teamInfo.companyName!=(""||null)){
+			    		that.stateOne.haveCompany=true;
 			//  		console.log(3)
 			    	}
-			    	if(that.teamInfo.topManagers.length===0){
-			    		that.stateOne.haveSenior = false;
+			    	if(that.teamInfo.topManagers.length!=0 ){
+			    		that.stateOne.haveSenior = true;
 			//  		console.log(4)
 			    	}
-			    	if(that.teamInfo.importantPsns.length===0){
-			    		that.stateOne.haveBackbone = false;
+			    	if(that.teamInfo.importantPsns.length!=0){
+			    		that.stateOne.haveBackbone = true;
 			//  		console.log(5)
 			    	}
-			    	if(that.teamInfo.teamprojexpes.length === 0){
-			    		that.stateOne.haveProject = false;
+			    	if(that.teamInfo.teamprojexpes.length != 0){
+			    		that.stateOne.haveProject = true;
 			    	}
           }else{
             // if(data.msg=="100004"){//没有token

@@ -87,8 +87,8 @@
 									<span class="wrap-left">搜索结果</span>
 									<ul class="resultList">
 										<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
-										<li v-for="(item,index) in list" >
-											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.nickName}}</router-link>
+										<li v-for="(item,index) in list">
+											<router-link :to="{name:'personaDetail',query:{id:item.accountID}}">{{item.nickName}}</router-link>
 											<span class="choseBtn" @click="choseThis($event,index)">
 											</span>
 										</li>
@@ -176,15 +176,15 @@
     <div class="orgTable"><!--所属公司部分-->
 			<p class="org-title"><img src="../../../assets/img/team/icon_company.png" />所属公司</p>
 			<ul class="companyInfo">
-				<li class="stateNone" v-if="haveCompany">(暂无所属公司)</p>
-				<li class="addMoreC" @click="overlay_com" v-if="haveCompany">添加所属公司</li>
-				<li class="companyList">
+				<li class="stateNone" v-if="!haveCompany">(暂无所属公司)</p>
+				<li class="addMoreC" @click="overlay_com" v-if="!haveCompany">添加所属公司</li>
+				<li class="companyList" v-if="haveCompany">
 					<p class="comName">
 						{{teamOrgaInfo.companyName}}
 					</p>
 					<!--<span class="deleSen" @click="removeCompany(index)" v-if="editCompanyShow"></span>-->
 				</li>
-				<li class="addMoreS" @click="overlay_com" v-if="!haveCompany">更改所属公司</li>
+				<li class="addMoreS" @click="overlay_com" v-if="haveCompany">更改所属公司</li>
 				
 	
 			</ul>
@@ -321,17 +321,21 @@
           }
         })
         /*判断有无高管团队*/
-		  	if(this.teamOrgaInfo.topManagers.length!=0){
+		  	if(this.teamOrgaInfo.topManagers==null || this.teamOrgaInfo.topManagers.length==0){
+		  		this.haveSenior = false;
+		  	}else{
 		  		this.haveSenior = true;
 		  	}
 		  	if(this.teamOrgaInfo.importantPsns.length!=0){
-		  		this.haveBackbone = true;
+		  		this.haveBackbone = true;																																	
 		  	}
 		  	if(this.teamOrgaInfo.members.length!=0){ 
 		  		this.haveStaff = true;
 		  	}
-		  	if(this.teamOrgaInfo.companyName.length!=0||this.teamOrgaInfo.companyName!=null){
-		  		this.haveBackbone = true;
+		  	if(this.teamOrgaInfo.companyName==""||this.teamOrgaInfo.companyName==null){
+		  		this.haveCompany = false;
+		  	}else{
+		  		this.haveCompany = true;
 		  	}
       },
       getList(){
@@ -1227,6 +1231,10 @@
 				.editPersonBtn{
 					display: inline-block;
 
+				}
+				.stateNone{
+					font-size: 18px;
+					color: #898989;
 				}
 				.companyList{
 					height: 35px;

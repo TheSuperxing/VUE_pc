@@ -1,24 +1,28 @@
 <template>
   <div class="provincesCity">
-    <select name="province" v-on:change="selectProvince" v-model="accptProvince.province" v-bind:value="accptProvince.province">
+    <select name="province" v-on:change="selectProvince" v-model="accptProvince.province" >
       <option v-for="item in province.provinceData" v-bind:value="item.name">{{item.name}}</option>
     </select>
 
     <p>省</p>
-    <select name="city" v-on:change="selectCity" v-model="accptProvince.city" v-bind:value="accptProvince.city">
+    <select name="city" v-on:change="selectCity" v-model="accptProvince.city">
       <option v-for="item in province.cityData" v-bind:value="item.name">{{item.name}}</option>
     </select>
     <p>市</p>
 
-    <select name="county" v-model="accptProvince.county" v-bind:value="accptProvince.county">
+    <select name="county"  v-model="accptProvince.county" >
       <option value="0" v-for="item in province.countyData" v-bind:value="item.name">{{item.name}}</option>
     </select>
     <p>区</p>
+    <p class="street"><input type="text" placeholder="请输入道路名" v-model="accptProvince.street"  @blur="streetMust"/>路</p>
+  	<alertTip v-if="showAlert.street" :showHide="showAlert.street" :alertText="alertText.street"></alertTip>
   </div>
 </template>
 <script>
   import Vue from "vue"
   import {mapState} from "vuex"
+	import alertTip from "./alertTip.vue"
+  
   var provinceArr=[
       {
         "code": "110000",
@@ -14832,20 +14836,71 @@
         reveal:{
           provices:{proviceIndex:"",cityIndex:""}//省市区三级联动，储存对应索引
         },
-        accptProvince:{//项目地址信息
-          province:provinceArr[0].name,//初始化，省份、城市、市区
-          city:provinceArr[0].children[0].name,
-          county:provinceArr[0].children[0].children[0].name,
-        }
+//      accptProvince:{//项目地址信息
+//        province:"",//初始化，省份、城市、市区
+//        city:"",
+//        county:"",
+//        street:"",
+//      },
+        showAlert:{street:false,},
+        alertText:{street:null,}
+        
       }
     },
+    components:{
+	    alertTip
+	  },
+	  
     watch:{
       /*accptProvince:function (val) {
         this.$emit("accpt-province-change",val);
       }*/
     },
+    created(){
+
+    },
+    mounted(){
+    	/*父组件有值传入的时候，需要根据省的值来初始化市、区的值，不然v-model绑定不了值*/
+			for(var i=0;i<this.province.provinceData.length;i++){//选择省份时通过遍历比较，得到省份对应索引
+	      if(this.province.provinceData[i].name==this.accptProvince.province){
+	        Vue.set(this.reveal.provices,"proviceIndex",i)
+	        Vue.set(this.province,"cityData",this.province.provinceData[i].children);//把所选省份对应的市的信息放到cityData中
+	        Vue.set(this.province,"countyData",this.province.provinceData[i].children[0].children);//把所选省份对应的区的信息放到cityData中
+					Vue.set(this.accptProvince,"county",provinceArr[i].children[0].children[0].name);	
+	        Vue.set(this.accptProvince,"city",provinceArr[i].children[0].name);
+					/*选择省、市、之后设置自动选择区的option*/
+	        var btsc=this.accptProvince.province=="北京市"||this.accptProvince.province=="天津市"||this.accptProvince.province=="上海市"||this.accptProvince.province=="重庆市"||this.accptProvince.province=="台湾省"||this.accptProvince.province=="香港特别行政区"||this.accptProvince.province=="澳门特别行政区";
+	        if(btsc){//初始化显示数据的时候如果btsc时从0初始化，否则从1初始化
+	          Vue.set(this.accptProvince,"county",provinceArr[i].children[0].children[0].name);
+	        }else {
+	          Vue.set(this.accptProvince,"county",provinceArr[i].children[0].children[1].name);
+	        }
+	      }
+	    }	
+    },
+    props:{
+    	accptProvince:{
+    		province:{
+    			type:String,
+    			default:provinceArr[0].name,
+    		},
+    		city:{
+    			type:String,
+    			default:provinceArr[0].children[0].name,
+    		},
+    		county:{
+    			type:String,
+    			default:provinceArr[0].children[0].children[0].name,
+    		},
+    		street:{
+    			type:String,
+    			default:"",
+    		},
+    	}
+    },
     updated(){
       this.$emit("accpt-province-change",this.accptProvince);
+      console.log(this.accptProvince)
     },
     methods:{
       selectProvince(){//添加模式下选择省份
@@ -14853,6 +14908,8 @@
           if(this.province.provinceData[i].name==this.accptProvince.province){
             Vue.set(this.reveal.provices,"proviceIndex",i)
             Vue.set(this.province,"cityData",this.province.provinceData[i].children);//把所选省份对应的市的信息放到cityData中
+            Vue.set(this.province,"countyData",this.province.provinceData[i].children[0].children);//把所选省份对应的区的信息放到cityData中
+						Vue.set(this.accptProvince,"county",provinceArr[i].children[0].children[0].name);	
             Vue.set(this.accptProvince,"city",provinceArr[i].children[0].name);
 
             var btsc=this.accptProvince.province=="北京市"||this.accptProvince.province=="天津市"||this.accptProvince.province=="上海市"||this.accptProvince.province=="重庆市"||this.accptProvince.province=="台湾省"||this.accptProvince.province=="香港特别行政区"||this.accptProvince.province=="澳门特别行政区";
@@ -14884,6 +14941,15 @@
         }
 
       },
+      streetMust(){
+      	if(this.accptProvince.street.trim().length==0){
+      		this.showAlert.street = true;
+      		this.alertText.street = "请填写路名";
+      	}else{
+      		this.showAlert.street = false;
+      		
+      	}
+      }
     }
   }
 </script>
@@ -14891,22 +14957,36 @@
   $borderColor:#ebebeb;
   $themeColor:#02a672;
   .provincesCity{
-  select{
-    float: left;
-    color: #353535;
-    width:120px;
-    height:35px;
-    padding-left:15px;
-    border:2px solid $borderColor;
-    border-radius: 5px;
-    line-height: 35px;
-
-  }
-  p{
-    line-height: 35px;
-    float: left;
-    padding:0 10px;
-    color: $themeColor;
-  }
+	  select{
+	    float: left;
+	    color: #353535;
+	    width:120px;
+	    height:35px;
+	    padding-left:15px;
+	    border:1px solid $borderColor;
+	    border-radius: 5px;
+	    line-height: 35px;
+	
+	  }
+	  p{
+	    line-height: 35px;
+	    float: left;
+	    padding:0 10px;
+	    color: $themeColor;
+	  }
+	  .street{
+	  	float: left;
+			line-height: 35px;
+			input{
+				width: 120px;
+				height: 35px;
+				border: 1px solid #EBEBEB;
+				border-radius: 5px;
+				text-indent: 8px;
+				float: left;
+				margin-right: 12px;
+				color: #323333;
+			}
+	  }
   }
 </style>

@@ -9,11 +9,11 @@
 			<li class="name-wrap">
 				<span class="table-wrap-left">* 项目名称</span>
 				<input type="text" placeholder="请输入项目名称" v-model="projectInfo.projectName"/>
-				<alertTip v-if="showAlert.name" :showHide="showAlert.name" @closeTip="closeTip" :alertText="alertText.name"></alertTip>
+				<alertTip v-if="showAlert.name" :showHide="showAlert.name" :alertText="alertText.name"></alertTip>
 			</li>
 			<li class="place-wrap">
 				<span class="table-wrap-left">项目地址</span>
-				<provinces-city v-on:accpt-province-change="changeProjectAds"></provinces-city>
+				<provinces-city :accptProvince="projectInfo.projectPlaceObj" v-on:accpt-province-change="changeProjectAds"></provinces-city>
 			</li>
 			<li class="status-wrap">
 				<span class="table-wrap-left">项目状态</span>
@@ -26,7 +26,7 @@
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 建成时间</span>
 				<year-month v-model="projectInfo.completeTime"></year-month> 
-				<alertTip v-if="showAlert.completeTime" :showHide="showAlert.completeTime" @closeTip="closeTip" :alertText="alertText.completeTime"></alertTip>
+				<alertTip v-if="showAlert.completeTime" :showHide="showAlert.completeTime"  :alertText="alertText.completeTime"></alertTip>
 				<div class="timeGray" v-if="complated">
 					<span class="table-wrap-left">* 建成时间</span>
 					<span class="picker"></span>
@@ -39,8 +39,7 @@
 						<em></em>
 						<p>{{item}}</p>
 					</label>
-					
-					<label><em></em><input type="text" placeholder="可自行填写建筑功能" @blur="keepAddProjectTypeName" v-model="addProjectType.value"/></label>
+					<label><em></em><input type="text" placeholder="可自行填写建筑功能" @blur="keepAddProjectTypeName" @keydown="keyDownkeepAddProjectTypeName($event)" v-model="addProjectType.value"/></label>
 				</div>
 			</li>
 			<li class="describe-wrap">
@@ -54,13 +53,13 @@
 				<span class="heng"></span>
 				<!-- <datepicker class="datePicker" v-model="projectInfo.partakeTimeDown"></datepicker> -->
 				<year-month v-model="projectInfo.partakeTimeDown" :min="projectInfo.partakeTimeUp" :today="true"></year-month>
-				<alertTip v-if="showAlert.parTakeTime" :showHide="showAlert.parTakeTime" @closeTip="closeTip" :alertText="alertText.parTakeTime"></alertTip>
+				<alertTip v-if="showAlert.parTakeTime" :showHide="showAlert.parTakeTime"  :alertText="alertText.parTakeTime"></alertTip>
 			</li>
 			<li class="duty-wrap">
 				<span class="table-wrap-left">* 团队职责</span>
 				<input type="text" placeholder="请输入公司在项目中所属职位" maxlength="30"  v-model="projectInfo.takeOffice"/>
 				<p class="limit-words">{{dutycont}}/30</p>
-				<alertTip v-if="showAlert.takeOffice" :showHide="showAlert.takeOffice" @closeTip="closeTip" :alertText="alertText.takeOffice"></alertTip>
+				<alertTip v-if="showAlert.takeOffice" :showHide="showAlert.takeOffice" :alertText="alertText.takeOffice"></alertTip>
 			</li>
 			<li class="detail-wrap">
 				<span class="table-wrap-left">详细描述</span>
@@ -70,6 +69,12 @@
 			</li>
 			<li class="img-wrap">
 				<span class="table-wrap-left">图片展示</span>
+				<div class="picListCont">
+					<div class="picList" v-for="(item,$index) in picList">
+						<img :src="item.pic" alt="">
+						<button @click="deletePic(index,$index)"></button>
+					</div>
+				</div>
 				<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -215,14 +220,14 @@
 	    },
 	    created(){
 	    	var that = this;
-			that.projectID = that.$route.query.proId;
-			that.psnProExpeID = that.$route.query.psnId;
+			that.projID = that.$route.query.projId;
+			that.expeID = that.$route.query.expeId;
 			
-			if(that.psnProExpeID == undefined){
-				that.psnProExpeID = '""';
+			if(that.projID == undefined){
+				that.projID = '""';
 			}
-			if(that.projectID == undefined){
-				that.projectID = '""';
+			if(that.expeID == undefined){
+				that.expeID = '""';
 			}
 			var url = MyAjax.urlsy+"/teamOrgaInfo/selectProjAndExpe/" + that.projID +"/" + that.expeID//暂时先写成这样
 	    	MyAjax.ajax({
@@ -317,7 +322,12 @@
 	    		
 	    	}
 	    	console.log(that.addNewProject.projectType)
-	    	
+	    	if(this.projectInfo.projectState=="在建"||this.projectInfo.projectState=="未建"){
+            	this.complated = true;//true表示在建状态  建成时间不可选
+            	this.projectInfo.completeTime="";
+            }else{
+            	this.complated = false;
+            }
 	    },
 	    async mounted(){
 			
@@ -325,7 +335,7 @@
 			$(document.body).css("overflow-y","scroll");
 			var that = this;
 			//上传图片
-			const data = await that.getPic(that.psnProExpeID)
+			const data = await that.getPic(that.expeID)
 			if(data.code===0){
 				Vue.set(that,"picList",data.msg)
 			    Vue.set(that,"picNum",data.msg.length)
@@ -337,7 +347,7 @@
 				singleManualUploader({
 					element:"fine-uploader-manual-trigger",
 	        		template: "qq-template-manual-trigger",
-					url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+					url:MyAjax.urlsy+'/teamOrgaInfo/uploadPic',
 					picIdCont:that.projectInfo.picId,
 					btnPrimary:".btn-primary",
 					canUploadNum:Math.floor(8-that.picNum),
@@ -347,7 +357,7 @@
 		methods: {
 			getPic(psnProExpeID){
 				var that=this;
-				var url=MyAjax.urlsy+"/psnProjExpe/findById/"+psnProExpeID;
+				var url=MyAjax.urlsy+"/teamOrgaInfo/findPicsById/"+psnProExpeID;
 				return new Promise((resolve, reject) => {
 					MyAjax.ajax({
 				        type: "GET",
@@ -363,7 +373,7 @@
 			},
 			async deletePic(index,$index){
 				var that =this;
-				var url = MyAjax.urlsy+"/psnProjExpe/delPic/"+this.picList[$index].id
+				var url = MyAjax.urlsy+"/teamOrgaInfo/delPic/"+this.picList[$index].id
 				MyAjax.ajax({
 					type: "POST",
 					url:url,
@@ -374,7 +384,7 @@
 					},function(err){
 						console.log(err)
 				})
-				const data = await that.getPic(that.psnProExpeID) 
+				const data = await that.getPic(that.expeID) 
 				if(data.code===0){
 					Vue.set(that,"picList",data.msg)
 				    Vue.set(that,"picNum",data.msg.length)
@@ -384,7 +394,7 @@
 					singleManualUploader({
 						element:"fine-uploader-manual-trigger",
 		        		template: "qq-template-manual-trigger",
-						url:MyAjax.urlsy+'/psnProjExpe/batchUpload',
+						url:MyAjax.urlsy+'/teamOrgaInfo/uploadPic',
 						picIdCont:that.projectInfo.picId,
 						btnPrimary:".btn-primary",
 						canUploadNum:Math.floor(8-that.picNum),
@@ -406,44 +416,56 @@
 			      }
 			    }
 			  },
-			  changeProjectTypeColor(index){//添加模式下，标记建筑功能选中
+			changeProjectTypeColor(index){//添加模式下，标记建筑功能选中
 			    for(var i=0 ; i<this.addNewProject.projectType.length ; i++){//遍历当前所有建筑功能，如果匹配进行设置
 			      if(i==index){
 			      	if(this.projectTypeColor[index]==false){
 			      		Vue.set(this.projectTypeColor,[index],true);
-			      		this.projectInfo.proFunc.push(this.addNewProject.projectType[index]);//更改项目功能名
-			      		this.projectInfo.proFunc.push.apply(this.projectInfo.proFunc,[])//去重
+			      		this.projectInfo.architectFunctions.push(this.addNewProject.projectType[index]);//更改项目功能名
+			      		this.projectInfo.architectFunctions.push.apply(this.projectInfo.architectFunctions,[])//去重
 	
 			      	}else{
 			      		console.log(333)
 			      		Vue.set(this.projectTypeColor,[index],false);
-			      		Array.prototype.remove = function(val){
+			      		Array.prototype.remove = function(val) {
 							var index = this.indexOf(val);
 							if (index > -1) {
 								this.splice(index, 1);
 							}
 						};
-						this.projectInfo.proFunc.remove(this.addNewProject.projectType[index])//移除此功能
-			      		
+						this.projectInfo.architectFunctions.remove(this.addNewProject.projectType[index])
 			      	}
 			        
 			      }else{
-//			        Vue.set(this.projectTypeColor,[i],false);
+
 			      }
 			      
 			    }
+			    console.log(this.projectInfo.architectFunctions)
 			},
 			keepAddProjectTypeName(){//添加模式下，建筑功能的扩展的保存
-		        Vue.set(this.addProjectType,"type",false);
-		        if(this.addProjectType.value.trim()!=''){
-		          this.addNewProject.projectType.push(this.addProjectType.value)//添加到建筑功能列表里
-		          this.projectInfo.proFunc.push(this.addProjectType.value);//更改项目建筑功能名
-			      this.projectInfo.proFunc.push.apply(this.projectInfo.proFunc,[])//去重
-		          Vue.set(this.addProjectType,"value","");//清空input框的内容
-		          this.projectTypeColor.push(true);//使得新添加的建筑功能被选中
+				var that = this;
+		        Vue.set(that.addProjectType,"type",false);
+		        if(that.addProjectType.value.trim()!=''){
+		          that.addNewProject.projectType.push(that.addProjectType.value)//添加到建筑功能列表里
+		          that.projectInfo.architectFunctions.push(that.addProjectType.value);//更改项目建筑功能名
+			      that.projectInfo.architectFunctions.push.apply(that.projectInfo.architectFunctions,[])//去重
+		          Vue.set(that.addProjectType,"value","");//清空input框的内容
+		          that.projectTypeColor.push(true);//使得新添加的建筑功能被选中
 		          
 		        }
 		
+		      },
+		      keyDownkeepAddProjectTypeName($event){
+		      	var event = $event || window.event;  
+				 	if(event.keyCode==13){ 
+				      this.keepAddProjectTypeName()
+			         event.returnValue = false;    
+			         event.cancelBubble=true;
+			         event.preventDefault();
+			         //event.stopProgagation();
+			         return false;
+			      	} 
 		      },
 			addProject(){
 				qq(document.getElementById("trigger-upload")).attach("click", function() {
@@ -487,7 +509,7 @@
 							that.projectInfo.partakeTimeDown = "0000.00";
 						}
 					    console.log(JSON.stringify(that.projectInfo))
-					    var url = MyAjax.urlsy+"/teamOrgaInfo/insertOrUpdateProjExpe";
+					    var url = MyAjax.urlsy+"/teamOrgaInfo/insertProjAndProjExpe";
 					    $.ajaxSetup({ contentType : 'application/json' });
 					    MyAjax.ajax({
 							type: "POST",
@@ -513,7 +535,7 @@
 							that.projectInfo.partakeTimeDown = "0000.00";
 						}
 					    console.log(JSON.stringify(that.projectInfo))
-					    var url = MyAjax.urlsy+"/teamOrgaInfo/insertOrUpdateProjExpe";
+					    var url = MyAjax.urlsy+"/teamOrgaInfo/insertProjAndProjExpe";
 					    $.ajaxSetup({ contentType : 'application/json' });
 					    MyAjax.ajax({
 							type: "POST",
@@ -549,10 +571,15 @@
 	    	this.dutycont = num1;//公司职责限制字数
 	    	var num2 = this.projectInfo.detailDes.length;//职责详细描述
 	    	this.detailcont = num2;
-	    	var num3 = this.projectInfo.proDesc.length;//项目描述
+	    	var num3 = this.projectInfo.projectDescription.length;//项目描述
 	    	this.procont = num3;
-	    	
-            
+	    	if(this.projectInfo.projectState=="在建"||this.projectInfo.projectState=="未建"){
+            	this.complated = true;//true表示在建状态  建成时间不可选
+            	this.projectInfo.completeTime="";
+            }else{
+            	this.complated = false;
+            }
+            console.log(this.complated)
 	    }
    }
 </script>
@@ -740,7 +767,7 @@ $activeColor: #02a672;
 				&.time-wrap{
 					height: 35px;
 					line-height: 35px;
-					
+					position: relative;
 					.datePicker{
 						height: 35px;
 						float: left;
@@ -756,7 +783,25 @@ $activeColor: #02a672;
 						background: #333333;
 						margin-right: 20px;
 						margin-top: 16px;
+						margin-left: 20px;
 						
+					}
+					.timeGray{
+						position: absolute;
+						left: 0px;
+						top: 0;
+						background: #FFFFFF;
+						color: #e0e0e0;
+						.table-wrap-left{
+							color:#BFBFBF;
+						}
+						.picker{
+							float: left;
+							width: 140px;
+							height: 35px;
+							border-radius: 5px;
+							border: 1px solid #E0E0E0;
+						}
 					}
 				}
 				&.duty-wrap{
@@ -820,6 +865,34 @@ $activeColor: #02a672;
 					.table-wrap-left{
 						float: left;
 						margin-top: 40px;
+					}
+					.picListCont{
+						width: 700px;
+						float: left;
+						.picList{
+							float: left;
+							width: 200px;
+							height: 200px;
+							padding: 8px;
+							background: rgba(210,210,210,.3);
+							border-radius: 10px;
+							margin-left: 10px;
+							margin-bottom: 10px;
+							position: relative;
+							img{
+								width: 182px;
+							}
+							button{
+								border-style: none;
+								width: 21px;
+								height: 21px;
+								position: absolute;
+								top: 10px;
+								right: 10px;
+								cursor: pointer;
+								background: url("../../../assets/img/personal/common/picDelete.png") no-repeat center;
+							}
+						}
 					}
 					.img-show{
 						float: left;

@@ -1,7 +1,7 @@
 import qq from "fine-uploader"
 function singleManualUploader(option){//url,picIdCont
-var manualUploader="";
-manualUploader = new qq.FineUploader({
+	var manualUploader="";
+	manualUploader = new qq.FineUploader({
         element: document.getElementById(option.element),
         template: option.template,
         request: {
@@ -49,6 +49,9 @@ manualUploader = new qq.FineUploader({
             onComplete: function (id, fileName, responseJSON, maybeXhr) {
                 $("#"+option.element+" .qq-uploader-selector .buttons .btn-primary").hide()
                 option.picIdCont.push(responseJSON.msg)
+                if(option.element == "fine-uploader-manual-trigger-license" || "fine-uploader-manual-trigger-aptitude"){
+                	$("#"+option.element + " .qq-upload-list-selector .qq-upload-success").hide()
+                }
             },
         }
     });

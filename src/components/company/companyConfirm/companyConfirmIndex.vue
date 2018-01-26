@@ -17,8 +17,14 @@
     				<img src="../../../assets/img/company/logo02.png"/>
     				<img src="../../../assets/img/company/logo02.png"/>
     			</li>
+    			<!--<li class="picListCont">
+            <div class="picList" v-for="(item,$index) in show.picList[index]">
+              <img :src="item.pic" alt="">
+              <button @click="deletePic(item.id,index,$index)"></button>
+            </div>
+          </li>-->
     		</ul>
-    		<script type="text/template" id="qq-template-manual-trigger">
+    		<script type="text/template" id="qq-template-manual-trigger-license">
 				    <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 				        <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
 				            <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
@@ -48,7 +54,7 @@
 				                <div style="float: left;" class="addBtn">添加文件</div>
 				            </div>
 				             <span class="limitTxt" style="float: left;">支持JPG、PNG、大小不能超过2M</span>
-				            <button type="button" id="trigger-upload" class="btn btn-primary">
+				            <button type="button" id="trigger-upload" class="btn btn-primary btn-primary-license">
 				                	提交上传
 				            </button>
 				        </div>
@@ -83,7 +89,7 @@
 				        </dialog>
 				    </div>
 				</script>
-				<div id="fine-uploader-manual-trigger"></div>
+				<div id="fine-uploader-manual-trigger-license"></div>
 				 <div id="message"></div>
     		
     	</li>
@@ -102,7 +108,7 @@
     				<img src="../../../assets/img/company/logo02.png"/>
     			</li>
     		</ul>
-    		<script type="text/template" id="qq-template-manual-trigger2">
+    		<script type="text/template" id="qq-template-manual-trigger-aptitude">
 				    <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 				        <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
 				            <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
@@ -116,7 +122,7 @@
 				                    <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
 				                </div>
 				                <span class="qq-upload-spinner-selector qq-upload-spinner"></span>
-				                <img class="qq-thumbnail-selector" qq-max-size="200" qq-server-scale>
+				                <img class="qq-thumbnail-selector" qq-max-size="180" qq-server-scale>
 				                <span class="qq-upload-file-selector qq-upload-file"></span>
 				                <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
 				                <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
@@ -132,7 +138,7 @@
 				                <div style="float: left;" class="addBtn">添加文件</div>
 				            </div>
 				             <span class="limitTxt" style="float: left;">支持JPG、PNG、大小不能超过2M</span>
-				            <button type="button" id="trigger-upload2" class="btn btn-primary">
+				            <button type="button" id="trigger-upload2" class="btn btn-primary btn-primary-aptitude">
 				                	提交上传
 				            </button>
 				        </div>
@@ -146,7 +152,7 @@
 				        <dialog class="qq-alert-dialog-selector">
 				            <div class="qq-dialog-message-selector"></div>
 				            <div class="qq-dialog-buttons">
-				                <button type="button" class="qq-cancel-button-selector">Close</button>
+				                <button type="button" class="qq-cancel-button-selector">关闭</button>
 				            </div>
 				        </dialog>
 				
@@ -168,8 +174,8 @@
 				        </dialog>
 				    </div>
 				</script>
-				<div id="fine-uploader-manual-trigger2"></div>
-				<div id="message2"></div>
+				<div id="fine-uploader-manual-trigger-aptitude"></div>
+				
     		<!--<div class="addProfile">
     			<span class="addBtn" @click="overlay">添加文件</span>
     			<span>支持JPG、PNG、大小不能超过2M</span>
@@ -201,6 +207,8 @@
 
 <script>
   import Modal from "../../../assets/js/modal.js"
+  import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
+  import MyAjax from "../../../assets/js/MyAjax.js"
 	import qq from "fine-uploader"
   export default {
     name:"companyConfirmIndex",
@@ -219,124 +227,41 @@
 	    		zh:false,
 	    		zz:false,
 	    	},
-        
+        license:{
+        	 picId:[],
+        },
+        aptitude:{
+        	 picId:[],
+        }
       }
     },
     mounted(){
     	var that = this;
-    	var manualUploader = new qq.FineUploader({
-	        element: document.getElementById('fine-uploader-manual-trigger'),
-	        template: 'qq-template-manual-trigger',
-	        request: {
-	            endpoint: '/server/uploads'
-	        },
-	        thumbnails: {
-	//              placeholders: {
-	//                  waitingPath: '/source/placeholders/waiting-generic.png',
-	//                  notAvailablePath: '/source/placeholders/not_available-generic.png'
-	//              }
-	        },
-	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg',  'png'],
-	            itemLimit: 5,
-	            sizeLimit: 2560000//2M
-	        },
-	        autoUpload: false,
-	        debug: true,
-	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload').show()
-	        	},
-	        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-	                //alert('This is onComplete function.');
-									//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-	                $('#message').append(responseJSON.msg);
-//	                $('#progress').hide();//隐藏进度动画
-	                //清除已上传队列
-	                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-	                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-//	                $('.stateOne').hide();
-//	                $('.stateTwo').show()
-	                
-	                $('#trigger-upload').hide()
-	                console.log(maybeXhr)
-	          },
-	          onAllComplete:  function(successIDs, failIDs){
-	          	console.log(failIDs)
-                if(submitFile)  
-                    submitdata(successIDs);
-                
-            },
-	          onUploadChunkSuccess:function(id, chunkData, responseJSON, xhr) {
-	          			that.stateTwo.zh= true;
-	                that.stateOne.zh= false;
-	                console.log(that.stateTwo)
-	          }
-	           
-	        }
-	        
-	        
-	    });
-	    var manualUploader2 = new qq.FineUploader({
-	        element: document.getElementById('fine-uploader-manual-trigger2'),
-	        template: 'qq-template-manual-trigger2',
-	        request: {
-	            endpoint: '/server/uploads'
-	        },
-	        thumbnails: {
-	//              placeholders: {
-	//                  waitingPath: '/source/placeholders/waiting-generic.png',
-	//                  notAvailablePath: '/source/placeholders/not_available-generic.png'
-	//              }
-	        },
-	        validation: {
-	            allowedExtensions: ['jpeg', 'jpg',  'png'],
-	            itemLimit: 5,
-	            sizeLimit: 2560000//2M
-	        },
-	        autoUpload: false,
-	        debug: true,
-	        callbacks:{
-	        	onSubmit:  function(id,  fileName)  {
-	        		$('#trigger-upload2').show()
-	        		console.log(id)
-	        	},
-	        	onComplete: function (id, fileName, responseJSON) {
-	                //alert('This is onComplete function.');
-	//	                alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-	
-	                
-	                $('#message2').append(responseJSON.msg);
-//	                $('#progress').hide();//隐藏进度动画   
-	                //清除已上传队列
-//	                $('#fine-uploader-manual-trigger2 .qq-upload-list li').hide();
-	                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）    
-	                
-	                	$('#trigger-upload2').hide()
-	
-	         },
-	         onUploadChunkSuccess:function(id, chunkData, responseJSON, xhr) {
-         				that.stateTwo.zz= true;
-                that.stateOne.zz= false;
-                console.log(id)
-	         }
-	        	
-	        }
-	        
-	        
-	    });
-	
-	    qq(document.getElementById("trigger-upload")).attach("click", function() {
-	        manualUploader.uploadStoredFiles();
-	    });
-	    qq(document.getElementById("trigger-upload2")).attach("click", function() {
-	        manualUploader2.uploadStoredFiles();
-	    });
-	    console.log(this.stateTwo)
+    	
+	    singleManualUploader({
+	      element:"fine-uploader-manual-trigger-license",
+	      template: "qq-template-manual-trigger-license",
+	      url:MyAjax.urlsy+'/psnlanguage/batchUpload',
+	      picIdCont:that.license.picId,
+	      btnPrimary:".btn-primary-license",
+	      canUploadNum:3,
+	    })
+	    
+	    singleManualUploader({
+	      element:"fine-uploader-manual-trigger-aptitude",
+	      template: "qq-template-manual-trigger-aptitude",
+	      url:MyAjax.urlsy+'/psnlanguage/batchUpload',
+	      picIdCont:that.aptitude.picId,
+	      btnPrimary:".btn-primary-aptitude",
+	      canUploadNum:3,
+	    })
+//  	
+//			if(that.stateTwo.zz == false){
+				$(".qq-upload-success").css("display","none")
+//			}
     },
     updated(){
-    	console.log(this.stateTwo)
+//  	console.log(this.stateTwo)
     },
     methods:{
     	overlay(){
@@ -384,6 +309,7 @@ $activeColor: #2eb3cf;
 	 }
 	 .ci-list{
 		 	.cfrmTable{
+		 		&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
 		 		margin-bottom: 50px;
 			 	.z-state{
 			 		padding-top: 30px;

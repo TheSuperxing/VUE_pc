@@ -158,7 +158,7 @@
 				this.current_page = 1;
 			},
     		jumpPage(current_page){
-    			console.log(location.href.split("#"))
+    			console.log(location.href)
 //  			location.href = location.href.split("#")[0] + this.searchText;
     			var that = this;
     			if(that.searchText.trim().length!=0){
@@ -266,7 +266,7 @@
 					contentType:"application/json;charset=utf-8",
 					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
 				}, function(data){
-					//console.log(data)
+					console.log(data)
 					if(data.code==0){
 						that.dataInfo = data.msg.records;//取出当前获取的所有需求
 						that.current_page=data.msg.current;//设置当前页

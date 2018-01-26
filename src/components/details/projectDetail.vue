@@ -1,7 +1,7 @@
 <template>
 <div class="projectDetail">
 	
-		<h3 class="c-title" v-bind:class="{'comStyle':user.userState==1,'teamStyle':user.userState==2,'personStyle':user.userState==0}">
+		<h3 class="c-title" v-bind:class="{'comStyle':user.userState=='com','teamStyle':user.userState=='team','personStyle':user.userState=='per'}">
 			<span class="proname">{{project.projectName}}</span>
 			<em class="addToPro" @click="addThisPro">加入项目</em>
 			<div id="modal-overlay" class="addNotice">
@@ -170,39 +170,39 @@
 	    },
 	    methods:{
 	    	getData(){
-					console.log(this.$route.query.id)
-					var that = this;
-					var url = MyAjax.urlsy+"/ediHomePage/projDetail/" + that.$route.query.id
-			    	MyAjax.ajax({
-							type: "GET",
-							url:url,
-							dataType: "json",
-							async:false,
-						},function(data){
-							console.log(data)
-								if(data.code==0){
-									console.log(data.msg)
-									Vue.set(that,"project",data.msg)
-								}
-							console.log(that.project)
-						},function(err){
-							console.log(err)
-						})
-			    	function emptyText(text) {
-					    if(text == null||text.length == 0){
-					      return "（暂无信息）";
-					    }else {
-					      return text;
-					    }
-						}
-			    	that.project.completeTime = emptyText(that.project.completeTime);
-			    	that.project.projectState = emptyText(that.project.projectState);
-			    	that.project.projectDescription = emptyText(that.project.projectDescription);
-			    	that.project.partakeTimeUp = emptyText(that.project.partakeTimeUp);
-			    	that.project.partakeTimeDown = emptyText(that.project.partakeTimeDown);
-			    	that.project.takeOffice = emptyText(that.project.takeOffice);
-			    	that.project.detailDes = emptyText(that.project.detailDes);
-				},
+				console.log(this.$route.query.id)
+				var that = this;
+				var url = MyAjax.urlsy+"/ediHomePage/projDetail/" + that.$route.query.id
+		    	MyAjax.ajax({
+						type: "GET",
+						url:url,
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+							if(data.code==0){
+								console.log(data.msg)
+								Vue.set(that,"project",data.msg)
+							}
+						console.log(that.project)
+					},function(err){
+						console.log(err)
+					})
+		    	function emptyText(text) {
+				    if(text == null||text.length == 0){
+				      return "（暂无信息）";
+				    }else {
+				      return text;
+				    }
+					}
+		    	that.project.completeTime = emptyText(that.project.completeTime);
+		    	that.project.projectState = emptyText(that.project.projectState);
+		    	that.project.projectDescription = emptyText(that.project.projectDescription);
+		    	that.project.partakeTimeUp = emptyText(that.project.partakeTimeUp);
+		    	that.project.partakeTimeDown = emptyText(that.project.partakeTimeDown);
+		    	that.project.takeOffice = emptyText(that.project.takeOffice);
+		    	that.project.detailDes = emptyText(that.project.detailDes);
+			},
 	    	addThisPro(){
 	    		//需先判断有没有完善基础信息；
 	    		Modal.makeText($(".addNotice"))

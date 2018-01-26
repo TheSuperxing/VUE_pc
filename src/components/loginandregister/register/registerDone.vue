@@ -20,6 +20,8 @@
 	import Modal from "../../../assets/js/modal.js"
 	import Vue from "vue";
   	import {mapState} from "vuex"
+  	import MyAjax from "../../../assets/js/MyAjax.js"
+  	
 	export default{
 		name:"registerDone",
 		data:function(){
@@ -41,8 +43,8 @@
 			sendAgain(){
 				var url2 = MyAjax.urlsy + "/teamOrgaInfo/sendMail"
 				var data2 = {
-					url:"10.1.31.27:8080/yhzx/comfirmActivate/"+data.accountID,
-					email:that.teamRegInput.email
+					url:"10.1.31.27:8080/yhzx/comfirmActivate/"+sessionStorage.getItem("accountID"),
+					email:that.email
 				}
 				console.log(data2)
 				MyAjax.ajax({

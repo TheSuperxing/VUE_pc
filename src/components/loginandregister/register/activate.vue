@@ -31,8 +31,8 @@
 			}
 		},
 		computed:mapState({
-      user:state=>state.userState.user
-    }),
+           user:state=>state.userState.user
+        }),
 		mounted(){
 			this.state = sessionStorage.getItem("state");
 			Vue.set(this.user,'userState',this.state)
@@ -43,7 +43,16 @@
 			sendAgain(){
 				console.log(sessionStorage.getItem("accountID"))
 				var that = this ;
-				var url2 = MyAjax.urlsy + "/teamOrgaInfo/sendMail"
+				switch (that.state){
+					case "com":
+						var url2 = MyAjax.urlsy + "/companyInfo/sendMail"
+						break;
+					case "team":
+						var url2 = MyAjax.urlsy + "/teamOrgaInfo/sendMail"
+						break;
+					default:
+						break;
+				}
 				var data2 = {
 					url:"10.1.31.27:8080/yhzx/comfirmActivate/"+ sessionStorage.getItem("accountID"),
 					email:that.email

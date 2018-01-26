@@ -31,7 +31,7 @@
 			</router-link>
 		</p>
 	</ul>
-	<ul class="com-wrap" v-if="state=='com'">
+	<ul class="com-wrap" v-if="state=='com'" @keydown="keyRegisterDoneCom($event)">
 		<li>
 			<input type="text"  placeholder="请输入公司名" v-model="comRegInput.name" @blur="nameConfirm"/>
 		</li>
@@ -39,10 +39,10 @@
 			<input type="text"  placeholder="请输入您的邮箱" v-model="comRegInput.email" @blur="mailConfirm"/>
 		</li>
 		<li>
-			<input type="text" placeholder="请输入密码(密码由6-14位字母（区分大小写）、数字或符号组成)" v-model="comRegInput.passWord" @blur="pwdConfirm"/>
+			<input type="password" placeholder="请输入密码(密码由6-14位字母（区分大小写）、数字或符号组成)" v-model="comRegInput.passWord" @blur="pwdConfirm"/>
 		</li>
 		<li>
-			<input type="text" placeholder="请再次输入密码" v-model="comRegInput.passWordCfm" @blur="samePwd"/>
+			<input type="password" placeholder="请再次输入密码" v-model="comRegInput.passWordCfm" @blur="samePwd"/>
 		</li>
 		<alertTip v-if="comRegInput.showAlert" :showHide="comRegInput.showAlert" @closeTip="closeTip" :alertText="comRegInput.alertText"></alertTip>
 		<div class="regBtn" @click="goRegisterDoneCom" >
@@ -142,11 +142,11 @@
         computed:{
         	
         	rightComEmail:function(){
-        		return /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/gi.test(this.comRegInput.email);
+        		return /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/gi.test(this.comRegInput.email);
         		
         	},
         	rightTeamEmail:function(){
-        		return /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/gi.test(this.teamRegInput.email);
+        		return /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/gi.test(this.teamRegInput.email);
         		
         	},
         	
@@ -211,25 +211,113 @@
 		    	$(".picConfirm").attr("src",this.picSrc)
 		    	
 		    },
-		    goRegisterDoneCom(){
-		    	
-		    },
-	    keyRegisterDoneTeam($event){//enter键登录事件
-	      var event = $event || window.event;  
-		 	if(event.keyCode==13){ 
-		     this.goRegisterDoneTeam()
-	         event.returnValue = false;    
-	         event.cancelBubble=true;
-	         event.preventDefault();
-	         //event.stopProgagation();
-	         return false;
-	      } 
+		    keyRegisterDoneCom($event){//enter键登录事件
+		      var event = $event || window.event;  
+			 	if(event.keyCode==13){ 
+			     this.goRegisterDoneCom()
+		         event.returnValue = false;    
+		         event.cancelBubble=true;
+		         event.preventDefault();
+		         //event.stopProgagation();
+		         return false;
+		      } 
 		
 			},
-	    goRegisterDoneTeam(){
+		    goRegisterDoneCom(){
+		    	var that = this;
+				var url = MyAjax.urlsy+"/companyInfo/register";
+				if(that.comRegInput.name.trim().length!=0&&that.comRegInput.email.trim().length!=0&&that.comRegInput.passWord.trim().length!=0&&that.comRegInput.passWordCfm.trim().length!=0){
+					var data = {name:that.comRegInput.name,email:that.comRegInput.email,pwd:that.comRegInput.passWord,confirmPwd:that.comRegInput.passWordCfm};
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(data),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+					}, function(data){
+						console.log(data)
+						console.log(data.token)
+						cookieTool.setCookie("token",data.token)
+						if(data.code==0){
+							//传递url用于发送邮件
+							sessionStorage.setItem("accountID",data.accountID);
+							var url2 = MyAjax.urlsy + "/companyInfo/sendMail"
+							var data2 = {
+								url:"10.1.31.27:8080/yhzx/comfirmActivate/"+data.accountID,
+								email:that.comRegInput.email
+							}
+							console.log(data2)
+							MyAjax.ajax({
+								type: "POST",
+								url:url2,
+								data: data2,
+								dataType: "json",
+//								contentType:"application/json;charset=utf-8",
+							}, function(data_url){
+								console.log(data_url)
+								if(data.msg == "success" && data.code == 0){
+									router.push({name:"RegisterDone",query:{id:"com"}});
+									sessionStorage.setItem("state","com");
+									sessionStorage.setItem("email",that.comRegInput.email);
+								}
+							},function(err_url){
+								console.log(err)
+							})
+							
+							if(data.ifActivated == 0){
+								sessionStorage.setItem("ifActivated",false);
+							}else{
+								sessionStorage.setItem("ifActivated",true);
+							}
+							
+						}else if(data.code==-1){
+							switch (data.msg){
+								case "该公司名称已被注册":
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "该公司名称已被注册";
+									break;
+								case "该邮箱已被注册":
+								console.log(222)
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "该邮箱已被注册";
+									break;
+								case "密码不一致":
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "密码不一致";
+									break;
+								case "对象不能为空":
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "对象不能为空";
+									break;
+								case "null":
+									that.teamRegInput.showAlert = true;
+									that.teamRegInput.alertText = "系统报错";
+									break;
+								default:
+									break;
+							}
+						}
+					},function(err){
+						console.log(err)
+					})
+				}
+		    },
+		    keyRegisterDoneTeam($event){//enter键登录事件
+		      var event = $event || window.event;  
+			 	if(event.keyCode==13){ 
+			     this.goRegisterDoneTeam()
+		         event.returnValue = false;    
+		         event.cancelBubble=true;
+		         event.preventDefault();
+		         //event.stopProgagation();
+		         return false;
+		      } 
+		
+			},
+		    goRegisterDoneTeam(){
 	    	/*,url:"10.1.31.27:8080/yhzx/comfirmActivate/"*/
-	    	console.log(555)
-	    	var that = this;
+	    		console.log(555)
+	    		var that = this;
 				var url = MyAjax.urlsy+"/teamOrgaInfo/register";
 				if(that.teamRegInput.name.trim().length!=0&&that.teamRegInput.email.trim().length!=0&&that.teamRegInput.passWord.trim().length!=0&&that.teamRegInput.passWordCfm.trim().length!=0){
 					var data = {name:that.teamRegInput.name,email:that.teamRegInput.email,pwd:that.teamRegInput.passWord,confirmPwd:that.teamRegInput.passWordCfm};
@@ -423,14 +511,13 @@
 		    	
 		    },
 		    mailConfirm(){/*验证邮箱*/
-		    	if(!this.rightComEmail){
+		    	if(!/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/gi.test(this.comRegInput.email)){
 		    		this.comRegInput.showAlert = true;
 		    		this.comRegInput.alertText = '您输入的邮箱格式不正确';
 		    	}else{
 		    		this.comRegInput.showAlert = false;
 		    	};/*验证公司邮箱*/
-		    	
-		    	if(!this.rightTeamEmail){
+		    	if(!/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/gi.test(this.teamRegInput.email)){
 		    		this.teamRegInput.showAlert = true;
 		    		this.teamRegInput.alertText = '您输入的邮箱格式不正确';
 		    	}else{

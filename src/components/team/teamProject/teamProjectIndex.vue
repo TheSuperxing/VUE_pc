@@ -19,7 +19,7 @@
 						<ul class="resultList">
 							<li class="noResult" v-if="noresult">抱歉，未找到该项目，请重新搜索</li>
 							<li v-for="(item,$index) in searchResult" >
-								<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.projectName}}</router-link>
+								<router-link :to="{name:'ProjectDetail',query:{id:item.projectID}}">{{item.projectName}}</router-link>
 								<span class="choseBtn" @click="choseThis($event,$index)">
 								</span>
 							</li>
@@ -34,6 +34,7 @@
   	</div>
   	<!--搜索项目模态框-->
     <h3 class="t-title"><span>{{title}}</span></h3>
+    <div class="stateNull" v-if="!stateNone">（您尚未添加项目经历信息）</div>
     <div class="projectTable" v-for="(item,$index) in proInfo">
     	<h5 class="tableTitle">{{item.projectName}}</h5>
     	<div class="toolsBox">
@@ -102,6 +103,7 @@
 					tag:[],
 					picList:[],
         },
+        stateNone:false,
         proInfo:[],
         searchText:"", /*搜索框input值*/
         searchResult:[],
@@ -152,6 +154,9 @@
 					console.log(data)
 					if(data.code==0){
 						that.proInfo = data.msg;
+						if(that.proInfo.length!=0){
+							that.stateNone = true;
+						}
 					}else{
 						console.log("错误返回");
 					}
@@ -219,12 +224,12 @@
 			router.push({name:'editTeamProject',query:{projId:item.projectID,expeId:item.teamProExpeID}})
 			/*通过路由传值*/
 		},
-  
+  	
     	upDown(index){
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
 					this.updowntxt[index] = "收起"
-					this.getPic(this.proInfo[index].pkid,index)
+					this.getPic(this.proInfo[index].teamProExpeID,index)
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
@@ -247,7 +252,7 @@
     		//确认删除该项目
     		var that = this;
 				console.log(that.proInfo[index].pkid)
-				var url = MyAjax.urlsy+"//teamOrgaInfo/del/"+that.proInfo[index].pkid;
+				var url = MyAjax.urlsy+"/teamOrgaInfo/del/"+that.proInfo[index].pkid;
 				MyAjax.delete(url)
 				that.getData();//更新一下数据
     		this.closeModal(index);
@@ -348,6 +353,14 @@ $activeColor: #02a672;
 			display: block;
 			color: $activeColor;
 			cursor: pointer;
+		}
+		.stateNull{
+			height: 50px;
+			line-height: 50px;
+			font-size: 16px;
+			color: #999999;
+			text-align: center;
+			margin-top: 30px;
 		}
 		.searchPro,.deletePro{
 			

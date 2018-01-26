@@ -25,12 +25,12 @@
         transitionName: 'slide-left',
 				pics:[
 					{text:"公司主页",pic2:require("../../assets/img/sidebar/home-bule.png"),pic1:require("../../assets/img/sidebar/home-gray.png"),route:"/yhzx/company/info/companyIndex"},
-					{text:"公司账号信息",pic1:require("../../assets/img/sidebar/man-gray.png"),pic2:require("../../assets/img/sidebar/man-blue.png"),route:"/yhzx/company/info/companyAccount"},
-					{text:"公司基本信息",pic1:require("../../assets/img/sidebar/text-gray.png"),pic2:require("../../assets/img/sidebar/text-blue.png"),route:"/yhzx/company/info/companyInfo"},
-					{text:"公司认证信息",pic1:require("../../assets/img/sidebar/authentication-gray.png"),pic2:require("../../assets/img/sidebar/authentication-blue.png"),route:"/yhzx/company/info/companyConfirm"},
-					{text:"公司组织信息",pic1:require("../../assets/img/sidebar/organization-grey.png"),pic2:require("../../assets/img/sidebar/organization-blue.png"),route:"/yhzx/company/info/companyOrganiz"},
-					{text:"公司项目信息",pic1:require("../../assets/img/sidebar/project-gray.png"),pic2:require("../../assets/img/sidebar/project-blue.png"),route:"/yhzx/company/info/companyProject"},
-          {text:"公司团队信息",pic1:require("../../assets/img/sidebar/team-gray.png"),pic2:require("../../assets/img/sidebar/team-blue.png"),route:"/yhzx/company/info/companyTeam"},
+					{text:"账号信息",pic1:require("../../assets/img/sidebar/man-gray.png"),pic2:require("../../assets/img/sidebar/man-blue.png"),route:"/yhzx/company/info/companyAccount"},
+					{text:"基本信息",pic1:require("../../assets/img/sidebar/text-gray.png"),pic2:require("../../assets/img/sidebar/text-blue.png"),route:"/yhzx/company/info/companyInfo"},
+					{text:"认证信息",pic1:require("../../assets/img/sidebar/authentication-gray.png"),pic2:require("../../assets/img/sidebar/authentication-blue.png"),route:"/yhzx/company/info/companyConfirm"},
+					{text:"组织信息",pic1:require("../../assets/img/sidebar/organization-grey.png"),pic2:require("../../assets/img/sidebar/organization-blue.png"),route:"/yhzx/company/info/companyOrganiz"},
+					{text:"项目信息",pic1:require("../../assets/img/sidebar/project-gray.png"),pic2:require("../../assets/img/sidebar/project-blue.png"),route:"/yhzx/company/info/companyProject"},
+          {text:"团队信息",pic1:require("../../assets/img/sidebar/team-gray.png"),pic2:require("../../assets/img/sidebar/team-blue.png"),route:"/yhzx/company/info/companyTeam"},
 				]
 			}
 

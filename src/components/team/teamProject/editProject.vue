@@ -1,7 +1,7 @@
 <template>
 <div class="editProject">
 	<h3 class="t-title"><span>{{title}}</span></h3>
-	<span class="editBtn" @click="overlayA">编辑项目信息</span>
+	<span class="editBtn" @click="overlayA" v-if="isMine">编辑项目信息</span>
 	<!--模态框 修改自己添加的项目-->
 	<div id="modal-overlay" class="modal-a"> 
 		<div class="editCfr">
@@ -12,7 +12,7 @@
 				<p>如您修改其中内容，已添加过的该项目信息也会随之变化</p>
 				<div class="btnBox">
 					<span class="cancelBtn" @click="closeModalA">取消</span>
-					<span class="confirmBtn" @click="closeModalA">确认</span>
+					<span class="confirmBtn" @click="goToDefined">确认</span>
 				</div>
 			</div>
 		</div>
@@ -193,6 +193,7 @@
 	        title:"编辑团队参加项目信息",
 	        state:"",
 	        editSeniorShow:false,
+	        isMine:false,
 	        dutytext:"",
 	        dutycont:'0',
 	        detailtext:"",
@@ -339,7 +340,7 @@
 					},function(err){
 						console.log(err)
 				})
-				const data = await that.getPic(that.psnProExpeID) 
+				const data = await that.getPic(that.teamProExpeID) 
 				if(data.code===0){
 					Vue.set(that,"picList",data.msg)
 				    Vue.set(that,"picNum",data.msg.length)
@@ -364,6 +365,9 @@
 			closeModalA(){
 				var modal = $('.modal-a')
 				Modal.closeModal(modal)
+			},
+			goToDefined(){
+				router.push({name:"definedTeamProject",query:{projId:this.projID,expeId:this.expeID}})
 			},
 			dutyWrap(){
 				let condition=this.project.takeOffice.length!=0

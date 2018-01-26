@@ -50,11 +50,11 @@
 							<h5>删除项目</h5>
 							<span class="modalChaBtn" @click="closeModal($index)"></span>
 							<div class="content-wrap">
-							<p class="deleteOrNo">确定删除该项目吗？</p>
-							<div class="btnBox">
-								<span class="cancelBtn" @click="cancleDele($index)">取消</span>
-								<span class="confirmBtn" @click="saveDele($index)">确认</span>
-							</div>
+								<p class="deleteOrNo">确定删除该项目吗？</p>
+								<div class="btnBox">
+									<span class="cancelBtn" @click="cancleDele($index)">取消</span>
+									<span class="confirmBtn" @click="saveDele($index)">确认</span>
+								</div>
 							</div>
 						</div>
 					</div>

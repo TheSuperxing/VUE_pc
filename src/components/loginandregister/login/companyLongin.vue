@@ -1,13 +1,14 @@
 <template>
-  <div class="companyLogin">
+  <div class="companyLogin" @keydown="keyLogin($event)">
     <ul class="loginInput">
       <li>
-        <input v-model="reveal.username"  type="text" placeholder="请输入您的邮箱">
+        <input v-model="reveal.email"  type="text" placeholder="请输入您的邮箱">
       </li>
       <li>
-        <input v-model="reveal.password"  type="password" placeholder="请输入您的密码">
+        <input v-model="reveal.pwd"  type="password" placeholder="请输入您的密码">
       </li>
     </ul>
+    <alertTip v-if="showAlert" :showHide="showAlert" :alertText="alertText"></alertTip>
     <ul class="loginSubmit">
       <li>
         <button @click="companyLogin"><router-link to="">登录</router-link></button>
@@ -22,20 +23,25 @@
 <script>
 	import Vue from "vue";
   import {mapState} from "vuex"
+  import router from "../../../router"
+  import alertTip from '../alertTip'
   import MyAjax from "../../../assets/js/MyAjax.js"
+  import {cookieTool} from "../../../assets/js/cookieTool.js"
   export default {
     name:"companyLogin",
-    components:{
-
+    components: {
+      alertTip,
     },
     data(){
       return{
         reveal:{
           //submit:false,//提交按钮是否可用
           //path:"",//页面跳转的路径
-          username:"",//用户名
-          password:""//密码
-        }
+          email:"",//用户名
+          pwd:""//密码
+        },
+        showAlert: false, //显示提示组件
+				alertText: "", //提示的内容
       }
     },
     computed:mapState({
@@ -58,20 +64,66 @@
     },
     methods:{
       companyLogin(){
-       var account = JSON.parse(sessionStorage.getItem("account"));
-        if((this.reveal.username==account.username&&this.reveal.password==account.password)||(this.reveal.username=="root"&&this.reveal.password=="root")){
-          Vue.set(this.reveal,"path","/indexcontent/index")
-          location.hash="/index";
-        }else if(this.reveal.username!=account.username&&this.reveal.username!="root"){
-          alert("账号不存在")
-        }else if(this.reveal.password!=account.password&&this.reveal.password!="root"){
-          alert("密码错误")
-        }
-      }
+       var that = this;
+				var url = MyAjax.urlsy+"/companyInfo/login";
+				if(that.reveal.email.trim().length!=0&&that.reveal.pwd.trim().length!=0){
+					var data = that.reveal;
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data: JSON.stringify(data),
+						dataType: "json",
+						contentType:"application/json;charset=utf-8",
+					},function(data){
+						console.log(data)
+						console.log(data.token)
+						cookieTool.setCookie("token",data.token)
+						if(data.code==0){
+							router.push("/indexcontent");
+							sessionStorage.setItem("state","com");
+							sessionStorage.setItem("email",that.reveal.email);
+							if(data.ifActivated == 0){
+								sessionStorage.setItem("ifActivated",false);
+							}else{
+								sessionStorage.setItem("ifActivated",true);
+							}
+						}else if(data.code==-1){
+							switch (data.msg){
+								case "登录错误":
+									that.showAlert = true;
+									that.alertText = "登录错误";
+									break;
+								case "密码不一致":
+									that.showAlert = true;
+									that.alertText = "密码不一致";
+									break;
+								default:
+									break;
+							}
+						}
+					},function(err){
+						console.log(err)
+					})
+				}
+	//				router.push("/indexcontent");
+	//				sessionStorage.setItem("state","team");
+	    },
+	    keyLogin($event){//enter键登录事件
+	      var event = $event || window.event;  
+			 	if(event.keyCode==13){ 
+			     this.companyLogin()
+	         event.returnValue = false;    
+	         event.cancelBubble=true;
+	         event.preventDefault();
+	         //event.stopProgagation();
+	         return false;
+	      } 
+
+		  },
     },
     destroyed(){
     }
-  }
+  } 
 </script>
 <style scoped lang="scss">
   $companyThemeColor:#2EB3CF;
@@ -92,6 +144,12 @@
         height: 25px;
       }
     }
+  }
+  .alet_container{
+  	bottom: 230px !important;
+  	.tip_text{
+  		font-size: 14px !important;
+  	}
   }
   .loginSubmit{
     margin-top:40px;

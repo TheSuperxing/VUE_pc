@@ -641,6 +641,7 @@
         Vue.set(this.reveal,"empty",false);
 
         var that=this;
+        that.newLanguage.picId = [];
         singleManualUploader({
           element:"fine-template-manual-trigger-language",
           template: "qq-template-manual-trigger-language",

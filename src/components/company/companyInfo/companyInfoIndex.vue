@@ -1,17 +1,13 @@
 <template>
   <div class="companyInfoIndex">
-    <h3 class="c-title"><span>{{title}}</span></h3>
+    <h3 class="c-title">
+    	<span>{{title}}</span>
+    	<router-link to="/yhzx/company/info/companyInfo/editCompanyInfo" class="modifyInfo">
+	    	编辑信息
+	    </router-link>
+    </h3>
     <ul class="ci-list">
-      <li class="clear">
-        <h4>公司标识</h4>
-        <div class="logoBox">
-        <img src="../../../assets/img/logo/logo02.png" alt="">
-        </div>
-        <router-link to="/yhzx/company/info/companyInfo/editCompanyInfo">
-        	<div class="modifyInfo">编辑信息</div>
-        </router-link>
-        
-      </li>
+      
       <li class="clear">
         <h4>公司名称</h4>
         <p v-if="stateOne.haveCompanyName">{{basicInfo.companyName}}</p>
@@ -100,8 +96,15 @@ $bfColor:#ffffff;
 .companyInfoIndex{
 	width:940px;
   padding:40px;
+  .modifyInfo{
+    float: right;
+    color: #2eb3cf;
+    padding-left:20px;
+    background: url("../../../assets/img/company/edit.png") left center no-repeat;
+  }
   .ci-list{
     padding-left: 30px;
+    
     li{
       width:100%;
       /*height:100px;*/
@@ -130,16 +133,18 @@ $bfColor:#ffffff;
         width: 640px;
         line-height: 24px;
       }
-      .modifyInfo{
-        float: right;
-        color: #2eb3cf;
-        padding-left:20px;
-        background: url("../../../assets/img/company/edit.png") left center no-repeat;
-      }
+      
     }
     li:nth-child(1){
-      height:130px;
-      line-height: 100px;
+      height:60px;
+      line-height: 60px;
+      p{
+      	float:left;
+      	width: 500px;
+      }
+     	a{
+     		float: right;
+     	}
       
     }
   }

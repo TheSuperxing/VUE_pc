@@ -11,39 +11,25 @@
 							<span class="wrap-left">项目名称</span>
 							<p class="wrap-right">
 								<input type="text" placeholder="请输入项目名称" v-model="searchText" class="searchInput"/>
-								<span class="sBtn" @click="getData"><img src="../../../assets/img/company/seacer.png" />搜索</span>
+								<span class="sBtn" @click="search"><img src="../../../assets/img/company/seacer.png" />搜索</span>
 							</p>
 						</div>
 						<div class="result-wrap">
 							<span class="wrap-left">搜索结果</span>
 							
 							<ul class="resultList">
-								<li class="noResult">抱歉，未找到该项目，请重新搜索</li>
-								<li v-for="">
-									<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-									<span class="choseBtn" @click="choseThis($event)">
-										
+								<li class="noResult" v-if="noresult">抱歉，未找到该项目，请重新搜索</li>
+								<li v-for="(item,$index) in searchResult" >
+									<router-link :to="{name:'ProjectDetail',query:{id:item.projectID}}">{{item.projectName}}</router-link>
+									<span class="choseBtn" @click="choseThis($event,$index)">
 									</span>
 								</li>
-								<li v-for="">
-									<router-link :to="{name:'ProjectDetail',query:{id:'2'}}">王大麻子</router-link>
-									<span class="choseBtn" @click="choseThis($event)">
-										
-									</span>
-								</li>
-								<li v-for="">
-									<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-									<span class="choseBtn" @click="choseThis($event)">
-										
-									</span>
-								</li>
-								
 							</ul>
-							<router-link to="/yhzx/company/info/companyProject/definedProject" @click="closeModal">
+							<router-link to="/yhzx/company/info/companyProject/definedProject" @click="closeModal()">
 								<div class="goToDefinedPro">自定义添加项目</div>
 							</router-link>
 							
-							<span class="confirmBtn">确认</span>
+							<span class="confirmBtn" @click="confirmAddPro">确认</span>
 						</div>
 				</div>
   		</div>
@@ -73,21 +59,16 @@
     		<!--确认删除该项目模态框-->
     	</div>
     	<div class="pr-wrap-a">
-    		<span class="completeTime">Time : {{item.parTakeTime_S}} 至 {{item.parTakeTime_E}}</span>
+    		<span class="completeTime">Time : {{item.partakeTimeUp}} — {{item.partakeTimeDown}}</span>
   			<span class="takeOfficeBar">项目责任：<em class="takeOffice">{{item.takeOffice}}</em></span>
     	</div>
-    	<div class="pr-wrap-b">{{item.detailDes}}
+    	<div class="pr-wrap-b">责任描述：
+    		<em>{{item.detailDes}}</em>
+    	</div>
+    	<div class="morePics" v-if="!show.tag[$index]">
+    		<img v-for="item in show.picList[$index]" :src="item.pic" />
     	</div>
     	
-    	<div class="morePics" v-if="!show.tag[$index]">
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		<img src="../../../assets/img/company/img.png" />
-    		
-    	</div>
     	<div class="viewMore">
     		<p v-bind:class="{viewDown:show.tag[$index],viewUp:!show.tag[$index]}" @click="upDown($index)">
     			<!--<img src="../../../assets/img/company/double-bottom-down.png" />
@@ -104,6 +85,7 @@
 	import router from "../../../router"
 	import Vue from "vue"
 	import {mapState} from "vuex"
+	import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"companyProjectIndex",
     data:function(){
@@ -113,12 +95,17 @@
         updowntxt:[],
         show:{
         	tag:[],
-        	
+        	picList:[],
         },
+        stateNone:false,
         proInfo:[],
         searchText:"", /*搜索框input值*/
-        list:[], /*搜索结果*/
+        searchResult:[], /*搜索结果*/
+        noresult:false,
         deleteModalClass:[],//确认删除项目的模态框
+        chosedOne:{
+       		
+       	}
       }
     },
     computed:mapState({
@@ -143,23 +130,103 @@
     	
     },
     methods:{
+    	getData(){
+    		console.log(7777)
+    		var that = this;
+			  var url = MyAjax.urlsy+"/companyInfo/findProjExpes";//暂时先写成这样
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					if(data.code==0){
+						that.proInfo = data.msg;
+						if(that.proInfo.length!=0){
+							that.stateNone = true;
+						}
+					}else{
+						console.log("错误返回");
+					}
+				},function(err){
+					console.log(err)
+				})
+	    	/*数据同步本地一份开始*/
+	    	function emptyText(text) {
+			    if(text==null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			  }
+	    	
+	    	//判断有无项目经历信息
+	    	
+				that.localProInfo=JSON.parse(JSON.stringify(that.proInfo));
+				that.show.tag = [];
+				that.updowntxt = [];
+				that.deleteModalClass = [];
+				that.openOrPrivacy = [];
+				that.openOrPrivacyText = [];
+				that.show.tag.length = that.proInfo.length;
+	//  	console.log(this.show.tag.length)
+	    	for(var i=0;i<this.proInfo.length;i++){
+	    		if(that.proInfo[i].partakeTimeDown==("0002.12.01"||"0002.12")){
+					 	that.proInfo[i].partakeTimeDown = "至今";
+					}
+	    		if(that.localProInfo[i].partakeTimeDown==("0002.12.01"||"0002.12")){
+					 	that.localProInfo[i].partakeTimeDown = "至今";
+					}
+	    		that.proInfo[i].takeOffice = emptyText(that.proInfo[i].takeOffice);
+	    	  that.proInfo[i].detailDes = emptyText(that.proInfo[i].detailDes);
+	    		that.show.tag[i]=true;
+	    		that.updowntxt.push("展开查看更多");
+	    		that.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
+					if(that.proInfo[i].ifVisable==1){
+						that.openOrPrivacy.push(true);
+						that.openOrPrivacyText.push("显示")
+					}else{
+						that.openOrPrivacy.push(false);
+						that.openOrPrivacyText.push("隐藏")
+					}
+		      /*对每一个循环列表的对外显示赋初始值*/
+	    	}
+			},
+			getPic(expeID,index){
+				var that=this;
+				var url=MyAjax.urlsy+"/teamOrgaInfo/findPicsById/"+expeID;
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:true,
+				},function(data){
+					console.log(data)
+					Vue.set(that.show.picList,[index],data.msg)
+				},function(err){
+					console.log(err)
+				})
+			},
     	goToEditPro(index,item){
-    		router.push({name:'editProject',params:{id:item.id}})
+    		router.push({name:'editCompanyProject',query:{projId:item.projectID,expeId:item.companyProExpeID}})
     		/*通过路由传值*/
     	},
     	
     	upDown(index){
 //  		Vue.set(this.show,"tag[index]",false)
-				console.log(this.show.tag[index])
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
-					this.updowntxt[index] = "收起图片"
+					this.updowntxt[index] = "收起"
+					this.getPic(this.proInfo[index].companyProExpeID,index)
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
 				}
     		this.show.tag[index] == true? false:true;
-    		this.updowntxt[index]=="展开查看更多"?"收起图片":"展开查看更多";
+				this.updowntxt[index]=="展开查看更多"?"收起":"展开查看更多";
+			
+				console.log(this.show.picList)
     	},
     	deletePro(index){
     		//删除模态框的弹出按钮事件
@@ -172,7 +239,11 @@
     	},
     	saveDele(index){
     		//确认删除该项目
-    		this.companyProInfo.splice(index,1);
+    		var that = this;
+				console.log(that.proInfo[index].pkid)
+				var url = MyAjax.urlsy+"/companyInfo/del/"+that.proInfo[index].pkid;
+				MyAjax.delete(url)
+				that.getData();//更新一下数据
     		this.closeModal(index);
     	},
     	//模态框
@@ -186,18 +257,58 @@
 				$('.search-wrap').css({marginTop:"120px",marginBottom:"170px"})
 				$('.result-wrap').css({display:"none"})
 			},
-			getData(){
+			search(){
 //				console.log($('.search-wrap').offsetTop())
+				var that = this;
+	    	var url = MyAjax.urlsy+"/companyInfo/findProjByName/"+that.searchText;
+	    	MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+				},function(data){
+					console.log(data)
+					data = data.msg;
+					that.searchResult = data;
+					if(that.searchResult.length!=0){
+						that.noresult=false;
+					}else{
+						that.noresult=true;
+					}
 					$('.search-wrap').animate({marginTop:"30px",marginBottom:"40px"},100);
 					$('.result-wrap').fadeIn(200);
+				},function(err){
+					console.log(err)
+				})
+			},
+			keySearch(){//enter键登录事件
+			 	var event = event || window.event;  
+			 	if(event.keyCode==13){ 
+			 		console.log("222")
+			    this.search()
+			    event.returnValue = false;    
+			    return false;
+			  }
 			},
 			choseThis(e){
-				$(".resultList li span").removeClass('selected');
-				$(e.target).addClass("selected");
-				console.log($(".resultList li span"))
+				if($(e.target).hasClass("selected")==false){
+//					console.log($(e.target))
+					$(e.target).addClass("selected");
+					$(e.target).parent().siblings().find("span").removeClass('selected');
+				}else if($(e.target).hasClass("selected") == true){
+//					console.log($(e.target))
+					$(e.target).removeClass("selected");
+				}
+				 e.stopPropagation();    //阻止冒泡  
+				 this.chosedOne = this.searchResult[index]
+				 console.log(this.chosedOne)
 				
 			},
-			
+			confirmAddPro(){
+				var that = this;
+				console.log(that.chosedOne.projectID,that.chosedOne.teamProExpeID)
+				router.push({name:'editTeamProject',query:{projId:that.chosedOne.projectID,expeId:that.chosedOne.teamProExpeID}})
+			}
 	
     
     }

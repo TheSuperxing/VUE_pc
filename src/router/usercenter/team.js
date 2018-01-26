@@ -77,7 +77,7 @@ var teamRouterChildren=[
 							},{
 								path:"/yhzx/team/info/teamProject/editProject",component:editProject,name:'editTeamProject'
 							},{
-								path:"/yhzx/team/info/teamProject/definedProject",component:definedProject
+								path:"/yhzx/team/info/teamProject/definedProject",component:definedProject,name:"definedTeamProject"
 							},{
 								path:"/yhzx/team/info/teamProject/detail",component:TeamProDetail,
 								name:"TeamProDetail",

@@ -51,7 +51,7 @@
 	          cfmnewPwd: ''
 	        },
 	        showAlert:false,//显隐
-   		 	alertText:"",//提示信息		
+   		 	  alertText:"",//提示信息		
 	        showSuc:false
 	      };
 	    },

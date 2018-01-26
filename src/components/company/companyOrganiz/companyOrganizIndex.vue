@@ -8,15 +8,15 @@
     		<li v-for="(item,index) in orgaInfo.senior" class="seniorList" v-if="!haveSenior"><!--有高管团队-->
     			<img src="../../../assets/img/company/icon_senior.png"/>
     			<p class="seniorName">{{item.dealId}}</p>
-    			<span class="deleSen"  v-if="editSeniorShow" @click="removeSenior(index)"></span>
+    			<span class="deleSen" @click="removeSenior(index)" v-if="editSeniorShow"></span>
     		</li>
     		<span class="addMoreS" @click="overlay" v-if="editSeniorShow"></span>
     		<div class="btnBox" v-if="editSeniorShow">
-					<span class="saveBtn" @click="editDoneSenior">保存</span>
-					<span class="cancelBtn" @click="cancleEditSenior">取消</span>
+					<span class="saveBtn" @click="editDone(state[0])">保存</span>
+					<span class="cancelBtn" @click="cancleEdit(state[0])">取消</span>
 				</div>
-
     	</ul>
+    	<span class="editPersonBtn" @click="toEdit(state[0])" v-if="!editSeniorShow">编辑</span>
     	<!--添加高管模态框-->
 				<div id="modal-overlay" class="modal-a">
 					<div class="searchSenior">
@@ -33,49 +33,38 @@
 								<div class="result-wrap">
 									<span class="wrap-left">搜索结果</span>
 									<ul class="resultList">
-										<li class="noResult">抱歉，未找到该项目，请重新搜索</li>
-										<li v-for="" >
-											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-											<span class="choseBtn" @click="choseThis($event)">
+										<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
+										<li v-for="(item,index) in list">
+											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.nickName}}</router-link>
+											<span class="choseBtn" @click="choseThis($event,index)">
 											</span>
 										</li>
-										<li v-for="">
-											<router-link :to="{name:'ProjectDetail',query:{id:'2'}}">王大麻子</router-link>
-											<span class="choseBtn" @click="choseThis($event)">
-											</span>
-										</li>
-										<li v-for="">
-											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-											<span class="choseBtn" @click="choseThis($event)">
-											</span>
-										</li>
-										
 									</ul>
-									<span class="confirmBtn">确认</span>
+									<span class="confirmBtn" @click="saveAdd(state[0])">确认</span>
 								</div>
 						</div>
 					</div>
 				</div>
 				<!--添加高管模态框-->
 
-    	<span class="editPersonBtn" @click="toEditSenior" v-if="!editSeniorShow">编辑</span>
+    	
     </div><!--高管部分 begin-->
     <div class="orgTable"><!--骨干部分 begin-->
     	<p class="t-title"><img src="../../../assets/img/company/backbone01.png" />重要骨干</p>
     	<ul class="backboneInfo">
-    		<li class="stateOne" v-if="haveBackbone">(暂无骨干团队)</li><!--暂无骨干-->
-    		<li v-for="(item,index) in orgaInfo.backbone" class="backboneList" v-if="!haveBackbone"><!--有骨干团队-->
-    			<img src="../../../assets/img/company/icon_senior.png"/>
-    			<p class="seniorName">{{item.dealId}}</p>
+    		<li class="stateOne" v-if="!haveBackbone">(暂无骨干团队)</li><!--暂无骨干-->
+    		<li v-for="(item,index) in orgaInfo.backbone" class="backboneList" v-if="haveBackbone"><!--有骨干团队-->
+    			<img :src="item.pic" :class="{'gray':item.IfCer=='0'}"/>
+    			<p class="seniorName">{{item.name}}</p>
     			<span class="deleSen" @click="removeBackbone(index)" v-if="editBackboneShow"></span>
     		</li>
     		<span class="addMoreS" @click="overlay" v-if="editBackboneShow"></span>
     		<div class="btnBox" v-if="editBackboneShow">
-					<span class="saveBtn" @click="editDoneBackbone" >保存</span>
-					<span class="cancelBtn" @click="cancleEditBackbone">取消</span>
+					<span class="saveBtn" @click="editDone(state[1])" >保存</span>
+					<span class="cancelBtn" @click="cancleEdit(state[1])">取消</span>
 				</div>
     	</ul>
-    	<span class="editPersonBtn" @click="toEditBackbone" v-if="!editBackboneShow">编辑</span>
+    	<span class="editPersonBtn"  @click="toEdit(state[1])" v-if="!editBackboneShow">编辑</span>
     	<div id="modal-overlay" class="modal-b">
 					<div class="searchBackbone">
 						<h5>搜索员工</h5>
@@ -85,34 +74,21 @@
 									<span class="wrap-left">员工姓名</span>
 									<p class="wrap-right">
 										<input type="text" />
-										<span class="sBtn"><img src="../../../assets/img/company/seacer.png" />搜索</span>
+										<span class="sBtn"  @click="getList" @keydown="keySearch($event)"><img src="../../../assets/img/company/seacer.png" />搜索</span>
 									</p>
 								</div>
 								<div class="result-wrap">
 									<span class="wrap-left">搜索结果</span>
 									<ul class="resultList">
-										<li class="noResult">抱歉，未找到该项目，请重新搜索</li>
-										<li v-for="" >
-											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-											<span class="choseBtn" @click="choseThis($event)">
-												
-											</span>
-										</li>
-										<li v-for="">
-											<router-link :to="{name:'ProjectDetail',query:{id:'2'}}">王大麻子</router-link>
-											<span class="choseBtn" @click="choseThis($event)">
-												
-											</span>
-										</li>
-										<li v-for="">
-											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">王大麻子</router-link>
-											<span class="choseBtn" @click="choseThis($event)">
-												
+										<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
+										<li v-for="(item,index) in list">
+											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.nickName}}</router-link>
+											<span class="choseBtn" @click="choseThis($event,index)">
 											</span>
 										</li>
 										
 									</ul>
-									<span class="confirmBtn">确认</span>
+									<span class="confirmBtn" @click="saveAdd(state[1])">确认</span>
 								</div>
 						</div>
 					</div>
@@ -204,7 +180,8 @@
         haveStaff:false,/*有无员工(控制高管及骨干模态框 有无员工可搜索)*/
         haveSenior:false,/*有无高管*/
        	haveBackbone:false,/*有无骨干*/
-        state:"",
+       	haveResult:false,/*有无搜索结果*/
+        state:["topManagers","importantPsns","members"],
         editSeniorShow:false,
         editBackboneShow:false,
         showCer:false,/*员工编辑状态的添加取消认证的按钮显隐*/
@@ -235,7 +212,13 @@
         childimg:require("../../../assets/img/company/senior02.png"),
        	searchText:"", /*搜索框input值*/
         list:[], /*搜索结果*/
-
+				chosedOne:{
+					IfCer:"",
+          defaultPic:"",
+					name:"",
+					pic:"",
+					psnID:""
+				}
 
       }
     },
@@ -297,7 +280,12 @@
     	}
     },
     methods:{
-
+    	getData(){
+    		
+    	},
+			getList(){
+				
+			},
     	switchTab(index){
 				this.active = index;
 
@@ -312,60 +300,115 @@
     		}
 
     	},
-    	toEditSenior(){
-    		this.editSeniorShow = true;
-
-//  		console.log($('.seniorInfo'));
-    	},
-    	editDoneSenior(){
-    		var str = JSON.stringify(this.orgaInfo);
-	    	var data = JSON.parse(str);
-    		for(var item in data){
-    			this.companyOrgaInfo.senior = data.senior;
+    	toEdit(state){
+    		switch (state){
+    			case "topManagers":
+    				this.editSeniorShow = true;
+    				break;
+    			case "importantPsns":
+    				this.editBackboneShow = true;
+    				break;
+    			case "members":
+    				this.editStaffShow = true; 
+    				break;
+    			default:
+    				break;
     		}
-    		this.editSeniorShow = false;
-
     	},
-    	cancleEditSenior(){/*取消编辑的高管状态 （再获取一次vuex数据放到页面）*/
-
-    		var str = JSON.stringify(this.companyOrgaInfo);
-	    	var data = JSON.parse(str);
-	    	console.log(data);
-	    	for(var item in data){/*遍历  非引用赋值*/
-	    		this.orgaInfo.senior = data.senior;
-	    		this.orgaInfo.backbone = data.backbone;
-	    		this.orgaInfo.staff = data.staff;
-	    	}
-    		this.editSeniorShow = false;
-    		$('.seniorInfo').css("display","block").siblings('.editPersonBtn').css("display","block");
-    	},
-
-    	toEditBackbone(){
-    		this.editBackboneShow = true;
-
-//  		console.log($('.seniorInfo'));
-    	},
-    	editDoneBackbone(){
-    		var str = JSON.stringify(this.orgaInfo);
-	    	var data = JSON.parse(str);
-    		for(var item in data){
-    			this.companyOrgaInfo.backbone = data.backbone;
+    	cancleEdit(state){
+    		switch (state){
+    			case "topManagers":
+    				this.editSeniorShow = false;
+    				break;
+    			case "importantPsns":
+    				this.editBackboneShow = false;
+    				break;
+    			case "members":
+    				this.editStaffShow = false; 
+    				break;
+    			default:
+    				break;
     		}
-    		this.editBackboneShow = false;
+    		this.getData()
     	},
-    	cancleEditBackbone(){/*取消编辑的高管状态 （再获取一次vuex数据放到页面）*/
+    	editDone(state){
+    		var that=this;
+    		switch (state){
+    			case "topManagers":
+    				var type = "高管";
+    				var list = that.teamOrgaInfo.topManagers;
+    				break;
+    			case "importantPsns":
+    				var type = "重要骨干";
+    				var list = that.teamOrgaInfo.importantPsns;
+    				break;
+    			case "members":
+    				var type = "下属员工";
+    				var list = that.teamOrgaInfo.members;
+    				break;
+    			default:
+    				break;
+    		}
+        var url = MyAjax.urlsy+"/teamOrgaInfo/saveTeamOrgInfo";
+        var data = {
+        	list:list,
+        	staffType:type
+        }
+        console.log(data)
+    		MyAjax.ajax({
+          type: "POST",
+          url:url,
+          data:JSON.stringify(data),
+          dataType: "json",
+          async:false,
+          contentType:"application/json;",
+        },function(data){
+        	console.log(data)
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+    		switch (state){
+    			case "topManagers":
+    				that.editSeniorShow = false;
+    				break;
+    			case "importantPsns":
+    				that.editBackboneShow = false;
+    				break;
+    			case "members":
+    				that.editStaffShow = false; 
+    				break;
+    			default:
+    				break;
+    		}
+    		that.getData();
+    	},
+    	saveAdd(state){/*添加员工   暂时   还需要点击确认或者取消*/
+				console.log(state)
+    		switch (state){
+    			case "topManagers":
+    				this.teamOrgaInfo.topManagers.push(this.chosedOne)
+    				break;
+    			case "importantPsns":
+    				this.teamOrgaInfo.importantPsns.push(this.chosedOne)
+    				break;
+    			case "members":
+    				this.teamOrgaInfo.members.push(this.chosedOne)
+    				break;
+    			default:
+    				break;
+    		}
+    		this.closeModal()
+    		console.log(this.teamOrgaInfo.topManagers)
+    	},
+    	
+    	
 
-    		var str = JSON.stringify(this.companyOrgaInfo);
-	    	var data = JSON.parse(str);
-	    	console.log(data);
-	    	for(var item in data){/*遍历  非引用赋值*/
-	    		this.orgaInfo.senior = data.senior;
-	    		this.orgaInfo.backbone = data.backbone;
-	    		this.orgaInfo.staff = data.staff;
-	    	}
-    		this.editBackboneShow = false;
-    		$('.backboneInfo').css("display","block").siblings('.editPersonBtn').css("display","block");
-    	},
+    	
+    	
+    	
     	removeSenior(index){
 //  		var that = this;
     		this.orgaInfo.senior.splice(index,1);

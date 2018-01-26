@@ -20,6 +20,7 @@
 <script>
 	import Vue from "vue"
 	import {mapState} from "vuex"
+	import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"companyTeamIndex",
     data:function(){
@@ -54,6 +55,26 @@
     	}
     },
     methods:{
+    	getData(){
+        var that=this;
+        var url = MyAjax.urlsy+"/teamOrgaInfo/findByMySelf";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async: false,
+        },function(data){
+        	console.log(data)
+          if(data.code==0){
+            that.teamExperience=data.msg
+            //Vue.set(that,"teamExperience",data.msg)//ifCer标识是否认证，0未认证，1已经认证
+          }else{
+            console.log("错误返回");
+          }
+        },function(err){
+          console.log(err)
+        })
+      },
     	certifyTag(index){
     		if(this.companyTeamInfo[index].cerState == true){
     			this.companyTeamInfo[index].cerState = false;
@@ -65,6 +86,22 @@
     			this.certified[index] = true;
     		}
     		
+    		var that=this;
+        var url = MyAjax.urlsy+"/teamOrgaInfo/update";
+        MyAjax.ajax({
+          type: "POST",
+          url:url,
+          data: JSON.stringify(that.teamExperience[index]),
+          dataType: "json",
+          contentType: "application/json;charset=UTF-8",
+          async: false,
+        },function(data){
+            console.log(data)
+        },function(err){
+          console.log(err)
+        })
+
+        that.getData();
     		
     	}
     }

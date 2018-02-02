@@ -6,12 +6,12 @@
 		    <el-input v-model="formLabelAlign.oldPwd"></el-input>
 		  </el-form-item>
 		  <el-form-item label="输入新密码">
-		    <el-input v-model="formLabelAlign.newPwd"></el-input>
+		    <el-input v-model="formLabelAlign.newPwd" @blur="comNewPwd"></el-input>
 
 		  </el-form-item>
 		  <p class="notice">密码由6-14位字母（区分大小写）、数字或符号组成</p>
 		  <el-form-item label="确认新密码">
-		    <el-input v-model="formLabelAlign.cfmnewPwd" @blur="comNewPwd"></el-input>
+		    <el-input v-model="formLabelAlign.cfmnewPwd"></el-input>
 		  </el-form-item>
 		</el-form>
 		<alertTip v-if="showAlert" :showHide="showAlert"  :alertText="alertText"></alertTip>
@@ -51,7 +51,7 @@
 	          cfmnewPwd: ''
 	        },
 	        showAlert:false,//显隐
-   		 	  alertText:"",//提示信息		
+   		 	alertText:"",//提示信息		
 	        showSuc:false
 	      };
 	    },

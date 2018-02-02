@@ -3,16 +3,11 @@
     <h3 class="c-title"><span>{{title}}</span></h3>
     <ul class="team-table">
     	<li class="stateOne" v-if="stateOne">（您尚未有团队认证信息）</li>
-	    <li v-for="(item,index) in companyTeamInfo" v-bind:class="{bga:item.cerState,bgb:!item.cerState}">
-	    	<span class="team-name">{{item.dealId}}<img src="../../../assets/img/company/Authentication-s.png" v-if="certified[index]"/></span>
+	    <li v-for="(item,index) in companyTeamInfo" v-bind:class="{bga:item.ifCer=='1',bgb:item.ifCer=='0'}">
+	    	<span class="team-name">{{item.teamName}}<img src="../../../assets/img/company/Authentication-s.png" v-if="certified[index]"/></span>
 	    	<span v-html="innertext[index]"  class="editBtn" @click="certifyTag(index)"></span>
 	    </li>
-	    
-	    <!--<li v-for="(item,index) in teamInfo.uncertified" v-bind:class="bgb">
-	    	<span class="team-name">{{item.dealId}}</span>
-	    	<span v-html="textb"  class="editBtn" @click="addCer(index)"></span>
-	    </li>-->
-    
+	
     </ul>
   </div>
 </template>
@@ -32,76 +27,81 @@
         bga:"bga",
         bgb:"bgb",
         stateOne:true,
+        companyTeamInfo:{}
       }
     },
     computed:mapState({
-      companyTeamInfo:state=>state.company.companyMessage.companyTeamInfo/*获取vuex数据*/
+//    companyTeamInfo:state=>state.company.companyMessage.companyTeamInfo/*获取vuex数据*/
     }),
-    mounted(){
-    	var str = JSON.stringify(this.companyTeamInfo);
-    	var data = JSON.parse(str);
-    	for(var i=0;i<this.companyTeamInfo.length;i++){
-    		
-    		if(this.companyTeamInfo[i].cerState===true){
-					this.innertext.push("取消认证") 
-					this.certified.push(true)
-				}else{
-					this.innertext.push( "添加认证")
-					this.certified.push(false)
-				}
-    	}
-    	if(this.companyTeamInfo.length!=0){
-    		this.stateOne =false;
-    	}
+    created(){
+    	this.getData()
     },
+    mounted(){},
     methods:{
     	getData(){
-        var that=this;
-        var url = MyAjax.urlsy+"/teamOrgaInfo/findByMySelf";
-        MyAjax.ajax({
-          type: "GET",
-          url:url,
-          dataType: "json",
-          async: false,
-        },function(data){
-        	console.log(data)
-          if(data.code==0){
-            that.teamExperience=data.msg
-            //Vue.set(that,"teamExperience",data.msg)//ifCer标识是否认证，0未认证，1已经认证
-          }else{
-            console.log("错误返回");
-          }
-        },function(err){
-          console.log(err)
-        })
-      },
+	        var that=this;
+	        var url = MyAjax.urlsy+"/companyInfo/findTeams";
+	        MyAjax.ajax({
+	          type: "GET",
+	          url:url,
+	          dataType: "json",
+	          async: false,
+	        },function(data){
+	        	console.log(data)
+	          if(data.code==0){
+	            that.companyTeamInfo=data.msg
+	            if(that.companyTeamInfo.length==0){
+		    		that.stateOne =true;
+		    	}else{
+		    		that.stateOne =false;
+		    	}
+		    	
+		    	for(var i=0;i<that.companyTeamInfo.length;i++){
+//  		
+	    			if(that.companyTeamInfo[i].ifCer===1){
+						that.innertext.push("取消认证") 
+						that.certified.push(true)
+					}else{
+						that.innertext.push( "添加认证")
+						that.certified.push(false)
+					}
+				}
+    	
+	            //Vue.set(that,"teamExperience",data.msg)//ifCer标识是否认证，0未认证，1已经认证
+	          }else{
+	            console.log("错误返回");
+	          }
+	        },function(err){
+	          console.log(err)
+	        })
+	    },
     	certifyTag(index){
-    		if(this.companyTeamInfo[index].cerState == true){
-    			this.companyTeamInfo[index].cerState = false;
+    		if(this.companyTeamInfo[index].ifCer == 1){
+    			this.companyTeamInfo[index].ifCer = 0;
     			this.innertext[index] = "添加认证";
     			this.certified[index] = false;
     		}else{
-    			this.companyTeamInfo[index].cerState = true;
+    			this.companyTeamInfo[index].ifCer = 1;
     			this.innertext[index]= "取消认证";
     			this.certified[index] = true;
     		}
-    		
+    		console.log(this.companyTeamInfo[index])
     		var that=this;
-        var url = MyAjax.urlsy+"/teamOrgaInfo/update";
-        MyAjax.ajax({
-          type: "POST",
-          url:url,
-          data: JSON.stringify(that.teamExperience[index]),
-          dataType: "json",
-          contentType: "application/json;charset=UTF-8",
-          async: false,
-        },function(data){
-            console.log(data)
-        },function(err){
-          console.log(err)
-        })
+	        var url = MyAjax.urlsy+"/companyInfo/updateTeamCerState";
+	        MyAjax.ajax({
+	          type: "POST",
+	          url:url,
+	          data: JSON.stringify(that.companyTeamInfo[index]),
+	          dataType: "json",
+	          contentType: "application/json;charset=UTF-8",
+	          async: false,
+	        },function(data){
+	            console.log(data)
+	        },function(err){
+	          console.log(err)
+	        })
 
-        that.getData();
+        	that.getData();
     		
     	}
     }
@@ -116,9 +116,7 @@ $activeColor: #2eb3cf;
 	padding: 40px;
 	min-height: 427px;
 	background: $bfColor;
-	.stateOne{
-		color: #898989;
-	}
+	
 	.team-table{
 		margin-top: 12px;
 		padding: 0 20px;
@@ -158,6 +156,11 @@ $activeColor: #2eb3cf;
 				
 			}
 			
+		}
+		.stateOne{
+			color: #898989;
+			text-align: center;
+			border:none;
 		}
 	}
 	

@@ -24,10 +24,10 @@ var MyAjax = {
 				callback(data);
 				if(!option.ifFreeLogin){
 					if(data.msg==="100004"){//tooken为空
-						window.location.hash ="/login"
+						window.location.href ="/login"
 					}
 					if(data.msg=="100003"){//没有成功登陆
-						window.location.hash="/login"
+						window.location.href="/login"
 					}
 				}
 			},error:function(error){

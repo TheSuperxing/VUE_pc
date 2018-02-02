@@ -120,7 +120,7 @@ export default new Router({
     {
       path:"/yhzx", name:"Users",component:Users,
       children:routerChildren
-		},
+	},
 		notice,
 		error
   ],

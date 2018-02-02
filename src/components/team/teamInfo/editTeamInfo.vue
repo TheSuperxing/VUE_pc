@@ -254,51 +254,7 @@
 						color: #B0B0B0;
 					}
 				}
-			    /*li:nth-child(1){
-			      height:130px;
-			      line-height: 100px;
-			      padding-top: 30px;
-			      margin-bottom: 20px;
-			      .logoBox{
-			      	float:left;
-			      	width:100px; height: 100px;
-			      	margin-left:90px;
-			      	position:relative;
-			      	border:1px solid #e0e0e0;
-			      	overflow: hidden;
-			      	input{
-							position: absolute;
-							width: 100%;
-							height: 100%;
-							opacity: 0;
-							left: -90px;
-							z-index: 99;
-						}
-				    img{
-				    	width: 100px; height: 100px;
-				    }
-				    .el-button{
-				    	border-radius:0 !important;
-				    	padding: 0 !important;
-				    }
-				    .modifyLogo{
-				    	width: 100px;
-				    	height: 20px;
-				    	line-height: 20px;
-				    	text-align: center;
-				    	display: inline-block;
-				    	background: rgba(155,155,155,.9);
-				    	position: absolute;
-				    	left: 0;
-				    	bottom: 0;
-				    	font-size: 12px;
-				    	color: #FFFFFF;
-				    	z-index: 11;
-				    	cursor: pointer;
-				    }
-			      }
-			      
-			    }*/
+			    
 		}
 		/*模态框模态框模态框模态框模态框模态框模态框模态框模态框模态框模态框*/
 		.previewZz{

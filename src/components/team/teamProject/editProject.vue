@@ -210,9 +210,7 @@
 	        alertText:{partakeTime:null,takeOffice:null},
 	      }
 	    },
-	    computed:mapState({
-		  teamProInfo:state=>state.team.teamMessage.teamProInfo/*获取vuex数据*/
-		}),
+	   
 		created(){
 	   		var that = this;
 			that.projID = that.$route.query.projId;
@@ -340,7 +338,7 @@
 					},function(err){
 						console.log(err)
 				})
-				const data = await that.getPic(that.teamProExpeID) 
+				const data = await that.getPic(that.expeID) 
 				if(data.code===0){
 					Vue.set(that,"picList",data.msg)
 				    Vue.set(that,"picNum",data.msg.length)

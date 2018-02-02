@@ -122,23 +122,7 @@
     },
     mounted(){
     	this.getData();
-    	/*将vuex里面的数据获取到本组件*/
-//  	this.proInfo= this.teamProInfo.reduce(function(coll,item){
-//  		coll.push(item);
-//  		return coll;
-//  	},this.proInfo)
-////  	console.log(this.proInfo);
-////  	console.log(this.teamProInfo)
-//  	
-//  	this.show.tag.length = this.teamProInfo.length;
-////  	console.log(this.show.tag.length)
-//  	for(var i=0;i<this.teamProInfo.length;i++){
-//  		this.show.tag[i]=true;
-//  		this.updowntxt.push("展开查看更多");
-//  		this.deleteModal.push("deleteModal"+i);//遍历所有项目数组 获取个数来确认模态框个数
-//  		
-//  	}
-    	
+  
     },
     methods:{
     	getData(){

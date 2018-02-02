@@ -158,24 +158,26 @@
 				this.user.userState = sessionStorage.getItem("state");
 				console.log(this.user.userState)
 				//首页请求信息
-				var that = this;
-				var url = MyAjax.urlhw+"/accountmanainfo/home";
-				MyAjax.ajax({
-					type: "GET",
-					url:url,
-					dataType: "json",
-					async:false,
-					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取					
-				},function(data){
-         		 data = data.msg;
-					// if(data == "100004"){
-					// 	cookieTool.delCookie("token")
-					// 	router.push("/login")
-          // } 
-				},function(err){
-					console.log(err)
-				})
-
+//				var that = this;
+//				var url = MyAjax.urlhw+"/accountmanainfo/home";
+//				MyAjax.ajax({
+//					type: "GET",
+//					url:url,
+//					dataType: "json",
+//					async:false,
+//					ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取					
+//				},function(data){
+//					console.log(data)
+//       		 data = data.msg;
+//					// if(data == "100004"){
+//					// 	cookieTool.delCookie("token")
+//					// 	router.push("/login")
+//        // } 
+//				},function(err){
+//					console.log(err)
+//				})
+				
+//				this.toUserCenter()
 		},
 	  updated(){
 	  	this.user.userState = sessionStorage.getItem("state");
@@ -220,6 +222,7 @@
 	     },
 
 	     toUserCenter(){
+	     	console.log(555)
 	     	if(this.ifActivated == true){
 	     		switch (this.user.userState){
 					case 'com':
@@ -232,8 +235,9 @@
 						router.push("/yhzx/personal/info")
 						break;
 					default:
+						router.push("/login")
 						break;
-				}
+				  }
 	     	}else{
 	     		router.push("/yhzx/activate")
 	     	}

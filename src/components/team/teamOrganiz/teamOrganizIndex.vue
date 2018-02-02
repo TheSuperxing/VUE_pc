@@ -290,13 +290,9 @@
     	this.getData();
     },
     mounted(){
-    	
-//  	
-
     },
     methods:{
 			getData(){
-				console.log(888)
         var that=this;
         var url = MyAjax.urlsy+"/teamOrgaInfo/teamOrgInfo";
         MyAjax.ajax({
@@ -607,16 +603,7 @@
     	removeStaff(index){
     		this.teamOrgaInfo.members.splice(index,1);
     	},
-    	addCer(index){/*添加认证 */
-//  		console.log(index);
-    		this.addCerArr.push(this.orgaInfo.staff.uncertified[index])/*把未认证的添加员工添加到data中的addCerArr*/
-    		this.orgaInfo.staff.uncertified.splice(index,1);/*把这个员工从本地未认证数据数组中删除*/
-//  		console.log(this.orgaInfo.staff.uncertified);
-    	},
-    	removeCer(index){
-    		this.removeCerArr.push(this.orgaInfo.staff.certified[index])/*把已认证的添加员工添加到data中的addCerArr*/
-    		this.orgaInfo.staff.certified.splice(index,1);/*把这个员工从本地认证数据数组中删除*/
-    	},
+    	
     	overlay(state){
     		/*模态框弹出有无可搜索员工判断*/
     		if(state == "topManagers"){
@@ -1211,7 +1198,7 @@
 								.cerBtn{
 									width: 80px;
 									height: 30px;
-									margin-top: 14px;
+									margin: 14px auto 0;
 									background: $activeColor;
 									color: #FFFFFF;
 									border-radius: 5px;

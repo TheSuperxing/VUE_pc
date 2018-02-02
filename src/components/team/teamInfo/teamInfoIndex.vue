@@ -59,11 +59,6 @@
     }),
     mounted(){
     	this.getData();
-    	
-
-
-    	
-//    console.log(this.stateOne)
     },
     methods:{
     	getData(){

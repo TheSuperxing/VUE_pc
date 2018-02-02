@@ -1,6 +1,6 @@
 <template>
 	<div class="comfirmActivate">
-		<div class="content-wrap" v-bind:class='[{"com-wrap":state=="com"},{"team-wrap":state=="team"},{"person-wrap":state=="per"}]'>
+		<div  v-if="!success" class="content-wrap" v-bind:class='[{"com-wrap":state=="com"},{"team-wrap":state=="team"},{"person-wrap":state=="per"}]'>
 			<h1 v-bind:class='{"expared":haveExpare}'>{{msg}}</h1>
 			<p v-if="sendAgainflag">已重新发送邮件，请登录邮箱，点击链接激活账号，链接在24小时内有效。</p>
 			<div class="btnBox">
@@ -8,7 +8,10 @@
 				<span @click="sendAgain" v-if="haveExpare">重新发送</span>
 			</div>
 		</div>
-		
+		<div v-if="success"  class="content-wrap" v-bind:class='[{"com-wrap":state=="com"},{"team-wrap":state=="team"},{"person-wrap":state=="per"}]'>
+			<h1 class="success">激活成功！正在跳转去登录。。。</h1>
+			
+		</div>
 	</div>
 </template>
 
@@ -27,6 +30,7 @@
 				email:"",
 				msg:"请点击下方按钮完成激活",
 				haveExpare:false,//有没有过期
+				success:false
 			}
 		},
 		computed:mapState({
@@ -41,6 +45,7 @@
 	          url:url,
 	          dataType: "json",
 	          async:false,
+	          ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取			
 	        },function(data){
 	        	console.log(data)
 	        	if(data.code==0){
@@ -90,7 +95,11 @@
 		        },function(data){
 		        	console.log(data)
 		        	if(data.code == 0 && data.msg == "success"){
-		        		router.push("/login")
+		        		Vue.set(that,"success",true)
+		        		setTimeout(()=>{
+						    router.push("/login")
+						},1000)
+		        		
 		        	}else if(data.code == -1 && data.msg == "超过24小时已过期"){
 		        		console.log(333)
 		        		that.msg = "激活连接超过24小时已经过期，请重新发送。";
@@ -169,7 +178,7 @@
 			padding-top: 45px;
 			padding-left: 96px;
 			padding-right:96px;
-			h1{
+			h1, .success{
 				height: 50px;
 				line-height: 50px;
 				margin-top: 80px;
@@ -211,7 +220,7 @@
 			}
 		}
 		.com-wrap{
-			h1{
+			h1,.success{
 				color: #2EB3CF;
 			}
 			.btnBox{
@@ -222,7 +231,7 @@
 			}
 		}
 		.team-wrap{
-			h1{
+			h1,.success{
 				color: #02a672;
 			}
 			.btnBox{
@@ -233,7 +242,7 @@
 			}
 		}
 		.person-wrap{
-			h1{
+			h1,.success{
 				color: rgb(242,117,25);
 			}
 			.btnBox{

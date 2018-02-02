@@ -2,7 +2,7 @@
   <div class="companyIndex">
     <div class="companyMessage">
       <div class="m-logo">
-      	<img :src="teamInfo.pic"/>
+      	<img :src="companyInfo.pic"/>
       	<span class="meng" @click="croperShow">更换头像</span>
       </div>
       <div id="modal-overlay" class="corpbox">
@@ -27,36 +27,36 @@
 				</div>
       </div>
       <div class="m-warp">
-        <h1 class="companyName">{{companyMessage.basicInfo.companyName}}</h1>
-        <p class="companyAddress" v-if="stateOne.haveAddress">{{companyMessage.basicInfo.companyAddress}}</p>
+        <h1 class="companyName">{{companyInfo.companyName}}</h1>
+        <p class="companyAddress" v-if="stateOne.haveAddress">{{companyInfo.companyAddress}}</p>
         <p v-if="!stateOne.haveAddress" class="">(暂未填写公司地址)</p>
       </div>
     </div>
     <div class="companyProfile">
       <h3 class="c-title"><span>公司简介</span></h3>
-      <div class="content-wrap" v-if="stateOne.haveCompanyDesc">{{companyMessage.basicInfo.companyDesc}}</div>
+      <div class="content-wrap" v-if="stateOne.haveCompanyDesc">{{companyInfo.companyProfile}}</div>
       <div v-if="!stateOne.haveCompanyDesc" class="stateOne">（此处暂无详细信息）</div>
     </div>
     <div class="companyLicense">
       <h3 class="c-title"><span>公司证照</span></h3>
-      <ul>
-      	<li><img :src="companyLicense"/></li>
+      <ul  v-if="stateOne.haveLicense">
+      	<li v-for="item in companyInfo.paperInfos"><img :src="item"/></li>
       </ul>
-      <div v-if="false" class="stateOne">（此处暂无详细信息）</div>
+      <div v-if="!stateOne.haveLicense" class="stateOne">（此处暂无详细信息）</div>
     </div>
     <div class="companyApitute">
       <h3 class="c-title"><span>公司资质</span></h3>
-      <ul>
-      	<li><img :src="companyApitute"/></li>
+      <ul  v-if="stateOne.haveApitute">
+      	<li v-for="item in companyInfo.quaInfos"><img :src="item"/></li>
       </ul>
-      <div v-if="false" class="stateOne">（此处暂无详细信息）</div>
+      <div v-if="!stateOne.haveApitute" class="stateOne">（此处暂无详细信息）</div>
     </div>
     <div class="companyTm">
       <h3 class="c-title"><span>高管团队</span></h3>
       <div class="seniorTable" v-if="stateOne.haveSenior">
-      	<dl v-for="item in companyMessage.companyOrgaInfo.senior" class="seniorList">
-      		<dt><img src="../../assets/img/company/icon_senior.png" /></dt>
-      		<dd>{{item.dealId}}</dd>
+      	<dl v-for="item in companyInfo.topManagers" class="seniorList">
+      		<dt><img :src="item.pic" /></dt>
+      		<dd>{{item.name}}</dd>
       	</dl>
       </div>
       <div v-if="!stateOne.haveSenior" class="stateOne">（此处暂无详细信息）</div>
@@ -64,23 +64,23 @@
     <div class="cadreman">
       <h3 class="c-title"><span>重要骨干</span></h3>
       <div class="backBoneTable" v-if="stateOne.haveBackbone">
-      	<dl v-for="item in companyMessage.companyOrgaInfo.backbone" class="backboneList">
-      		<dt><img src="../../assets/img/company/icon_senior.png" /></dt>
-      		<dd>{{item.dealId}}</dd>
+      	<dl v-for="item in companyInfo.importantPsns" class="backboneList">
+      		<dt><img :src="item.pic" /></dt>
+      		<dd>{{item.name}}</dd>
       	</dl>
       </div>
       <div v-if="!stateOne.haveBackbone" class="stateOne">（此处暂无详细信息）</div>
     </div>
     <div class="companyShow">
       <h3 class="c-title"><span>项目展示</span></h3>
-        <div v-for="item in companyMessage.companyProInfo" class="projectTable" v-if="stateOne.haveProject">
-      	<h4 class="projectName">{{item.proName}}</h4>
+        <div v-for="item in companyInfo.companyprojexpes" class="projectTable" v-if="stateOne.haveProject">
+      	<h4 class="projectName">{{item.projectName}}</h4>
       		<div class="pr-wrap-a">
-			  		<span class="completeTime">Time : {{item.parTakeTime_S}}——{{item.parTakeTime_E}}</span>
+			  		<span class="completeTime">Time : {{item.partakeTimeUp}}——{{item.partakeTimeDown}}</span>
 			  		<span class="takeOfficeBar">项目责任：<em class="takeOffice">建筑设计</em></span>
 			  	</div>
 			  	<p class="pr-wrap-b">{{item.detailDes}}</p>
-			  	<router-link :to="{name:'ProjectDetail',query:{id:item.id}}">
+			  	<router-link :to="{name:'ProjectDetail',query:{id:item.pkid}}">
 			  		<span class="more">查看详情>></span>
 			  	</router-link>
 			  	
@@ -117,7 +117,7 @@
       }
     },
     computed:mapState({
-    	companyMessage:state=>state.company.companyMessage
+//  	companyMessage:state=>state.company.companyMessage
     }),
     created(){
     	this.getData()
@@ -181,7 +181,6 @@
 						})
 				}
 				
-				
 			})
 			$('#btnZoomIn').on('click', function(){
 				cropper.zoomIn();
@@ -189,33 +188,7 @@
 			$('#btnZoomOut').on('click', function(){
 				cropper.zoomOut();
 			})
-    	
-    	
-//  	console.log(this.stateOne);
-//  	console.log(this.teamMessage)
-    	
-    	if(this.companyMessage.basicInfo.companyAddress.replace(/(^\s*)|(\s*$)/g, "").length===0){
-    		this.stateOne.haveAddress = false;
-    	}
-    	if(this.companyMessage.basicInfo.companyDesc.replace(/(^\s*)|(\s*$)/g, "").length===0){
-    		this.stateOne.haveCompanyDesc=false;
-    		console.log(1)
-    	}
 
-    	if(this.companyMessage.companyOrgaInfo.senior.length===0){
-    		this.stateOne.haveSenior = false;
-    		console.log(4)
-    	}
-    	if(this.companyMessage.companyOrgaInfo.backbone.length===0){
-    		this.stateOne.haveBackbone = false;
-    		console.log(5)
-    	}
-    	if(this.companyMessage.companyProInfo.length === 0){
-    		this.stateOne.haveProject = false;
-    	}
-    	
-    	console.log(this.companyMessage);
-    	
     },
     methods:{
     	getData(){
@@ -230,30 +203,47 @@
         	console.log(data)
           if(data.code==0){
             that.companyInfo=data.msg;
-            //Vue.set(that,"psnMsg",data.msg);
-//          if(that.companyInfo.teamProfile!=(""||null)){
-//			    		that.stateOne.haveTeamDesc=true;
-//			//  		console.log(1)
-//			    	}
-//			    	if(that.companyInfo.contactInfo!=(""||null)){
-//			    		that.stateOne.haveTeamMail=true;
-//			//  		console.log(2)
-//			    	}
-//			    	if(that.companyInfo.companyName!=(""||null)){
-//			    		that.stateOne.haveCompany=true;
-//			//  		console.log(3)
-//			    	}
-//			    	if(that.companyInfo.topManagers.length!=0 ){
-//			    		that.stateOne.haveSenior = true;
-//			//  		console.log(4)
-//			    	}
-//			    	if(that.companyInfo.importantPsns.length!=0){
-//			    		that.stateOne.haveBackbone = true;
-//			//  		console.log(5)
-//			    	}
-//			    	if(that.companyInfo.teamprojexpes.length != 0){
-//			    		that.stateOne.haveProject = true;
-//			    	}
+            if(that.companyInfo.companyProfile==null||that.companyInfo.companyProfile==""){
+			    		that.stateOne.haveCompanyDesc=false;
+			    	}else{
+			    		that.stateOne.haveCompanyDesc=true;
+			    	}
+			    	for(var i=0;i<that.companyInfo.companyprojexpes.length;i++){
+			    		if(that.companyInfo.companyprojexpes[i].partakeTimeDown=="0002.12.01"||"0002.12"){
+							 	that.companyInfo.companyprojexpes[i].partakeTimeDown = "至今";
+							}
+			    	}
+			    	
+			    	if(that.companyInfo.companyName==(""||null)){
+			    		that.stateOne.haveCompany=false;
+			    	}else{
+			    		that.stateOne.haveCompany=true;
+			    	}
+			    	if(that.companyInfo.paperInfos.length==0){
+			    		that.stateOne.haveLicense = false;
+			    	}else{
+			    		that.stateOne.haveLicense = true;
+			    	}
+			    	if(that.companyInfo.quaInfos.length==0){
+			    		that.stateOne.haveApitute = false;
+			    	}else{
+			    		that.stateOne.haveApitute = true;
+			    	}
+			    	if(that.companyInfo.topManagers.length==0){
+			    		that.stateOne.haveSenior = false;
+			    	}else{
+			    		that.stateOne.haveSenior = true;
+			    	}
+			    	if(that.companyInfo.importantPsns.length==0){
+			    		that.stateOne.haveBackbone = false;
+			    	}else{
+			    		that.stateOne.haveBackbone = true;
+			    	}
+			    	if(that.companyInfo.companyprojexpes.length == 0){
+			    		that.stateOne.haveProject = false;
+			    	}else{
+			    		that.stateOne.haveProject = true;
+			    	}
           }else{
             // if(data.msg=="100004"){//没有token
 						// 	window.location.hash="/login"
@@ -265,7 +255,6 @@
             status=err.status;
           }
         })
-        
       },
       croperShow(){
     		Modal.makeText($('.corpbox'))

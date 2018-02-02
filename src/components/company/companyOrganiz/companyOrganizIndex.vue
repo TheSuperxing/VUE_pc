@@ -4,13 +4,13 @@
     <div class="orgTable"><!--高管部分 begin-->
     	<p class="t-title"><img src="../../../assets/img/company/senior01.png" />高管团队</p>
     	<ul class="seniorInfo">
-    		<li class="stateOne" v-if="haveSenior">(暂无高管团队)</li><!--暂无高管团队-->
-    		<li v-for="(item,index) in orgaInfo.senior" class="seniorList" v-if="!haveSenior"><!--有高管团队-->
+    		<li class="stateOne" v-if="!haveSenior">(暂无高管团队)</li><!--暂无高管团队-->
+    		<li v-for="(item,index) in companyOrgaInfo.topManagers" class="seniorList" v-if="haveSenior"><!--有高管团队-->
     			<img src="../../../assets/img/company/icon_senior.png"/>
-    			<p class="seniorName">{{item.dealId}}</p>
+    			<p class="seniorName">{{item.name}}</p>
     			<span class="deleSen" @click="removeSenior(index)" v-if="editSeniorShow"></span>
     		</li>
-    		<span class="addMoreS" @click="overlay" v-if="editSeniorShow"></span>
+    		<span class="addMoreS" @click="overlay(state[0])" v-if="editSeniorShow"></span>
     		<div class="btnBox" v-if="editSeniorShow">
 					<span class="saveBtn" @click="editDone(state[0])">保存</span>
 					<span class="cancelBtn" @click="cancleEdit(state[0])">取消</span>
@@ -18,8 +18,8 @@
     	</ul>
     	<span class="editPersonBtn" @click="toEdit(state[0])" v-if="!editSeniorShow">编辑</span>
     	<!--添加高管模态框-->
-				<div id="modal-overlay" class="modal-a">
-					<div class="searchSenior">
+				<div id="modal-overlay" class="modal-topManagers">
+					<div class="searchSenior"  @keydown="keySearch($event)">
 						<h5>搜索员工</h5>
 						<span class="modalChaBtn" @click="closeModal"></span>
 						<div class="content-wrap">
@@ -27,7 +27,7 @@
 									<span class="wrap-left">员工姓名</span>
 									<p class="wrap-right">
 										<input type="text" v-model="searchText"/>
-										<span class="sBtn" @click="getData"><img src="../../../assets/img/company/seacer.png" />搜索</span>
+										<span class="sBtn" @click="getList"><img src="../../../assets/img/company/seacer.png" />搜索</span>
 									</p>
 								</div>
 								<div class="result-wrap">
@@ -35,7 +35,7 @@
 									<ul class="resultList">
 										<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
 										<li v-for="(item,index) in list">
-											<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.nickName}}</router-link>
+											<router-link :to="{name:'ProjectDetail',query:{id:item.psnID}}">{{item.psnName}}</router-link>
 											<span class="choseBtn" @click="choseThis($event,index)">
 											</span>
 										</li>
@@ -53,28 +53,28 @@
     	<p class="t-title"><img src="../../../assets/img/company/backbone01.png" />重要骨干</p>
     	<ul class="backboneInfo">
     		<li class="stateOne" v-if="!haveBackbone">(暂无骨干团队)</li><!--暂无骨干-->
-    		<li v-for="(item,index) in orgaInfo.backbone" class="backboneList" v-if="haveBackbone"><!--有骨干团队-->
+    		<li v-for="(item,index) in companyOrgaInfo.importantPsns" class="backboneList" v-if="haveBackbone"><!--有骨干团队-->
     			<img :src="item.pic" :class="{'gray':item.IfCer=='0'}"/>
     			<p class="seniorName">{{item.name}}</p>
     			<span class="deleSen" @click="removeBackbone(index)" v-if="editBackboneShow"></span>
     		</li>
-    		<span class="addMoreS" @click="overlay" v-if="editBackboneShow"></span>
+    		<span class="addMoreS" @click="overlay(state[1])" v-if="editBackboneShow"></span>
     		<div class="btnBox" v-if="editBackboneShow">
 					<span class="saveBtn" @click="editDone(state[1])" >保存</span>
 					<span class="cancelBtn" @click="cancleEdit(state[1])">取消</span>
 				</div>
     	</ul>
     	<span class="editPersonBtn"  @click="toEdit(state[1])" v-if="!editBackboneShow">编辑</span>
-    	<div id="modal-overlay" class="modal-b">
-					<div class="searchBackbone">
+    	<div id="modal-overlay" class="modal-importantPsns">
+					<div class="searchBackbone"  @keydown="keySearch($event)">
 						<h5>搜索员工</h5>
 						<span class="modalChaBtn" @click="closeModal"></span>
 						<div class="content-wrap">
 								<div class="search-wrap">
 									<span class="wrap-left">员工姓名</span>
 									<p class="wrap-right">
-										<input type="text" />
-										<span class="sBtn"  @click="getList" @keydown="keySearch($event)"><img src="../../../assets/img/company/seacer.png" />搜索</span>
+										<input type="text"  v-model="searchText"/>
+										<span class="sBtn"  @click="getList"><img src="../../../assets/img/company/seacer.png" />搜索</span>
 									</p>
 								</div>
 								<div class="result-wrap">
@@ -98,7 +98,7 @@
     </div><!--骨干部分 begin-->
 
     <!--没有员工添加贵公司经历的情况  模态框-->
-    <div id="modal-overlay" class="modal-c" v-if="haveStaff">
+    <div id="modal-overlay" class="modal-c" v-if="!haveStaff">
 			<div class="searchHaveNone">
 				<h5>搜索员工</h5>
 				<span class="modalChaBtn" @click="closeModal"></span>
@@ -117,12 +117,12 @@
     	</p>
     	<div class="staff">
     		<div class="tabWrap">
-    			<p v-if="have.value" v-for="(item,$index) in tabbarinfo" class="tabBar">
+    			<p v-if="!haveStaff" v-for="(item,$index) in tabbarinfo" class="tabBar">
     				<img :src="item.pic1"/>
     				{{item.txt}}
     				<span class="verified">{{item.num}}</span>
     			</p>
-    			<p v-if="!have.value" v-for="(item,$index) in tabbarinfo" class="tabBar" :class="[{activeBar:active==$index},{unactiveBar:active!=$index}]" @click="switchTab($index)">
+    			<p v-if="haveStaff" v-for="(item,$index) in tabbarinfo" class="tabBar" :class="[{activeBar:active==$index},{unactiveBar:active!=$index}]" @click="switchTab($index)">
     				<img :src="item.pic1"/>
     				<img :src="item.pic2"/>
     				{{item.txt}}
@@ -134,25 +134,25 @@
     		<!--
             	底部Tab切换   子路由  staffList
             -->
-            <div v-if="have.value" class="staffList">
+            <div v-if="!haveStaff" class="staffList">
             	<p class="stateNone">(此处暂无个人用户添加贵公司经历)</p>
             </div>
-            <div v-if="!have.value" class="staffList">
+            <div v-if="haveStaff" class="staffList">
             	<ul v-if="tab.aa[0]">
-		        		<li v-for="(item,index) in orgaInfo.staff.certified">
+		        		<li v-for="(item,index) in companyOrgaInfo.cerMembers">
 		        			<dl class="person">
 		        				<dt><img src="../../../assets/img/company/icon_staff.png"></dt>
-		        				<dd>{{item.dealId}}</dd>
-		        				<p class="cerBtn" v-if="showCer" @click="removeCer(index)">取消认证</p>
+		        				<dd>{{item.name}}</dd>
+		        				<p class="cerBtn" v-if="showCer" @click="certificateOrNot(item.psnID,0)">取消认证</p>
 		        			</dl>
 		        		</li>
 		        	</ul>
             	<ul v-if="tab.aa[1]">
-            		<li v-for="(item,index) in orgaInfo.staff.uncertified">
+            		<li v-for="(item,index) in companyOrgaInfo.noCerMembers">
             			<dl class="person">
             				<dt><img src="../../../assets/img/company/icon_staff.png"></dt>
-            				<dd>{{item.dealId}}</dd>
-            				<p class="cerBtn" v-if="showCer" @click="addCer(index)">添加认证</p>
+            				<dd>{{item.name}}</dd>
+            				<p class="cerBtn" v-if="showCer" @click="certificateOrNot(item.psnID,1)">添加认证</p>
             			</dl>
             		</li>
             	</ul>
@@ -172,6 +172,8 @@
 	import Vue from "vue"
 	import {mapState} from "vuex"
 	import Modal from "../../../assets/js/modal.js"
+	import MyAjax from "../../../assets/js/MyAjax.js"
+	
   export default {
     name:"companyOrganizIndex",
     data:function(){
@@ -189,21 +191,17 @@
        	removeCerArr:[],/*移除并取消认证的已认证员工*/
         Tabflag:0,
         active:0,
-        orgaInfo:{
-        	senior:[],
-        	backbone:[],
-        	staff:{}
-        },
+       
         tabbarinfo:[
         	{
         		txt:"已认证员工",pic1:require("../../../assets/img/company/Authentication01.png"),
 			    	pic2:require("../../../assets/img/company/Authentication03.png"),
-			    	num:"8"
+			    	num:""
 			    },
         	{
         		txt:"未认证员工",pic1:require("../../../assets/img/company/Authentication02.png"),
 	        	pic2:require("../../../assets/img/company/Authentication04.png"),
-	        	num:"10"
+	        	num:""
 	        },
         	
         ],
@@ -212,6 +210,7 @@
         childimg:require("../../../assets/img/company/senior02.png"),
        	searchText:"", /*搜索框input值*/
         list:[], /*搜索结果*/
+       companyOrgaInfo:{},
 				chosedOne:{
 					IfCer:"",
           defaultPic:"",
@@ -237,54 +236,112 @@
     	}
     },
     computed:mapState({
-      companyOrgaInfo:state=>state.company.companyMessage.companyOrgaInfo/*获取vuex数据*/
+//    companyOrgaInfo:state=>state.company.companyMessage.companyOrgaInfo/*获取vuex数据*/
     }),
-    mounted(){
-//  	console.log(this.companyOrgaInfo);
-    	var str = JSON.stringify(this.companyOrgaInfo);
-    	var data = JSON.parse(str);
-    	console.log(data);
-    	for(var item in data){/*遍历  引用赋值*/
-    		this.orgaInfo.senior = data.senior;
-    		this.orgaInfo.backbone = data.backbone;
-    		this.orgaInfo.staff = data.staff;
-    	}
-//  	console.log(this.orgaInfo)
-    	/*判断有无高管团队*/
-    	if(this.companyOrgaInfo.senior.length===0){
-    		this.haveSenior = true;
-    	}else if(this.companyOrgaInfo.backbone===0){
-    		this.haveBackbone = true;
-    	}
-
-    	/*判断有无下属员工（包含已认证和未认证）*/
-    	if(this.orgaInfo.staff.length!=0){
-    		Vue.set(this.have,"value",false)
-    		console.log(this.active)
-    	}else{
-    		Vue.set(this.have,"value",true)
-    	}
-    	console.log(this.have.value)
-
-
+    created(){
+    	this.getData()
     },
     updated(){
-    	if(this.companyOrgaInfo.senior.length===0){
-    		this.haveSenior = true;
-    	}
-    	if(this.companyOrgaInfo.backbone.length===0){
-    		this.haveBackbone = true;
-    	}
-    	if(this.companyOrgaInfo.staff.length===0){
-    		this.haveStaff = true;
-    	}
+    	if(this.companyOrgaInfo.topManagers.length!=0){
+	  		this.haveSenior = true;
+	  	}
+	  	if(this.companyOrgaInfo.importantPsns.length!=0){
+	  		this.haveBackbone = true;																																	
+	  	}
+	  	if(this.companyOrgaInfo.cerMembers.length!=0||this.companyOrgaInfo.noCerMembers.length!=0){ 
+	  		this.haveStaff = true;
+	  	}
     },
+   
     methods:{
     	getData(){
-    		
+    		var that=this;
+        var url = MyAjax.urlsy+"/companyInfo/companyOrgInfo";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+          if(data.code==0){
+            that.companyOrgaInfo=data.msg;
+            Vue.set(that.tabbarinfo[0],"num",that.companyOrgaInfo.cerCounts);
+            Vue.set(that.tabbarinfo[1],"num",that.companyOrgaInfo.noCerCounts);
+          }else{
+            // if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
+          }
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+        
+        if(this.companyOrgaInfo.topManagers.length!=0){
+		  		this.haveSenior = true;
+		  	}else{
+		  		this.haveSenior = false;	
+		  	}
+		  	if(this.companyOrgaInfo.importantPsns.length!=0){
+		  		this.haveBackbone = true;																																	
+		  	}else{
+		  		this.haveBackbone = false;	
+		  	}
+		  	if(this.companyOrgaInfo.cerMembers.length!=0||this.companyOrgaInfo.noCerMembers.length!=0){ 
+		  		this.haveStaff = true;
+		  	}else{
+		  		this.haveStaff = false;	
+		  	}
+		  	console.log(this.haveSenior)
     	},
+    	keySearch($event){//enter键登录事件
+    		console.log(999)
+	      	var event = $event || window.event;  
+			 	if(event.keyCode==13){ 
+			      this.getList()
+		         event.returnValue = false;    
+		         event.cancelBubble=true;
+		         event.preventDefault();
+		         //event.stopProgagation();
+		         return false;
+		      	} 
+			},
 			getList(){
-				
+				var that=this;
+        var url = MyAjax.urlsy+"/companyInfo/searchPerson/" + that.searchText;
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+          if(data.code==0){
+          	that.list = data.msg;
+          	that.haveResult = false;
+            if(that.list.length!=0){
+            	Vue.set(that,"haveResult",true)
+            }else{
+            	Vue.set(that,"haveResult",false)
+            }
+            //Vue.set(that,"psnMsg",data.msg);
+          }else{
+            // if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
+          }
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+        console.log(that.haveResult)
+        $('.search-wrap').animate({marginTop:"30px",marginBottom:"40px"},100);
+				$('.result-wrap').fadeIn(200);
 			},
     	switchTab(index){
 				this.active = index;
@@ -336,20 +393,20 @@
     		switch (state){
     			case "topManagers":
     				var type = "高管";
-    				var list = that.teamOrgaInfo.topManagers;
+    				var list = that.companyOrgaInfo.topManagers;
     				break;
     			case "importantPsns":
     				var type = "重要骨干";
-    				var list = that.teamOrgaInfo.importantPsns;
+    				var list = that.companyOrgaInfo.importantPsns;
     				break;
     			case "members":
     				var type = "下属员工";
-    				var list = that.teamOrgaInfo.members;
+    				var list = that.companyOrgaInfo.members;
     				break;
     			default:
     				break;
     		}
-        var url = MyAjax.urlsy+"/teamOrgaInfo/saveTeamOrgInfo";
+        var url = MyAjax.urlsy+"/companyInfo/saveCompanyOrgInfo";
         var data = {
         	list:list,
         	staffType:type
@@ -389,42 +446,31 @@
 				console.log(state)
     		switch (state){
     			case "topManagers":
-    				this.teamOrgaInfo.topManagers.push(this.chosedOne)
+    				this.companyOrgaInfo.topManagers.push(this.chosedOne)
     				break;
     			case "importantPsns":
-    				this.teamOrgaInfo.importantPsns.push(this.chosedOne)
+    				this.companyOrgaInfo.importantPsns.push(this.chosedOne)
     				break;
     			case "members":
-    				this.teamOrgaInfo.members.push(this.chosedOne)
+    				this.companyOrgaInfo.members.push(this.chosedOne)
     				break;
     			default:
     				break;
     		}
     		this.closeModal()
-    		console.log(this.teamOrgaInfo.topManagers)
+    		console.log(this.companyOrgaInfo.topManagers)
     	},
-    	
-    	
-
-    	
-    	
     	
     	removeSenior(index){
 //  		var that = this;
-    		this.orgaInfo.senior.splice(index,1);
-
-    		console.log($(this))
-
-//  		$(this).parent().remove()
+    		this.companyOrgaInfo.topManagers.splice(index,1);
     	},
     	removeBackbone(index){
 //  		var that = this;
 
-    		this.orgaInfo.backbone.splice(index,1);
+    		this.companyOrgaInfo.importantPsns.splice(index,1);
 
 //  		console.log($(this))
-
-    		$(this).parent().remove()
     	},
     	editPerson(){
     		this.showCer = true;
@@ -432,44 +478,68 @@
     	},
     	saveEditPerson(){
     		/*保存取消和添加认证的操作到本地中*/
-    		this.orgaInfo.staff.certified = this.addCerArr.reduce(function(coll,item){
-    			coll.push(item);
-    			return coll;
-    		},this.orgaInfo.staff.certified)
-    		this.addCerArr = [];
-    		this.orgaInfo.staff.uncertified = this.removeCerArr.reduce(function(coll,item){
-    			coll.push(item);
-    			return coll;
-    		},this.orgaInfo.staff.uncertified)
-    		this.removeCerArr = [];
-    		console.log(this.addCerArr);
-    		console.log(this.orgaInfo.staff)
-    		/*将本地数据保存到vuex当中*/
-    		for(var item in this.orgaInfo){
-    			this.companyOrgaInfo.staff = this.orgaInfo.staff
-    		}
+//  		this.companyOrgaInfo.staff.certified = this.addCerArr.reduce(function(coll,item){
+//  			coll.push(item);
+//  			return coll;
+//  		},this.companyOrgaInfo.staff.certified)
+//  		this.addCerArr = [];
+//  		this.companyOrgaInfo.staff.uncertified = this.removeCerArr.reduce(function(coll,item){
+//  			coll.push(item);
+//  			return coll;
+//  		},this.orgaInfo.staff.uncertified)
+//  		this.removeCerArr = [];
+//  		console.log(this.addCerArr);
+//  		console.log(this.orgaInfo.staff)
+//  		/*将本地数据保存到vuex当中*/
+//  		for(var item in this.orgaInfo){
+//  			this.companyOrgaInfo.staff = this.orgaInfo.staff
+//  		}
     		this.showCer = false; /*关闭取消和添加按钮显示*/
 
     	},
     	addCer(index){/*添加认证 */
 //  		console.log(index);
 
-    		this.addCerArr.push(this.orgaInfo.staff.uncertified[index])/*把未认证的添加员工添加到data中的addCerArr*/
-    		this.orgaInfo.staff.uncertified.splice(index,1);/*把这个员工从本地未认证数据数组中删除*/
+//  		this.addCerArr.push(this.orgaInfo.staff.uncertified[index])/*把未认证的添加员工添加到data中的addCerArr*/
+//  		this.orgaInfo.staff.uncertified.splice(index,1);/*把这个员工从本地未认证数据数组中删除*/
 //  		console.log(this.orgaInfo.staff.uncertified);
 
     	},
-    	removeCer(index){
-    		this.removeCerArr.push(this.orgaInfo.staff.certified[index])/*把已认证的添加员工添加到data中的addCerArr*/
-    		this.orgaInfo.staff.certified.splice(index,1);/*把这个员工从本地认证数据数组中删除*/
+    	certificateOrNot(id,status){
+    		console.log(id)
+    		var that=this;
+        var url = MyAjax.urlsy+"/companyInfo/confirmMemberCer/" + id + "/" + status;
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+        	if(data.code==0){
+        		that.getData()
+        	}
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
     	},
-    	overlay(){
+    	overlay(state){
     		/*模态框弹出有无可搜索员工判断*/
-    		if(this.orgaInfo != ""){
-    			var modalA= $('.modal-a')
-					Modal.makeText(modalA)
-					var modalB = $('modal-b')
-					Modal.makeText(modalB)
+    		if(this.companyOrgaInfo != ""){
+    		/*模态框弹出有无可搜索员工判断*/
+		    		if(state == "topManagers"){
+		    			var modalA= $('.modal-topManagers')
+							Modal.makeText(modalA)
+		    		}else if(state == "importantPsns"){
+		    			var modalA= $('.modal-importantPsns')
+							Modal.makeText(modalA)
+		    		}
+		    		$('.search-wrap').animate({marginTop:"50px",marginBottom:"80px"},100);
+						$('.result-wrap').css("display","none");
+						this.haveResult = false;
     		}else{
     			var modalC = $('.modal-c')
     			Modal.makeText(modalC)
@@ -477,42 +547,58 @@
 
 			},
 			closeModal(){
-				var modalA = $('.modal-a')
+				var modalA = $('.modal-topManagers')
 				Modal.closeModal(modalA)
-				var modalB = $('.modal-b')
+				var modalB = $('.modal-importantPsns')
 				Modal.closeModal(modalB)
-				var modalC = $('.modal-c')
+				var modalC = $('.modal-members')
 				Modal.closeModal(modalC)
+				var modalD = $('.modal-com')
+				Modal.closeModal(modalD)
+				this.searchText = "",
+				this.list = [];
 			},
-			choseThis(e){
-				$(".resultList li span").removeClass('selected');
-				$(e.target).addClass("selected");
-				console.log($(".resultList li span"))
+			choseThis(e,index){
+				console.log($(e.target).hasClass("selected"))
+				if($(e.target).hasClass("selected")==false){
+					console.log(999)
+					$(e.target).addClass("selected");
+					$(e.target).parent().siblings().find("span").removeClass('selected');
+//					console.log($(e.target).attr("class"))
+				}else if($(e.target).hasClass("selected") == true){
+//					console.log($(e.target).attr("class"))
+					$(e.target).removeClass("selected");
+					console.log($(e.target).attr("class"))
+				}
+				this.chosedOne.psnID = this.list[index].pkid;
+				this.chosedOne.pic = this.list[index].pic;
+				this.chosedOne.name = this.list[index].nickName;
+				console.log(this.chosedOne)
 				
 			},
 			/*模态框搜索获取数据*/
-			getData(){
-				/*var timer = "";
-				var url = "https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd="+this.searchText;
-				var that = this;
-				clearTimeout(this.timer);
-
-				this.timer = setTimeout(function(){
-					axios.get(url).then((responseText) => {
-						//获取到的数据一般都在responseText.data中
-						console.log(responseText)
-					}).catch((err) => {
-						console.log(err);
-					})
-//					that.$http.jsonp(url,{
-//						jsonp:"cb"
-//					}).then((responseText)=>{
-//						console.log(responseText.body)
-//					},(err)=>{
-//						console.log(err)
+//			getData(){
+//				/*var timer = "";
+//				var url = "https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd="+this.searchText;
+//				var that = this;
+//				clearTimeout(this.timer);
+//
+//				this.timer = setTimeout(function(){
+//					axios.get(url).then((responseText) => {
+//						//获取到的数据一般都在responseText.data中
+//						console.log(responseText)
+//					}).catch((err) => {
+//						console.log(err);
 //					})
-				},500)*/
-			},
+////					that.$http.jsonp(url,{
+////						jsonp:"cb"
+////					}).then((responseText)=>{
+////						console.log(responseText.body)
+////					},(err)=>{
+////						console.log(err)
+////					})
+//				},500)*/
+//			},
 
     },
     watch:{
@@ -722,6 +808,7 @@ $activeColor: #2eb3cf;
 							margin-top: 30px;
 							display: block;
 							background: url(../../../assets/img/company/rectangle05.png) no-repeat center;
+							cursor: pointer;
 							&:hover{
 	                filter:alpha(opacity=80);       /* IE */
 	                -moz-opacity:0.8;              /* 老版Mozilla */
@@ -763,10 +850,22 @@ $activeColor: #2eb3cf;
 					position: relative;
 					margin-bottom: 15px;
 					img{
-						width: 100px;
-						height: 100px;
-
-
+							width: 100px;
+							height: 100px;
+							border-radius: 50%;
+							background:#e6e6e6;
+							position:relative;
+						
+					}
+					.gray{
+						 -webkit-filter: grayscale(100%);
+					    -moz-filter: grayscale(100%);
+					    -ms-filter: grayscale(100%);
+					    -o-filter: grayscale(100%);
+					    
+					    filter: grayscale(100%);
+						
+					    filter: gray;
 					}
 					.seniorName,.backboneName{
 						text-align: center;
@@ -917,25 +1016,29 @@ $activeColor: #2eb3cf;
 							color: $activeColor;
 							overflow: hidden;
 							.person{
-
 								text-align: center;
 								dt{
 									width: 80px;
 									height: 80px;
+									line-height: 80px;
+									text-align: center;
+									margin: 0 auto;
 									img{
 										width: 100%;
 										height: 100%;
+										
 									}
 								}
 								dd{
 									margin-top: 15px;
 									height: 15px;
 									line-height: 15px;
+									text-align: center;
 								}
 								.cerBtn{
 									width: 80px;
 									height: 30px;
-									margin-top: 14px;
+									margin: 14px auto 0;
 									background: $activeColor;
 									color: #FFFFFF;
 									border-radius: 5px;

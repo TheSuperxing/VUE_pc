@@ -142,7 +142,7 @@
           }
         })
         function empty(text){
-	    		if(text==null||""){
+	    		if(text==(null||"")){
 	    			return "暂无信息"
 	    		}else{
 	          return text;
@@ -155,21 +155,21 @@
 	    			return text;
 	    		}
 	    	}
-	    	this.accountInfo.registerTime = empty(this.accountInfo.registerTime)
-	    	this.accountInfo.accountName = empty(this.accountInfo.accountName)
-	    	this.accountInfo.passWord = empty(this.accountInfo.passWord)
-	    	if(this.accountInfo.passWord!=(null||"")){
-	    		this.accountInfo.passWord = "******"
+	    	that.accountInfo.registerTime = empty(that.accountInfo.registerTime)
+	    	that.accountInfo.accountName = empty(that.accountInfo.accountName)
+	    	that.accountInfo.passWord = empty(that.accountInfo.passWord)
+	    	if(that.accountInfo.passWord!=(null||"")){
+	    		that.accountInfo.passWord = "******"
 	    	}
-	    	this.accountInfo.accountContacts1 = empty(this.accountInfo.accountContacts1)
-	    	this.accountInfo.contactPhone1 = empty(this.accountInfo.contactPhone1)
-	    	this.accountInfo.cccountContacts2 = empty(this.accountInfo.cccountContacts2)
-	    	this.accountInfo.contactPhone2 = empty(this.accountInfo.contactPhone2)
-	    	
-	    	this.localContactInfo.accountContacts1 = empty2(this.accountInfo.accountContacts1);
-	    	this.localContactInfo.contactPhone1 = empty2(this.accountInfo.contactPhone1);
-	    	this.localContactInfo.cccountContacts2 = empty2(this.accountInfo.cccountContacts2);
-	    	this.localContactInfo.contactPhone2 = empty2(this.accountInfo.contactPhone2);
+	    	that.accountInfo.accountContacts1 = empty(that.accountInfo.accountContacts1)
+	    	that.accountInfo.contactPhone1 = empty(that.accountInfo.contactPhone1)
+	    	that.accountInfo.cccountContacts2 = empty(that.accountInfo.cccountContacts2)
+	    	that.accountInfo.contactPhone2 = empty(that.accountInfo.contactPhone2)
+	    	console.log(that.accountInfo.accountContacts1)
+	    	that.localContactInfo.accountContacts1 = empty2(that.accountInfo.accountContacts1);
+	    	that.localContactInfo.contactPhone1 = empty2(that.accountInfo.contactPhone1);
+	    	that.localContactInfo.cccountContacts2 = empty2(that.accountInfo.cccountContacts2);
+	    	that.localContactInfo.contactPhone2 = empty2(that.accountInfo.contactPhone2);
       },
     	toEditCtr(){
     		this.ediCtrShow = true;
@@ -245,7 +245,6 @@ $bfColor:#ffffff;
 	.contactor{
     width: 260px;
     height: 104px;
-    /*padding: 30px;*/
     background: #f7f7f7;
     border-radius: 5px;
     float: left;

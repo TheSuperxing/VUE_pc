@@ -38,8 +38,15 @@ $bfColor:#ffffff;
         float:left;
         border: 1px solid #F7F7F7;
         position: relative;
+        overflow: hidden;
+        &:hover{
+            .meng{
+                display: block;
+            }
+        }
         img{
-
+            width: 100%;
+            height: 100%;
             position:absolute;top:50%;left:50%;
              transform:translate(-50%,-50%);
              -webkit-transform:translate(-50%,-50%);
@@ -47,8 +54,44 @@ $bfColor:#ffffff;
             -ms-transform:translate(-50%,-50%);
             -o-transform:translate(-50%,-50%);
         }
+        .meng{
+            position: absolute;
+            width: 100%;
+            height: 115px;
+            line-height: 115px;
+            text-align: center;
+            background: rgba(0,0,0,.5);
+            top: 0; left: 0;
+            color: #FFFFFF;
+            cursor: pointer;
+            display: none;
+        }
 
       }
+      .container{
+        position:absolute;top:50%;left:50%; 
+        transform:translate(-50%,-50%);
+        -webkit-transform:translate(-50%,-50%);
+        -moz-transform:translate(-50%,-50%);
+        -ms-transform:translate(-50%,-50%);
+        -o-transform:translate(-50%,-50%);
+        .Btnsty_peyton{
+            text-align: center;
+        }
+        .thumbBox{
+            border-radius: 50%;
+        }
+        .cha{
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 32px;
+            height: 32px;
+            background: url(../../assets/img/personal/common/guanbi-2.png) no-repeat ;
+            background-size: 100% 100%;
+            z-index: 9;
+            cursor: pointer;
+        }
+     }
       .m-warp{
         float: left;
         margin-left:40px;
@@ -75,70 +118,94 @@ $bfColor:#ffffff;
     .companyProfile{
       margin-top:70px;
       .content-wrap{
-         text-indent: 28px;
-        padding:20px 20px;
+        text-indent: 28px;
         font-size: 14px;
+        margin: 20px;
         color:#353535;
+        height: 20px; line-height: 20px;
         font-family: 'Microsoft Yahei';
 
       }
 
     }
     .companyLicense{
-      div{
+      ul{
         margin:30px 0;
-        img{
-            float:left;
-            margin-right: 20px;
-            &:last-child{
-                margin-right: 0;
+        &:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+        li{
+            float: left;margin-right: 20px;
+            img{
+                width: 150px; height: 150px;
+                
+                &:last-child{
+                    margin-right: 0;
+                }
+    
             }
-
         }
+        
       }
 
     }
     .companyApitute{
-      div{
+      ul{
         margin:30px 0;
-        img{
-            float:left;
-            margin-right: 20px;
-            &:last-child{
-                margin-right: 0;
+        &:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+        li{
+            float: left;margin-right: 20px;
+            img{
+                width: 150px; height: 150px;
+                
+                &:last-child{
+                    margin-right: 0;
+                }
+    
             }
-
         }
+        
       }
 
     }
     .companyTm{
       div{
-        img{
-            width: 100px;
-            height: 100px;
-            float: left;
-            margin-right: 30px;
-            &:last-child{
-                margin-right: 0;
-            }
-
-        }
+          dl{
+              float: left;
+              margin-right: 30px;
+               &:last-child{
+                    margin-right: 0;
+                }
+              dt{
+                  border-radius: 50%;
+                  overflow: hidden;
+                img{
+                  width: 100px;
+                  height: 100px;
+                   
+                }
+              }
+          }
+        
       }
 
     }
     .cadreman{
       div{
-        img{
-            width: 80px;
-            height: 80px;
-            float: left;
-            margin-right: 30px;
-            &:last-child{
+        dl{
+          float: left;
+          margin-right: 30px;
+           &:last-child{
                 margin-right: 0;
             }
-
-        }
+          dt{
+              border-radius: 50%;
+              overflow: hidden;
+            img{
+              width: 100px;
+              height: 100px;
+               
+            }
+          }
+          }
       }
 
     }

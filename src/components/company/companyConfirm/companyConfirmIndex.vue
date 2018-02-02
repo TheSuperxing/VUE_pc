@@ -6,23 +6,18 @@
     	<li class="cfrmTable">
     		<h3 class="c-title"><span>证照文件</span></h3>
     		<ul class="z-state">
-    			<li class="stateOne" v-show="stateOne.zh">（暂未上传证照文件）</li>
-    			<li class="stateTwo" v-show="stateTwo.zh">
-    				<p>您的证照文件已上传至后台，请等待管理员审核！</p>
-    				<p>您可点击“添加”继续上传，不会影响您已经上传的证照文件</p>
+    			<li class="stateOne" v-if="info.paperCounts==0">（暂无审核通过的证照文件）</li> <!--没有图片的时候-->
+    			<li class="stateTwo">
+    				<p v-if="info.paperAuditState==0">您的证照文件已上传至后台，请等待管理员审核！</p> <!--已经有审核通过 还有正在等待审核的-->
+    				<p v-if="info.paperCounts!=0">您可点击“添加”继续上传，不会影响您已经上传的证照文件</p><!--已经有审核通过 还有正在等待审核的-->
     			</li>
-    			<li class="stateThree" v-if="stateThree.zh">
-    				<img src="../../../assets/img/company/logo02.png"/>
-    				<img src="../../../assets/img/company/logo02.png"/>
-    				<img src="../../../assets/img/company/logo02.png"/>
-    				<img src="../../../assets/img/company/logo02.png"/>
+    			<li class="stateThree" v-if="info.paperPics.length!==0">
+    				<span v-for="(item,index) in info.paperPics">
+    					<img :src="item.pic"/>
+    					<em @click="deletePaper(item.id)"></em>
+    				</span>
     			</li>
-    			<!--<li class="picListCont">
-            <div class="picList" v-for="(item,$index) in show.picList[index]">
-              <img :src="item.pic" alt="">
-              <button @click="deletePic(item.id,index,$index)"></button>
-            </div>
-          </li>-->
+    			
     		</ul>
     		<script type="text/template" id="qq-template-manual-trigger-license">
 				    <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
@@ -96,16 +91,16 @@
     	<li class="cfrmTable">
     		<h3 class="c-title"><span>资质文件</span></h3>
     		<ul class="z-state">
-    			<li class="stateOne" v-if="stateOne.zz">（暂未上传证照文件）</li>
-    			<li class="stateTwo" v-if="stateTwo.zz">
-    				<p>您的证照文件已上传至后台，请等待管理员审核！</p>
-    				<p>您可点击“添加”继续上传，不会影响您已经上传的证照文件</p>
+    			<li class="stateOne" v-if="info.quaCounts==0">（暂无审核通过的证照文件）</li>
+    			<li class="stateTwo">
+    				<p v-if="info.quaAuditState==0">您的证照文件已上传至后台，请等待管理员审核！</p>
+    				<p v-if="info.quaCounts!=0">您可点击“添加”继续上传，不会影响您已经上传的证照文件</p>
     			</li>
-    			<li class="stateThree" v-if="stateThree.zz">
-    				<img src="../../../assets/img/company/logo02.png"/>
-    				<img src="../../../assets/img/company/logo02.png"/>
-    				<img src="../../../assets/img/company/logo02.png"/>
-    				<img src="../../../assets/img/company/logo02.png"/>
+    			<li class="stateThree"  v-if="info.quaPics.length!==0">
+    				<span v-for="(item,index) in info.quaPics">
+    					<img :src="item.pic"/>
+    					<em @click="deletePaper(item.id)"></em>
+    				</span>
     			</li>
     		</ul>
     		<script type="text/template" id="qq-template-manual-trigger-aptitude">
@@ -210,11 +205,13 @@
   import {singleManualUploader,moreManualUploader} from "../../../assets/js/manualUploader.js"
   import MyAjax from "../../../assets/js/MyAjax.js"
 	import qq from "fine-uploader"
+	import Vue from "vue"
   export default {
     name:"companyConfirmIndex",
     data:function(){
       return {
         title:"公司认证信息",
+        info:{},
 	    	stateOne:{
 	    		zh:true,
 	    		zz:true,
@@ -235,35 +232,81 @@
         }
       }
     },
+    created(){
+    	this.getData()
+    },
     mounted(){
     	var that = this;
-    	
 	    singleManualUploader({
 	      element:"fine-uploader-manual-trigger-license",
 	      template: "qq-template-manual-trigger-license",
-	      url:MyAjax.urlsy+'/psnlanguage/batchUpload',
+	      url:MyAjax.urlsy+'/companyInfo/uploadPaperPic',
 	      picIdCont:that.license.picId,
 	      btnPrimary:".btn-primary-license",
-	      canUploadNum:3,
+	      canUploadNum:100,
+	      anotherParam: sessionStorage.getItem("email"),
+	      functionName:that.getData
 	    })
 	    
 	    singleManualUploader({
 	      element:"fine-uploader-manual-trigger-aptitude",
 	      template: "qq-template-manual-trigger-aptitude",
-	      url:MyAjax.urlsy+'/psnlanguage/batchUpload',
+	      url:MyAjax.urlsy+'/companyInfo/uploadQuaPic',
 	      picIdCont:that.aptitude.picId,
 	      btnPrimary:".btn-primary-aptitude",
-	      canUploadNum:3,
+	      canUploadNum:100,
+	      anotherParam: sessionStorage.getItem("email"),
+	      functionName:that.getData
 	    })
+	    
+//	    console.log(that.getData)
 //  	
 //			if(that.stateTwo.zz == false){
-				$(".qq-upload-success").css("display","none")
+//				$(".qq-upload-success").css("display","none")
 //			}
     },
     updated(){
 //  	console.log(this.stateTwo)
     },
     methods:{
+    	getData(){
+    		var that=this;
+        var url = MyAjax.urlsy+"/companyInfo/findCerInfos";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+        	Vue.set(that,"info",data.msg)
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+    	},
+    	deletePaper(id){
+    		var that=this;
+        var url = MyAjax.urlsy +"/companyInfo/delCerPic/"+ id;
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+        	if(data.code==0){
+        		that.getData()
+        	}
+        },function(err){
+          if(err.status!=200){
+            status=err.status;
+          }
+        })
+    	},
+    	
     	overlay(){
     		var modal = $('.modal-a')
 				Modal.makeText(modal)
@@ -319,12 +362,32 @@ $activeColor: #2eb3cf;
 			 			color: #999999;
 			 		}
 			 		.stateThree{
-			 			img{
-			 				width: 160px;
-			 				height: 160px;
+			 			margin: 20px;
+			 			&:after {  content: "."; display: block; height: 0; clear: both; visibility: hidden;  }
+			 			span{
 			 				float: left;
-			 				margin-right: 20px;
+				 			margin-right: 20px;
+				 			margin-bottom: 20px;
+				 			position: relative;
+				 			&:hover{
+				 				em{
+				 					display: block;
+				 				}
+				 			}
+			 				img{
+				 				width: 160px;
+				 				height: 160px;
+				 				
+				 			}
+				 			em{
+				 				position: absolute;
+				 				right: 10px; top: 10px;
+				 				display: none; cursor: pointer;
+				 				width: 15px; height: 15px;
+				 				background: url(../../../assets/img/company/Close.png) no-repeat;
+				 			}
 			 			}
+			 			
 			 		}
 			 	}
 		 	.addProfile{

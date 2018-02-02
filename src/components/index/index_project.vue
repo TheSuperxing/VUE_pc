@@ -37,46 +37,8 @@
 	    name: 'index_project',
 	    data:function(){
 	      return {
-	        proMsg:[
-//	        		{
-//	        			"img":require("../../assets/img/images/10.jpg"),
-//	        			"projectName":"国家游泳馆",
-//	        		},{
-//	        			"img":require("../../assets/img/images/11.jpg"),
-//	        			"projectName":"上海迪士尼",
-//	        		},{
-//	        			"img":require("../../assets/img/images/12.jpg"),
-//	        			"projectName":"上海中心",
-//	        		},{
-//	        			"img":require("../../assets/img/images/13.jpg"),
-//	        			"projectName":"金茂大厦",
-//	        		},{
-//	        			"img":require("../../assets/img/images/26.jpg"),
-//	        			"projectName":"东方明珠",
-//	        		},{
-//	        			"img":require("../../assets/img/images/31.jpg"),
-//	        			"projectName":"五角大楼",
-//	        		},{
-//	        			"img":require("../../assets/img/images/14.jpg"),
-//	        			"projectName":"香格里拉酒店",
-//	        		},{
-//	        			"img":require("../../assets/img/images/15.jpg"),
-//	        			"projectName":"国际会展中心",
-//	        		},{
-//	        			"img":require("../../assets/img/images/16.jpg"),
-//	        			"projectName":"世博园",
-//	        		},{
-//	        			"img":require("../../assets/img/images/17.jpg"),
-//	        			"projectName":"还有啥",
-//	        		},{
-//	        			"img":require("../../assets/img/images/22.jpg"),
-//	        			"projectName":"想不出",
-//	        		},{
-//	        			"img":require("../../assets/img/images/30.jpg"),
-//	        			"projectName":"赶紧的",
-//	        		},
-	        	],
-	        	slidesNum:"",
+	        proMsg:[],
+	        slidesNum:"",
 	        
 	      }
 	    },

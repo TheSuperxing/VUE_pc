@@ -20,12 +20,12 @@
       </li>
       <li class="clear">
         <h4>公司简介</h4>
-        <p v-html="basicInfo.companyDesc" v-if="stateOne.haveCompanyDesc"></p>
+        <p v-html="basicInfo.companyProfile" v-if="stateOne.haveCompanyDesc"></p>
         <p v-if="!stateOne.haveCompanyDesc">暂无信息</p>
       </li>
       <li  class="clear">
         <h4>公司电话</h4>
-        <p v-html="basicInfo.companyPhone" v-if="stateOne.haveCompanyPhone"></p>
+        <p v-html="basicInfo.contactInfo" v-if="stateOne.haveCompanyPhone"></p>
         <p v-if="!stateOne.haveCompanyPhone">暂无信息</p>
       </li>
     </ul>
@@ -35,6 +35,7 @@
 <script>
 	import Vue from "vue"
 	import {mapState} from "vuex"
+	import MyAjax from "../../../assets/js/MyAjax.js"
   export default {
     name:"companyInfoIndex",
     data:function(){
@@ -46,46 +47,59 @@
         	companyDesc:"",
 			    companyPhone:"",
         },
+        basicInfo:{},
         stateOne:{
-        	haveCompanyName:true,
-        	haveCompanyAddress:true,
-        	haveCompanyDesc:true,
-        	haveCompanyPhone:true
+        	haveCompanyName:false,
+        	haveCompanyAddress:false,
+        	haveCompanyDesc:false,
+        	haveCompanyPhone:false
         }
         
       }
     },
-    computed:mapState({
-      basicInfo:state=>state.company.companyMessage.basicInfo
-    }),
+//  computed:mapState({
+//    basicInfo:state=>state.company.companyMessage.basicInfo
+//  }),
     mounted(){
-    	console.log(this.basicInfo)
-    	//将vuex数据取到本组件
-    	for(var item in this.basicInfo){
-// 			this.contactsss.info.push(this.accountInfo.contacts[i])
-				this.info.companyName=this.basicInfo.companyName;
-				this.info.companyAddress=this.basicInfo.companyAddress;
-				this.info.companyDesc=this.basicInfo.companyDesc;
-				this.info.companyPhone=this.basicInfo.companyPhone;
-   		}
-    	console.log(this.info)
-    	
-    	if(this.basicInfo.companyName.replace(/(^\s*)|(\s*$)/g, "").length===0){
-    		this.stateOne.haveCompanyName = false;
-    	}
-    	if(this.basicInfo.companyAddress.replace(/(^\s*)|(\s*$)/g, "").length===0){
-    		this.stateOne.haveCompanyAddress = false;
-    	}
-    	if(this.basicInfo.companyDesc.replace(/(^\s*)|(\s*$)/g, "").length===0){
-    		this.stateOne.haveCompanyDesc=false;
-    		console.log(1)
-    	}
-    	if(this.basicInfo.companyPhone.replace(/(^\s*)|(\s*$)/g, "").length===0){
-    		this.stateOne.haveCompanyPhone=false;
-    		console.log(1)
-    	}
-
-    	
+    	this.getData();
+    },
+    methods:{
+    	getData(){
+        var that=this;
+        var url = MyAjax.urlsy+"/companyInfo/getCompanyBasicInfo";
+        MyAjax.ajax({
+          type: "GET",
+          url:url,
+          dataType: "json",
+          async:false,
+        },function(data){
+        	console.log(data)
+          if(data.code==0){
+            that.basicInfo=data.msg;
+            if(that.basicInfo.companyName!=""||that.basicInfo.companyName != null){/*两端空格*/
+			    		that.stateOne.haveCompanyName = true;
+			    	}
+            if(that.basicInfo.companyAddress!=""||that.basicInfo.companyAddress != null){/*两端空格*/
+			    		that.stateOne.haveteamDesc = true;
+			    	}
+            if(that.basicInfo.companyProfile!=""||that.basicInfo.companyProfile != null){/*两端空格*/
+			    		that.stateOne.haveteamDesc = true;
+			    	}
+			    	if(that.basicInfo.contactInfo!=""){
+			    		that.stateOne.haveteamPhone = true;
+			    	}
+          }else{
+            // if(data.msg=="100004"){//没有token
+						// 	window.location.hash="/login"
+						// }
+          }
+        },function(err){
+          if(err.status!=200){
+            //router.push("/index")
+            status=err.status;
+          }
+        })
+      }
     }
   }
 </script>
@@ -95,6 +109,7 @@ $activeColor: #2eb3cf;
 $bfColor:#ffffff;
 .companyInfoIndex{
 	width:940px;
+	min-height: 430px;
   padding:40px;
   .modifyInfo{
     float: right;

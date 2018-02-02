@@ -3,28 +3,30 @@
 	<div class="editPassword">
 		<el-form :label-position="labelPosition" label-width="80px" :model="formLabelAlign">
 		  <el-form-item label="输入原密码">
-		    <el-input v-model="formLabelAlign.name"></el-input>
+		    <el-input v-model="formLabelAlign.oldPwd"></el-input>
 		  </el-form-item>
 		  <el-form-item label="输入新密码">
-		    <el-input v-model="formLabelAlign.region"></el-input>
+		    <el-input v-model="formLabelAlign.newPwd" @blur="comNewPwd"></el-input>
 
 		  </el-form-item>
 		  <p class="notice">密码由6-14位字母（区分大小写）、数字或符号组成</p>
 		  <el-form-item label="确认新密码">
-		    <el-input v-model="formLabelAlign.type"></el-input>
+		    <el-input v-model="formLabelAlign.cfmnewPwd"></el-input>
 		  </el-form-item>
 		</el-form>
+		<alertTip v-if="showAlert" :showHide="showAlert"  :alertText="alertText"></alertTip>
 		<div class="btnBox">
 			<router-link to="/yhzx/company/info/companyAccount/index">
 				<span class="cancelBtn">取消</span>
 			</router-link>
 			
-			<router-link to="/yhzx/company/info/companyAccount/editPasswordSuc">
-				<span class="confirmBtn" >确认</span>
-			</router-link>
+			<span class="confirmBtn" @click="confirmEdit">确认</span>
 			
 		</div>
-		
+		<!--<div class="succseed" v-if="showSuc">
+			<div class="s-wrap">您已成功修改代码！</div>
+			<span class="confirmBtn">完成</span>
+		</div>-->
 	</div>
 
 </template>
@@ -33,6 +35,8 @@
 	import Vue from 'vue'
 	import {Form,FormItem,Input} from "element-ui"
 	import router from "../../../router"
+	import MyAjax from "../../../assets/js/MyAjax.js"
+	import alertTip from "../units/alertTip.vue"
 	Vue.use(FormItem)
 	Vue.use(Input)
 	Vue.use(Form)
@@ -41,15 +45,80 @@
 	      return {
 	        labelPosition: 'left',
 	        formLabelAlign: {
-	          name: '',
-	          region: '',
-	          type: ''
+	          oldPwd: '',
+	          newPwd: '',
+	          cfmnewPwd: ''
 	        },
+	        showAlert:false,//显隐
+   		 	alertText:"",//提示信息		
 	        showSuc:false
 	      }
 	    },
+	    components:{
+	    	alertTip,
+	    },
+	    mounted(){
+	    	var that = this;
+	    	$('.el-input__inner').blur(function(){
+	    		if(!/^[\@A-Za-z0-9\!\#\$\%\^\&\*\.\~]{6,14}$/gi.test(that.formLabelAlign.newPwd)&&that.formLabelAlign.newPwd.trim().length!=0){
+		    		that.showAlert = true;
+		    		that.alertText = '您输入的密码格式不正确';
+		    	}else{
+		    		that.showAlert = false;
+		    	};/*验证公司密码*/
+	    	})
+	    },
 	    methods:{
-	   		
+	    	comNewPwd(){	
+	    		if(!/^[\@A-Za-z0-9\!\#\$\%\^\&\*\.\~]{6,14}$/gi.test(this.formLabelAlign.newPwd)&&this.formLabelAlign.newPwd.trim().length!=0){
+		    		this.showAlert = true;
+		    		this.alertText = '您输入的密码格式不正确';
+		    	}else{
+		    		this.showAlert = false;
+		    	};/*验证公司密码*/
+	    	},
+	   		confirmEdit(){
+	    		var that=this;
+		        var url = MyAjax.urlsy+"/companyInfo/updatePwd";
+//		        if(that.formLabelAlign.oldPwd.trim().length!=0&&that.formLabelAlign.newPwd.trim().length!=0
+//		        &&that.formLabelAlign.cfmnewPwd.trim().length!=0){
+		        	var data = {
+		        		oldPwd:that.formLabelAlign.oldPwd,
+		        		newPwd:that.formLabelAlign.newPwd
+		        	}
+		        	console.log(JSON.stringify(data))
+		        	MyAjax.ajax({
+			          type: "POST",
+			          url:url,
+			          data:data,
+			          dataType: "json",
+			          async:false,
+			        },function(data){
+			        	console.log(data)
+		        		switch (data.msg){
+		        			case "原密码输入不正确":
+		        				Vue.set(that,"showAlert",true)
+		        				Vue.set(that,"alertText",data.msg)
+		        				break;
+		        			case "修改密码成功":
+//		        				Vue.set(that,"showAlert",true)
+//		        				Vue.set(that,"alertText",data.msg)
+		        				setTimeout(()=>{
+		        					router.push("/yhzx/company/info/companyAccount/editPasswordSuc")
+								},1000)
+		        				break;
+		        			default:
+		        				break;
+		        		}
+			        },function(err){
+			          if(err.status!=200){
+			            //router.push("/index")
+			            status=err.status;
+			          }
+			        })
+//		        }
+		        
+	    	},
 	    }
 	}
 </script>
@@ -111,6 +180,16 @@
 
 		    }
 	    }
+	    
+	    .alet_container{
+			position: absolute;
+			left: 50%; bottom:175px ;
+			transform:translate(-50%);
+			 -webkit-transform:translate(-50%);
+			-moz-transform:translate(-50%);
+			-ms-transform:translate(-50%);
+			-o-transform:translate(-50%);
+		}
 
 	    .btnBox{
 	    	height: 40px;

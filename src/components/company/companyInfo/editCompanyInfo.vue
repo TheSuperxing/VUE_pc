@@ -3,35 +3,25 @@
 	<div class="editCompanyInfo">
 		<h3 class="c-title"><span>{{title}}</span></h3>
 		<ul class="ci-list">
-	      <li class="clear">
-	        <h4>公司标志</h4>
-	        <div class="logoBox">
-	        	<img src="../../../assets/img/logo/logo02.png" alt="">
-	        	<div class="modifyLogo" @click="overlay">点击更换标示</div>
-	        	<!--<el-button type="text" @click="modifyLogo" class="modifyLogo">点击更换标志 </el-button>-->
-	        </div>
-	        
-	        
-	        
-	      </li>
-	      
 	      <li>
 	      	<h4>公司名称</h4>
-	      	<input placeholder="请在此输入公司名称" v-model="info.companyName"/>
+	      	<p>{{basicInfo.companyName}}</p>
+	      	<!--<input placeholder="请在此输入公司名称" v-model="basicInfo.companyName"/>-->
+	      	<p>如需修改公司名称，请联系管理员</p>
 	      </li>
 	      <li>
 	      	<h4>公司地址</h4>
-	      	<input  placeholder="请在此输入公司地址" v-model="info.companyAddress"/>
-	      	<p>进入认证流程后，公司名称将不可自行修改，需联系管理员</p>
+	      	<input  placeholder="请在此输入公司地址" v-model="basicInfo.companyAddress"/>
+	      	
 	      </li>
 	      <li>
 	      	<h4>公司简介</h4>
-	      	<textarea placeholder="请在此输入公司简介" v-model="info.companyDesc"></textarea>
+	      	<textarea placeholder="请在此输入公司简介" v-model="basicInfo.companyProfile"></textarea>
 	      	<p class="limit-words">{{detailcont}}/500</p>
 	      </li>
 	      <li>
 	      	<h4>公司电话</h4>
-	      	<input placeholder="请在此输入公司电话" v-model="info.companyPhone"/>
+	      	<input placeholder="请在此输入公司电话" v-model="basicInfo.contactInfo"/>
 	      </li>
 	    </ul>
 	    <div class="btnBox">
@@ -62,6 +52,7 @@
 //	import {MessageBox,Button} from "element-ui"
 //	Vue.use(MessageBox)
 //	Vue.use(Button)
+	import MyAjax from "../../../assets/js/MyAjax.js"
     import Modal from "../../../assets/js/modal.js"
     import Vue from "vue"
 	import {mapState} from "vuex"
@@ -72,48 +63,76 @@
       return {
         title:"公司基本信息",
         detailcont:"0",
-        info:{
-        	companyName:'',
-        	companyAddress:'',
-        	companyDesc:"",
-			companyPhone:"",
-        },
+        
+        basicInfo:{}
       }
     },
-    computed:mapState({
-      basicInfo:state=>state.company.companyMessage.basicInfo
-    }),
     mounted(){
-    	console.log(this.basicInfo)
-    	//将vuex数据取到本组件
-    	for(var item in this.basicInfo){
-// 			this.contactsss.info.push(this.accountInfo.contacts[i])
-				this.info.companyName=this.basicInfo.companyName;
-				this.info.companyAddress=this.basicInfo.companyAddress;
-				this.info.companyDesc=this.basicInfo.companyDesc;
-				this.info.companyPhone=this.basicInfo.companyPhone;
-   		}
-    	console.log(this.info)
-    	
+    	this.getData()
     },
     methods:{
+    	getData(){
+	        var that=this;
+	        var url = MyAjax.urlsy+"/companyInfo/getCompanyBasicInfo";
+	        MyAjax.ajax({
+	          type: "GET",
+	          url:url,
+	          dataType: "json",
+	          async:false,
+	        },function(data){
+	        	console.log(data)
+	          if(data.code==0){
+	            that.basicInfo=data.msg;
+	          }else{
+	            // if(data.msg=="100004"){//没有token
+							// 	window.location.hash="/login"
+							// }
+	          }
+	        },function(err){
+	          if(err.status!=200){
+	            //router.push("/index")
+	            status=err.status;
+	          }
+	        })
+	        function emptyText(text) {
+		        if(text==null||text.length==0){
+		          return "";
+		        }else{
+		          return text;
+		        }
+		    }
+	        that.basicInfo.companyProfile = emptyText(that.basicInfo.companyProfile)
+	        that.basicInfo.contactInfo = emptyText(that.basicInfo.contactInfo)
+	    },
     	cancleEdit(){
-			for(var item in this.basicInfo){
-	// 			this.contactsss.info.push(this.accountInfo.contacts[i])
-				this.info.companyName=this.basicInfo.companyName;
-				this.info.companyAddress=this.basicInfo.companyAddress;
-				this.info.companyDesc=this.basicInfo.companyDesc;
-				this.info.companyPhone=this.basicInfo.companyPhone;
-			}
+			
 			router.push({path:"/yhzx/company/info/companyInfo/index"})
     	},
     	saveEdit(){
-    		for(var item in this.info){
-    			this.basicInfo.companyName=this.info.companyName;
-    			this.basicInfo.companyAddress=this.info.companyAddress;
-    			this.basicInfo.companyDesc=this.info.companyDesc;
-    			this.basicInfo.companyPhone=this.info.companyPhone;
-    		}
+    		var that=this;
+	        var url = MyAjax.urlsy+"/companyInfo/saveCompanyBasicInfo";
+//	        if(that.basicInfo.teamName.trim().length!=0||that.basicInfo.teamProfile.trim().length!=0
+//	        ||that.basicInfo.contactInfo.trim().length!=0){
+	        	var data = that.basicInfo
+	        	console.log(JSON.stringify(data))
+	        	MyAjax.ajax({
+		          type: "POST",
+		          url:url,
+		          data:JSON.stringify(data),
+		          dataType: "json",
+		          async:false,
+	              contentType:"application/json;charset=utf-8",
+		          
+		        },function(data){
+		        	console.log(data)
+	        		
+		        },function(err){
+		          if(err.status!=200){
+		            //router.push("/index")
+		            status=err.status;
+		          }
+		        })
+//	        }
     		router.push({path:"/yhzx/company/info/companyInfo/index"})
     	},
 		overlay(){
@@ -126,7 +145,7 @@
 		}
     },
     updated(){
-    	var num = this.info.companyDesc.length;
+    	var num = this.basicInfo.companyProfile.length;
     	this.detailcont = num;
 	    	
     }
@@ -145,6 +164,7 @@ $bfColor:#ffffff;
 	    position: relative;
 	    .ci-list{
 			padding-left: 30px;
+			margin-top: 30px;
 			overflow:hidden;
 			li{
 			  width:100%;
@@ -193,55 +213,26 @@ $bfColor:#ffffff;
 			  }
 			  
 			}
-				li:nth-child(3){
+				li:nth-child(1){
 					margin-bottom: 30px;
 					position: relative;
 					height: 60px;
 					p{
+						float: left;
+						margin-left:90px;
+					}
+					p:last-child{
 						position: absolute;
 						left: 165px;
 						bottom: -10px;
 						color: $activeColor;
+						margin-left:0;
 					}
 				}
-				li:nth-child(4){
+				li:nth-child(3){
 					margin-bottom: 0;
 				}
-			    li:nth-child(1){
-			      height:130px;
-			      line-height: 100px;
-			      padding-top: 30px;
-			      margin-bottom: 20px;
-			      .logoBox{
-			      	float:left;
-			      	width:100px; height: 100px;
-			      	margin-left:90px;
-			      	position:relative;
-				    img{
-				    	width: 100px; height: 100px;
-				    }
-				    .el-button{
-				    	border-radius:0 !important;
-				    	padding: 0 !important;
-				    }
-				    .modifyLogo{
-				    	width: 100px;
-				    	height: 20px;
-				    	line-height: 20px;
-				    	text-align: center;
-				    	display: inline-block;
-				    	background: rgba(155,155,155,.9);
-				    	position: absolute;
-				    	left: 0;
-				    	bottom: 0;
-				    	font-size: 12px;
-				    	color: #FFFFFF;
-				    	z-index: 11;
-				    	cursor: pointer;
-				    }
-			      }
-			      
-			    }
+			   
 		}
 		/*模态框模态框模态框模态框模态框模态框模态框模态框模态框模态框模态框*/
 		.previewZz{

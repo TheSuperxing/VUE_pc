@@ -12,7 +12,7 @@
 				<p>如您修改其中内容，已添加过的该项目信息也会随之变化</p>
 				<div class="btnBox">
 					<span class="cancelBtn" @click="closeModalA">取消</span>
-					<span class="confirmBtn" @click="closeModalA">确认</span>
+					<span class="confirmBtn" @click="goToDefined">确认</span>
 				</div>
 			</div>
 		</div>
@@ -20,35 +20,37 @@
 	<!--模态框 修改自己添加的项目-->
 	<ul class="proInfo">
 		<li class="proName">
-			<p><span>项目名称</span><span class="">{{project.proName}}</span></p>
+			<p><span>项目名称</span><span class="">{{project.projectName}}</span></p>
 		</li>
 		<li class="proPlace">
-			<p><span>项目地点</span><span class="">{{project.proPlace}}</span></p>
+			<p><span>项目地点</span><span class="">{{project.projectPlace}}</span></p>
 		</li>
 		<li class="proState">
-			<p><span>项目状态</span><span class="">{{project.proState}}</span></p>
+			<p><span>项目状态</span><span class="">{{project.projectState}}</span></p>
 		</li>
 		<li class="proTime">
-			<p><span>建成时间</span><span class="">{{project.compalteTime_E}}</span></p>
+			<p><span>建成时间</span><span class="">{{project.completeTime}}</span></p>
 		</li>
 		<li class="proFunc">
-			<p><span>建筑功能</span><span class="">{{project.proFunc}}</span></p>
+			<p><span>建筑功能</span><span v-for="item in project.architectFunctions">{{item}}&nbsp;&nbsp;</span></p>
+			
 		</li>
 		<li class="proDesc">
 			<p>
 				<span>项目描述</span>
-				<span class="">{{project.proDesc}}
+				<span class="">{{project.projectDescription}}
 				</span>
 			</p>
 		</li>
-		<li>
+		<li  class="proPics">
 			<p>
 				<span>项目图片</span>
 				<span>
+					<img v-for="item in project.projPics" :src="item.pic"/>
+					<!--<img src="../../../assets/img/company/img.png" />
 					<img src="../../../assets/img/company/img.png" />
 					<img src="../../../assets/img/company/img.png" />
-					<img src="../../../assets/img/company/img.png" />
-					<img src="../../../assets/img/company/img.png" />
+					<img src="../../../assets/img/company/img.png" />-->
 				</span>
 			</p>
 			
@@ -59,14 +61,20 @@
 		<ul class="modify-table-wrap">
 			<li class="time-wrap">
 				<span class="table-wrap-left">* 参与时间</span>
-				<datepicker class="datePicker" v-model="project.parTakeTime_S"></datepicker>
+				<!-- <datepicker class="datePicker" v-model="project.partakeTimeUp"></datepicker> -->
+				<year-month v-model="project.partakeTimeUp"></year-month> 
 				<span class="heng"></span>
-				<datepicker class="datePicker" v-model="project.parTakeTime_E"></datepicker>
+				<!-- <datepicker class="datePicker" v-model="project.partakeTimeDown"></datepicker> -->
+				<year-month v-model="project.partakeTimeDown" :min="project.partakeTimeUp" :today="true"></year-month>
+				<alertTip v-if="showAlert.partakeTime" :showHide="showAlert.partakeTime"  :alertText="alertText.partakeTime"></alertTip>
+			
 			</li>
 			<li class="duty-wrap">
-				<span class="table-wrap-left">* 公司职责</span>
-				<input type="text" placeholder="请输入公司在项目中所属职位" maxlength="30"  v-model="project.takeOffice"/>
+				<span class="table-wrap-left">* 项目职责</span>
+				<input @input="dutyWrap" type="text" placeholder="请输入项目职责" maxlength="30"  v-model="project.takeOffice"/>
 				<p class="limit-words">{{dutycont}}/30</p>
+				<alertTip v-if="showAlert.takeOffice" :showHide="showAlert.takeOffice"  :alertText="alertText.takeOffice"></alertTip>
+			
 			</li>
 			<li class="detail-wrap">
 				<span class="table-wrap-left">详细描述</span>
@@ -74,21 +82,16 @@
 				<p class="limit-words">{{detailcont}}/500</p>
 				
 			</li>
-			<!--<li class="img-wrap">
-				<span class="table-wrap-left">图片展示</span>
-				<ul class="img-show">
-					<li v-for="" class="imgBox"><img src=""/><span class="closeImg"></span>
-					</li>
-					<div class="uploadBtn">
-						<input type="file" class=""/>
-						<img src="../../../assets/img/company/top.png" />
-						<span>请上传图片</span>
-					</div>
-				</ul>
-				
-			</li>-->
+			
 			<li class="img-wrap">
 				<span class="table-wrap-left">图片展示</span>
+				<div class="picListCont">
+					<div class="picList" v-for="(item,$index) in picList">
+						<img :src="item.pic" alt="">
+						<button @click="deletePic(index,$index)"></button>
+					</div>
+				</div>
+				
 				<script type="text/template" id="qq-template-manual-trigger">
 			        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Drop files here">
 			            <!--<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -171,15 +174,22 @@
 </template>
 <script>
 	import {mapState} from "vuex"
+	import Vue from "vue"
 	import 	Modal from "../../../assets/js/modal.js"
 	import Datepicker from "../units/Datepicker.vue"
+	import YearMonth from "../units/yearMonth.vue"
 	import router from "../../../router"
 	import qq from "fine-uploader"
+	import MyAjax from "../../../assets/js/MyAjax.js"
+	import {singleManualUploader} from "../../../assets/js/manualUploader.js"
+	import alertTip from "../units/alertTip.vue"
 	
 	export default {
 	    name:"editProject",
 	     components:{
-	      Datepicker
+	      Datepicker,
+		  YearMonth,
+		  alertTip
 	    },
 	    data:function(){
 	      return {
@@ -190,77 +200,166 @@
 	        dutycont:'0',
 	        detailtext:"",
 	        detailcont:'0',
-	        proInfos:[],
 	        project:{},/*由项目主页点击进去的相应项目*/
+	        projectPlaceObj:{},
 	        index:"",
 	        compalteTime:[],
-	        parTakeTime:[]
+			parTakeTime:[],
+			picList:[],
+			picNum:"",
+			buttonColor:true,//控制编辑按钮的颜色
+			showAlert:{partakeTime:false,takeOffice:false},//提示框显隐
+	        alertText:{partakeTime:null,takeOffice:null},
 	      }
 	    },
 	    
 	    computed:mapState({
-		  companyProInfo:state=>state.company.companyMessage.companyProInfo/*获取vuex数据*/
+//		  companyProInfo:state=>state.company.companyMessage.companyProInfo/*获取vuex数据*/
 		}),
+		created(){
+	   		var that = this;
+			that.projID = that.$route.query.projId;
+			that.expeID = that.$route.query.expeId;
+			
+			if(that.expeID == undefined){
+				that.expeID = '""';
+			}
+			if(that.projID == undefined){
+				that.projID = '""';
+			}
+			var url = MyAjax.urlsy+"/companyInfo/selectProjAndExpe/" + that.projID +"/" + that.expeID//暂时先写成这样
+	    	MyAjax.ajax({
+				type: "GET",
+				url: url,
+				dataType: "json",
+				async:false,
+			},function(data){
+				console.log(data)
+				data = data.msg;
+				Vue.set(that,"project",data)
+				that.project.picId=[];
+				console.log(that.project)
+			},function(err){
+				console.log(err)
+			})
+			// 获取数据信息
+			
 		
-		mounted(){
-			var str = JSON.stringify(this.companyProInfo);
-    		var data = JSON.parse(str);
-    		this.proInfos = data;/*获取vuex里面所有项目信息*/
-    		
 			
-	    	this.index = this.$route.params.id;
-//	    	console.log(this.index)
-	    	this.project = data[this.index-1]
-//	    	console.log(this.$route)
+			if(that.project.ifPublish==0){
+				that.isMine = true;
+			}else if(that.project.ifPublish==1){
+				that.isMine = false;
+			}//判断是否为本人创建的项目，”是isMine“就可以编辑
 			
+	    	function emptyText(text) {
+			    if(text == null||text.length == 0){
+			      return "（暂无信息）";
+			    }else {
+			      return text;
+			    }
+			}
+	    	function emptyText2(text) {
+			    if(text==null||text.length == 0){
+			      return "";
+			    }else {
+			      return text;
+			    }
+			}
+	    	that.projectPlaceObj = that.project.projectPlaceObj;
+			//console.log(that.project.projectPlaceObj)
+	    	that.project.completeTime = emptyText(that.project.completeTime);
+	    	that.project.projectState = emptyText(that.project.projectState);
+	    	that.project.projectDescription = emptyText(that.project.projectDescription);
+	    	that.project.partakeTimeUp = emptyText2(that.project.partakeTimeUp);
+	    	that.project.partakeTimeDown = emptyText2(that.project.partakeTimeDown);
+	    	that.project.takeOffice = emptyText2(that.project.takeOffice);
+	    	that.project.detailDes = emptyText2(that.project.detailDes);
+	    	that.showAlert.partakeTime = false;
+	    	that.showAlert.takeOffice = false;
+	    	that.alertText.partakeTime = null;
+	    	that.alertText.takeOffice = null;
+	    	if(that.project.architectFunctions[0]==""){
+	    		that.project.architectFunctions[0] = "（暂无信息）"
+	    	}
+	    	if(that.project.partakeTimeDown=="0002.12"){
+			 	that.project.partakeTimeDown = "至今";
+			}
+	    	
+	    	//空值的处理
+	    	
+	   	},
+		async mounted(){
+			
+			$(document.body).css("overflow-y","scroll");
+			var that = this;
 			//上传图片
-			var manualUploader = new qq.FineUploader({
-	            element: document.getElementById('fine-uploader-manual-trigger'),
-	            template: 'qq-template-manual-trigger',
-	            request: {
-	                endpoint: '/server/uploads'
-	            },
-	            thumbnails: {
-//	                placeholders: {
-//	                    waitingPath: '../../../assets/js/units/fine-uploader/placeholders/waiting-generic.png',
-//	                    notAvailablePath: '../../../assets/js/units/fine-uploader/placeholders/not_available-generic.png'
-//	                }
-	            },
-	            validation: {
-	                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png'],
-	                itemLimit: 5,
-	                sizeLimit: 1500000
-	            },
-	            autoUpload: false,
-	            debug: true,
-	            callbacks:{
-		        	onSubmit:  function(id,  fileName)  {
-		        		$('#trigger-upload').show()
-		        	},
-		        	onComplete: function (id, fileName, responseJSON, maybeXhr) {
-		                //alert('This is onComplete function.');
-										//alert("complete name:"+responseJSON);//responseJSON就是controller传来的return Json
-		                console.log(responseJSON)
-		                $('#message').append(responseJSON.msg);
-		//	                $('#progress').hide();//隐藏进度动画
-		                //清除已上传队列
-		                $('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-fail').show();
-		                //$('#fine-uploader-manual-trigger .qq-upload-list .qq-upload-success').hide();
-		                //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）   
-		//	                $('.stateOne').hide();
-		//	                $('.stateTwo').show()
-		                
-		                $('#trigger-upload').hide()
-		                console.log(maybeXhr)
-		          	},
-	        	}
-	        });
-			qq(document.getElementById("trigger-upload")).attach("click", function() {
-	            manualUploader.uploadStoredFiles();
-	        });
-			
+			const data = await that.getPic(that.expeID)
+			if(data.code===0){
+				Vue.set(that,"picList",data.msg)
+			    Vue.set(that,"picNum",data.msg.length)
+			}
+			console.log(that.picList)
+			console.log(that.picNum)
+			console.log(Math.floor(3-that.picNum))
+			if(Math.floor(3-that.picNum)>0){
+				singleManualUploader({
+					element:"fine-uploader-manual-trigger",
+	        		template: "qq-template-manual-trigger",
+					url:MyAjax.urlsy+'/companyInfo/uploadPic',
+					picIdCont:that.project.picId,
+					btnPrimary:".btn-primary",
+					canUploadNum:Math.floor(3-that.picNum),
+				})
+			}
 	    },
 	    methods:{
+	    	getPic(expeID){
+				var that=this;
+				var url=MyAjax.urlsy+"/companyInfo/findPicsById/"+expeID;
+				return new Promise((resolve, reject) => {
+					MyAjax.ajax({
+				        type: "GET",
+						url:url,
+						dataType: "json",
+						async: true, 
+				    },(data) => {
+				    	resolve(data)
+				    },(err) => {
+				        reject(err);
+					});
+				})
+			},
+			async deletePic(index,$index){
+				var that =this;
+				var url = MyAjax.urlsy+"/companyInfo/delPic/"+this.picList[$index].id
+				MyAjax.ajax({
+					type: "GET",
+					url:url,
+					dataType: "json",
+					async:false,
+					},function(data){
+						console.log(data)
+					},function(err){
+						console.log(err)
+				})
+				const data = await that.getPic(that.expeID) 
+				if(data.code===0){
+					Vue.set(that,"picList",data.msg)
+				    Vue.set(that,"picNum",data.msg.length)
+				}
+				$("#fine-uploader-manual-trigger").html("")
+				if(Math.floor(3-that.picNum)>0){
+					singleManualUploader({
+						element:"fine-uploader-manual-trigger",
+		        		template: "qq-template-manual-trigger",
+						url:MyAjax.urlsy+'/companyInfo/uploadPic',
+						picIdCont:that.project.picId,
+						btnPrimary:".btn-primary",
+						canUploadNum:Math.floor(3-that.picNum),
+					})
+				}
+			},
 	    	textcount(){
 	    		
 	    	},
@@ -272,14 +371,74 @@
 				var modal = $('.modal-a')
 				Modal.closeModal(modal)
 			},
+			goToDefined(){
+				router.push({name:"definedComProject",query:{projId:this.projID,expeId:this.expeID}})
+			},
+			dutyWrap(){
+				let condition=this.project.takeOffice.length!=0
+				&&this.project.partakeTimeUp.length!=0
+				&&this.project.partakeTimeDown.length!=0;
+				if(condition){
+					this.buttonColor=true;
+				}else{
+					this.buttonColor=false;
+				}
+			},
 			saveEdit(){
-				qq(document.getElementById("trigger-upload")).attach("click", function() {
-		            manualUploader.uploadStoredFiles();
-		        });
-				var str = JSON.stringify(this.project);
-				var data = JSON.parse(str);
-				this.companyProInfo[this.index-1] = data;/*将修改过得数据放在vuex里*/
-				console.log(this.companyProInfo)
+				let condition=this.project.takeOffice.trim().length!=0
+				&&this.project.partakeTimeUp.trim().length!=0
+				&&this.project.partakeTimeDown.trim().length!=0;
+				function emptyText(text) {
+				    if(text=="（暂无信息）"){
+				      return " ";
+				    }else {
+				      return text;
+				    }
+				}
+				this.project.completeTime = emptyText(this.project.completeTime);
+		    	this.project.projectState = emptyText(this.project.projectState);
+		    	this.project.projectDescription = emptyText(this.project.projectDescription);
+		    	if(this.project.architectFunctions[0] = "（暂无信息）"){
+		    		this.project.architectFunctions = [];
+		    	}
+				var that = this;
+				console.log(that.project)
+			    if(condition){
+					if(that.project.partakeTimeDown=="至今"){
+						that.project.partakeTimeDown = "0000.00";
+					}
+					var url = MyAjax.urlsy+"/companyInfo/insertOrUpdateProjExpe";
+					$.ajaxSetup({ contentType : 'application/json' });
+					MyAjax.ajax({
+						type: "POST",
+						url:url,
+						data:JSON.stringify(that.project),
+						dataType: "json",
+						async:false,
+					},function(data){
+						console.log(data)
+						if(data.code == 0){
+							router.push("/yhzx/company/info/companyProject/index")
+						}
+					},function(err){
+						console.log(err)
+					})
+				}else{
+					if(that.project.takeOffice.trim().length===0){
+						that.showAlert.takeOffice = true;
+						that.alertText.takeOffice = "请输入项目职责"
+					}else{
+						that.showAlert.takeOffice = false;
+						that.alertText.takeOffice = ""
+					}
+					if(that.project.partakeTimeUp.trim().length===0||that.project.partakeTimeDown.trim().length===0){
+						that.showAlert.partakeTime = true;
+						that.alertText.partakeTime = "请输入参与时间"
+					}else{
+						that.showAlert.partakeTime = false;
+						that.alertText.partakeTime = ""
+					}
+				}
 //				router.push("/yhzx/company/info/companyProject/index")
 				
 			},
@@ -447,7 +606,9 @@ $activeColor: #2eb3cf;
 			p{
 				overflow: hidden;
 				
-				span{
+				overflow: hidden;
+				
+				>span{
 					float: left;
 					display: inline-block;
 					&:first-child{
@@ -455,25 +616,40 @@ $activeColor: #2eb3cf;
 						color: rgb(102,102,102);
 						
 					}
-					&:last-child{
-						width: 720px;
-						color: rgb(53,53,53);
-						text-align: justify;
-						img{
-							width: 160px; height: 100px;
-							display: block;
-							margin-right: 15px;
-							margin-bottom: 15px;
-							float:left; 
-							&:nth-child(4n){
-								margin-right: 0;
-							}
-						}
-					}
+					
 					
 				}
 			}
 			
+		}
+		.proFunc{
+			span{
+				float:left;
+			}
+		}
+		.proDesc{
+			span:last-child{
+				width: 720px;
+				color: rgb(53,53,53);
+				text-align: justify;
+				img{
+					width: 160px; height: 100px;
+					display: block;
+					margin-right: 15px;
+					margin-bottom: 15px;
+					float:left; 
+					&:nth-child(4n){
+						margin-right: 0;
+					}
+				}
+			}
+		}
+		.proPics{
+			img{
+				float: left;
+				width: 120px;
+				margin-right: 10px;margin-bottom: 10px;
+			}
 		}
 	}
 	.btnBox{
@@ -542,6 +718,7 @@ $activeColor: #2eb3cf;
 						width: 20px;
 						float: left;
 						background: #333333;
+						margin-left: 20px;
 						margin-right: 20px;
 						margin-top: 16px;
 					}
@@ -602,26 +779,31 @@ $activeColor: #2eb3cf;
 						float: left;
 						margin-top: 40px;
 					}
-					.img-show{
+					.picListCont{
+						width: 720px;
 						float: left;
-						width: 685px;
-						.imgBox{
-							width: 160px; height: 100px;
+						.picList{
 							float: left;
-							margin-right: 15px;
-							margin-bottom: 20px;
-							margin-top: 0;
-							background: rgb(230,230,230);
+							width: 200px;
+							height: 200px;
+							padding: 8px;
+							background: rgba(210,210,210,.3);
+							border-radius: 10px;
+							margin-left: 10px;
+							margin-bottom: 10px;
 							position: relative;
-							cursor:pointer; 
-							&:nth-of-child(4n){
-								margin-right: 0;
+							img{
+								width: 182px;
 							}
-							.closeImg{
-								width: 21px; height: 21px;
+							button{
+								border-style: none;
+								width: 21px;
+								height: 21px;
 								position: absolute;
-								top: 10px; right: 10px;
-								background: url(../../../assets/img/company/Close2.png) no-repeat center;
+								top: 10px;
+								right: 10px;
+								cursor: pointer;
+								background: url("../../../assets/img/personal/common/picDelete.png") no-repeat center;
 							}
 						}
 					}

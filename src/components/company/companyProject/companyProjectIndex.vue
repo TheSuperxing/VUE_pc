@@ -7,7 +7,7 @@
 				<h5>搜索项目</h5>
 				<span class="modalChaBtn" @click="closeModal"></span>
 				<div class="content-wrap">
-						<div class="search-wrap">
+						<div class="search-wrap"  @keydown="keySearch($event)">
 							<span class="wrap-left">项目名称</span>
 							<p class="wrap-right">
 								<input type="text" placeholder="请输入项目名称" v-model="searchText" class="searchInput"/>
@@ -16,7 +16,6 @@
 						</div>
 						<div class="result-wrap">
 							<span class="wrap-left">搜索结果</span>
-							
 							<ul class="resultList">
 								<li class="noResult" v-if="noresult">抱歉，未找到该项目，请重新搜索</li>
 								<li v-for="(item,$index) in searchResult" >
@@ -36,8 +35,9 @@
   	</div>
   	<!--搜索项目模态框-->
     <h3 class="c-title"><span>{{title}}</span></h3>
-    <div class="projectTable" v-for="(item,$index) in companyProInfo">
-    	<h5 class="tableTitle">{{item.proName}}</h5>
+    <div class="stateNull" v-if="!stateNone">（您尚未添加项目经历信息）</div>
+    <div class="projectTable" v-for="(item,$index) in proInfo">
+    	<h5 class="tableTitle">{{item.projectName}}</h5>
     	<div class="toolsBox">
     		<!--点击跳转到编辑该项目的页面  路由传值index-->
     		<span class="editBtn" @click="goToEditPro($index,item)">编辑</span>
@@ -103,31 +103,12 @@
         searchResult:[], /*搜索结果*/
         noresult:false,
         deleteModalClass:[],//确认删除项目的模态框
-        chosedOne:{
-       		
-       	}
+        chosedOne:{}
       }
     },
-    computed:mapState({
-      companyProInfo:state=>state.company.companyMessage.companyProInfo/*获取vuex数据*/
-    }),
+   
     mounted(){
-    	/*将vuex里面的数据获取到本组件*/
-    	this.proInfo= this.companyProInfo.reduce(function(coll,item){
-    		coll.push(item);
-    		return coll;
-    	},this.proInfo)
-//  	console.log(this.proInfo);
-//  	console.log(this.companyProInfo)
-    	
-    	this.show.tag.length = this.companyProInfo.length;
-//  	console.log(this.show.tag.length)
-    	for(var i=0;i<this.companyProInfo.length;i++){
-    		this.show.tag[i]=true;
-    		this.updowntxt.push("展开查看更多");
-    		this.deleteModalClass.push("deleteModalClass"+i);//添加模态框类名
-    	}
-    	
+    	this.getData()
     },
     methods:{
     	getData(){
@@ -145,6 +126,8 @@
 						that.proInfo = data.msg;
 						if(that.proInfo.length!=0){
 							that.stateNone = true;
+						}else{
+							that.stateNone = false;
 						}
 					}else{
 						console.log("错误返回");
@@ -195,7 +178,7 @@
 			},
 			getPic(expeID,index){
 				var that=this;
-				var url=MyAjax.urlsy+"/teamOrgaInfo/findPicsById/"+expeID;
+				var url=MyAjax.urlsy+"/companyInfo/findPicsById/"+expeID;
 				MyAjax.ajax({
 					type: "GET",
 					url:url,
@@ -209,7 +192,7 @@
 				})
 			},
     	goToEditPro(index,item){
-    		router.push({name:'editCompanyProject',query:{projId:item.projectID,expeId:item.companyProExpeID}})
+    		router.push({name:'editCompanyProject',query:{projId:item.projectID,expeId:item.comProExpeID}})
     		/*通过路由传值*/
     	},
     	
@@ -218,7 +201,7 @@
 				if(this.show.tag[index]==true){
 					Vue.set(this.show.tag,[index],false)
 					this.updowntxt[index] = "收起"
-					this.getPic(this.proInfo[index].companyProExpeID,index)
+					this.getPic(this.proInfo[index].comProExpeID,index)
 				}else{
 					Vue.set(this.show.tag,[index],true)
 					this.updowntxt[index] = "展开查看更多" 
@@ -281,7 +264,7 @@
 					console.log(err)
 				})
 			},
-			keySearch(){//enter键登录事件
+			keySearch($event){//enter键登录事件
 			 	var event = event || window.event;  
 			 	if(event.keyCode==13){ 
 			 		console.log("222")
@@ -290,7 +273,7 @@
 			    return false;
 			  }
 			},
-			choseThis(e){
+			choseThis(e,index){
 				if($(e.target).hasClass("selected")==false){
 //					console.log($(e.target))
 					$(e.target).addClass("selected");
@@ -306,8 +289,8 @@
 			},
 			confirmAddPro(){
 				var that = this;
-				console.log(that.chosedOne.projectID,that.chosedOne.teamProExpeID)
-				router.push({name:'editTeamProject',query:{projId:that.chosedOne.projectID,expeId:that.chosedOne.teamProExpeID}})
+				console.log(that.chosedOne.projectID,that.chosedOne.comProExpeID)
+				router.push({name:'editCompanyProject',query:{projId:that.chosedOne.projectID,expeId:that.chosedOne.comProExpeID}})
 			}
 	
     
@@ -523,6 +506,7 @@ $activeColor: #2eb3cf;
 							margin-top: 30px;
 							display: block;
 							background: url(../../../assets/img/company/rectangle05.png) no-repeat center;
+							cursor:pointer;
 							&:hover{
 	                filter:alpha(opacity=80);       /* IE */
 	                -moz-opacity:0.8;              /* 老版Mozilla */
@@ -543,6 +527,14 @@ $activeColor: #2eb3cf;
 	    	background: url(../../../assets/img/company/plus2.png) no-repeat left center;
 	    	
 	    }
+		}
+		.stateNull{
+			height: 50px;
+			line-height: 50px;
+			font-size: 16px;
+			color: #999999;
+			text-align: center;
+			margin-top: 30px;
 		}
 		.projectTable{
 			padding: 30px 20px;

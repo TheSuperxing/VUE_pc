@@ -102,10 +102,10 @@ var companyRouterChildren=[
 						        {
 						        	path:"/yhzx/company/info/companyProject/index", component:companyProjectIndex},
 						        {
-						      	    path:"/yhzx/company/info/companyProject/editProject/:id",component:editProject,name:'editProject'
+						      	    path:"/yhzx/company/info/companyProject/editProject",component:editProject,name:'editCompanyProject'
 						      	},
 						        {
-						      		path:"/yhzx/company/info/companyProject/definedProject",component:definedProject
+						      		path:"/yhzx/company/info/companyProject/definedProject",component:definedProject,name:"definedComProject"
 						        },
 						        {
 						      		path:"/yhzx/company/info/companyProject/detail",component:comProDetail,

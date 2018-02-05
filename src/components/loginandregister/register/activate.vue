@@ -34,10 +34,9 @@
            user:state=>state.userState.user
         }),
 		mounted(){
-			this.state = sessionStorage.getItem("state");
+			this.state = cookieTool.getCookie("state");
 			Vue.set(this.user,'userState',this.state)
-			sessionStorage.setItem("state",this.user.userState);
-			Vue.set(this,"email",sessionStorage.getItem("email"))
+			Vue.set(this,"email",cookieTool.getCookie("email"))
 		},
 		methods:{
 			sendAgain(){
@@ -54,7 +53,7 @@
 						break;
 				}
 				var data2 = {
-					url:"10.1.31.27:8080/yhzx/comfirmActivate/"+ sessionStorage.getItem("accountID"),
+					url:"10.1.31.27:8080/yhzx/comfirmActivate/"+ cookieTool.getCookie("accountID"),
 					email:that.email
 				}
 				console.log(data2)

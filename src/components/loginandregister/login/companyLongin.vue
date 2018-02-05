@@ -77,15 +77,15 @@
 					},function(data){
 						console.log(data)
 						console.log(data.token)
-						cookieTool.setCookie("token",data.token)
+						cookieTool.setCookie("token",data.token,0.5)//12小时后需要重新登录
 						if(data.code==0){
 							router.push("/indexcontent");
-							sessionStorage.setItem("state","com");
-							sessionStorage.setItem("email",that.reveal.email);
+							cookieTool.setCookie("state","com",0.5);
+							cookieTool.setCookie("email",that.reveal.email,0.5);
 							if(data.ifActivated == 0){
-								sessionStorage.setItem("ifActivated",false);
+								sessionStorage.setItem("ifActivated",false,1);
 							}else{
-								sessionStorage.setItem("ifActivated",true);
+								sessionStorage.setItem("ifActivated",true,1);
 							}
 						}else if(data.code==-1){
 							switch (data.msg){

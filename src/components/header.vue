@@ -41,7 +41,7 @@
         <div class="wrap-left">
         	<img src="../assets/img/header/001.png" />
         </div>
-        <ul class="navlist" v-bind:class="{'personStyle':user.userState=='per'}">
+        <ul class="navlist">
           <li class="primary" v-for="(item,_index) in nav"><router-link :to="item.rout[0]">{{item.text}}</router-link></li>
         	<li class="primary" >
         		<div @click="toUserCenter" class=""><router-link to="/yhzx">用户中心</router-link></div>
@@ -142,21 +142,24 @@
 		},
 	    mounted(){
 				//判断有没有登录
-				console.log(cookieTool.getCookie("token")==null)
+				console.log(cookieTool.getCookie("email"))
 				if(cookieTool.getCookie("token")==null||cookieTool.getCookie("token")=='undefined'){
 					this.haveLogin = false;
 				}else{
 					this.haveLogin = true;
 				}
-				if(sessionStorage.getItem("ifActivated") == "false"){
-					this.ifActivated = false;
-				}else{
+				//判断有没有激活
+				if(sessionStorage.getItem("ifActivated") == "true"){
 					this.ifActivated = true;
+				}else if(sessionStorage.getItem("ifActivated") == "false"){
+					this.ifActivated = false;
+				}else if(sessionStorage.getItem("ifActivated") == null){ //游客身份
+					this.ifActivated = null;
 				}
 				
 				console.log(this.haveLogin)
-				this.user.userState = sessionStorage.getItem("state");
-				console.log(this.user.userState)
+				this.user.userState = cookieTool.getCookie("state");
+				console.log(sessionStorage.getItem("ifActivated"))
 				//首页请求信息
 //				var that = this;
 //				var url = MyAjax.urlhw+"/accountmanainfo/home";
@@ -180,7 +183,7 @@
 //				this.toUserCenter()
 		},
 	  updated(){
-	  	this.user.userState = sessionStorage.getItem("state");
+	  	this.user.userState = cookieTool.getCookie("state");
 	  },
     methods: {
 				getNewNote(){//通知是否有新消息提示
@@ -193,7 +196,7 @@
 						async: false,
 						ifFreeLogin:true,//是否能够进行免登录获取数据,true能够无登陆获取
 					},function(data){
-						console.log(data.msg)
+						console.log(data)
 						if(data.code==0){
 							if(!(data.msg.sysCount||data.msg.businessCount)){
 								that.user.newNotice=false;
@@ -218,7 +221,7 @@
 	      /*鼠标滑过 退出登录的显示隐藏*/
 
 	     getState(){
-	     	this.state = sessionStorage.getItem("state");
+	     	this.state = cookieTool.getCookie("state");
 	     },
 
 	     toUserCenter(){
@@ -234,12 +237,14 @@
 					case 'per':
 						router.push("/yhzx/personal/info")
 						break;
-					default:
+					default: //已经激活但是没有登录身份状态  即没有登录  那么就去登录
 						router.push("/login")
 						break;
 				  }
-	     	}else{
-	     		router.push("/yhzx/activate")
+	     	}else if(this.ifActivated == false){
+	     		router.push("/yhzx/activate") //没有激活就去激活页面
+	     	}else if(this.ifActivated == null){ //游客身份点击“用户中心”去登录
+	     		router.push("/login")
 	     	}
 				
 				event.stopPropagation();

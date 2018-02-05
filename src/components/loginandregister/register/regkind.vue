@@ -237,10 +237,10 @@
 					}, function(data){
 						console.log(data)
 						console.log(data.token)
-						cookieTool.setCookie("token",data.token)
+						cookieTool.setCookie("token",data.token,0.5)//12小时后失效
 						if(data.code==0){
 							//传递url用于发送邮件
-							sessionStorage.setItem("accountID",data.accountID);
+							cookieTool.setCookie("accountID",data.accountID,1);//24小时内有效
 							var url2 = MyAjax.urlsy + "/companyInfo/sendMail"
 							var data2 = {
 								url:"10.1.31.27:8080/yhzx/comfirmActivate/"+data.accountID,
@@ -250,22 +250,22 @@
 							MyAjax.ajax({
 								type: "POST",
 								url:url2,
-								data: data2,
+								data: JSON.stringify(data2),
 								dataType: "json",
-//								contentType:"application/json;charset=utf-8",
+								contentType:"application/json;charset=utf-8",
 							}, function(data_url){
 								console.log(data_url)
-								if(data.msg == "success" && data.code == 0){
+								if(data_url.msg == "success" && data.code == 0){
 									router.push({name:"RegisterDone",query:{id:"com"}});
-									sessionStorage.setItem("state","com");
-									sessionStorage.setItem("email",that.comRegInput.email);
+									cookieTool.setCookie("state","com",1);//注册成功后确认激活页的用户身份
+									cookieTool.setCookie("email",that.comRegInput.email,1);//注册成功后确认激活页的用户身份
 								}
 							},function(err_url){
 								console.log(err)
 							})
 							
 							if(data.ifActivated == 0){
-								sessionStorage.setItem("ifActivated",false);
+								sessionStorage.setItem("ifActivated",false);//24小时内有效  是否激活都没效了
 							}else{
 								sessionStorage.setItem("ifActivated",true);
 							}
@@ -330,10 +330,10 @@
 					}, function(data){
 						console.log(data)
 						console.log(data.token)
-						cookieTool.setCookie("token",data.token)
+						cookieTool.setCookie("token",data.token,0.5)//12小时后失效
 						if(data.code==0){
 							//传递url用于发送邮件
-							sessionStorage.setItem("accountID",data.accountID);
+							cookieTool.setCookie("accountID",data.accountID);
 							var url2 = MyAjax.urlsy + "/teamOrgaInfo/sendMail"
 							var data2 = {
 								url:"10.1.31.27:8080/yhzx/comfirmActivate/"+data.accountID,
@@ -348,10 +348,10 @@
 //								contentType:"application/json;charset=utf-8",
 							}, function(data_url){
 								console.log(data_url)
-								if(data.msg == "success" && data.code == 0){
+								if(data_url.msg == "success" && data.code == 0){
 									router.push({name:"RegisterDone",query:{id:"team"}});
-									sessionStorage.setItem("state","team");
-									sessionStorage.setItem("email",that.teamRegInput.email);
+									cookieTool.setCookie("state","team");
+									cookieTool.setCookie("email",that.teamRegInput.email);
 								}
 							},function(err_url){
 								console.log(err)
@@ -421,10 +421,10 @@
 					}, function(data){
 						console.log(data)
 						console.log(data.token)
-						cookieTool.setCookie("token",data.token)
+						cookieTool.setCookie("token",data.token,0.5)//12小时后失效
 						if(data.code==0){
 							router.push("/indexcontent");
-							sessionStorage.setItem("state","per");
+							cookieTool.setCookie("state","per");
 						}else if(data.code==-1){
 							switch (data.msg){
 								case "100002":

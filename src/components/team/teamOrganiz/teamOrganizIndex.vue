@@ -88,7 +88,7 @@
 									<ul class="resultList">
 										<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
 										<li v-for="(item,index) in list">
-											<router-link :to="{name:'personaDetail',query:{id:item.accountID}}">{{item.nickName}}</router-link>
+											<router-link :to="{name:'personalDetail',query:{id:item.accountID}}">{{item.nickName}}</router-link>
 											<span class="choseBtn" @click="choseThis($event,index)">
 											</span>
 										</li>
@@ -105,7 +105,7 @@
 				</div>
     	</ul>
 
-    	<span class="editPersonBtn" @click="toEdit(state[1])" v-if="!editBackboneShow">编辑</span>
+    	<span class="editPersonBtn" @click="toEdit(state[2])" v-if="!editBackboneShow">编辑</span>
     </div><!--骨干部分 end-->
 
 
@@ -116,17 +116,13 @@
     		团队可以添加个人用户成为其成员，个人用户在其“工作经历”中同样添加对应团队或者确认后，才会正式成为认证成员。
     	</p>
     	<div class="staff">
-
-
-            <div v-if="!haveStaff" class="staffList">
-            	<p class="stateNone">(此处暂无下属成员)</p>
-            </div>
-            <div v-if="haveStaff" class="staffList">
-            	<ul v-if="tab.aa[0]">
-            		<li v-for="(item,index) in teamOrgaInfo.members">
+            <div  class="staffList">
+            	<ul>
+            		<li class="stateNone"  v-if="!haveStaff">(此处暂无下属成员)</li>
+            		<li v-for="(item,index) in teamOrgaInfo.members" v-if="haveStaff">
             			<dl class="person">
             				<dt>
-											<img :src="item.pic" :class="{'gray':item.IfCer=='0'}" />
+								<img :src="item.pic" :class="{'gray':item.IfCer=='0'}" />
             				</dt>
             				<dd>{{item.name}}</dd>
             			</dl>
@@ -154,7 +150,7 @@
 											<ul class="resultList">
 												<li class="noResult" v-if="!haveResult">抱歉，未找到该项目，请重新搜索</li>
 												<li v-for="(item,index) in list" >
-													<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.nickName}}</router-link>
+													<router-link :to="{name:'ProjectDetail',query:{id:'1'}}">{{item.psnName}}</router-link>
 													<span class="choseBtn" @click="choseThis($event,index)">
 													</span>
 												</li>
@@ -289,33 +285,53 @@
     created(){
     	this.getData();
     },
-    mounted(){
+    updated(){
+    	if(this.teamOrgaInfo.topManagers==null || this.teamOrgaInfo.topManagers.length==0){
+	  		this.haveSenior = false;
+	  	}else{
+	  		this.haveSenior = true;
+	  	}
+	  	if(this.teamOrgaInfo.importantPsns.length!=0){
+	  		this.haveBackbone = true;																																	
+	  	}else{
+	  		this.haveBackbone = false;
+	  	}
+	  	if(this.teamOrgaInfo.members.length!=0){ 
+	  		this.haveStaff = true;
+	  	}else{
+	  		this.haveStaff = false;
+	  	}
+	  	if(this.teamOrgaInfo.companyName==""||this.teamOrgaInfo.companyName==null){
+	  		this.haveCompany = false;
+	  	}else{
+	  		this.haveCompany = true;
+	  	}
     },
     methods:{
 			getData(){
-        var that=this;
-        var url = MyAjax.urlsy+"/teamOrgaInfo/teamOrgInfo";
-        MyAjax.ajax({
-          type: "GET",
-          url:url,
-          dataType: "json",
-          async:false,
-        },function(data){
-        	console.log(data)
-          if(data.code==0){
-            that.teamOrgaInfo=data.msg;
-            //Vue.set(that,"psnMsg",data.msg);
-          }else{
-            // if(data.msg=="100004"){//没有token
-						// 	window.location.hash="/login"
-						// }
-          }
-        },function(err){
-          if(err.status!=200){
-            //router.push("/index")
-            status=err.status;
-          }
-        })
+		        var that=this;
+		        var url = MyAjax.urlsy+"/teamOrgaInfo/teamOrgInfo";
+		        MyAjax.ajax({
+		          type: "GET",
+		          url:url,
+		          dataType: "json",
+		          async:false,
+		        },function(data){
+		        	console.log(data)
+		          if(data.code==0){
+		            that.teamOrgaInfo=data.msg;
+		            //Vue.set(that,"psnMsg",data.msg);
+		          }else{
+		            // if(data.msg=="100004"){//没有token
+								// 	window.location.hash="/login"
+								// }
+		          }
+		        },function(err){
+		          if(err.status!=200){
+		            //router.push("/index")
+		            status=err.status;
+		          }
+		        })
         /*判断有无高管团队*/
 		  	if(this.teamOrgaInfo.topManagers==null || this.teamOrgaInfo.topManagers.length==0){
 		  		this.haveSenior = false;
@@ -324,9 +340,13 @@
 		  	}
 		  	if(this.teamOrgaInfo.importantPsns.length!=0){
 		  		this.haveBackbone = true;																																	
+		  	}else{
+		  		this.haveBackbone = false;
 		  	}
 		  	if(this.teamOrgaInfo.members.length!=0){ 
 		  		this.haveStaff = true;
+		  	}else{
+		  		this.haveStaff = false;
 		  	}
 		  	if(this.teamOrgaInfo.companyName==""||this.teamOrgaInfo.companyName==null){
 		  		this.haveCompany = false;
@@ -543,7 +563,8 @@
     				break;
     		}
     		this.closeModal()
-    		console.log(this.teamOrgaInfo.topManagers)
+    		console.log(this.teamOrgaInfo.members)
+    		console.log(this.haveStaff)
     	},
     	saveChangeCom(){
     		var that=this;
@@ -837,6 +858,7 @@
 							margin-top: 30px;
 							display: block;
 							background: url(../../../assets/img/team/icon_green_119inform_confirm.png) no-repeat center;
+							cursor: pointer;
 							&:hover{
 	                filter:alpha(opacity=80);       /* IE */
 	                -moz-opacity:0.8;              /* 老版Mozilla */
@@ -962,7 +984,7 @@
 									float: right;
 									margin-top: 10px;
 									background: url(../../../assets/img/team/icon_selected.png) no-repeat center;
-								
+									cursor: pointer;
 									&.selected{
 										background: url(../../../assets/img/team/icon_selected_green.png) no-repeat center;
 										

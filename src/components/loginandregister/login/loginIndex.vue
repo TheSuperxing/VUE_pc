@@ -30,6 +30,7 @@
   import CompanyLogin from "./companyLongin.vue"
   import TeamLogin from "./teamLogin.vue"
   import PersonalLogin from "./personalLogin.vue"
+  import {cookieTool} from "../../../assets/js/cookieTool.js"
   export default {
     name:"LoginIndex",
     components:{
@@ -46,7 +47,7 @@
       }
     },
     mounted(){
-    	switch (sessionStorage.getItem("state")){
+    	switch (cookieTool.getCookie("state")){
     		case "per":
     			this.loginTog(0)
     			break;

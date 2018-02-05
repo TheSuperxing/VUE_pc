@@ -842,6 +842,8 @@ $activeColor:#546686;
 					}
 					
 					.cancelBtn{
+						display: inline-block;
+						width: 120px !important;
 						img{
 							margin-right: 10px;
 							margin-top: 8px;

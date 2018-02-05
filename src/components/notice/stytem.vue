@@ -19,6 +19,7 @@
 	import Vue from "vue"
 	import {mapState} from "vuex"
 	import MyAjax from "../../assets/js/MyAjax.js"
+	import router from "../../router"
   export default {
     name: 'stytem',
     data:function(){

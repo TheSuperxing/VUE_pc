@@ -67,11 +67,11 @@
 					}, function(data){
 						console.log(data)
 						console.log(data.token)
-						cookieTool.setCookie("token",data.token)
+						cookieTool.setCookie("token",data.token,0.5)//12小时后需要重新登录
 						if(data.code==0){
 							router.push("/indexcontent");
-							sessionStorage.setItem("state","team");
-							sessionStorage.setItem("email",that.reveal.email);
+							cookieTool.setCookie("state","team",0.5);
+							cookieTool.setCookie("email",that.reveal.email,0.5);
 							if(data.ifActivated == 0){
 								sessionStorage.setItem("ifActivated",false);
 							}else{

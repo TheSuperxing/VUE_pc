@@ -21,6 +21,7 @@
 	import Vue from "vue";
   	import {mapState} from "vuex"
   	import MyAjax from "../../../assets/js/MyAjax.js"
+  	import {cookieTool} from "../../../assets/js/cookieTool.js"
   	
 	export default{
 		name:"registerDone",
@@ -36,26 +37,26 @@
 			Modal.makeText(modal);
 			var id = this.$route.query.id
 			this.state = id;
-			Vue.set(this,"email",sessionStorage.getItem("email"))
+			Vue.set(this,"email",cookieTool.getCookie("email"))
 			
 		},
 		methods:{
 			sendAgain(){
 				var url2 = MyAjax.urlsy + "/teamOrgaInfo/sendMail"
 				var data2 = {
-					url:"10.1.31.27:8080/yhzx/comfirmActivate/"+sessionStorage.getItem("accountID"),
-					email:that.email
+					url:"10.1.31.27:8080/yhzx/comfirmActivate/" + cookieTool.getCookie("accountID"),
+					email: this.email
 				}
 				console.log(data2)
 				MyAjax.ajax({
 					type: "POST",
 					url:url2,
-					data: data2,
+					data: JSON.stringify(data2),
 					dataType: "json",
-//								contentType:"application/json;charset=utf-8",
+					contentType:"application/json;charset=utf-8",
 				}, function(data_url){
 					console.log(data_url)
-					if(data.msg == "success"&&data.code == 0){
+					if(data_url.msg == "success"&&data_url.code == 0){
 						this.sendAgainflag = true;
 					}
 				},function(err_url){

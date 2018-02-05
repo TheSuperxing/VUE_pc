@@ -782,7 +782,7 @@ $activeColor:#546686;
 		padding: 26px 20px;
 		background: #FFFFFF;
 		max-width: 1200px;
-		/*margin: 120px auto 0;*/
+		/*margin: 120px auto 0;*/    /*trading文件夹下的需求详情不需要在全屏居中显示*/
 		.title-wrap{
 			height:100px;
 			border-bottom:1px solid #E0E0E0;
@@ -868,6 +868,7 @@ $activeColor:#546686;
 					}
 					
 					.cancelBtn{
+						width: 120px;
 						img{
 							margin-right: 10px;
 							margin-top: 8px;

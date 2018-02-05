@@ -24,7 +24,7 @@
       </li>
     </ul>
 
-    <ul class="cA-contactInfo" v-if="!ediCtrShow">
+    <ul class="cA-contactInfo" v-if="!ediCtrShow"> 
       <li class="contactor">
         <dl>
           <dt><img src="../../../assets/img/company/big-man.png" /></dt>

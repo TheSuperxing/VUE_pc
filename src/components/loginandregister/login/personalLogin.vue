@@ -92,20 +92,22 @@
       	console.log(JSON.stringify({tel:that.personalLoginInput.tel,pwd:that.personalLoginInput.messageConfirm,verifyCode:that.personalLoginInput.picConfirm}))
       	if(that.personalLoginInput.tel.trim().length!=0&&that.personalLoginInput.messageConfirm.trim().length!=0
       	&&that.personalLoginInput.picConfirm.trim().length!=0){
+      		var data = {tel:that.personalLoginInput.tel,pwd:that.personalLoginInput.messageConfirm,verifyCode:that.personalLoginInput.picConfirm};
       		MyAjax.ajax({
 						type: "POST",
 						url:url,
-						data: {tel:that.personalLoginInput.tel,pwd:that.personalLoginInput.messageConfirm,verifyCode:that.personalLoginInput.picConfirm},
+						data: JSON.stringify(data),
 						dataType: "json",
 						async:false,
+						contentType:"application/json;charset=utf-8",
 					}, function(data){
 						console.log(data)
-						cookieTool.setCookie("token",data.token)
+						cookieTool.setCookie("token",data.token,0.5)//12小时后需要重新登录
 						if(data.code==0){
               console.log("success")
               console.log(window.history.length)
               window.history.back()
-              sessionStorage.setItem("state","per");
+              cookieTool.setCookie("state","per",0.5);//12小时后需要重新登录
 							//router.push("/index")
 						}else if(data.code==-1){
 							switch (data.msg){

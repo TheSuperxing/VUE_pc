@@ -28,3 +28,4 @@ export var cookieTool = {
             document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString()+";path=/";
     }
 }
+

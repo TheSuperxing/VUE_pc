@@ -19,7 +19,7 @@ import PublishBtn from "../../components/demand/publish/PublishBtn.vue"
 import DraftIndex from "../../components/demand/draft/draftIndex.vue"
 import modifyDraft from "../../components/demand/draft/modifyDraft.vue"
 import demandDraft from "../../components/demand/draft/demandDraft.vue"
-import draftDetail from "../../components/trading/demandDetail.vue"
+import draftDetail from "../../components/trading/demandDetail.vue"  //用户中心的需求详情都是trading文件夹下面的
 import Application from "../../components/demand/application/application.vue"
 import ApplicationIndex from "../../components/demand/application/applicationIndex.vue"
 import ApplicationDetail from "../../components/trading/demandDetail.vue"

@@ -20,6 +20,7 @@
 	import Vue from "vue";
 	import {mapState} from "vuex";
 	import MyAjax from "../../../assets/js/MyAjax.js"
+    import {cookieTool} from "../../../assets/js/cookieTool.js"
 	
 	export default{
 		name:"activate",

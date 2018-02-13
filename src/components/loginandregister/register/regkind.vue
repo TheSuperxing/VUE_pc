@@ -343,9 +343,9 @@
 							MyAjax.ajax({
 								type: "POST",
 								url:url2,
-								data: data2,
+								data: JSON.stringify(data2),
 								dataType: "json",
-//								contentType:"application/json;charset=utf-8",
+								contentType:"application/json;charset=utf-8",
 							}, function(data_url){
 								console.log(data_url)
 								if(data_url.msg == "success" && data.code == 0){

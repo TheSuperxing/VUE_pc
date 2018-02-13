@@ -25,9 +25,9 @@
 			}
 		},
 		mounted(){
-			 if(cookieTool.getCookie("token")==null){
-			 	router.push("/login")
-			 }
+//			 if(cookieTool.getCookie("token")==null){
+//			 	router.push("/login")
+//			 }
 		}
 	}
 </script>

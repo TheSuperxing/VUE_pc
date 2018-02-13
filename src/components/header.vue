@@ -180,7 +180,6 @@
 //					console.log(err)
 //				})
 				
-//				this.toUserCenter()
 		},
 	  updated(){
 	  	this.user.userState = cookieTool.getCookie("state");
@@ -226,7 +225,7 @@
 
 	     toUserCenter(){
 	     	console.log(555)
-	     	if(this.ifActivated == true){
+	     	if(this.haveLogin == true){//已经登录成功了
 	     		switch (this.user.userState){
 					case 'com':
 						router.push("/yhzx/company/info")
@@ -238,16 +237,17 @@
 						router.push("/yhzx/personal/info")
 						break;
 					default: //已经激活但是没有登录身份状态  即没有登录  那么就去登录
+						console.log("tookenkong")
 						router.push("/login")
 						break;
 				  }
-	     	}else if(this.ifActivated == false){
+	     	}else if(this.ifActivated == false  && this.haveLogin == false){//注册成功还没激活 也就是没有登录无token
 	     		router.push("/yhzx/activate") //没有激活就去激活页面
-	     	}else if(this.ifActivated == null){ //游客身份点击“用户中心”去登录
+	     	}else if(this.ifActivated == null && this.haveLogin == false){ //游客身份点击“用户中心”去登录
+	     		console.log("tookenkong")
 	     		router.push("/login")
 	     	}
 				
-				event.stopPropagation();
 			},
 			loginOut(){
 				// cookieTool.setCookie("token","")

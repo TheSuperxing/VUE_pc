@@ -14,7 +14,7 @@
       </li>
       <li class="clearfix">
         <h4 class="info-left"><img src="../../../assets/img/connect/zcmima.png"/>登录密码</h4>
-        <p class="teamPassword">{{accountInfo.passWord}}</p>
+        <p class="teamPassword">******</p>
         <router-link to="/yhzx/team/info/teanAccount/editTeamPwd">
           <span class="editPwd" >
              修改密码
@@ -142,7 +142,7 @@
           }
         })
         function empty(text){
-	    		if(text==(null||"")){
+	    		if(text==null||text==""){
 	    			return "暂无信息"
 	    		}else{
 	          return text;
@@ -158,14 +158,11 @@
 	    	that.accountInfo.registerTime = empty(that.accountInfo.registerTime)
 	    	that.accountInfo.accountName = empty(that.accountInfo.accountName)
 	    	that.accountInfo.passWord = empty(that.accountInfo.passWord)
-	    	if(that.accountInfo.passWord!=(null||"")){
-	    		that.accountInfo.passWord = "******"
-	    	}
+	    	
 	    	that.accountInfo.accountContacts1 = empty(that.accountInfo.accountContacts1)
 	    	that.accountInfo.contactPhone1 = empty(that.accountInfo.contactPhone1)
 	    	that.accountInfo.cccountContacts2 = empty(that.accountInfo.cccountContacts2)
 	    	that.accountInfo.contactPhone2 = empty(that.accountInfo.contactPhone2)
-	    	console.log(that.accountInfo.accountContacts1)
 	    	that.localContactInfo.accountContacts1 = empty2(that.accountInfo.accountContacts1);
 	    	that.localContactInfo.contactPhone1 = empty2(that.accountInfo.contactPhone1);
 	    	that.localContactInfo.cccountContacts2 = empty2(that.accountInfo.cccountContacts2);
@@ -276,7 +273,7 @@ $bfColor:#ffffff;
             	border-bottom: 1px solid #b6b6b6;
             	input{
             		width: 100%;
-            		color: #B6B6B6;
+            		color: #353535;
             		font-size: 14px;
             		text-indent: 8px;
             		

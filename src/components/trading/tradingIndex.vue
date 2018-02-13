@@ -673,6 +673,7 @@ $bfColor : #ffffff;
 						margin-top: 2px;
 						margin-right: 2px;
 						background: url(../../assets/img/demand/icon001.png) no-repeat right center;
+						cursor: pointer;
 					}
 				}
 				

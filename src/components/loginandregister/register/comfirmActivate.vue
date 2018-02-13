@@ -20,6 +20,8 @@
 	import {mapState} from "vuex"
 	import MyAjax from "../../../assets/js/MyAjax.js"
 	import router from "../../../router"
+    import {cookieTool} from "../../../assets/js/cookieTool.js"
+	
 	
 	export default{
 		name:"activate",
@@ -37,6 +39,7 @@
 	      user:state=>state.userState.user
 	    }),
 		mounted(){
+			
 			var that=this;
 			console.log(that.$route.params)
 	        var url = MyAjax.urlsy+"/teamOrgaInfo/getInfo/" + that.$route.params.id;

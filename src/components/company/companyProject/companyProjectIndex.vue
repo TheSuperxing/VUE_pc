@@ -395,8 +395,8 @@ $activeColor: #2eb3cf;
 							   opacity: 0.8;           /* 支持opacity的浏览器*/
 			    			}
 			    		}
-	    		}
-	    }		
+		    		}
+		   		}		
 	    		.result-wrap{
 	    			display: none;
 	    			margin-bottom: 80px;

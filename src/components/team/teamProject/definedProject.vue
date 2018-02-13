@@ -180,7 +180,7 @@
 	    },
 	    data:function(){
 	      return {
-	        title:"编辑公司参加项目信息",
+	        title:"编辑团队参加项目信息",
 	        state:"",
 	        editSeniorShow:false,
 	        showAlert:{name:false,completeTime:false,parTakeTime:false,takeOffice:false},//提示框显隐

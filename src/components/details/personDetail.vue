@@ -389,6 +389,7 @@
 					url:url,
 					dataType: "json",
 					async:false,
+					ifFreeLogin:true,
 				},function(data){
 					console.log(data)
 					if(data.code==0){

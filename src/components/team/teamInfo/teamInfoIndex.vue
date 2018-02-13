@@ -13,10 +13,7 @@
         <p >{{basicInfo.teamName}}</p>
        	
       </li>
-      <!--<li  class="clear">
-        <h4>公司地址</h4>
-        <p>{{basicInfo.teamAddress}}</p>
-      </li>-->
+     
       <li class="clear">
         <h4>团队简介</h4>
         <p v-if="stateOne.haveteamDesc">{{basicInfo.teamProfile}}</p>
@@ -76,7 +73,7 @@
             if(that.basicInfo.teamProfile!=""&&that.basicInfo.teamProfile != null){/*两端空格*/
 			    		that.stateOne.haveteamDesc = true;
 			    	}
-			    	if(that.basicInfo.contactInfo!=""){
+			    	if(that.basicInfo.contactInfo!=""&&that.basicInfo.contactInfo != null){
 			    		that.stateOne.haveteamPhone = true;
 			    	}
             //Vue.set(that,"psnMsg",data.msg);

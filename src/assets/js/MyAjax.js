@@ -24,9 +24,11 @@ var MyAjax = {
 				callback(data);
 				if(!option.ifFreeLogin){
 					if(data.msg==="100004"){//tooken为空
+						console.log("tookenkong")
 						window.location.href ="/login"
 					}
 					if(data.msg=="100003"){//没有成功登陆
+						console.log("tookenkong")
 						window.location.href="/login"
 					}
 				}
